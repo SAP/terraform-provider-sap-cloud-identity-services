@@ -12,10 +12,7 @@
             "mode": "debug",
             // this assumes your workspace is the root of the repo
             "program": "${workspaceFolder}",
-            "env": {
-                "ias_username" : "diya.dhandapani.shanmugam@sap.com",
-                "ias_password" : "Ddd18102001@213"
-            },
+            "env": {},
             "args": [
                 "-debug",
             ]
@@ -26,10 +23,7 @@
             "request": "launch",
             "mode": "auto",
             "program": "main.go",
-            "env": {
-                "ias_username" : "diya.dhandapani.shanmugam@sap.com",
-                "ias_password" : "Ddd18102001@213"
-            }
+            "env": {}
         }
     ]
 }
