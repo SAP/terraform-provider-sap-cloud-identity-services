@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"terraform-provider-cloudidentityservices/internal/cli"
+	"terraform-provider-ias/internal/cli"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -16,26 +16,26 @@ import (
 )
 
 func New() provider.Provider {
-    return &IasProvider{}
+	return &IasProvider{}
 }
 
 type IasProvider struct {
 }
 
-type IasProviderData struct{
-	TenantUrl	types.String	`tfsdk:"tenant_url"`
+type IasProviderData struct {
+	TenantUrl types.String `tfsdk:"tenant_url"`
 }
 
 func (p *IasProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
-    resp.TypeName = "cloudidentityservices"
+	resp.TypeName = "ias"
 }
 
 func (p *IasProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
-    resp.Schema = schema.Schema{
+	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"tenant_url" : schema.StringAttribute{
+			"tenant_url": schema.StringAttribute{
 				MarkdownDescription: "The URL of the IAS tenant",
-				Required: true,
+				Required:            true,
 			},
 		},
 	}
@@ -48,29 +48,31 @@ func (p *IasProvider) Configure(ctx context.Context, req provider.ConfigureReque
 	resp.Diagnostics.Append(diags...)
 
 	if config.TenantUrl.IsNull() {
-		resp.Diagnostics.AddError("Tenant URL missing","Please provide a valid tenant URL")
+		resp.Diagnostics.AddError("Tenant URL missing", "Please provide a valid tenant URL")
 		return
 	}
 
 	pasrsedUrl, err := url.Parse(config.TenantUrl.ValueString())
 
-	if err!=nil{
-		resp.Diagnostics.AddError("Unable to parse URL", fmt.Sprintf("%s",err))
-		return	
+	if err != nil {
+		resp.Diagnostics.AddError("Unable to parse URL", fmt.Sprintf("%s", err))
+		return
 	}
 
-	client := cli.NewIasClient(cli.NewClient(http.DefaultClient,pasrsedUrl))
+	client := cli.NewIasClient(cli.NewClient(http.DefaultClient, pasrsedUrl))
 
 	resp.DataSourceData = client
 	resp.ResourceData = client
 }
 
 func (p *IasProvider) DataSources(_ context.Context) []func() datasource.DataSource {
-    return []func() datasource.DataSource {
+	return []func() datasource.DataSource{
 		newApplicationDataSource,
 	}
 }
 
 func (p *IasProvider) Resources(_ context.Context) []func() resource.Resource {
-    return nil
+	return []func() resource.Resource{
+		newApplicationResource,
+	}
 }
