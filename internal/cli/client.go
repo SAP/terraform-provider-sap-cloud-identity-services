@@ -104,14 +104,7 @@ func (c *Client) Execute (ctx context.Context, method string, endpoint string, b
 		var responseError struct{
 			Error 	Error	`json:"error"` 
 		}
-
-		// _ = json.NewDecoder(res.Body).Decode(&O)
-
-		// body, _ := io.ReadAll(res.Body)
-		// bodyString := string(body)
-
-		// fmt.Println(bodyString)
-
+		
 		if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
 			err = fmt.Errorf(fmt.Sprintf("%d : %s",responseError.Error.Code, responseError.Error.Message))
 		} else{

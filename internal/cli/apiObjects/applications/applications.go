@@ -51,9 +51,9 @@ type ApplicationResponse struct{
 }
 
 type ApplicationsResponse struct{
-	TotalResults	int 				`json:"totalResults,omitempty"`
-	ItemsPerPage	int 				`json:"itemsPerPage,omitempty"`
-	NextCursor		string 				`json:"nextCursor,omitempty"`
-	Applications	ApplicationResponse	`json:"applications,omitempty"`
+	TotalResults	int 					`json:"totalResults,omitempty"`
+	ItemsPerPage	int 					`json:"itemsPerPage,omitempty"`
+	NextCursor		string 					`json:"nextCursor,omitempty"`
+	Applications	[]ApplicationResponse	`json:"applications,omitempty"`
 }
 
