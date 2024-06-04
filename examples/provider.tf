@@ -1,11 +1,11 @@
 terraform {
   required_providers {
-    cloudidentityservices = {
-        source = "sap/cloudidentityservices"
+    ias = {
+        source = "sap/ias"
     }
   }
 }
 
-provider "cloudidentityservices" {
+provider "ias" {
   tenant_url = "https://iasprovidertestblr.accounts400.ondemand.com/"
 }

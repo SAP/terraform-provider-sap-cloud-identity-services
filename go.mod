@@ -1,4 +1,4 @@
-module terraform-provider-cloudidentityservices
+module terraform-provider-ias
 
 go 1.22.0
 

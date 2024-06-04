@@ -3,28 +3,28 @@ package cli
 import (
 	"context"
 	"encoding/json"
-	// "strconv"
-	"terraform-provider-cloudidentityservices/internal/cli/apiObjects/applications"
+
+	"terraform-provider-ias/internal/cli/apiObjects/applications"
 )
 
 type ApplicationsCli struct {
 	cliClient *Client
 }
 
-func NewApplicationCli (cliClient *Client) ApplicationsCli{
+func NewApplicationCli(cliClient *Client) ApplicationsCli {
 	return ApplicationsCli{cliClient: cliClient}
 }
 
-func (a *ApplicationsCli) getUrl() string{
-	return "Applications/v1//"
+func (a *ApplicationsCli) getUrl() string {
+	return "Applications/v1/"
 }
 
-func (a *ApplicationsCli) Get(ctx context.Context) (applications.ApplicationsResponse, error){
+func (a *ApplicationsCli) Get(ctx context.Context) (applications.ApplicationsResponse, error) {
 	var app applications.ApplicationsResponse
 
-	res, err := a.cliClient.Execute(ctx, "GET", a.getUrl(), nil)
+	res, err, _ := a.cliClient.Execute(ctx, "GET", a.getUrl(), nil, ApplicationHeader, nil)
 
-	if err!=nil {
+	if err != nil {
 		return app, err
 	}
 
@@ -34,14 +34,12 @@ func (a *ApplicationsCli) Get(ctx context.Context) (applications.ApplicationsRes
 	return app, nil
 }
 
-func (a *ApplicationsCli) GetByAppId(ctx context.Context, appId string) (applications.ApplicationResponse, error){
+func (a *ApplicationsCli) GetByAppId(ctx context.Context, appId string) (applications.ApplicationResponse, error) {
 	var app applications.ApplicationResponse
 
-	// id, _ := strconv.Atoi(appId)
+	res, err, _ := a.cliClient.Execute(ctx, "GET", a.getUrl()+appId[1:len(appId)-1], nil, ApplicationHeader, nil)
 
-	res, err := a.cliClient.Execute(ctx, "GET", a.getUrl()+appId[ 1: len(appId)-1], nil)
-
-	if err!=nil {
+	if err != nil {
 		return app, err
 	}
 
@@ -49,4 +47,27 @@ func (a *ApplicationsCli) GetByAppId(ctx context.Context, appId string) (applica
 		return app, err
 	}
 	return app, nil
+}
+
+type ApplicationCreateInput struct {
+	Id          string `json:"id,omitempty"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
+func (a *ApplicationsCli) Create(ctx context.Context, args *ApplicationCreateInput) (string, error) {
+
+	var appId string
+
+	_, err, res := a.cliClient.Execute(ctx, "POST", a.getUrl(), args, ApplicationHeader, []string{
+		"location",
+	})
+
+	if err != nil {
+		return appId, err
+	}
+
+	appId = res["location"]
+
+	return appId, nil
 }
