@@ -36,6 +36,75 @@ type Branding struct{
 	Logo 							Logo 		`json:"logo,omitempty"`
 }
 
+type UserAttribute struct{
+	UserAttributeName		string 		`json:"userAttributeName"`
+	IsRequired				bool 		`json:"isRequired"`
+}
+
+type UserAccess struct{
+	Type						string 			`json:"type"`
+	UserAttributesForAccess		UserAttribute	`json:"userAttributesForAccess"`
+}
+
+type AuthorizationScope string
+
+type ApiCertificateData struct{
+	Id 						string 					`json:"id"`
+	Dn						string 					`json:"dn"`
+	Description				string 					`json:"description"`
+	ApiNames				[]string 				`json:"apiNames"`
+	AllApisAccess			bool 					`json:"allApisAccess"`
+	AuthorizationScopes		[]AuthorizationScope	`json:"authorizationScopes"`
+	Base64Certificate		string 					`json:"base64Certificate"`
+}
+
+type JwtClientAuthCredential struct{
+	Id 						string 					`json:"id"`
+	Subject					string 					`json:"subject"`
+	Description				string 					`json:"description"`
+	IdentityProviderId		string 					`json:"identityProviderId"`
+	AuthorizationScopes		[]AuthorizationScope	`json:"authorizationScopes"`
+	ApiNames				[]string 				`json:"apiNames"`
+	AllApisAccess			bool 					`json:"allApisAccess"`
+}	
+
+type AssertionAttribute struct{
+	AssertionAttributeName		string 		`json:"assertionAttributeName"`
+	UserAttributeName			string 		`json:"userAttributeName"`
+	Inherited					bool 		`json:"inherited"`
+}
+
+type AdvancedAssertionAttribute struct{
+	AttributeName		string 		`json:"attributeName,omitempty"`
+	AttributeValue		string 		`json:"attributeValue,omitempty"`
+	Inherited			bool 		`json:"inherited"`
+}
+
+type DisabledInheritedProperties struct {
+	AssertionAttributes				[]AssertionAttribute			`json:"assertionAttributes,omitempty"`
+	AdvancedAssertionAttributes		[]AdvancedAssertionAttribute	`json:"advancedAssertionAttributes,omitempty"`
+}
+
+type AuthenticationSchema struct{
+	SsoType 							string 							`json:"ssoType"`
+	HomeUrl								string 							`json:"homeUrl"`
+	SubjectNameIdentifier				string 							`json:"subjectNameIdentifier"`
+	FallbackSubjectNameIdentifier		string 							`json:"fallbackSubjectNameIdentifier"`
+	SubjectNameIdentifierFunction		string 							`json:"subjectNameIdentifierFunction"`
+	RememberMeExpirationTimeInMonths	string 							`json:"rememberMeExpirationTimeInMonths"`
+	PasswordPolicy						string 							`json:"passwordPolicy"`
+	UserAccess							UserAccess 						`json:"userAccess"`
+	CompanyId							string 							`json:"companyId"`
+	ClientId							string 							`json:"clientId"`
+	ApiCertificates						[]ApiCertificateData			`json:"apiCertificates"`
+	JwtClientAuthCredentials			[]JwtClientAuthCredential		`json:"jwtClientAuthCredentials"`
+	AssertionAttributes					[]AssertionAttribute			`json:"assertionAttributes"`	
+	AdvancedAssertionAttributes			[]AdvancedAssertionAttribute 	`json:"advancedAssertionAttributes"`
+	DisabledInheritedProperties			DisabledInheritedProperties		`json:"disabledInheritedProperties,omitempty"`
+	SocialSignOn						bool 							`json:"socialSignOn,omitempty"`
+	
+}
+
 type ApplicationResponse struct{
 	Id						string 		`json:"id"`
 	Meta 					Meta 		`json:"meta,omitempty"`

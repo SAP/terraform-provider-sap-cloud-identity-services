@@ -47,6 +47,21 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 				MarkdownDescription: "Description for the application",
 				Optional:            true,
 			},
+			"parentApplicationId": schema.StringAttribute{
+				MarkdownDescription: "ID of the parent, from which the application will inherit its configurations",
+				Optional:			 true,
+			},
+			"multiTenantApp": schema.BoolAttribute{
+				// MarkdownDescription: "Show whether the application ",
+				Optional: true,
+				Computed: true,
+			},
+			"globalAccount": schema.StringAttribute{
+				// MarkdownDescription: "The ",
+				Optional: true,
+				Computed: true,
+			},
+			
 		},
 	}
 }

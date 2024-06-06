@@ -50,9 +50,14 @@ func (a *ApplicationsCli) GetByAppId(ctx context.Context, appId string) (applica
 }
 
 type ApplicationCreateInput struct {
-	Id          string `json:"id,omitempty"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	Id          			string 		`json:"id,omitempty"`
+	Name        			string 		`json:"name"`
+	Description 			string 		`json:"description"`
+	ParentApplicationId		string 		`json:"parentApplicationId"`
+	MultiTenantApp			bool 		`json:"multiTenantApp"`
+	PrivacyPolicy			string 		`json:"privacyPolicy"`
+	TermsOfUse				string 		`json:"termsOfUse"`
+	GlobalAccount 			string 		`json:"globalAcount"`
 }
 
 func (a *ApplicationsCli) Create(ctx context.Context, args *ApplicationCreateInput) (string, error) {
