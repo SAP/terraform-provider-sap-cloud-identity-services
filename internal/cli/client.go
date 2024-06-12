@@ -90,7 +90,6 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 	if res.StatusCode >= 400 {
 
 		type ErrorDetail struct {
-			Target  string `json:"target"`
 			Message string `json:"message"`
 		}
 
@@ -104,15 +103,13 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 			Error Error `json:"error"`
 		}
 
-		// _ = json.NewDecoder(res.Body).Decode(&O)
-
-		// body, _ := io.ReadAll(res.Body)
-		// bodyString := string(body)
-
-		// fmt.Println(bodyString)
-
 		if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
-			err = fmt.Errorf(fmt.Sprintf("%d : %s", responseError.Error.Code, responseError.Error.Message))
+			err = fmt.Errorf(responseError.Error.Message)
+
+			for i:=0; i<len(responseError.Error.Details); i++ {
+				err = fmt.Errorf(fmt.Sprintf("%v \n%s",err,responseError.Error.Details[0].Message))
+			}
+
 		} else {
 			err = fmt.Errorf("responded with unknown error : %d", responseError.Error.Code)
 		}
@@ -125,6 +122,9 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 	}
 
 	if err = json.NewDecoder(res.Body).Decode(&O); err == nil || err == io.EOF {
+
+
+
 		encodedRes, err := json.Marshal(O)
 
 		if err != nil {
