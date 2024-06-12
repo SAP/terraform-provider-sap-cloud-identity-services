@@ -109,7 +109,7 @@ type ApplicationResponse struct{
 	Id						string 		`json:"id"`
 	Meta 					Meta 		`json:"meta,omitempty"`
 	Name 					string 		`json:"name"`
-	Description				string 		`json:"string,omitempty"`
+	Description				string 		`json:"description,omitempty"`
 	ParentApplicationId 	string 		`json:"parentApplicationId,omitempty"`
 	MultiTenantApp 			bool 		`json:"multiTenantApp,omitempty"`	//only for SAP internal use
 	PrivacyPolicy 			string 		`json:"privacyPolicy,omitempty"`
