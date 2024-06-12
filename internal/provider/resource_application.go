@@ -145,7 +145,7 @@ func (r *applicationResource) Update(ctx context.Context, req resource.UpdateReq
 	}
 
 	// **Fix: Update the state with the latest data from the resource**
-	updatedState := applicationValueFrom(ctx, *res)
+	updatedState := applicationValueFrom(ctx, res)
 	diags = resp.State.Set(ctx, &updatedState)
 	resp.Diagnostics.Append(diags...)
 }
@@ -161,7 +161,10 @@ func (r *applicationResource) Delete(ctx context.Context, req resource.DeleteReq
 		return
 	}
 
-	// Update the resource state in the response
-	diags = resp.State.Set(ctx, &config)
-	resp.Diagnostics.Append(diags...)
+	err := r.cli.ApplicationConfiguration.Application.Delete(ctx, config.Id.ValueString())
+
+	if err!=nil{
+		resp.Diagnostics.AddError("Error retrieving deleting application", fmt.Sprintf("%s", err))
+		return
+	}
 }
