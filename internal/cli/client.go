@@ -7,13 +7,10 @@ import (
 
 	"io"
 
-	// "context"
-	"encoding/base64"
 	"encoding/json"
 	"net/http"
 
 	"net/url"
-	"os"
 )
 
 const ApplicationHeader = "application/json"
@@ -27,8 +24,9 @@ func NewClient(h *http.Client, u *url.URL) *Client {
 }
 
 type Client struct {
-	HttpClient *http.Client
-	ServerURL  *url.URL
+	HttpClient 				*http.Client
+	ServerURL 				*url.URL
+	AuthorizationToken		string
 }
 
 func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, body any, reqHeader string) (*http.Response, error) {
@@ -37,13 +35,6 @@ func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, 
 	if err != nil {
 		return nil, err
 	}
-
-	var username, password string
-
-	username = os.Getenv("ias_username")
-	password = os.Getenv("ias_password")
-
-	base64Encoded := base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
 
 	var encodedBody bytes.Buffer
 	if body != nil {
@@ -60,7 +51,7 @@ func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, 
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Authorization", "Basic "+base64Encoded)
+	req.Header.Set("Authorization", "Basic " + c.AuthorizationToken)
 	req.Header.Set("Accept", "*/*")
 	req.Header.Set("DataServiceVersion", "2.0")
 	req.Header.Set("Content-Type", reqHeader)
@@ -122,8 +113,6 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 	}
 
 	if err = json.NewDecoder(res.Body).Decode(&O); err == nil || err == io.EOF {
-
-
 
 		encodedRes, err := json.Marshal(O)
 

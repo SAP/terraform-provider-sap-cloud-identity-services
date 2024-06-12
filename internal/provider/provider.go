@@ -2,9 +2,11 @@ package provider
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"terraform-provider-ias/internal/cli"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -60,6 +62,11 @@ func (p *IasProvider) Configure(ctx context.Context, req provider.ConfigureReque
 	}
 
 	client := cli.NewIasClient(cli.NewClient(http.DefaultClient, pasrsedUrl))
+
+	username := os.Getenv("ias_username")
+	password := os.Getenv("ias_password")
+
+	client.AuthorizationToken = base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
 
 	resp.DataSourceData = client
 	resp.ResourceData = client
