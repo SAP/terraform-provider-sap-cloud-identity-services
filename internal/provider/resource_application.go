@@ -94,8 +94,16 @@ func (r *applicationResource) Create(ctx context.Context, req resource.CreateReq
 	}
 
 	id = strings.Split(id, "/")[3]
-	config.Id = types.StringValue(id)
-	diags = resp.State.Set(ctx, &config)
+
+	res, err := r.cli.ApplicationConfiguration.Application.GetByAppId(ctx, id)
+
+	if err != nil {
+		resp.Diagnostics.AddError("Error retrieving application", fmt.Sprintf("%s", err))
+		return
+	}
+
+	state := applicationValueFrom(ctx, res)
+	diags = resp.State.Set(ctx, &state)
 
 	resp.Diagnostics.Append(diags...)
 }
