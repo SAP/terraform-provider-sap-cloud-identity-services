@@ -1,6 +1,6 @@
 package applications
 
-type Meta struct{
+type Meta struct {
 	Created					string		`json:"created,omitempty"`
 	CreatedBy				string		`json:"createdBy,omitempty"`
 	LastModified			string		`json:"lastModified,omitempty"`
@@ -11,20 +11,20 @@ type Meta struct{
 	Version 				string		`json:"version,omitempty"`
 }
 
-type Theme struct{
+type Theme struct {
 	Type 		string 		`json:"type,omitempty"`
 	// Basic
 	Advanced	string 		`json:"advanced,omitempty"`
 }
 
-type Logo struct{	
+type Logo struct {	
 	ResourceId		string 		`json:"resourceId"`
 	Version 		int 		`json:"version,omitempty"`
 	AspectRatio  	float32		`json:"aspectRatio,omitempty"`
 }
 
 
-type Branding struct{
+type Branding struct {
 	DisplayName 					string 		`json:"displayName,omitempty"`
 	ShowDisplayNameOnLogonScreen	bool 		`json:"showDisplayNameOnLogonScreen,omitempty"`
 	RememberMeVisible 				bool 		`json:"rememberMeVisible,omitempty"`
@@ -36,11 +36,126 @@ type Branding struct{
 	Logo 							Logo 		`json:"logo,omitempty"`
 }
 
-type ApplicationResponse struct{
+type UserAttribute struct {
+	UserAttributeName		string 		`json:"userAttributeName"`
+	IsRequired				bool 		`json:"isRequired"`
+}
+
+type UserAccess struct {
+	Type						string 			`json:"type"`
+	UserAttributesForAccess		UserAttribute	`json:"userAttributesForAccess"`
+}
+
+type AuthorizationScope string
+
+type ApiCertificateData struct {
+	Id 						string 					`json:"id"`
+	Dn						string 					`json:"dn"`
+	Description				string 					`json:"description"`
+	ApiNames				[]string 				`json:"apiNames"`
+	AllApisAccess			bool 					`json:"allApisAccess"`
+	AuthorizationScopes		[]AuthorizationScope	`json:"authorizationScopes"`
+	Base64Certificate		string 					`json:"base64Certificate"`
+}
+
+type JwtClientAuthCredential struct {
+	Id 						string 					`json:"id"`
+	Subject					string 					`json:"subject"`
+	Description				string 					`json:"description"`
+	IdentityProviderId		string 					`json:"identityProviderId"`
+	AuthorizationScopes		[]AuthorizationScope	`json:"authorizationScopes"`
+	ApiNames				[]string 				`json:"apiNames"`
+	AllApisAccess			bool 					`json:"allApisAccess"`
+}	
+
+type AssertionAttribute struct {
+	AssertionAttributeName		string 		`json:"assertionAttributeName"`
+	UserAttributeName			string 		`json:"userAttributeName"`
+	Inherited					bool 		`json:"inherited"`
+}
+
+type AdvancedAssertionAttribute struct {
+	AttributeName		string 		`json:"attributeName,omitempty"`
+	AttributeValue		string 		`json:"attributeValue,omitempty"`
+	Inherited			bool 		`json:"inherited"`
+}
+
+type DisabledInheritedProperties struct {
+	AssertionAttributes				[]AssertionAttribute			`json:"assertionAttributes,omitempty"`
+	AdvancedAssertionAttributes		[]AdvancedAssertionAttribute	`json:"advancedAssertionAttributes,omitempty"`
+}
+
+type AuthenicationRule struct {
+	UserType				string 			`json:"userType,omitempty"`
+	UserGroup				string 			`json:"userGroup,omitempty"`
+	UserEmailDomain			string 			`json:"userEmailDomain,omitempty"`
+	IdentityProviderId		string 			`json:"identityProviderId,omitempty"`
+	IpNetworkRange			string 			`json:"ipNetworkRange,omitempty"`
+}
+
+type ConsumedService struct {
+	ServiceInstanceId		string 		`json:"serviceInstanceId,omitempty"`
+	AppId					string 		`json:"appId"`
+	ClientId				string 		`json:"clientId"`
+	PlanName				string 		`json:"planName,omitempty"`
+	Inherit					string 		`json:"inherit"`
+}
+
+type ProvidedApi struct {
+	Name			string 		`json:"name,omitempty"`
+	Description		string 		`json:"description,omitempty"`
+}
+
+type ConsumedApi struct {
+	AppId					string 		`json:"appId"`
+	ClientId				string 		`json:"clientId,omitempty"`
+	ApiName					string 		`json:"apiName"`
+	Name 					string 		`json:"name"`
+}		
+
+type AuthenticationSchema struct {
+	SsoType 							string 							`json:"ssoType"`
+	HomeUrl								string 							`json:"homeUrl"`
+	SubjectNameIdentifier				string 							`json:"subjectNameIdentifier"`
+	FallbackSubjectNameIdentifier		string 							`json:"fallbackSubjectNameIdentifier"`
+	SubjectNameIdentifierFunction		string 							`json:"subjectNameIdentifierFunction"`
+	RememberMeExpirationTimeInMonths	string 							`json:"rememberMeExpirationTimeInMonths"`
+	PasswordPolicy						string 							`json:"passwordPolicy"`
+	UserAccess							UserAccess 						`json:"userAccess"`
+	CompanyId							string 							`json:"companyId"`
+	ClientId							string 							`json:"clientId"`
+	ApiCertificates						[]ApiCertificateData			`json:"apiCertificates"`
+	JwtClientAuthCredentials			[]JwtClientAuthCredential		`json:"jwtClientAuthCredentials"`
+	AssertionAttributes					[]AssertionAttribute			`json:"assertionAttributes"`	
+	AdvancedAssertionAttributes			[]AdvancedAssertionAttribute 	`json:"advancedAssertionAttributes"`
+	DisabledInheritedProperties			DisabledInheritedProperties		`json:"disabledInheritedProperties,omitempty"`
+	SocialSignOn						bool 							`json:"socialSignOn,omitempty"`
+	SpnegoEnabled						bool 							`json:"spnegoEnabled,omitempty"`
+	BiometricAuthenticationEnabled		bool 							`json:"biometricAuthenticationEnabled,omitempty"`
+	ForceAuthentication					bool 							`json:"forceAuthentication,omitempty"`
+	ConcurrentAccess					[]string						`json:"concurrentAccess,omitempty"`
+	TrustAllCorporateIdentityProviders	bool 							`json:"trustAllCorporateIdentityProviders,omitempty"`
+	AllowIasUsers						bool 							`json:"allowIasUsers,omitempty"`
+	DefaultAuthenticatingIdpId			string 							`json:"defaultAuthenticatingIdpId,omitempty"`
+	ConditionalAuthentication			[]AuthenicationRule				`json:"conditionalAuthentication,omitempty"`
+	ConsumedServices					[]ConsumedService				`json:"consumedServices,omitempty"`
+	ProvidedApis						[]ProvidedApi 					`json:"providedApis,omitempty"`
+	ConsumedApis						[]ConsumedApi 					`json:"consumedApis,omitempty"`
+	// riskBasedAuthentication
+	// smsVerificationConfig
+	// captchaConfig
+	// saml2Configuration
+	// openIdConnectConfiguration 
+	// sapManagedAttributes
+	// idpCertificateSerialNumber
+	// restApiAuthentication
+}
+
+type ApplicationResponse struct {
 	Id						string 		`json:"id"`
 	Meta 					Meta 		`json:"meta,omitempty"`
 	Name 					string 		`json:"name"`
-	Description				string 		`json:"string,omitempty"`
+	Description				string 		`json:"description,omitempty"`
 	ParentApplicationId 	string 		`json:"parentApplicationId,omitempty"`
 	MultiTenantApp 			bool 		`json:"multiTenantApp,omitempty"`	//only for SAP internal use
 	PrivacyPolicy 			string 		`json:"privacyPolicy,omitempty"`
@@ -50,10 +165,10 @@ type ApplicationResponse struct{
 	Branding 				Branding 	`json:"branding,omitempty"`
 }
 
-type ApplicationsResponse struct{
-	TotalResults	int 				`json:"totalResults,omitempty"`
-	ItemsPerPage	int 				`json:"itemsPerPage,omitempty"`
-	NextCursor		string 				`json:"nextCursor,omitempty"`
-	Applications	ApplicationResponse	`json:"applications,omitempty"`
+type ApplicationsResponse struct {
+	TotalResults	int 					`json:"totalResults,omitempty"`
+	ItemsPerPage	int 					`json:"itemsPerPage,omitempty"`
+	NextCursor		string 					`json:"nextCursor,omitempty"`
+	Applications	[]ApplicationResponse	`json:"applications,omitempty"`
 }
 

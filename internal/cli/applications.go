@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"terraform-provider-ias/internal/cli/apiObjects/applications"
 )
@@ -37,7 +38,7 @@ func (a *ApplicationsCli) Get(ctx context.Context) (applications.ApplicationsRes
 func (a *ApplicationsCli) GetByAppId(ctx context.Context, appId string) (applications.ApplicationResponse, error) {
 	var app applications.ApplicationResponse
 
-	res, err, _ := a.cliClient.Execute(ctx, "GET", a.getUrl()+appId[1:len(appId)-1], nil, ApplicationHeader, nil)
+	res, err, _ := a.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", a.getUrl(), appId), nil, ApplicationHeader, nil)
 
 	if err != nil {
 		return app, err
@@ -50,9 +51,14 @@ func (a *ApplicationsCli) GetByAppId(ctx context.Context, appId string) (applica
 }
 
 type ApplicationCreateInput struct {
-	Id          string `json:"id,omitempty"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	Id          			string 		`json:"id,omitempty"`
+	Name        			string 		`json:"name"`
+	Description 			string 		`json:"description"`
+	ParentApplicationId		string 		`json:"parentApplicationId"`
+	MultiTenantApp			bool 		`json:"multiTenantApp"`
+	PrivacyPolicy			string 		`json:"privacyPolicy"`
+	TermsOfUse				string 		`json:"termsOfUse"`
+	GlobalAccount 			string 		`json:"globalAcount"`
 }
 
 func (a *ApplicationsCli) Create(ctx context.Context, args *ApplicationCreateInput) (string, error) {
@@ -70,4 +76,20 @@ func (a *ApplicationsCli) Create(ctx context.Context, args *ApplicationCreateInp
 	appId = res["location"]
 
 	return appId, nil
+}
+
+type ApplicationUpdateInput struct {
+	Id          string `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
+func (a *ApplicationsCli) Update(ctx context.Context, args *ApplicationUpdateInput) error {
+	_, err, _ := a.cliClient.Execute(ctx, "PUT", fmt.Sprintf("%s%s", a.getUrl(), args.Id), args, ApplicationHeader, nil)
+	return err
+}
+
+func (a *ApplicationsCli) Delete(ctx context.Context, id string) error {
+	_, err, _ := a.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", a.getUrl(), id), nil, ApplicationHeader, nil)
+	return err
 }
