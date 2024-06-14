@@ -8,7 +8,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
 func newApplicationResource() resource.Resource {
@@ -38,30 +38,36 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 				MarkdownDescription: "Id of the application",
 				Optional:            true,
 				Computed:            true,
+				Validators: []validator.String{
+					ValidUUID(),
+				},
 			},
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Name of the application",
-				Optional:            true,
+				Required:            true,
 			},
 			"description": schema.StringAttribute{
 				MarkdownDescription: "Description for the application",
 				Optional:            true,
 			},
-			"parentApplicationId": schema.StringAttribute{
+			"parent_application_id": schema.StringAttribute{
 				MarkdownDescription: "ID of the parent, from which the application will inherit its configurations",
 				Optional:			 true,
+				Computed: 			 true,
+				Validators: []validator.String{
+					ValidUUID(),
+				},
 			},
-			"multiTenantApp": schema.BoolAttribute{
+			"multi_tenant_app": schema.BoolAttribute{
 				// MarkdownDescription: "Show whether the application ",
 				Optional: true,
 				Computed: true,
 			},
-			"globalAccount": schema.StringAttribute{
+			"global_account": schema.StringAttribute{
 				// MarkdownDescription: "The ",
 				Optional: true,
 				Computed: true,
 			},
-			
 		},
 	}
 }
