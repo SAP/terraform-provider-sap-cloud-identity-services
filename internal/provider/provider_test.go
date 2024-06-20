@@ -27,8 +27,8 @@ func providerConfig(tenantUrl string) string {
 	`, tenantUrl)
 }
 
-func getTestProviders() map[string]func() (tfprotov6.ProviderServer, error) {
-	iasProvider := &IasProvider{}
+func getTestProviders(httpClient *http.Client) map[string]func() (tfprotov6.ProviderServer, error) {
+	iasProvider := NewWithClient(httpClient)
 	
 	return map[string]func() (tfprotov6.ProviderServer, error){
 		"ias": providerserver.NewProtocol6WithError(iasProvider),

@@ -20,7 +20,7 @@ func TestResourceApplication (t *testing.T) {
 
 		resource.Test(t, resource.TestCase{
 			IsUnitTest:               true,
-			ProtoV6ProviderFactories: getTestProviders(),
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
 					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/") + ResourceApplication("testApp", "testApp", "application for testing purposes"),
@@ -42,7 +42,7 @@ func TestResourceApplication (t *testing.T) {
 
 		resource.Test(t, resource.TestCase{
 			IsUnitTest:               true,
-			ProtoV6ProviderFactories: getTestProviders(),
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
 					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/") + ResourceApplication("testApp", "testApp", "application for testing purposes"),
@@ -71,7 +71,7 @@ func TestResourceApplication (t *testing.T) {
 	t.Run("error path - app_id not a valid UUID", func(t *testing.T) {
 		resource.Test(t, resource.TestCase{
 			IsUnitTest:               true,
-			ProtoV6ProviderFactories: getTestProviders(),
+			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithAppId("testApp", "this-is-not-uuid", "testApp", "application for testing purposes"),
@@ -84,7 +84,7 @@ func TestResourceApplication (t *testing.T) {
 	t.Run("error path - parent_id not a valid UUID", func(t *testing.T) {
 		resource.Test(t, resource.TestCase{
 			IsUnitTest:               true,
-			ProtoV6ProviderFactories: getTestProviders(),
+			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithParent("testApp", "testApp", "application for testing purposes", "this-is-not-uuid"),
@@ -97,7 +97,7 @@ func TestResourceApplication (t *testing.T) {
 	t.Run("error path - parent_id not a valid UUID", func(t *testing.T) {
 		resource.Test(t, resource.TestCase{
 			IsUnitTest:               true,
-			ProtoV6ProviderFactories: getTestProviders(),
+			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithParent("testApp", "testApp", "application for testing purposes", "this-is-not-uuid"),

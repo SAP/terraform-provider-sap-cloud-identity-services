@@ -18,10 +18,17 @@ import (
 )
 
 func New() provider.Provider {
-	return &IasProvider{}
+	return NewWithClient(http.DefaultClient)
+}
+
+func NewWithClient (httpClient *http.Client) *IasProvider{
+	return &IasProvider{
+		httpClient: httpClient,
+	}
 }
 
 type IasProvider struct {
+	httpClient 		*http.Client
 }
 
 type IasProviderData struct {
@@ -61,10 +68,12 @@ func (p *IasProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		return
 	}
 
-	client := cli.NewIasClient(cli.NewClient(http.DefaultClient, pasrsedUrl))
+	client := cli.NewIasClient(cli.NewClient(p.httpClient, pasrsedUrl))
 
 	username := os.Getenv("ias_username")
 	password := os.Getenv("ias_password")
+
+	
 
 	client.AuthorizationToken = base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
 
