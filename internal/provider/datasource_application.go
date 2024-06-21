@@ -18,6 +18,34 @@ type applicationDataSource struct {
 	cli *cli.IasClient
 }
 
+var applicationSchemaAttributes = map[string]schema.Attribute{
+	"id": schema.StringAttribute{
+		Computed: true,
+		Validators: []validator.String{
+			ValidUUID(),
+		},
+	},
+	"name": schema.StringAttribute{
+		Computed: true,
+	},
+	"description": schema.StringAttribute{
+		MarkdownDescription: "Description for the application",
+		Computed: true,
+	},
+	"parent_application_id": schema.StringAttribute{
+		MarkdownDescription: "ID of the parent, from which the application will inherit its configurations",
+		Computed: true,
+	},
+	"multi_tenant_app": schema.BoolAttribute{
+		// MarkdownDescription: "Show whether the application ",
+		Computed: true,
+	},
+	"global_account": schema.StringAttribute{
+		// MarkdownDescription: "The ",
+		Computed: true,
+	},
+}
+
 func (d *applicationDataSource) Configure(_ context.Context, req datasource.ConfigureRequest, _ *datasource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
@@ -32,33 +60,7 @@ func (d *applicationDataSource) Metadata(_ context.Context, req datasource.Metad
 
 func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Attributes: map[string]schema.Attribute{
-			"id": schema.StringAttribute{
-				Required: true,
-				Validators: []validator.String{
-					ValidUUID(),
-				},
-			},
-			"name": schema.StringAttribute{
-				Computed: true,
-			},
-			"description": schema.StringAttribute{
-				MarkdownDescription: "Description for the application",
-				Computed: true,
-			},
-			"parent_application_id": schema.StringAttribute{
-				MarkdownDescription: "ID of the parent, from which the application will inherit its configurations",
-				Computed: true,
-			},
-			"multi_tenant_app": schema.BoolAttribute{
-				// MarkdownDescription: "Show whether the application ",
-				Computed: true,
-			},
-			"global_account": schema.StringAttribute{
-				// MarkdownDescription: "The ",
-				Computed: true,
-			},
-		},
+		Attributes: applicationSchemaAttributes,
 	}
 }
 

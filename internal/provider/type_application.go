@@ -30,3 +30,16 @@ func applicationValueFrom(ctx context.Context, a applications.ApplicationRespons
 		GlobalAccount: types.StringValue(a.GlobalAccount),
 	}
 }
+
+func applicationsValueFrom(ctx context.Context, a applications.ApplicationsResponse) []applicationData {
+	apps := []applicationData{}
+
+	for _, appRes := range a.Applications {
+
+		app := applicationValueFrom(ctx, appRes)
+		apps = append(apps, app)
+
+	}
+
+	return apps
+}
