@@ -1,15 +1,20 @@
 package provider
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
+
 	// "strconv"
 	"testing"
 
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
+	"github.com/stretchr/testify/assert"
 	"gopkg.in/dnaeon/go-vcr.v3/cassette"
 	"gopkg.in/dnaeon/go-vcr.v3/recorder"
 )
@@ -95,4 +100,47 @@ func stopQuietly(rec *recorder.Recorder) {
 	if err := rec.Stop(); err != nil {
 		panic(err)
 	}
+}
+
+func TestIasProvider_AllResources (t *testing.T){
+
+	expectedResources := []string{
+		"ias_application",
+	}
+
+	ctx := context.Background()
+	registeredResources := []string{}
+
+	for _, resourceFunc := range New().Resources(ctx) {
+		var resp resource.MetadataResponse
+
+		resourceFunc().Metadata(ctx, resource.MetadataRequest{ProviderTypeName: "ias"}, &resp)
+
+		registeredResources = append(registeredResources, resp.TypeName)
+	}
+
+	assert.ElementsMatch(t, expectedResources, registeredResources)
+
+}
+
+func TestIasProvider_AllDataSources (t *testing.T){
+
+	expectedDataSources := []string{
+		"ias_application",
+		"ias_applications",
+	}
+
+	ctx := context.Background()
+	registeredDataSources := []string{}
+
+	for _, datasourceFunc := range New().DataSources(ctx) {
+		var resp datasource.MetadataResponse
+
+		datasourceFunc().Metadata(ctx, datasource.MetadataRequest{ProviderTypeName: "ias"}, &resp)
+
+		registeredDataSources = append(registeredDataSources, resp.TypeName)
+	}
+
+	assert.ElementsMatch(t, expectedDataSources, registeredDataSources)
+
 }
