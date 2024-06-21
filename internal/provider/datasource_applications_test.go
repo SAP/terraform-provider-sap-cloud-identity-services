@@ -21,7 +21,7 @@ func TestDataSourceApplications(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/") + DataSourceApplication("allApps"),
+					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/") + DataSourceApplications("allApps"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestCheckResourceAttr("data.ias_applications.allApps", "values.#", "21"),
 					),
@@ -33,7 +33,7 @@ func TestDataSourceApplications(t *testing.T) {
 
 }
 
-func DataSourceApplication(datasourceName string) string {
+func DataSourceApplications(datasourceName string) string {
 	return fmt.Sprintf(`
 	data "ias_applications" "%s"{
 

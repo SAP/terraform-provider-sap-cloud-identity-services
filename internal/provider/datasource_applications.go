@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -59,7 +60,33 @@ func (d *applicationsDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 
 			"values": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
-					Attributes: applicationSchemaAttributes,
+					Attributes: map[string]schema.Attribute{
+						"id": schema.StringAttribute{
+							Computed: true,
+							Validators: []validator.String{
+								ValidUUID(),
+							},
+						},
+						"name": schema.StringAttribute{
+							Computed: true,
+						},
+						"description": schema.StringAttribute{
+							MarkdownDescription: "Description for the application",
+							Computed: true,
+						},
+						"parent_application_id": schema.StringAttribute{
+							MarkdownDescription: "ID of the parent, from which the application will inherit its configurations",
+							Computed: true,
+						},
+						"multi_tenant_app": schema.BoolAttribute{
+							// MarkdownDescription: "Show whether the application ",
+							Computed: true,
+						},
+						"global_account": schema.StringAttribute{
+							// MarkdownDescription: "The ",
+							Computed: true,
+						},
+					},
 				},
 				Computed: true,
 			},
