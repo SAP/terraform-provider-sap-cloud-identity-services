@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 
 	"strconv"
 	"testing"
@@ -24,12 +25,14 @@ type User struct {
 	Password 	string
 }
 
-func providerConfig(tenantUrl string) string {
+func providerConfig(tenantUrl string, testUser User) string {
 	return fmt.Sprintf(`
 	provider "ias" {
 		tenant_url = "%s"
+		username = "%s"
+		password = "%s"
 	}
-	`, tenantUrl)
+	`, tenantUrl, testUser.Username, testUser.Password)
 }
 
 func getTestProviders(httpClient *http.Client) map[string]func() (tfprotov6.ProviderServer, error) {
@@ -55,14 +58,14 @@ func setupVCR(t *testing.T, cassetteName string) (*recorder.Recorder, User) {
 		RealTransport:      http.DefaultTransport,
 	})
 
-	var testUser User
+	var  testUser User
 	if rec.IsRecording() {
 		t.Logf("ATTENTION: Recording '%s'", cassetteName)
 		testUser.Username = os.Getenv("ias_username")
 		testUser.Password = os.Getenv("ias_password")
-		// if len(testUser.Username) == 0 || len(testUser.Password) == 0 {
-		// 	t.Fatal("Env vars ias_username and ias_password are required when recording test fixtures")
-		// }
+		if len(testUser.Username) == 0 || len(testUser.Password) == 0 {
+			t.Fatal("Env vars ias_username and ias_password are required when recording test fixtures")
+		}
 	} else {
 		t.Logf("Replaying '%s'", cassetteName)
 	}
@@ -71,14 +74,13 @@ func setupVCR(t *testing.T, cassetteName string) (*recorder.Recorder, User) {
 		t.Fatal()
 	}
 
-	rec.SetMatcher(RequestMatcher(t))
-
-	//any hooks to be added?
+	rec.SetMatcher(requestMatcher(t))
+	rec.AddHook(redactAuthorizationToken(), recorder.BeforeSaveHook)
 
 	return rec, testUser
 }
 
-func RequestMatcher(t *testing.T) (cassette.MatcherFunc) {
+func requestMatcher(t *testing.T) (cassette.MatcherFunc) {
 	return func(r *http.Request, i cassette.Request) bool {
 		if r.Method != i.Method || r.URL.String() != i.URL {
 			return false
@@ -95,6 +97,25 @@ func RequestMatcher(t *testing.T) (cassette.MatcherFunc) {
 		return requestBody == i.Body
 	}
 }
+
+func redactAuthorizationToken() (recorder.HookFunc) {
+	return func(i *cassette.Interaction) error {
+
+		redact := func(headers map[string][]string) {
+			for key := range headers {
+				if strings.Contains(strings.ToLower(key), "authorization") {
+					headers[key] = []string{"redacted"}
+				}
+			}
+		}
+
+		redact(i.Request.Headers)
+		redact(i.Response.Headers)
+
+		return nil
+	}
+}
+
 
 func stopQuietly(rec *recorder.Recorder) {
 	if err := rec.Stop(); err != nil {
@@ -120,7 +141,6 @@ func TestIasProvider_AllResources (t *testing.T){
 	}
 
 	assert.ElementsMatch(t, expectedResources, registeredResources)
-
 }
 
 func TestIasProvider_AllDataSources (t *testing.T){
@@ -142,5 +162,4 @@ func TestIasProvider_AllDataSources (t *testing.T){
 	}
 
 	assert.ElementsMatch(t, expectedDataSources, registeredDataSources)
-
 }

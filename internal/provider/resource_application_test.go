@@ -15,7 +15,7 @@ func TestResourceApplication (t *testing.T) {
 	t.Parallel()
 
 	t.Run("happy path", func(t *testing.T) {
-		rec, _ := setupVCR(t, "fixtures/resource_application")
+		rec, user := setupVCR(t, "fixtures/resource_application")
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{
@@ -23,7 +23,7 @@ func TestResourceApplication (t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/") + ResourceApplication("testApp", "testApp", "application for testing purposes"),
+					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/", user) + ResourceApplication("testApp", "testApp", "application for testing purposes"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("ias_application.testApp", "id", regexpUUID),
 						resource.TestCheckResourceAttr("ias_application.testApp", "name", "testApp"),
@@ -37,7 +37,7 @@ func TestResourceApplication (t *testing.T) {
 	})
 
 	t.Run("happy path - application update", func(t *testing.T) {
-		rec, _ := setupVCR(t, "fixtures/resource_application_updated")
+		rec, user := setupVCR(t, "fixtures/resource_application_updated")
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{
@@ -45,7 +45,7 @@ func TestResourceApplication (t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/") + ResourceApplication("testApp", "testApp", "application for testing purposes"),
+					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/", user) + ResourceApplication("testApp", "testApp", "application for testing purposes"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("ias_application.testApp", "id", regexpUUID),
 						resource.TestCheckResourceAttr("ias_application.testApp", "name", "testApp"),
@@ -55,7 +55,7 @@ func TestResourceApplication (t *testing.T) {
 					),
 				},
 				{
-					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/") + ResourceApplication("testApp", "testApp_updated", "application for testing purposes"),
+					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/", user) + ResourceApplication("testApp", "testApp_updated", "application for testing purposes"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("ias_application.testApp", "id", regexpUUID),
 						resource.TestCheckResourceAttr("ias_application.testApp", "name", "testApp_updated"),

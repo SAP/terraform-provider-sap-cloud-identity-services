@@ -13,7 +13,7 @@ func TestDataSourceApplications(t *testing.T) {
 	t.Parallel()
 
 	t.Run("happy path", func (t *testing.T) {
-		rec, _ := setupVCR(t, "fixtures/datasource_applications_all")
+		rec, user := setupVCR(t, "fixtures/datasource_applications_all")
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{
@@ -21,7 +21,7 @@ func TestDataSourceApplications(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/") + DataSourceApplications("allApps"),
+					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/", user) + DataSourceApplications("allApps"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestCheckResourceAttr("data.ias_applications.allApps", "values.#", "21"),
 					),

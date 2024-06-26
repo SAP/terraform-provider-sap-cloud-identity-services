@@ -14,7 +14,7 @@ func TestDataSourceApplication(t *testing.T){
 
 	t.Run("happy path", func (t *testing.T){
 
-		rec, _ := setupVCR(t, "fixtures/datasource_application")
+		rec, user := setupVCR(t, "fixtures/datasource_application")
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{
@@ -22,7 +22,7 @@ func TestDataSourceApplication(t *testing.T){
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/") + DataSourceApplication("testApp", "oac.accounts.sap.com"),
+					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/", user) + DataSourceApplication("testApp", "oac.accounts.sap.com"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("data.ias_application.testApp", "id", regexpUUID),
 						resource.TestCheckResourceAttr("data.ias_application.testApp", "description", ""),
@@ -43,7 +43,7 @@ func TestDataSourceApplication(t *testing.T){
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/") + DataSourceApplicationById("testApp", "invalid-uuid"),
+					Config: DataSourceApplicationById("testApp", "invalid-uuid"),
 					ExpectError: regexp.MustCompile(`Attribute id value must be a valid UUID, got: invalid-uuid`),
 				},
 			},
@@ -57,7 +57,7 @@ func TestDataSourceApplication(t *testing.T){
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/") + DataSourceApplicationNoId("testApp"),
+					Config: DataSourceApplicationNoId("testApp"),
 					ExpectError: regexp.MustCompile(`The argument "id" is required, but no definition was found.`),
 				},
 			},
