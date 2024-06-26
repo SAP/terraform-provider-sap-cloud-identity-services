@@ -14,7 +14,7 @@ func TestDataSourceApplication(t *testing.T){
 
 	t.Run("happy path", func (t *testing.T){
 
-		rec, _ := setupVCR(t, "datasource_application")
+		rec, _ := setupVCR(t, "fixtures/datasource_application")
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{

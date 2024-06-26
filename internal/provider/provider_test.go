@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	// "strconv"
+	"strconv"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -43,10 +43,10 @@ func getTestProviders(httpClient *http.Client) map[string]func() (tfprotov6.Prov
 func setupVCR(t *testing.T, cassetteName string) (*recorder.Recorder, User) {
 	t.Helper()
 
-	mode := recorder.ModeRecordOnly
-	// if testRecord, _ := strconv.ParseBool(os.Getenv("TEST_RECORD")); testRecord {
-	// 	mode = recorder.ModeRecordOnly
-	// }
+	mode := recorder.ModeRecordOnce
+	if testRecord, _ := strconv.ParseBool(os.Getenv("TEST_RECORD")); testRecord {
+		mode = recorder.ModeRecordOnly
+	}
 
 	rec, err := recorder.NewWithOptions(&recorder.Options{
 		CassetteName:       cassetteName,
