@@ -23,14 +23,19 @@ func TestResourceApplication (t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/", user) + ResourceApplication("testApp", "testApp", "application for testing purposes"),
+					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/", user) + ResourceApplication("testApp", "basic-test-app", "application for testing purposes"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("ias_application.testApp", "id", regexpUUID),
-						resource.TestCheckResourceAttr("ias_application.testApp", "name", "testApp"),
+						resource.TestCheckResourceAttr("ias_application.testApp", "name", "basic-test-app"),
 						resource.TestCheckResourceAttr("ias_application.testApp", "description", "application for testing purposes"),
 						resource.TestCheckResourceAttr("ias_application.testApp", "multi_tenant_app", "false"),
 						resource.TestCheckResourceAttr("ias_application.testApp", "global_account", "unknown"),
 					),
+				},
+				{
+					ResourceName:      "ias_application.testApp",
+					ImportState:       true,
+					ImportStateVerify: true,
 				},
 			},
 		})
@@ -45,20 +50,20 @@ func TestResourceApplication (t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/", user) + ResourceApplication("testApp", "testApp", "application for testing purposes"),
+					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/", user) + ResourceApplication("testApp", "test-app", "application for testing purposes"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("ias_application.testApp", "id", regexpUUID),
-						resource.TestCheckResourceAttr("ias_application.testApp", "name", "testApp"),
+						resource.TestCheckResourceAttr("ias_application.testApp", "name", "test-app"),
 						resource.TestCheckResourceAttr("ias_application.testApp", "description", "application for testing purposes"),
 						resource.TestCheckResourceAttr("ias_application.testApp", "multi_tenant_app", "false"),
 						resource.TestCheckResourceAttr("ias_application.testApp", "global_account", "unknown"),
 					),
 				},
 				{
-					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/", user) + ResourceApplication("testApp", "testApp_updated", "application for testing purposes"),
+					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/", user) + ResourceApplication("testApp", "test-app-updated", "application for testing purposes"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("ias_application.testApp", "id", regexpUUID),
-						resource.TestCheckResourceAttr("ias_application.testApp", "name", "testApp_updated"),
+						resource.TestCheckResourceAttr("ias_application.testApp", "name", "test-app-updated"),
 						resource.TestCheckResourceAttr("ias_application.testApp", "description", "application for testing purposes"),
 						resource.TestCheckResourceAttr("ias_application.testApp", "multi_tenant_app", "false"),
 						resource.TestCheckResourceAttr("ias_application.testApp", "global_account", "unknown"),
@@ -74,21 +79,21 @@ func TestResourceApplication (t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      ResourceApplicationWithAppId("testApp", "this-is-not-uuid", "testApp", "application for testing purposes"),
+					Config:      ResourceApplicationWithAppId("testApp", "this-is-not-uuid", "test-app", "application for testing purposes"),
 					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute id value must be a valid UUID, got: %s","this-is-not-uuid")),
 				},
 			},
 		})
 	})
 
-	t.Run("error path - parent_id not a valid UUID", func(t *testing.T) {
+	t.Run("error path - name is mandatory", func(t *testing.T) {
 		resource.Test(t, resource.TestCase{
 			IsUnitTest:               true,
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      ResourceApplicationWithParent("testApp", "testApp", "application for testing purposes", "this-is-not-uuid"),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute parent_application_id value must be a valid UUID, got:\n%s","this-is-not-uuid")),
+					Config:      ResourceApplicationWithoutAppName("testApp"),
+					ExpectError: regexp.MustCompile("The argument \"name\" is required, but no definition was found."),
 				},
 			},
 		})
@@ -100,7 +105,7 @@ func TestResourceApplication (t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      ResourceApplicationWithParent("testApp", "testApp", "application for testing purposes", "this-is-not-uuid"),
+					Config:      ResourceApplicationWithParent("testApp", "test-app", "application for testing purposes", "this-is-not-uuid"),
 					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute parent_application_id value must be a valid UUID, got:\n%s","this-is-not-uuid")),
 				},
 			},
@@ -136,4 +141,11 @@ func ResourceApplicationWithAppId (resourceName string, appID string, appName st
 		description = "%s"
 	}
 	`, resourceName, appID, appName, description )
+}
+
+func ResourceApplicationWithoutAppName(resourceName string) string {
+	return fmt.Sprintf(`
+	resource "ias_application" "%s" {
+	}
+	`, resourceName)
 }
