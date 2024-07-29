@@ -18,14 +18,23 @@ import (
 )
 
 func New() provider.Provider {
-	return &IasProvider{}
+	return NewWithClient(http.DefaultClient)
+}
+
+func NewWithClient (httpClient *http.Client) *IasProvider{
+	return &IasProvider{
+		httpClient: httpClient,
+	}
 }
 
 type IasProvider struct {
+	httpClient 		*http.Client
 }
 
 type IasProviderData struct {
 	TenantUrl types.String `tfsdk:"tenant_url"`
+	Username  types.String `tfsdk:"username"`
+	Password  types.String `tfsdk:"password"`
 }
 
 func (p *IasProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -38,6 +47,13 @@ func (p *IasProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *
 			"tenant_url": schema.StringAttribute{
 				MarkdownDescription: "The URL of the IAS tenant",
 				Required:            true,
+			},
+			"username": schema.StringAttribute{
+				Optional:			 true,
+			},
+			"password": schema.StringAttribute{
+				Optional:			 true,
+				Sensitive: 			 true,	
 			},
 		},
 	}
@@ -61,10 +77,21 @@ func (p *IasProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		return
 	}
 
-	client := cli.NewIasClient(cli.NewClient(http.DefaultClient, pasrsedUrl))
+	client := cli.NewIasClient(cli.NewClient(p.httpClient, pasrsedUrl))
 
-	username := os.Getenv("ias_username")
-	password := os.Getenv("ias_password")
+	var username string
+	if config.Username.IsNull() {
+		username = os.Getenv("ias_username")
+	} else {
+		username = config.Username.ValueString()
+	}
+
+	var password string
+	if config.Password.IsNull() {
+		password = os.Getenv("ias_password")
+	} else {
+		password = config.Password.ValueString()
+	}
 
 	client.AuthorizationToken = base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
 
@@ -75,6 +102,7 @@ func (p *IasProvider) Configure(ctx context.Context, req provider.ConfigureReque
 func (p *IasProvider) DataSources(_ context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		newApplicationDataSource,
+		newApplicationsDataSource,
 	}
 }
 
