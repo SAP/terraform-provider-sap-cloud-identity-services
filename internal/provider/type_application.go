@@ -20,7 +20,7 @@ type applicationData struct {
 	GlobalAccount 			types.String `tfsdk:"global_account"`
 }
 
-func applicationValueFrom(ctx context.Context, a applications.ApplicationResponse) applicationData {
+func applicationValueFrom(_ context.Context, a applications.ApplicationResponse) applicationData {
 	return applicationData{
 		Id:          types.StringValue(a.Id),
 		Name:        types.StringValue(a.Name),

@@ -120,12 +120,7 @@ func (r *applicationResource) Read(ctx context.Context, req resource.ReadRequest
 	var config applicationData
 	diags := req.State.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
-
-	if config.Id.IsNull() {
-		resp.Diagnostics.AddError("Application ID is missing", "Please provide a valid ID")
-		return
-	}
-
+	
 	res, err := r.cli.ApplicationConfiguration.Application.GetByAppId(ctx, config.Id.ValueString())
 
 	if err != nil {
