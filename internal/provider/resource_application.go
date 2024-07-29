@@ -6,9 +6,10 @@ import (
 	"strings"
 	"terraform-provider-ias/internal/cli"
 
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
 func newApplicationResource() resource.Resource {
@@ -38,30 +39,36 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 				MarkdownDescription: "Id of the application",
 				Optional:            true,
 				Computed:            true,
+				Validators: []validator.String{
+					ValidUUID(),
+				},
 			},
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Name of the application",
-				Optional:            true,
+				Required:            true,
 			},
 			"description": schema.StringAttribute{
 				MarkdownDescription: "Description for the application",
 				Optional:            true,
 			},
-			"parentApplicationId": schema.StringAttribute{
+			"parent_application_id": schema.StringAttribute{
 				MarkdownDescription: "ID of the parent, from which the application will inherit its configurations",
 				Optional:			 true,
+				Computed: 			 true,
+				Validators: []validator.String{
+					ValidUUID(),
+				},
 			},
-			"multiTenantApp": schema.BoolAttribute{
+			"multi_tenant_app": schema.BoolAttribute{
 				// MarkdownDescription: "Show whether the application ",
 				Optional: true,
 				Computed: true,
 			},
-			"globalAccount": schema.StringAttribute{
+			"global_account": schema.StringAttribute{
 				// MarkdownDescription: "The ",
 				Optional: true,
 				Computed: true,
 			},
-			
 		},
 	}
 }
@@ -94,8 +101,16 @@ func (r *applicationResource) Create(ctx context.Context, req resource.CreateReq
 	}
 
 	id = strings.Split(id, "/")[3]
-	config.Id = types.StringValue(id)
-	diags = resp.State.Set(ctx, &config)
+
+	res, err := r.cli.ApplicationConfiguration.Application.GetByAppId(ctx, id)
+
+	if err != nil {
+		resp.Diagnostics.AddError("Error retrieving application", fmt.Sprintf("%s", err))
+		return
+	}
+
+	state := applicationValueFrom(ctx, res)
+	diags = resp.State.Set(ctx, &state)
 
 	resp.Diagnostics.Append(diags...)
 }
@@ -105,12 +120,7 @@ func (r *applicationResource) Read(ctx context.Context, req resource.ReadRequest
 	var config applicationData
 	diags := req.State.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
-
-	if config.Id.IsNull() {
-		resp.Diagnostics.AddError("Application ID is missing", "Please provide a valid ID")
-		return
-	}
-
+	
 	res, err := r.cli.ApplicationConfiguration.Application.GetByAppId(ctx, config.Id.ValueString())
 
 	if err != nil {
@@ -182,4 +192,8 @@ func (r *applicationResource) Delete(ctx context.Context, req resource.DeleteReq
 		resp.Diagnostics.AddError("Error retrieving deleting application", fmt.Sprintf("%s", err))
 		return
 	}
+}
+
+func (rs *applicationResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }

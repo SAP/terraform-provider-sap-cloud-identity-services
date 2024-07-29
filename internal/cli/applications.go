@@ -54,11 +54,11 @@ type ApplicationCreateInput struct {
 	Id          			string 		`json:"id,omitempty"`
 	Name        			string 		`json:"name"`
 	Description 			string 		`json:"description"`
-	ParentApplicationId		string 		`json:"parentApplicationId"`
+	ParentApplicationId		string 		`json:"parentApplicationId,omitempty"`
 	MultiTenantApp			bool 		`json:"multiTenantApp"`
 	PrivacyPolicy			string 		`json:"privacyPolicy"`
 	TermsOfUse				string 		`json:"termsOfUse"`
-	GlobalAccount 			string 		`json:"globalAcount"`
+	GlobalAccount 			string 		`json:"globalAccount"`
 }
 
 func (a *ApplicationsCli) Create(ctx context.Context, args *ApplicationCreateInput) (string, error) {
