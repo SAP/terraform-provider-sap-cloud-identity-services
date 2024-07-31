@@ -25,7 +25,8 @@ type User struct {
 	Password 	string
 }
 
-func providerConfig(tenantUrl string, testUser User) string {
+func providerConfig(_ string, testUser User) string {
+	tenantUrl := "https://iasprovidertestblr.accounts400.ondemand.com/"
 	return fmt.Sprintf(`
 	provider "ias" {
 		tenant_url = "%s"

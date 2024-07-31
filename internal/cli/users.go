@@ -18,21 +18,18 @@ func (u *UsersCli) getUrl() string {
 	return "scim/Users"
 }
 
-func (u *UsersCli) Get(ctx context.Context) (users.UserGet, error) {
-	var user users.UserGet
+func (u *UsersCli) Get(ctx context.Context) (users.UsersResponse, error) {
+	var users users.UsersResponse
 
 	res, err, _ := u.cliClient.Execute(ctx, "GET", u.getUrl(), nil, DirectoryHeader, nil)
 
 	if err != nil {
-		return user, err
+		return users, err
 	}
 
-	encodedRes, _ := json.Marshal(res)
-	err = json.Unmarshal(encodedRes, &user)
-
-	if err != nil {
-		return user, err
+	if err = json.Unmarshal(res, &users); err != nil{
+		return users, err
 	}
-
-	return user, nil
+	
+	return users, nil
 }

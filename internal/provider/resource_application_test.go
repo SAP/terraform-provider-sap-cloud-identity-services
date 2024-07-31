@@ -23,7 +23,7 @@ func TestResourceApplication (t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/", user) + ResourceApplication("testApp", "basic-test-app", "application for testing purposes"),
+					Config: providerConfig("", user) + ResourceApplication("testApp", "basic-test-app", "application for testing purposes"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("ias_application.testApp", "id", regexpUUID),
 						resource.TestCheckResourceAttr("ias_application.testApp", "name", "basic-test-app"),

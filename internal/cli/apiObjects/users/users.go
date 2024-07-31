@@ -62,15 +62,14 @@ type Address struct{
 	Type 			string 		`json:"type"`
 }
 
-type Resource struct {
-	Id 					string 			`json:"id"`
+type User struct {
+	Id 					string 			`json:"id,omitempty"`
 	ExternalId			string			`json:"externalId,omitempty"`
-	Name 				Name 			`json:"name,omitempty"`
-	Emails 				[]Email			`json:"emails"`
 	Meta				Meta			`json:"meta,omitempty"`
 	Schemas 			[]string 		`json:"schemas"`
 	UserName 			string 			`json:"userName"`
 	Password 			string 			`json:"password,omitempty"`
+	Name 				Name 			`json:"name,omitempty"`
 	DisplayName 		string 			`json:"displayName,omitempty"`
 	NickName 			string 			`json:"nickName,omitempty"`
 	ProfileUrl 			string 			`json:"profileUrl,omitempty"`
@@ -80,35 +79,20 @@ type Resource struct {
 	Locale 				string 			`json:"locale,omitempty"`
 	TimeZone 			string 			`json:"timeZone,omitempty"`
 	Active 				bool 			`json:"active,omitempty"`
+	Emails 				[]Email			`json:"emails"`
 	PhoneNumbers 		[]PhoneNumber	`json:"phoneNumbers,omitempty"`
 	Photo 				[]Photo 		`json:"photos,omitempty"`
 	Addresses 			[]Address 		`json:"addresses,omitempty"`
 	Entitlements 		[]Enititlement 	`json:"entitlements,omitempty"`
 	Roles 				[]Role 			`json:"roles,omitempty"`
-	
 }
 
-type UserGet struct {
+type UsersResponse struct {
 	Schemas 		[]string 	`json:"schemas,omitempty"`
-	Resources 		[]Resource 	`json:"resources,omitempty"`
+	Resources 		[]User 		`json:"Resources,omitempty"`
 	TotalResult		int			`json:"totalResults,omitempty"`
 	ItemsPerPage	int			`json:"itemsPerPage,omitempty"`
 	StartIndex		int			`json:"startIndex,omitempty"`
 	StartId 		string		`json:"startId,omitempty"`
 	NextId 			string		`json:"nextId,omitempty"`
-}
-
-type UserReq struct {
-	Schemas []string `json:"schemas"`
-	UserName string `json:"userName"`
-	Name Name `json:"name"`
-	Emails []Email `json:"emails"`
-}
-
-type UserPost struct {
-	Id string `json:"id"`
-	Schemas []string `json:"schemas"`
-	UserName string `json:"userName"`
-	Name Name `json:"name"`
-	Emails []Email `json:"emails"`
 }

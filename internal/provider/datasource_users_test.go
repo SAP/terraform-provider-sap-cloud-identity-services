@@ -7,13 +7,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
-
-func TestDataSourceApplications(t *testing.T) {
+func TestDataSourceUsers(t *testing.T){
 
 	t.Parallel()
 
-	t.Run("happy path", func (t *testing.T) {
-		rec, user := setupVCR(t, "fixtures/datasource_applications_all")
+	t.Run("happy path", func (t *testing.T){
+		rec, user := setupVCR(t, "fixtures/datasource_users_all")
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{
@@ -21,9 +20,9 @@ func TestDataSourceApplications(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + DataSourceApplications("allApps"),
+					Config: providerConfig("", user) + DataSourceUsers("allUsers"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestCheckResourceAttr("data.ias_applications.allApps", "values.#", "4"),
+						resource.TestCheckResourceAttr("data.ias_users.allUsers","values.#","4"),
 					),
 				},
 			},
@@ -33,9 +32,10 @@ func TestDataSourceApplications(t *testing.T) {
 
 }
 
-func DataSourceApplications(datasourceName string) string {
+
+func DataSourceUsers(datasourceName string) string {
 	return fmt.Sprintf(`
-	data "ias_applications" "%s"{
+	data "ias_users" "%s"{
 
 	}
 	`, datasourceName)
