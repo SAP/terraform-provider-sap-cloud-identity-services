@@ -22,7 +22,7 @@ func TestDataSourceUsers(t *testing.T){
 				{
 					Config: providerConfig("", user) + DataSourceUsers("allUsers"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestCheckResourceAttr("data.ias_users.allUsers","values.#","4"),
+						resource.TestCheckResourceAttr("data.ias_users.allUsers","values.#","5"),
 					),
 				},
 			},

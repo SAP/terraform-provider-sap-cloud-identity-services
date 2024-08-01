@@ -104,6 +104,7 @@ func (p *IasProvider) DataSources(_ context.Context) []func() datasource.DataSou
 		newApplicationDataSource,
 		newApplicationsDataSource,
 		newUsersDataSource,
+		newUserDataSource,
 	}
 }
 

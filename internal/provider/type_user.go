@@ -31,8 +31,8 @@ type userData struct {
 	//OUTPUT
 	Schemas 		types.List 	 `tfsdk:"schemas"`
 	UserName 		types.String `tfsdk:"user_name"`
-	Name        	name 		 `tfsdk:"name"`
-	Emails			[]email 	 `tfsdk:"emails"` 				
+	Name        	types.Object `tfsdk:"name"`
+	Emails			types.List 	 `tfsdk:"emails"` 				
 }	
 
 func userValueFrom(ctx context.Context, u users.User) (userData, diag.Diagnostics) {
@@ -46,7 +46,7 @@ func userValueFrom(ctx context.Context, u users.User) (userData, diag.Diagnostic
 	user.Schemas, diags = types.ListValueFrom(ctx, types.StringType, u.Schemas)
 	diagnostics.Append(diags...)
 
-	user.Name = name{
+	userName := name{
 		FamilyName: types.StringValue(u.Name.FamilyName),
 		GivenName: types.StringValue(u.Name.GivenName),
 		Formatted: types.StringValue(u.Name.Formatted),
@@ -55,21 +55,24 @@ func userValueFrom(ctx context.Context, u users.User) (userData, diag.Diagnostic
 		HonoricSuffix: types.StringValue(u.Name.HonoricSuffix),
 	}
 
-	user.Emails = []email{}
+	user.Name, diags = types.ObjectValueFrom(ctx, nameObjType, userName)
+	diagnostics.Append(diags...)
+
+	userEmails := []email{}
 	for _, emailRes := range u.Emails {
-	
 		userEmail := email{
 			Value: types.StringValue(emailRes.Value),
 			Type: types.StringValue(emailRes.Type),
 			Display: types.StringValue(emailRes.Display),
 			Primary: types.BoolValue(emailRes.Primary),
 		}
-
-		user.Emails = append(user.Emails, userEmail)
-	
+		userEmails = append(userEmails, userEmail)
 	}
 
-	return user, diags
+	user.Emails, diags = types.ListValueFrom(ctx, emailObjType, userEmails)
+	diagnostics.Append(diags...)
+
+	return user, diagnostics
 }
 
 func usersValueFrom(ctx context.Context, u users.UsersResponse) []userData {

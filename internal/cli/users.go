@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"terraform-provider-ias/internal/cli/apiObjects/users"
 )
 
@@ -15,7 +16,7 @@ func NewUserCli(cliClient *Client) UsersCli {
 }
 
 func (u *UsersCli) getUrl() string {
-	return "scim/Users"
+	return "scim/Users/"
 }
 
 func (u *UsersCli) Get(ctx context.Context) (users.UsersResponse, error) {
@@ -32,4 +33,20 @@ func (u *UsersCli) Get(ctx context.Context) (users.UsersResponse, error) {
 	}
 	
 	return users, nil
+}
+
+func (u *UsersCli) GetByUserId(ctx context.Context, userId string) (users.User, error) {
+	var user users.User
+
+	res, err, _ := u.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", u.getUrl(), userId), nil, DirectoryHeader, nil)
+
+	if err != nil {
+		return user, err
+	}
+
+	if err = json.Unmarshal(res, &user); err != nil{
+		return user, err
+	}
+	
+	return user, nil
 }
