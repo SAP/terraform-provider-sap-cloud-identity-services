@@ -9,14 +9,14 @@ import (
 	"terraform-provider-ias/internal/cli/apiObjects/users"
 )
 
-type email struct {
+type emailData struct {
 	Value 		types.String 	`tfsdk:"value"`
 	Type 		types.String 	`tfsdk:"type"`
 	Display 	types.String 	`tfsdk:"display"`
 	Primary 	types.Bool 		`tfsdk:"primary"`
 }
 
-type name struct {
+type nameData struct {
 	FamilyName 		types.String 	`tfsdk:"family_name"`
 	GivenName 		types.String 	`tfsdk:"given_name"`
 	Formatted 		types.String 	`tfsdk:"formatted"`
@@ -29,10 +29,10 @@ type userData struct {
 	//INPUT
 	Id 				types.String `tfsdk:"id"`
 	//OUTPUT
-	Schemas 		types.List 	 `tfsdk:"schemas"`
+	Schemas 		types.Set 	 `tfsdk:"schemas"`
 	UserName 		types.String `tfsdk:"user_name"`
 	Name        	types.Object `tfsdk:"name"`
-	Emails			types.List 	 `tfsdk:"emails"` 				
+	Emails			types.Set 	 `tfsdk:"emails"` 				
 }	
 
 func userValueFrom(ctx context.Context, u users.User) (userData, diag.Diagnostics) {
@@ -43,10 +43,10 @@ func userValueFrom(ctx context.Context, u users.User) (userData, diag.Diagnostic
 		UserName:    types.StringValue(u.UserName),
 	}
 
-	user.Schemas, diags = types.ListValueFrom(ctx, types.StringType, u.Schemas)
+	user.Schemas, diags = types.SetValueFrom(ctx, types.StringType, u.Schemas)
 	diagnostics.Append(diags...)
 
-	userName := name{
+	userName := nameData{
 		FamilyName: types.StringValue(u.Name.FamilyName),
 		GivenName: types.StringValue(u.Name.GivenName),
 		Formatted: types.StringValue(u.Name.Formatted),
@@ -58,9 +58,9 @@ func userValueFrom(ctx context.Context, u users.User) (userData, diag.Diagnostic
 	user.Name, diags = types.ObjectValueFrom(ctx, nameObjType, userName)
 	diagnostics.Append(diags...)
 
-	userEmails := []email{}
+	userEmails := []emailData{}
 	for _, emailRes := range u.Emails {
-		userEmail := email{
+		userEmail := emailData{
 			Value: types.StringValue(emailRes.Value),
 			Type: types.StringValue(emailRes.Type),
 			Display: types.StringValue(emailRes.Display),
@@ -69,7 +69,7 @@ func userValueFrom(ctx context.Context, u users.User) (userData, diag.Diagnostic
 		userEmails = append(userEmails, userEmail)
 	}
 
-	user.Emails, diags = types.ListValueFrom(ctx, emailObjType, userEmails)
+	user.Emails, diags = types.SetValueFrom(ctx, emailObjType, userEmails)
 	diagnostics.Append(diags...)
 
 	return user, diagnostics
