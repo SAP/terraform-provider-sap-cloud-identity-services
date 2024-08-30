@@ -103,11 +103,14 @@ func (p *IasProvider) DataSources(_ context.Context) []func() datasource.DataSou
 	return []func() datasource.DataSource{
 		newApplicationDataSource,
 		newApplicationsDataSource,
+		newUsersDataSource,
+		newUserDataSource,
 	}
 }
 
 func (p *IasProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		newApplicationResource,
+		newUserResource,
 	}
 }

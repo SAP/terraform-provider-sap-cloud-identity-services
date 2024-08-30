@@ -80,19 +80,15 @@ func (r *applicationResource) Create(ctx context.Context, req resource.CreateReq
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
 
-	args := &cli.ApplicationCreateInput{}
-
-	if !config.Id.IsUnknown() && !config.Id.IsNull() {
-		args.Id = config.Id.ValueString()
+	args := &cli.ApplicationCreateInput{
+		Id: config.Id.ValueString(),
+		Name: config.Name.ValueString(),
+		Description: config.Description.ValueString(),
+		ParentApplicationId: config.ParentApplicationId.ValueString(),
+		MultiTenantApp: config.MultiTenantApp.ValueBool(),
+		GlobalAccount: config.GlobalAccount.ValueString(),
 	}
 
-	if !config.Name.IsUnknown() {
-		args.Name = config.Name.ValueString()
-	}
-
-	if !config.Description.IsUnknown() {
-		args.Description = config.Description.ValueString()
-	}
 	id, err := r.cli.ApplicationConfiguration.Application.Create(ctx, args)
 
 	if err != nil {
@@ -189,7 +185,7 @@ func (r *applicationResource) Delete(ctx context.Context, req resource.DeleteReq
 	err := r.cli.ApplicationConfiguration.Application.Delete(ctx, config.Id.ValueString())
 
 	if err!=nil{
-		resp.Diagnostics.AddError("Error retrieving deleting application", fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError("Error deleting application", fmt.Sprintf("%s", err))
 		return
 	}
 }

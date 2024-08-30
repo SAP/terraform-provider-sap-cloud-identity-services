@@ -22,7 +22,7 @@ func TestDataSourceApplication(t *testing.T){
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/", user) + DataSourceApplication("testApp", "oac.accounts.sap.com"),
+					Config: providerConfig("", user) + DataSourceApplication("testApp", "oac.accounts.sap.com"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("data.ias_application.testApp", "id", regexpUUID),
 						resource.TestCheckResourceAttr("data.ias_application.testApp", "description", ""),
