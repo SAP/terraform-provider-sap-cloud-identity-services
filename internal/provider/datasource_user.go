@@ -41,7 +41,7 @@ func (d *userDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 					ValidUUID(),
 				},
 			},
-			"schemas": schema.ListAttribute{
+			"schemas": schema.SetAttribute{
 				ElementType: types.StringType,
 				Computed: true,
 			},
@@ -71,7 +71,7 @@ func (d *userDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 				},
 				Computed: true,
 			},
-			"emails": schema.ListNestedAttribute{
+			"emails": schema.SetNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"value": schema.StringAttribute{

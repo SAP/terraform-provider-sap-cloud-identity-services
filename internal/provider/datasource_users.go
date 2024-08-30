@@ -45,14 +45,14 @@ var emailObjType = types.ObjectType{
 var userObjType = types.ObjectType{
 	AttrTypes: map[string]attr.Type{
 		"id": types.StringType,
-		"schemas": types.ListType{
+		"schemas": types.SetType{
 			ElemType: types.StringType,
 		},
 		"user_name": types.StringType,
 		"name": types.ObjectType{
 			AttrTypes: nameObjType,
 		},
-		"emails": types.ListType{
+		"emails": types.SetType{
 			ElemType: emailObjType,
 		},
 	},
@@ -85,7 +85,7 @@ func (d *usersDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, 
 								ValidUUID(),
 							},
 						},
-						"schemas": schema.ListAttribute{
+						"schemas": schema.SetAttribute{
 							ElementType: types.StringType,
 							Computed: true,
 						},
@@ -115,7 +115,7 @@ func (d *usersDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, 
 							},
 							Computed: true,
 						},
-						"emails": schema.ListNestedAttribute{
+						"emails": schema.SetNestedAttribute{
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
 									"value": schema.StringAttribute{
