@@ -105,6 +105,8 @@ func (p *IasProvider) DataSources(_ context.Context) []func() datasource.DataSou
 		newApplicationsDataSource,
 		newUsersDataSource,
 		newUserDataSource,
+		newSchemasDataSource,
+		newSchemaDataSource,
 	}
 }
 
@@ -112,5 +114,6 @@ func (p *IasProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		newApplicationResource,
 		newUserResource,
+		newSchemaResource,
 	}
 }
