@@ -84,25 +84,33 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 			Message string `json:"message"`
 		}
 
+		// type Error struct {
+		// 	Code    int           `json:"code"`
+		// 	Message string        `json:"message"`
+		// 	Details []ErrorDetail `json:"details"`
+		// }
+
 		type Error struct {
-			Code    int           `json:"code"`
-			Message string        `json:"message"`
-			Details []ErrorDetail `json:"details"`
+			// Code	int 	`json:"code"`
+			Status  string 	`json:"status"`
+			Detail  string  `json:"detail"`
 		}
 
-		var responseError struct {
-			Error Error `json:"error"`
-		}
+		// var responseError struct {
+		// 	Error Error `json:"error"`
+		// }
 		
-		if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
-			err = fmt.Errorf(responseError.Error.Message)
+		var responseError Error
 
-			for i:=0; i<len(responseError.Error.Details); i++ {
-				err = fmt.Errorf(fmt.Sprintf("%v \n%s",err,responseError.Error.Details[0].Message))
-			}
+		if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
+			err = fmt.Errorf(responseError.Detail)
+
+			// for i:=0; i<len(responseError.Error.Details); i++ {
+			// 	err = fmt.Errorf(fmt.Sprintf("%v \n%s",err,responseError.Error.Details[0].Message))
+			// }
 
 		} else {
-			err = fmt.Errorf("responded with unknown error : %d", responseError.Error.Code)
+			err = fmt.Errorf("responded with unknown error : %d", responseError.Status)
 		}
 
 		return nil, err, out

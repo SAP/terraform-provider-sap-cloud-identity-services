@@ -55,6 +55,14 @@ var userObjType = types.ObjectType{
 		"emails": types.SetType{
 			ElemType: emailObjType,
 		},
+		"password": types.StringType,
+		"display_name": types.StringType,
+		"title": types.StringType,
+		"user_type": types.StringType,
+		"active": types.BoolType,
+		"send_mail": types.BoolType,
+		"mail_verified": types.BoolType,
+		"status": types.StringType,
 	},
 }
 
@@ -132,6 +140,30 @@ func (d *usersDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, 
 									},
 								},
 							},
+							Computed: true,
+						},
+						"password": schema.StringAttribute{
+							Computed: true,
+						},
+						"display_name": schema.StringAttribute{
+							Computed: true,
+						},
+						"title": schema.StringAttribute{
+							Computed: true,
+						},
+						"user_type": schema.StringAttribute{
+							Computed: true,
+						},
+						"active": schema.BoolAttribute{
+							Computed: true,
+						},
+						"send_mail": schema.BoolAttribute{
+							Computed: true,
+						},
+						"mail_verified": schema.BoolAttribute{
+							Computed: true,
+						},
+						"status": schema.StringAttribute{
 							Computed: true,
 						},
 					},

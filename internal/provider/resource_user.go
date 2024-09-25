@@ -100,6 +100,39 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 					},
 				},
 			},
+			"password": schema.StringAttribute{
+				Optional: true,
+				Sensitive: true,
+				//regex to check validity
+			},
+			"display_name": schema.StringAttribute{
+				Optional: true,
+				Computed: true,
+			},
+			"title": schema.StringAttribute{
+				Optional: true,
+				Computed: true,
+			},
+			"user_type": schema.StringAttribute{
+				Optional: true,
+				Computed: true,
+			},
+			"active": schema.BoolAttribute{
+				Optional: true,
+				Computed: true,
+			},
+			"send_mail": schema.BoolAttribute{
+				Optional: true,
+				Computed: true,
+			},
+			"mail_verified": schema.BoolAttribute{
+				Optional: true,
+				Computed: true,
+			},
+			"status": schema.StringAttribute{
+				Optional: true,
+				Computed: true,
+			},
 		},	
 	}
 }
@@ -123,6 +156,9 @@ func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, r
 
 	state, diags := userValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
+
+	state.Password = plan.Password
+	state.Schemas = plan.Schemas
 
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -227,6 +263,16 @@ func getUserRequest(ctx context.Context, plan userData) (*users.User, diag.Diagn
 			MiddleName: name.MiddleName.ValueString(),
 			HonoricPrefix: name.HonoricPrefix.ValueString(),
 			HonoricSuffix: name.HonoricSuffix.ValueString(),
+		},
+		DisplayName: plan.DisplayName.ValueString(),
+		Password: plan.Password.ValueString(),
+		Title: plan.Title.ValueString(),
+		UserType: plan.UserType.ValueString(),
+		Active: plan.Active.ValueBool(),
+		SAPExtension: users.SAPExtension{
+			SendMail: plan.SendMail.ValueBool(),
+			MailVerified: plan.MailVerified.ValueBool(),
+			Status: plan.Status.ValueString(),
 		},
 	}
 
