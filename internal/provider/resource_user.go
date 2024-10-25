@@ -103,7 +103,7 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 			"password": schema.StringAttribute{
 				Optional: true,
 				Sensitive: true,
-				//regex to check validity
+				//regex to check validity, if check is added, add a test
 			},
 			"display_name": schema.StringAttribute{
 				Optional: true,
@@ -147,6 +147,10 @@ func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, r
 	args, diags := getUserRequest(ctx, plan)
 	resp.Diagnostics.Append(diags...)
 
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	res, err := r.cli.Directory.User.Create(ctx, args)
 
 	if err != nil {
@@ -178,6 +182,9 @@ func (r *userResource) Read(ctx context.Context, req resource.ReadRequest, resp 
 
 	state, diags := userValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
+
+	state.Password = config.Password
+	state.Schemas = config.Schemas
 
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -211,6 +218,9 @@ func (r *userResource) Update(ctx context.Context, req resource.UpdateRequest, r
 	updatedState, diags := userValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
 
+	updatedState.Password = plan.Password
+	updatedState.Schemas = plan.Schemas
+
 	diags = resp.State.Set(ctx, &updatedState)
 	resp.Diagnostics.Append(diags...)
 }
@@ -233,7 +243,7 @@ func (r *userResource) Delete(ctx context.Context, req resource.DeleteRequest, r
 	}
 }
 
-func (rs *userResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+func (r *userResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
 
@@ -244,6 +254,11 @@ func getUserRequest(ctx context.Context, plan userData) (*users.User, diag.Diagn
 	var schemas []string
 	diags := plan.Schemas.ElementsAs(ctx, &schemas, true)
 	diagnostics.Append(diags...)
+
+	if len(schemas) == 0{
+		diagnostics.AddError("The Schemas attribute cannot be Null or Empty","Provide a valid value for \"schemas\"")
+		return nil, diagnostics
+	}
 
 	var name nameData
 	diags = plan.Name.As(ctx, &name, basetypes.ObjectAsOptions{})
