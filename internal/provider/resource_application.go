@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"strings"
 	"terraform-provider-ias/internal/cli"
+	"terraform-provider-ias/internal/cli/apiObjects/applications"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
+
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 )
 
 func newApplicationResource() resource.Resource {
@@ -54,7 +57,6 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 			"parent_application_id": schema.StringAttribute{
 				MarkdownDescription: "ID of the parent, from which the application will inherit its configurations",
 				Optional:			 true,
-				Computed: 			 true,
 				Validators: []validator.String{
 					ValidUUID(),
 				},
@@ -69,6 +71,38 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 				Optional: true,
 				Computed: true,
 			},
+			"sso_type": schema.StringAttribute{
+				//MarkdownDescription:
+				Optional: true,
+				Computed: true,
+			},
+			"subjectNameIdentifier" : schema.SingleNestedAttribute{
+				Attributes: map[string]schema.Attribute{
+					"source": schema.StringAttribute{
+						Required: true,
+					},
+					"value": schema.StringAttribute{
+						Required: true,
+					},
+				},
+			},
+			"assertion_attributes": schema.SetNestedAttribute{
+				Optional: true,
+				Computed: true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"assertion_attribute_name": schema.StringAttribute{
+							Required: true,
+						},
+						"user_attribute_name": schema.StringAttribute{
+							Required: true,
+						},
+						"inherited": schema.StringAttribute{
+							Computed: true,
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -80,14 +114,8 @@ func (r *applicationResource) Create(ctx context.Context, req resource.CreateReq
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
 
-	args := &cli.ApplicationCreateInput{
-		Id: config.Id.ValueString(),
-		Name: config.Name.ValueString(),
-		Description: config.Description.ValueString(),
-		ParentApplicationId: config.ParentApplicationId.ValueString(),
-		MultiTenantApp: config.MultiTenantApp.ValueBool(),
-		GlobalAccount: config.GlobalAccount.ValueString(),
-	}
+	args, diags := getApplicationRequest(ctx, config)
+	resp.Diagnostics.Append(diags...)
 
 	id, err := r.cli.ApplicationConfiguration.Application.Create(ctx, args)
 
@@ -105,7 +133,9 @@ func (r *applicationResource) Create(ctx context.Context, req resource.CreateReq
 		return
 	}
 
-	state := applicationValueFrom(ctx, res)
+	state, diags := applicationValueFrom(ctx, res)
+	resp.Diagnostics.Append(diags...)
+
 	diags = resp.State.Set(ctx, &state)
 
 	resp.Diagnostics.Append(diags...)
@@ -124,7 +154,9 @@ func (r *applicationResource) Read(ctx context.Context, req resource.ReadRequest
 		return
 	}
 
-	state := applicationValueFrom(ctx, res)
+	state, diags := applicationValueFrom(ctx, res)
+	resp.Diagnostics.Append(diags...)
+	
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 }
@@ -146,11 +178,10 @@ func (r *applicationResource) Update(ctx context.Context, req resource.UpdateReq
 	}
 
 	// Update the application details
-	args := &cli.ApplicationUpdateInput{
-		Id:          state.Id.ValueString(),
-		Name:        config.Name.ValueString(),
-		Description: config.Description.ValueString(),
-	}
+	args, diags := getApplicationRequest(ctx, config)
+	resp.Diagnostics.Append(diags...)
+
+	args.Id = state.Id.ValueString()
 
 	err := r.cli.ApplicationConfiguration.Application.Update(ctx, args)
 	if err != nil {
@@ -166,7 +197,9 @@ func (r *applicationResource) Update(ctx context.Context, req resource.UpdateReq
 	}
 
 	// **Fix: Update the state with the latest data from the resource**
-	updatedState := applicationValueFrom(ctx, res)
+	updatedState, diags := applicationValueFrom(ctx, res)
+	resp.Diagnostics.Append(diags...)
+
 	diags = resp.State.Set(ctx, &updatedState)
 	resp.Diagnostics.Append(diags...)
 }
@@ -192,4 +225,37 @@ func (r *applicationResource) Delete(ctx context.Context, req resource.DeleteReq
 
 func (rs *applicationResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+}
+
+func getApplicationRequest (ctx context.Context, plan applicationData) (*applications.Application, diag.Diagnostics){
+
+	var diagnostics  diag.Diagnostics
+
+	args := &applications.Application{
+		Name: plan.Name.ValueString(),
+		Description: plan.Description.ValueString(),
+		ParentApplicationId: plan.ParentApplicationId.ValueString(),
+		MultiTenantApp: plan.MultiTenantApp.ValueBool(),
+		GlobalAccount: plan.GlobalAccount.String(),
+		AuthenticationSchema: applications.AuthenticationSchema{
+			SsoType: plan.SsoType.ValueString(),
+		},
+	}
+
+	if !plan.AssertionAttributes.IsNull() {
+
+		var attributes []assertionAttributesData
+		diags := plan.AssertionAttributes.ElementsAs(ctx, &attributes, true)
+		diagnostics.Append(diags ...)
+
+		for _, attribute := range attributes {
+			assertionAttribute := applications.AssertionAttribute{
+				AssertionAttributeName: attribute.AssertionAttributeName.ValueString(),
+				UserAttributeName: attribute.UserAttributeName.ValueString(),
+			}
+			args.AuthenticationSchema.AssertionAttributes = append(args.AuthenticationSchema.AssertionAttributes, assertionAttribute)
+		}
+	}
+
+	return args, diagnostics
 }

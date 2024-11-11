@@ -151,24 +151,25 @@ type AuthenticationSchema struct {
 	// restApiAuthentication
 }
 
-type ApplicationResponse struct {
-	Id						string 		`json:"id"`
-	Meta 					Meta 		`json:"meta,omitempty"`
-	Name 					string 		`json:"name"`
-	Description				string 		`json:"description,omitempty"`
-	ParentApplicationId 	string 		`json:"parentApplicationId,omitempty"`
-	MultiTenantApp 			bool 		`json:"multiTenantApp,omitempty"`	//only for SAP internal use
-	PrivacyPolicy 			string 		`json:"privacyPolicy,omitempty"`
-	TermsOfUse 				string 		`json:"termsOfUse,omitempty"`
-	GlobalAccount 			string 		`json:"globalAccount,omitempty"`
-	Schemas 				[]string 	`json:"schemas,omitempty"`
-	Branding 				Branding 	`json:"branding,omitempty"`
+type Application struct {
+	Id						string 					`json:"id"`
+	Meta 					Meta 					`json:"meta,omitempty"`
+	Name 					string 					`json:"name"`
+	Description				string 					`json:"description,omitempty"`
+	ParentApplicationId 	string 					`json:"parentApplicationId,omitempty"`
+	MultiTenantApp 			bool 					`json:"multiTenantApp,omitempty"`	//only for SAP internal use
+	PrivacyPolicy 			string 					`json:"privacyPolicy,omitempty"`
+	TermsOfUse 				string 					`json:"termsOfUse,omitempty"`
+	GlobalAccount 			string 					`json:"globalAccount,omitempty"`
+	Schemas 				[]string 				`json:"schemas,omitempty"`
+	Branding 				Branding 				`json:"branding,omitempty"`
+	AuthenticationSchema    AuthenticationSchema	`json:"urn:sap:identity:application:schemas:extension:sci:1.0:Authentication"`
 }
 
 type ApplicationsResponse struct {
 	TotalResults	int 					`json:"totalResults,omitempty"`
 	ItemsPerPage	int 					`json:"itemsPerPage,omitempty"`
 	NextCursor		string 					`json:"nextCursor,omitempty"`
-	Applications	[]ApplicationResponse	`json:"applications,omitempty"`
+	Applications	[]Application	`json:"applications,omitempty"`
 }
 

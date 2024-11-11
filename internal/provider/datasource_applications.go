@@ -25,6 +25,14 @@ type applicationsData struct{
 	Values 	types.List 		`tfsdk:"values"`
 }
 
+var attributesObjType = types.ObjectType{
+	AttrTypes: map[string]attr.Type{
+		"assertion_attribute_name" : types.StringType,
+		"user_attribute_name" : types.StringType,
+		"inherited" : types.BoolType,
+	},
+}
+
 var appObjType = types.ObjectType {
 	AttrTypes: map[string]attr.Type{
 		"id": types.StringType,
@@ -33,6 +41,10 @@ var appObjType = types.ObjectType {
 		"parent_application_id": types.StringType,
 		"multi_tenant_app": types.BoolType,
 		"global_account": types.StringType,
+		"sso_type": types.StringType,
+		"assertion_attributes": types.SetType{
+			ElemType:attributesObjType,
+		},
 	},
 }
 
