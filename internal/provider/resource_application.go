@@ -89,7 +89,7 @@ func (r *applicationResource) Create(ctx context.Context, req resource.CreateReq
 		GlobalAccount: config.GlobalAccount.ValueString(),
 	}
 
-	id, err := r.cli.ApplicationConfiguration.Application.Create(ctx, args)
+	id, err := r.cli.Application.Create(ctx, args)
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error creating application", fmt.Sprintf("%s", err))
@@ -98,7 +98,7 @@ func (r *applicationResource) Create(ctx context.Context, req resource.CreateReq
 
 	id = strings.Split(id, "/")[3]
 
-	res, err := r.cli.ApplicationConfiguration.Application.GetByAppId(ctx, id)
+	res, err := r.cli.Application.GetByAppId(ctx, id)
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving application", fmt.Sprintf("%s", err))
@@ -117,7 +117,7 @@ func (r *applicationResource) Read(ctx context.Context, req resource.ReadRequest
 	diags := req.State.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
 	
-	res, err := r.cli.ApplicationConfiguration.Application.GetByAppId(ctx, config.Id.ValueString())
+	res, err := r.cli.Application.GetByAppId(ctx, config.Id.ValueString())
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving application", fmt.Sprintf("%s", err))
@@ -152,14 +152,14 @@ func (r *applicationResource) Update(ctx context.Context, req resource.UpdateReq
 		Description: config.Description.ValueString(),
 	}
 
-	err := r.cli.ApplicationConfiguration.Application.Update(ctx, args)
+	err := r.cli.Application.Update(ctx, args)
 	if err != nil {
 		resp.Diagnostics.AddError("Error updating application", fmt.Sprintf("%s", err))
 		return
 	}
 
 	// Refresh the state with the latest data
-	res, err := r.cli.ApplicationConfiguration.Application.GetByAppId(ctx, state.Id.ValueString())
+	res, err := r.cli.Application.GetByAppId(ctx, state.Id.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving updated application", fmt.Sprintf("%s", err))
 		return
@@ -182,7 +182,7 @@ func (r *applicationResource) Delete(ctx context.Context, req resource.DeleteReq
 		return
 	}
 
-	err := r.cli.ApplicationConfiguration.Application.Delete(ctx, config.Id.ValueString())
+	err := r.cli.Application.Delete(ctx, config.Id.ValueString())
 
 	if err!=nil{
 		resp.Diagnostics.AddError("Error deleting application", fmt.Sprintf("%s", err))
