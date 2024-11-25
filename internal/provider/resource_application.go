@@ -7,6 +7,7 @@ import (
 	"terraform-provider-ias/internal/cli"
 	"terraform-provider-ias/internal/cli/apiObjects/applications"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -14,6 +15,8 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 )
+
+var sourceValues = []string {"Identity Directory", "Corporate Identity Provider", "Expression"}
 
 func newApplicationResource() resource.Resource {
 	return &applicationResource{}
@@ -80,10 +83,17 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 				Attributes: map[string]schema.Attribute{
 					"source": schema.StringAttribute{
 						Required: true,
+						MarkdownDescription: "Acceptable values: \"Identity Directory\", \"Corporate Idenity Provider\", \"Expression\"",
+						Validators: []validator.String{
+							stringvalidator.OneOf(sourceValues...),
+						},
 					},
 					"value": schema.StringAttribute{
 						Required: true,
+						MarkdownDescription: "If the source is Identity Directory, the only acceptable values are \"Global User ID\", \"User ID\", \"Email\", \"Display Name\", \"Login Name\", \"Employee Number\"",
+
 					},
+
 				},
 			},
 			"assertion_attributes": schema.SetNestedAttribute{

@@ -80,7 +80,7 @@ func (d *applicationDataSource) Read(ctx context.Context, req datasource.ReadReq
 		return
 	}
 
-	state := applicationValueFrom(ctx, res)
+	state, _ := applicationValueFrom(ctx, res)
 	diags = resp.State.Set(ctx, &state)
 
 	resp.Diagnostics.Append(diags...)
