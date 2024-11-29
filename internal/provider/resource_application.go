@@ -12,6 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 )
@@ -60,6 +61,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 			"parent_application_id": schema.StringAttribute{
 				MarkdownDescription: "ID of the parent, from which the application will inherit its configurations",
 				Optional:			 true,
+				Computed: 			 true,
 				Validators: []validator.String{
 					ValidUUID(),
 				},
@@ -79,7 +81,9 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 				Optional: true,
 				Computed: true,
 			},
-			"subjectNameIdentifier" : schema.SingleNestedAttribute{
+			"subject_name_identifier" : schema.SingleNestedAttribute{
+				Optional: true,
+				Computed: true,
 				Attributes: map[string]schema.Attribute{
 					"source": schema.StringAttribute{
 						Required: true,
@@ -90,24 +94,34 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 					},
 					"value": schema.StringAttribute{
 						Required: true,
-						MarkdownDescription: "If the source is Identity Directory, the only acceptable values are \"Global User ID\", \"User ID\", \"Email\", \"Display Name\", \"Login Name\", \"Employee Number\"",
-
+						MarkdownDescription: "If the source is Identity Directory, the only acceptable values are \" none, uid, mail, loginName, displayName, personnelNumber, userUuid\"",
 					},
-
 				},
 			},
-			"assertion_attributes": schema.SetNestedAttribute{
+			"assertion_attributes": schema.ListNestedAttribute{
 				Optional: true,
 				Computed: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
+						"source": schema.StringAttribute{
+							Optional: true,
+							Computed: true,
+							// Required: true,
+							Validators: []validator.String{
+								stringvalidator.OneOf(sourceValues...),
+							},
+						},
 						"assertion_attribute_name": schema.StringAttribute{
-							Required: true,
+							Optional: true,
+							Computed: true,
+							// Required: true,
 						},
 						"user_attribute_name": schema.StringAttribute{
-							Required: true,
+							Optional: true,
+							Computed: true,
+							// Required: true,
 						},
-						"inherited": schema.StringAttribute{
+						"inherited": schema.BoolAttribute{
 							Computed: true,
 						},
 					},
@@ -141,10 +155,17 @@ func (r *applicationResource) Create(ctx context.Context, req resource.CreateReq
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving application", fmt.Sprintf("%s", err))
 		return
-	}
+	} 
 
 	state, diags := applicationValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
+
+	if config.SubjectNameIdentifier == nil {
+		state.SubjectNameIdentifier.Source = types.StringValue("Identity Directory")
+	} else {
+		state.SubjectNameIdentifier.Source = config.SubjectNameIdentifier.Source
+		state.SubjectNameIdentifier.Value = config.SubjectNameIdentifier.Value
+	}
 
 	diags = resp.State.Set(ctx, &state)
 
@@ -244,26 +265,58 @@ func getApplicationRequest (ctx context.Context, plan applicationData) (*applica
 	args := &applications.Application{
 		Name: plan.Name.ValueString(),
 		Description: plan.Description.ValueString(),
-		ParentApplicationId: plan.ParentApplicationId.ValueString(),
+		// ParentApplicationId: plan.ParentApplicationId.ValueString(),
 		MultiTenantApp: plan.MultiTenantApp.ValueBool(),
-		GlobalAccount: plan.GlobalAccount.String(),
-		AuthenticationSchema: applications.AuthenticationSchema{
-			SsoType: plan.SsoType.ValueString(),
-		},
+		GlobalAccount: plan.GlobalAccount.ValueString(),
+		// AuthenticationSchema: applications.AuthenticationSchema{
+		// 	SsoType: plan.SsoType.ValueString(),
+		// },
 	}
 
-	if !plan.AssertionAttributes.IsNull() {
+	if !plan.ParentApplicationId.IsNull() {
+		args.ParentApplicationId = plan.ParentApplicationId.ValueString()
+	}
 
-		var attributes []assertionAttributesData
-		diags := plan.AssertionAttributes.ElementsAs(ctx, &attributes, true)
-		diagnostics.Append(diags ...)
+	if plan.SubjectNameIdentifier!=nil && !plan.SubjectNameIdentifier.Source.IsNull() {
 
-		for _, attribute := range attributes {
-			assertionAttribute := applications.AssertionAttribute{
-				AssertionAttributeName: attribute.AssertionAttributeName.ValueString(),
-				UserAttributeName: attribute.UserAttributeName.ValueString(),
+		if plan.SubjectNameIdentifier.Source.ValueString() == "Identity Directory" {
+			args.AuthenticationSchema.SubjectNameIdentifier = plan.SubjectNameIdentifier.Value.ValueString()
+		} else {
+			args.AuthenticationSchema.SubjectNameIdentifier = "${corporateIdP."+*plan.SubjectNameIdentifier.Value.ValueStringPointer()+"}"
+		}
+
+	}
+
+	if plan.AssertionAttributes!=nil {
+
+		for _, attribute := range *plan.AssertionAttributes {
+
+			if attribute.Source == types.StringValue("Identity Directory") {
+
+				assertionAttribute := applications.AssertionAttribute{
+					AssertionAttributeName: attribute.AssertionAttributeName.ValueString(),
+					UserAttributeName: attribute.UserAttributeName.ValueString(),
+				}
+				args.AuthenticationSchema.AssertionAttributes = append(args.AuthenticationSchema.AssertionAttributes, assertionAttribute)
+
+			} else if attribute.Source == types.StringValue("Corporate Identity Provider") {
+
+				assertionAttribute := applications.AdvancedAssertionAttribute{
+					AttributeName: attribute.AssertionAttributeName.ValueString(),
+					AttributeValue:  "${corporateIdP."+attribute.UserAttributeName.ValueString()+"}",
+				}
+				args.AuthenticationSchema.AdvancedAssertionAttributes = append(args.AuthenticationSchema.AdvancedAssertionAttributes, assertionAttribute)
+			
+			} else {
+
+				assertionAttribute := applications.AdvancedAssertionAttribute{
+					AttributeName: attribute.AssertionAttributeName.ValueString(),
+					AttributeValue: attribute.UserAttributeName.ValueString(),
+				}
+				args.AuthenticationSchema.AdvancedAssertionAttributes = append(args.AuthenticationSchema.AdvancedAssertionAttributes, assertionAttribute)
+
 			}
-			args.AuthenticationSchema.AssertionAttributes = append(args.AuthenticationSchema.AssertionAttributes, assertionAttribute)
+			
 		}
 	}
 
