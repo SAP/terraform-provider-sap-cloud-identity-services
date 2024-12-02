@@ -25,11 +25,35 @@ type applicationsData struct{
 	Values 	types.List 		`tfsdk:"values"`
 }
 
-var attributesObjType = types.ObjectType{
+var subjectNameIdentitfierObjType = map[string]attr.Type{
+	"source" : types.StringType,
+	"value" : types.StringType,
+}
+
+var advancedAssertionAttributesObjType = types.ObjectType{
+	AttrTypes : map[string]attr.Type {
+		"source" : types.StringType,
+		"attribute_name" : types.StringType,
+		"attribute_value" : types.StringType,
+		"inherited" : types.BoolType,
+	},
+}
+
+var assertionAttributesObjType = types.ObjectType {
 	AttrTypes: map[string]attr.Type{
 		"assertion_attribute_name" : types.StringType,
 		"user_attribute_name" : types.StringType,
 		"inherited" : types.BoolType,
+	},
+}
+
+var authenticationRulesObjType = types.ObjectType{
+	AttrTypes: map[string]attr.Type{
+		"user_type" : types.StringType,
+		"user_group" : types.StringType,
+		"user_email_domain" : types.StringType,
+		"identity_provider_id" : types.StringType,
+		"ip_network_range" : types.StringType,
 	},
 }
 
@@ -42,8 +66,19 @@ var appObjType = types.ObjectType {
 		"multi_tenant_app": types.BoolType,
 		"global_account": types.StringType,
 		"sso_type": types.StringType,
-		"assertion_attributes": types.SetType{
-			ElemType:attributesObjType,
+		//verify below attributes
+		"subject_name_identitifer": types.ObjectType{
+			AttrTypes: subjectNameIdentitfierObjType,
+		},
+		"assertion_attributes": types.ListType{
+			ElemType:assertionAttributesObjType,
+		},
+		"advanced_assertion_attributes" : types.ListType{
+			ElemType: advancedAssertionAttributesObjType,
+		},
+		"default_authenticating_idp" : types.StringType,
+		"authentication_rules" : types.ListType{
+			ElemType: authenticationRulesObjType,
 		},
 	},
 }
@@ -120,6 +155,7 @@ func (d *applicationsDataSource) Read(ctx context.Context, req datasource.ReadRe
 		return
 	}
 
+	//check
 	config.Id = types.StringValue("dummy")
 
 	resApps := applicationsValueFrom(ctx, res)

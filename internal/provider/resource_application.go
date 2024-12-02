@@ -103,29 +103,68 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 				Computed: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
-						"source": schema.StringAttribute{
-							Optional: true,
-							Computed: true,
-							// Required: true,
-							Validators: []validator.String{
-								stringvalidator.OneOf(sourceValues...),
-							},
-						},
 						"assertion_attribute_name": schema.StringAttribute{
-							Optional: true,
-							Computed: true,
-							// Required: true,
+							Required: true,
 						},
+						//markdown should mention the defined list
 						"user_attribute_name": schema.StringAttribute{
-							Optional: true,
-							Computed: true,
-							// Required: true,
+							Required: true,
 						},
 						"inherited": schema.BoolAttribute{
 							Computed: true,
 						},
 					},
 				},
+			},
+			//source values check
+			"advanced_assertion_attributes" : schema.ListNestedAttribute{
+				Optional: true,
+				Computed: true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"source": schema.StringAttribute{
+							Required: true,
+						},
+						"attribute_name": schema.StringAttribute{
+							Required: true,
+						},
+						"attribute_value": schema.StringAttribute{
+							Required: true,
+						},
+						"inherited": schema.BoolAttribute{
+							Computed: true,
+						},
+					},
+				},
+			},
+			"default_authenticating_idp" : schema.StringAttribute{
+				Optional: true,
+				Computed: true,
+			},
+			"authentication_rules": schema.ListNestedAttribute{
+				Optional: true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"user_type": schema.StringAttribute{
+							Optional: true,
+						},
+						"user_group": schema.StringAttribute{
+							Optional: true,
+						},
+						"user_email_domain": schema.StringAttribute{
+							Optional: true,
+						},
+						"identity_provider_id": schema.StringAttribute{
+							Optional: true,
+						},
+						"ip_network_range": schema.StringAttribute{
+							Optional: true,
+						},
+					},
+				},
+				//regex for email domain and n/w range
+				//check for atleast one of the above attributes
+				//check for user type values
 			},
 		},
 	}
@@ -160,11 +199,15 @@ func (r *applicationResource) Create(ctx context.Context, req resource.CreateReq
 	state, diags := applicationValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
 
+
+	//the source of the subject name identifier cannot be determined with the help of the API response
+	//hence it needs to be set with the help of the user provided config
 	if config.SubjectNameIdentifier == nil {
+		// if user does not configure the subject name identifier, there is 
+		// a default value set in the application with the source as Identity Directory 
 		state.SubjectNameIdentifier.Source = types.StringValue("Identity Directory")
 	} else {
 		state.SubjectNameIdentifier.Source = config.SubjectNameIdentifier.Source
-		state.SubjectNameIdentifier.Value = config.SubjectNameIdentifier.Value
 	}
 
 	diags = resp.State.Set(ctx, &state)
@@ -187,6 +230,9 @@ func (r *applicationResource) Read(ctx context.Context, req resource.ReadRequest
 
 	state, diags := applicationValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
+
+	state.SubjectNameIdentifier.Source = config.SubjectNameIdentifier.Source
+	state.SubjectNameIdentifier.Value = config.SubjectNameIdentifier.Value
 	
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -195,7 +241,7 @@ func (r *applicationResource) Read(ctx context.Context, req resource.ReadRequest
 // Update updates the resource and sets the updated Terraform state on success.
 func (r *applicationResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var config applicationData
-	diags := req.Plan.Get(ctx, &config)
+	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
 
 	// Retrieve the current state to get the existing application ID
@@ -227,9 +273,14 @@ func (r *applicationResource) Update(ctx context.Context, req resource.UpdateReq
 		return
 	}
 
-	// **Fix: Update the state with the latest data from the resource**
 	updatedState, diags := applicationValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
+
+	if config.SubjectNameIdentifier != nil {
+		updatedState.SubjectNameIdentifier.Source = config.SubjectNameIdentifier.Source
+	} else {
+		updatedState.SubjectNameIdentifier.Source = state.SubjectNameIdentifier.Source
+	}
 
 	diags = resp.State.Set(ctx, &updatedState)
 	resp.Diagnostics.Append(diags...)
@@ -260,17 +311,13 @@ func (rs *applicationResource) ImportState(ctx context.Context, req resource.Imp
 
 func getApplicationRequest (ctx context.Context, plan applicationData) (*applications.Application, diag.Diagnostics){
 
-	var diagnostics  diag.Diagnostics
+	var diagnostics, diags  diag.Diagnostics
 
 	args := &applications.Application{
 		Name: plan.Name.ValueString(),
 		Description: plan.Description.ValueString(),
-		// ParentApplicationId: plan.ParentApplicationId.ValueString(),
 		MultiTenantApp: plan.MultiTenantApp.ValueBool(),
 		GlobalAccount: plan.GlobalAccount.ValueString(),
-		// AuthenticationSchema: applications.AuthenticationSchema{
-		// 	SsoType: plan.SsoType.ValueString(),
-		// },
 	}
 
 	if !plan.ParentApplicationId.IsNull() {
@@ -279,44 +326,76 @@ func getApplicationRequest (ctx context.Context, plan applicationData) (*applica
 
 	if plan.SubjectNameIdentifier!=nil && !plan.SubjectNameIdentifier.Source.IsNull() {
 
-		if plan.SubjectNameIdentifier.Source.ValueString() == "Identity Directory" {
+		if plan.SubjectNameIdentifier.Source.ValueString() == "Identity Directory" || plan.SubjectNameIdentifier.Source.ValueString() == "Expression" {
 			args.AuthenticationSchema.SubjectNameIdentifier = plan.SubjectNameIdentifier.Value.ValueString()
 		} else {
-			args.AuthenticationSchema.SubjectNameIdentifier = "${corporateIdP."+*plan.SubjectNameIdentifier.Value.ValueStringPointer()+"}"
+			args.AuthenticationSchema.SubjectNameIdentifier = "${corporateIdP."+plan.SubjectNameIdentifier.Value.ValueString()+"}"
 		}
 
 	}
 
-	if plan.AssertionAttributes!=nil {
+	if !plan.AssertionAttributes.IsNull() {
 
-		for _, attribute := range *plan.AssertionAttributes {
+		var attributes []assertionAttributesData
+		diags := plan.AssertionAttributes.ElementsAs(ctx, &attributes, true)
+		diagnostics.Append(diags...)
 
-			if attribute.Source == types.StringValue("Identity Directory") {
+		for _, attribute := range attributes {
 
-				assertionAttribute := applications.AssertionAttribute{
-					AssertionAttributeName: attribute.AssertionAttributeName.ValueString(),
-					UserAttributeName: attribute.UserAttributeName.ValueString(),
-				}
-				args.AuthenticationSchema.AssertionAttributes = append(args.AuthenticationSchema.AssertionAttributes, assertionAttribute)
-
-			} else if attribute.Source == types.StringValue("Corporate Identity Provider") {
-
-				assertionAttribute := applications.AdvancedAssertionAttribute{
-					AttributeName: attribute.AssertionAttributeName.ValueString(),
-					AttributeValue:  "${corporateIdP."+attribute.UserAttributeName.ValueString()+"}",
-				}
-				args.AuthenticationSchema.AdvancedAssertionAttributes = append(args.AuthenticationSchema.AdvancedAssertionAttributes, assertionAttribute)
-			
-			} else {
-
-				assertionAttribute := applications.AdvancedAssertionAttribute{
-					AttributeName: attribute.AssertionAttributeName.ValueString(),
-					AttributeValue: attribute.UserAttributeName.ValueString(),
-				}
-				args.AuthenticationSchema.AdvancedAssertionAttributes = append(args.AuthenticationSchema.AdvancedAssertionAttributes, assertionAttribute)
-
+			assertionAttribute := applications.AssertionAttribute{
+				AssertionAttributeName: attribute.AssertionAttributeName.ValueString(),
+				UserAttributeName: attribute.UserAttributeName.ValueString(),
 			}
+			args.AuthenticationSchema.AssertionAttributes = append(args.AuthenticationSchema.AssertionAttributes, assertionAttribute)
+		
+		}	
+	}
+
+	if !plan.AdvancedAssertionAttributes.IsNull() {
+
+		var advancedAssertionAttributes []advancedAssertionAttributesData
+		diags := plan.AdvancedAssertionAttributes.ElementsAs(ctx, &advancedAssertionAttributes, true)
+		diagnostics.Append(diags...)
+
+		for _, attribute := range advancedAssertionAttributes {
+
+				if attribute.Source == types.StringValue("Corporate Identity Provider") {
+
+					assertionAttribute := applications.AdvancedAssertionAttribute{
+						AttributeName: attribute.AttributeName.ValueString(),
+						AttributeValue:  "${corporateIdP."+attribute.AttributeValue.ValueString()+"}",
+					}
+					args.AuthenticationSchema.AdvancedAssertionAttributes = append(args.AuthenticationSchema.AdvancedAssertionAttributes, assertionAttribute)
+
+				} else {
+
+					assertionAttribute := applications.AdvancedAssertionAttribute{
+						AttributeName: attribute.AttributeName.ValueString(),
+						AttributeValue: attribute.AttributeValue.ValueString(),
+					}
+					args.AuthenticationSchema.AdvancedAssertionAttributes = append(args.AuthenticationSchema.AdvancedAssertionAttributes, assertionAttribute)
+
+				}
+		}
+	}
+
+	if !plan.AuthenticationRules.IsNull(){
+
+		var authrules []authenticationRulesData
+		diags = plan.AuthenticationRules.ElementsAs(ctx, &authrules, true)
+		diagnostics.Append(diags...)
+
+		for _, rule := range authrules{
 			
+			authrule := applications.AuthenicationRule{
+				UserType: rule.UserType.ValueString(),
+				UserGroup: rule.UserGroup.ValueString(),
+				UserEmailDomain: rule.UserEmailDomain.ValueString(),
+				IdentityProviderId: rule.IdentityProviderId.ValueString(),
+				IpNetworkRange: rule.IpNetworkRange.ValueString(),
+			}
+
+			args.AuthenticationSchema.ConditionalAuthentication = append(args.AuthenticationSchema.ConditionalAuthentication, authrule)
 		}
 	}
 
