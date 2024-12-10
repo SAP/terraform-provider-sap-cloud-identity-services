@@ -1,0 +1,71 @@
+---
+version: 2
+interactions:
+    - id: 0
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 542
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: |
+            {"meta":{},"schemas":["urn:ietf:params:scim:schemas:core:2.0:User","urn:ietf:params:scim:schemas:extension:sap:2.0:User"],"userName":"Joe Doe","name":{"familyName":"Doe","givenName":"Joe"},"emails":[{"value":"joe.doe@test.com","type":"work"}],"urn:ietf:params:scim:schemas:extension:sap:2.0:User":{"sourceSystem":0,"sourceSystemId":"","applicationId":"","emailTemplateSetId":"","sendMail":false,"targetUrl":"","mailVerified":false,"userId":"","status":"","totpEnabled":false,"webAuthEnabled":false,"mfaEnabled":false,"corporateGroups":null}}
+        form: {}
+        headers:
+            Accept:
+                - '*/*'
+            Authorization:
+                - redacted
+            Content-Type:
+                - application/scim+json
+            Dataserviceversion:
+                - "2.0"
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 167
+        uncompressed: false
+        body: '{"schemas":["urn:ietf:params:scim:api:messages:2.0:Error"],"status":"400","detail":"Provided value is not part of ''status'' canonical values","scimType":"invalidValue"}'
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+            Content-Length:
+                - "167"
+            Content-Type:
+                - application/scim+json
+            Date:
+                - Wed, 09 Oct 2024 06:12:04 GMT
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains; preload
+            Vary:
+                - X-CSP-STRIP
+            X-Content-Type-Options:
+                - nosniff
+            X-Ids-Id:
+                - EA9975EC-FE7C-481F-B42C-8FB09A58A1EE
+            X-Ids-Landscape:
+                - cc3-eu-nl-1-a2
+            X-Ids-Node:
+                - http-brkhv
+            X-Ids-Pool:
+                - a2
+            X-Ids-Project:
+                - qa
+            X-Robots-Tag:
+                - none
+        status: '400 '
+        code: 400
+        duration: 761.432719ms
