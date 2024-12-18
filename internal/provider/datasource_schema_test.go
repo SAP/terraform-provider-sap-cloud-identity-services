@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	// "regexp"
 	"testing"
 
@@ -22,11 +23,54 @@ func TestDataSourceSchema(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + DataSourceSchema("testSchema", ""),
+					Config: providerConfig("", user) + DataSourceSchema("testSchema", "Schema"),
+					Check: resource.ComposeAggregateTestCheckFunc(
+						//add a regex check
+						resource.TestCheckResourceAttr("data.ias_schema.testSchema", "description", "Specifies the schema that describes a SCIM schema"),
+						resource.TestCheckResourceAttr("data.ias_schema.testSchema", "name", "Schema"),
+						resource.TestCheckResourceAttr("data.ias_schema.testSchema", "attributes.0.name", "name"),
+						resource.TestCheckResourceAttr("data.ias_schema.testSchema", "attributes.0.description", "The schemas human-readable name. When applicable, service providers MUST specify the name, e.g., User."),
+						resource.TestCheckResourceAttr("data.ias_schema.testSchema", "attributes.0.multivalued", "false"),
+						resource.TestCheckResourceAttr("data.ias_schema.testSchema", "attributes.0.mutability", "readOnly"),
+						resource.TestCheckResourceAttr("data.ias_schema.testSchema", "attributes.0.required", "true"),
+						resource.TestCheckResourceAttr("data.ias_schema.testSchema", "attributes.0.returned", "default"),
+						resource.TestCheckResourceAttr("data.ias_schema.testSchema", "attributes.0.type", "string"),
+						resource.TestCheckResourceAttr("data.ias_schema.testSchema", "attributes.0.uniqueness", "none"),
+					),
 				},
 			},
 		})
 
+	})
+
+	//after regex has been set for schema i
+	// t.Run("error path - invalid schema id", func(t *testing.T){
+		
+	// 	resource.Test(t, resource.TestCase{
+	// 		IsUnitTest: true,
+	// 		ProtoV6ProviderFactories: getTestProviders(nil),
+	// 		Steps: []resource.TestStep{
+	// 			{
+	// 				Config: DataSourceSchemaById("testSchema", "invalid-uuid"),
+	// 				ExpectError: regexp.MustCompile(`Attribute id value must be a valid UUID, got: invalid-uuid`),
+	// 			},
+	// 		},
+	// 	})
+	// })
+
+	t.Run("error path - schema id is mandatory", func(t *testing.T){
+		
+		resource.Test(t, resource.TestCase{
+			IsUnitTest: true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config: DataSourceSchemaNoId("testSchema"),
+					ExpectError: regexp.MustCompile(`The argument "id" is required, but no definition was found.`),
+				},
+			},
+		})
+	
 	})
 
 }
@@ -37,5 +81,20 @@ func DataSourceSchema (datasourceName string, schemaName string) string {
 	data "ias_schema" "%s" {
 		id = [for schema in data.ias_schemas.allSchemas.values : schema.id if schema.name == "%s"][0]
 	}
-	`, datasourceName,schemaName)
+	`, datasourceName, schemaName)
+}
+
+// func DataSourceSchemaById (datasourceName string, schemaId string) string {
+// 	return fmt.Sprintf(`
+// 	data "ias_schema" "%s" {
+// 		id = "%s"
+// 	}
+// 	`, datasourceName, schemaId)
+// }
+
+func DataSourceSchemaNoId (datasourceName string) string {
+	return fmt.Sprintf(`
+	data "ias_schema" "%s" {
+	}
+	`, datasourceName)
 }
