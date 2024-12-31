@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"terraform-provider-ias/internal/cli"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	// "github.com/hashicorp/terraform-plugin-framework/schema/validator"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
+
+var typeSourceValues = []string{"string", "boolean", "decimal", "integer", "dateTime", "binary", "reference", "complex"}
 
 func newSchemaDataSource() datasource.DataSource {
 	return &schemaDataSource{}
@@ -56,7 +59,7 @@ func (d *schemaDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 			},
 			"external_id" : schema.StringAttribute{
 				Computed: true,
-				// MarkdownDescription: ,
+				MarkdownDescription: "Unique and global identifier for the given schema",
 			},
 			"attributes" : schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
@@ -67,7 +70,10 @@ func (d *schemaDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 						},
 						"type" : schema.StringAttribute{
 							Computed: true,
-							MarkdownDescription: "Type of the attribute",
+							MarkdownDescription: "Data type of the attribute. ",
+							Validators: []validator.String{
+								stringvalidator.OneOf(typeSourceValues...),
+							},
 						},
 						"multivalued" : schema.BoolAttribute{
 							Computed: true,
@@ -96,11 +102,11 @@ func (d *schemaDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 						},
 						"returned": schema.StringAttribute{
 							Computed: true,
-							// 
+							MarkdownDescription: "Set a restriction on attribute, it it can be returned or not",
 						},
 						"uniqueness": schema.StringAttribute{
 							Computed: true,
-							// MarkdownDescription: ,
+							MarkdownDescription: "Set a restriction on attribute, it it should be unique or not",
 						},
 					},
 				},
