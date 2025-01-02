@@ -231,8 +231,15 @@ func (r *applicationResource) Read(ctx context.Context, req resource.ReadRequest
 	state, diags := applicationValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
 
-	state.SubjectNameIdentifier.Source = config.SubjectNameIdentifier.Source
-	state.SubjectNameIdentifier.Value = config.SubjectNameIdentifier.Value
+	//the source of the subject name identifier cannot be determined with the help of the API response
+	//hence it needs to be set with the help of the user provided config
+	if config.SubjectNameIdentifier == nil {
+		// if user does not configure the subject name identifier, there is 
+		// a default value set in the application with the source as Identity Directory 
+		state.SubjectNameIdentifier.Source = types.StringValue("Identity Directory")
+	} else {
+		state.SubjectNameIdentifier.Source = config.SubjectNameIdentifier.Source
+	}
 	
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
