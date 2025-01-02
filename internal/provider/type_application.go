@@ -64,12 +64,15 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 	application := applicationData{
 		Id:         			types.StringValue(a.Id),
 		Name:       			types.StringValue(a.Name),
-		Description: 			types.StringValue(a.Description),
 		ParentApplicationId: 	types.StringValue(a.ParentApplicationId),
 		MultiTenantApp: 		types.BoolValue(a.MultiTenantApp),
 		GlobalAccount: 			types.StringValue(a.GlobalAccount),
 		SsoType: 				types.StringValue(a.AuthenticationSchema.SsoType),
 		DefaultAuthenticatingIdpId: types.StringValue(a.AuthenticationSchema.DefaultAuthenticatingIdpId),
+	}
+
+	if len(a.Description) > 0 {
+		application.Description = types.StringValue(a.Description)
 	}
 
 	application.SubjectNameIdentifier = &subjectNameIdentifierData{}
