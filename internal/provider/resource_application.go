@@ -232,15 +232,15 @@ func (r *applicationResource) Create(ctx context.Context, req resource.CreateReq
 	resp.Diagnostics.Append(diags...)
 
 
-	//the source of the subject name identifier cannot be determined with the help of the API response
-	//hence it needs to be set with the help of the user provided config
-	if config.SubjectNameIdentifier == nil {
-		// if user does not configure the subject name identifier, there is 
-		// a default value set in the application with the source as Identity Directory 
-		state.SubjectNameIdentifier.Source = types.StringValue("Identity Directory")
-	} else {
-		state.SubjectNameIdentifier.Source = config.SubjectNameIdentifier.Source
-	}
+	// //the source of the subject name identifier cannot be determined with the help of the API response
+	// //hence it needs to be set with the help of the user provided config
+	// if config.SubjectNameIdentifier == nil {
+	// 	// if user does not configure the subject name identifier, there is 
+	// 	// a default value set in the application with the source as Identity Directory 
+	// 	state.SubjectNameIdentifier.Source = types.StringValue("Identity Directory")
+	// } else {
+	// 	state.SubjectNameIdentifier.Source = config.SubjectNameIdentifier.Source
+	// }
 
 	diags = resp.State.Set(ctx, &state)
 
@@ -263,15 +263,15 @@ func (r *applicationResource) Read(ctx context.Context, req resource.ReadRequest
 	state, diags := applicationValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
 
-	//the source of the subject name identifier cannot be determined with the help of the API response
-	//hence it needs to be set with the help of the user provided config
-	if config.SubjectNameIdentifier == nil {
-		// if user does not configure the subject name identifier, there is 
-		// a default value set in the application with the source as Identity Directory 
-		state.SubjectNameIdentifier.Source = types.StringValue("Identity Directory")
-	} else {
-		state.SubjectNameIdentifier.Source = config.SubjectNameIdentifier.Source
-	}
+	// //the source of the subject name identifier cannot be determined with the help of the API response
+	// //hence it needs to be set with the help of the user provided config
+	// if config.SubjectNameIdentifier == nil {
+	// 	// if user does not configure the subject name identifier, there is 
+	// 	// a default value set in the application with the source as Identity Directory 
+	// 	state.SubjectNameIdentifier.Source = types.StringValue("Identity Directory")
+	// } else {
+	// 	state.SubjectNameIdentifier.Source = config.SubjectNameIdentifier.Source
+	// }
 	
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -315,11 +315,11 @@ func (r *applicationResource) Update(ctx context.Context, req resource.UpdateReq
 	updatedState, diags := applicationValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
 
-	if config.SubjectNameIdentifier != nil {
-		updatedState.SubjectNameIdentifier.Source = config.SubjectNameIdentifier.Source
-	} else {
-		updatedState.SubjectNameIdentifier.Source = state.SubjectNameIdentifier.Source
-	}
+	// if config.SubjectNameIdentifier != nil {
+	// 	updatedState.SubjectNameIdentifier.Source = config.SubjectNameIdentifier.Source
+	// } else {
+	// 	updatedState.SubjectNameIdentifier.Source = state.SubjectNameIdentifier.Source
+	// }
 
 	diags = resp.State.Set(ctx, &updatedState)
 	resp.Diagnostics.Append(diags...)
