@@ -8,7 +8,7 @@ import (
 )
 
 var UuidRegexp   		= regexp.MustCompile(`^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$`)
-var IPRegexp     	 	= regexp.MustCompile(`^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$`)
+var IPRegexp     	 	= regexp.MustCompile(`^$|^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$`)
 var EmailDomainRegexp 	= regexp.MustCompile(`^$|^(((\*|([a-zA-Z0-9_\-]{1,63}))\.)(?:[a-zA-Z0-9_\-]{1,63}\.)*(?:[a-zA-Z]{2,})|((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))|(localhost))$`)
 
 // Checks that the String held in the attribute is a valid UUID
