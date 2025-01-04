@@ -48,7 +48,6 @@ type applicationData struct {
 	GlobalAccount 						types.String							 `tfsdk:"global_account"`
 	SsoType 							types.String 	 						 `tfsdk:"sso_type"`
 	SubjectNameIdentifier 				*subjectNameIdentifierData  			 `tfsdk:"subject_name_identifier"`
-	//change to types.List and see
 	AssertionAttributes    				types.List 			 					 `tfsdk:"assertion_attributes"`
 	AdvancedAssertionAttributes			types.List								 `tfsdk:"advanced_assertion_attributes"`
 	DefaultAuthenticatingIdpId  		types.String 				 			 `tfsdk:"default_authenticating_idp"`
@@ -59,6 +58,7 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 	
 	var diagnostics, diags diag.Diagnostics
 
+	// check for expressions?
 	re := regexp.MustCompile(`\$\{corporateIdP\.([^\}]+)\}`)
 
 	application := applicationData{
@@ -79,8 +79,10 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 	if re.MatchString(a.AuthenticationSchema.SubjectNameIdentifier) {
 		match := re.FindStringSubmatch(a.AuthenticationSchema.SubjectNameIdentifier)
 		application.SubjectNameIdentifier.Value = types.StringValue(match[1])
+		application.SubjectNameIdentifier.Source = types.StringValue("Corporate Identity Provider")
 	} else {
 		application.SubjectNameIdentifier.Value = types.StringValue(a.AuthenticationSchema.SubjectNameIdentifier)
+		application.SubjectNameIdentifier.Source = types.StringValue("Identity Directory")
 	}
 
 	attributes := []assertionAttributesData{}
