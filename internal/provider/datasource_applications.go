@@ -41,8 +41,8 @@ var advancedAssertionAttributesObjType = types.ObjectType{
 
 var assertionAttributesObjType = types.ObjectType {
 	AttrTypes: map[string]attr.Type{
-		"assertion_attribute_name" : types.StringType,
-		"user_attribute_name" : types.StringType,
+		"attribute_name" : types.StringType,
+		"attribute_value" : types.StringType,
 		"inherited" : types.BoolType,
 	},
 }

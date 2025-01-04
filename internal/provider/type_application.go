@@ -19,8 +19,8 @@ type advancedAssertionAttributesData struct {
 }
 
 type assertionAttributesData struct {
-	AssertionAttributeName 		types.String 		`tfsdk:"assertion_attribute_name"`
-	UserAttributeName 			types.String 		`tfsdk:"user_attribute_name"`
+	AttributeName 				types.String 		`tfsdk:"attribute_name"`
+	AttributeValue 			    types.String 		`tfsdk:"attribute_value"`
 	Inherited 					types.Bool 			`tfsdk:"inherited"`
 }
 
@@ -87,8 +87,8 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 	for _, attributeRes := range a.AuthenticationSchema.AssertionAttributes{
 		
 		attribute := assertionAttributesData{
-			AssertionAttributeName: types.StringValue(attributeRes.AssertionAttributeName),
-			UserAttributeName: types.StringValue(attributeRes.UserAttributeName),
+			AttributeName: types.StringValue(attributeRes.AssertionAttributeName),
+			AttributeValue: types.StringValue(attributeRes.UserAttributeName),
 			Inherited: types.BoolValue(attributeRes.Inherited),
 		}
 
