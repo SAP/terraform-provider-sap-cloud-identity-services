@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"terraform-provider-ias/internal/cli"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -15,6 +16,10 @@ import (
 
 	"terraform-provider-ias/internal/cli/apiObjects/users"
 )
+
+var emailTypeValues = []string{"work", "home", "other"}
+var userTypeValues  = []string{"public", "partner", "customer", "external", "onboardee", "employee"}
+var activeValues    = []string{"active", "inactive", "new"}
 
 func newUserResource() resource.Resource {
 	return &userResource{}
@@ -40,60 +45,78 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
+				MarkdownDescription: "Unique ID of the resource.",
 				Computed: true,
 				Validators: []validator.String{
 					ValidUUID(),
 				},
 			},
 			"schemas": schema.SetAttribute{
+				// MarkdownDescription: "",
 				ElementType: types.StringType,
 				Required: true,
 			},
 			"user_name": schema.StringAttribute{
+				MarkdownDescription: "Unique user name of the user.",
 				Required: true,
 			},
 			"name": schema.SingleNestedAttribute{
+				MarkdownDescription: "Name of the user",
 				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"family_name": schema.StringAttribute{
+						MarkdownDescription: "The following characters: <, >, : are not allowed.",
 						Required: true,
 					},
 					"given_name": schema.StringAttribute{
+						MarkdownDescription: "The following characters: <, >, : are not allowed.",
 						Required: true,
 					},
 					"formatted": schema.StringAttribute{
+						// MarkdownDescription: ,
 						Optional: true,
 						Computed: true,
 					},
 					"middle_name": schema.StringAttribute{
+						// MarkdownDescription: ,
 						Optional: true,
 						Computed: true,
 					},
 					"honoric_prefix": schema.StringAttribute{
+						// MarkdownDescription: ,
 						Optional: true,
 						Computed: true,
 					},
 					"honoric_suffix": schema.StringAttribute{
+						// MarkdownDescription: ,
 						Optional: true,
 						Computed: true,
 					},
 				},
 			},
 			"emails": schema.SetNestedAttribute{
+				MarkdownDescription: "Email of the user.",
 				Required: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"value": schema.StringAttribute{
+							MarkdownDescription: "Value of the email of the user.",
 							Required: true,
 						},
 						"type": schema.StringAttribute{
+							MarkdownDescription: "Type of the email of the user.",
 							Required: true,
+							Validators: []validator.String{
+								stringvalidator.OneOf(emailTypeValues...),
+							},
 						},
 						"display": schema.StringAttribute{
+							// MarkdownDescription: "",
 							Computed: true,
 							Optional: true,
 						},
 						"primary": schema.BoolAttribute{
+							MarkdownDescription: "Set the email to be primary or not.",
 							Computed: true,
 							Optional: true,
 						},
@@ -101,37 +124,51 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 				},
 			},
 			"password": schema.StringAttribute{
+				MarkdownDescription: "The password to be set for the user.",
 				Optional: true,
 				Sensitive: true,
 				//regex to check validity, if check is added, add a test
 			},
 			"display_name": schema.StringAttribute{
+				MarkdownDescription: "The name to be displayed for the user.",
 				Optional: true,
 				Computed: true,
 			},
 			"title": schema.StringAttribute{
+				MarkdownDescription: "The title to be given for the user.",
 				Optional: true,
 				Computed: true,
 			},
 			"user_type": schema.StringAttribute{
+				MarkdownDescription: "Specifies the type of the user.The default type is \"public\".",
 				Optional: true,
 				Computed: true,
+				Validators: []validator.String{
+					stringvalidator.OneOf(userTypeValues...),
+				},
 			},
 			"active": schema.BoolAttribute{
+				MarkdownDescription: "Determines whether the user is active or not.The default value for the attribute is false.",
 				Optional: true,
 				Computed: true,
 			},
 			"send_mail": schema.BoolAttribute{
+				MarkdownDescription: "Specifies if an activation mail should be sent. The value of the attribute only matters when creating the user.",
 				Optional: true,
 				Computed: true,
 			},
 			"mail_verified": schema.BoolAttribute{
+				MarkdownDescription: "The attribute specifies if the e-mail of the newly created user is verified or not. So if the values of the mailVerified and sendMail are true, the user will receive e-mail and they will be able to log on. On the other hand, if the sendMail is true, but the mailVerified is false, the user will receive e-mail and they have to click the verification link in the e-mail. If the attribute \"verified\" is not passed in the request body, the default value of mailVerified is false.",
 				Optional: true,
 				Computed: true,
 			},
 			"status": schema.StringAttribute{
+				MarkdownDescription: "Specifies if the user is created as active, inactive or new. If the attribute \"active\" is not passed in the request body, the default value of the attribute \"status\" is inactive.",
 				Optional: true,
 				Computed: true,
+				Validators: []validator.String{
+					stringvalidator.OneOf(activeValues...),
+				},
 			},
 		},	
 	}
@@ -287,9 +324,12 @@ func getUserRequest(ctx context.Context, plan userData) (*users.User, diag.Diagn
 		SAPExtension: users.SAPExtension{
 			SendMail: plan.SendMail.ValueBool(),
 			MailVerified: plan.MailVerified.ValueBool(),
-			Status: plan.Status.ValueString(),
 		},
 	}
+
+	if !plan.Status.IsNull() && !plan.Status.IsUnknown() {
+		args.SAPExtension.Status = plan.Status.ValueString()
+	} 
 
 	for _, email := range emails{
 		userEmail := users.Email{
