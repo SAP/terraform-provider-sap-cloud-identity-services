@@ -370,7 +370,6 @@ func getApplicationRequest (ctx context.Context, plan applicationData) (*applica
 		} else {
 			args.AuthenticationSchema.SubjectNameIdentifier = "${corporateIdP."+plan.SubjectNameIdentifier.Value.ValueString()+"}"
 		}
-
 	}
 
 	if !plan.AssertionAttributes.IsNull() {
