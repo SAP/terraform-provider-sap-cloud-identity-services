@@ -145,7 +145,7 @@ func TestResourceUser (t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config: 	 ResourceUserWithoutEmails("testUser", "Joe Doe", schemas, name),
-					ExpectError: regexp.MustCompile("Inappropriate value for attribute \"email\": element 0: attributes \"type\" and\n \"value\" are required."),
+					ExpectError: regexp.MustCompile("Inappropriate value for attribute \"emails\": element 0: attributes \"type\" and\n\"value\" are required."),
 				},
 			},
 		})
