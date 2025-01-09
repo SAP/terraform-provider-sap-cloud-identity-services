@@ -7,6 +7,8 @@ import (
 	"terraform-provider-ias/internal/cli"
 	"terraform-provider-ias/internal/cli/apiObjects/applications"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/objectvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -55,10 +57,16 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Name of the application",
 				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.LengthBetween(1,255),
+				},
 			},
 			"description": schema.StringAttribute{
 				MarkdownDescription: "Free text description of the Application",
 				Optional:            true,
+				Validators: []validator.String{
+					stringvalidator.LengthBetween(1,255),
+				},
 			},
 			"parent_application_id": schema.StringAttribute{
 				MarkdownDescription: "ID of the parent, from which the application will inherit its configurations",
@@ -77,9 +85,12 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 				// MarkdownDescription: "",
 				Optional: true,
 				Computed: true,
+				Validators: []validator.String{
+					stringvalidator.LengthBetween(1,255),
+				},
 			},
 			"sso_type": schema.StringAttribute{
-				MarkdownDescription: "The preferred protocol for the application",
+				MarkdownDescription: "The preferred protocol for the application. Acceptable values: \"openIdConnect\", \"saml2\"",
 				Optional: true,
 				Computed: true,
 				Validators: []validator.String{
@@ -90,17 +101,25 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 				MarkdownDescription: "The attribute by which the application uses to identify the users. Identity Authentication sends the attribute to the application as subject in OpenID Connect tokens.",
 				Optional: true,
 				Computed: true,
+				Validators: []validator.Object{
+					objectvalidator.AlsoRequires(path.MatchRoot("subject_name_identifier").AtName("source"),path.MatchRoot("subject_name_identifier").AtName("value")),
+				},
 				Attributes: map[string]schema.Attribute{
 					"source": schema.StringAttribute{
 						MarkdownDescription: "Acceptable values: \"Identity Directory\", \"Corporate Idenity Provider\", \"Expression\"",
-						Required: true,
+						Optional: true,
+						Computed: true,
 						Validators: []validator.String{
 							stringvalidator.OneOf(sourceValues...),
 						},
 					},
 					"value": schema.StringAttribute{
-						MarkdownDescription: "If the source is Identity Directory, the only acceptable values are \" none, uid, mail, loginName, displayName, personnelNumber, userUuid\"",
-						Required: true,
+						MarkdownDescription: "If the source is Identity Directory, the only acceptable values are \" none\", \"uid\", \"mail\", \"loginName\", \"displayName\", \"personnelNumber\", \"userUuid\"",
+						Optional: true,
+						Computed: true,
+						Validators: []validator.String{
+							stringvalidator.LengthBetween(1,255),
+						},
 					},
 				},
 			},
@@ -108,15 +127,26 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 				MarkdownDescription: "User attributes to be sent to the application. The Source of these attributes is always the Identity Directory, thus only valid attribute values will be accepted.",
 				Optional: true,
 				Computed: true,
+				Validators: []validator.List{
+					listvalidator.AlsoRequires(path.MatchRoot("assertion_attributes").AtAnyListIndex().AtName("attribute_name"),path.MatchRoot("assertion_attributes").AtAnyListIndex().AtName("attribute_value")),
+				},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"attribute_name": schema.StringAttribute{
 							MarkdownDescription: "Name of the attribute",
-							Required: true,
+							Optional: true,
+							Computed: true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1,255),
+							},
 						},
 						"attribute_value": schema.StringAttribute{
 							MarkdownDescription: "Value of the attribute.",
-							Required: true,
+							Optional: true,
+							Computed: true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1,255),
+							},
 						},
 						"inherited": schema.BoolAttribute{
 							MarkdownDescription: "Indicates whether the attribute has been inherited from a parent application.",
@@ -129,22 +159,34 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 				MarkdownDescription: "Identical to the assertion attributes, except that the assertion attributes can come from other Sources.",
 				Optional: true,
 				Computed: true,
+				Validators: []validator.List{
+					listvalidator.AlsoRequires(path.MatchRoot("advanced_assertion_attributes").AtAnyListIndex().AtName("source"),path.MatchRoot("advanced_assertion_attributes").AtAnyListIndex().AtName("attribute_name"),path.MatchRoot("advanced_assertion_attributes").AtAnyListIndex().AtName("attribute_value")),
+				},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"source": schema.StringAttribute{
 							MarkdownDescription: "Acceptable values: \"Corporate Idenity Provider\", \"Expression\"",
-							Required: true,
+							Optional: true,
+							Computed: true,
 							Validators: []validator.String{
 								stringvalidator.OneOf(sourceValues[1:]...),
 							},
 						},
 						"attribute_name": schema.StringAttribute{
 							MarkdownDescription: "Name of the attribute",
-							Required: true,
+							Optional: true,
+							Computed: true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1,512),
+							},
 						},
 						"attribute_value": schema.StringAttribute{
 							MarkdownDescription: "Value of the attribute",
-							Required: true,
+							Optional: true,
+							Computed: true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1,512),
+							},
 						},
 						"inherited": schema.BoolAttribute{
 							MarkdownDescription: "Indicates whether the attribute has been inherited from a parent application.",
@@ -157,17 +199,25 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 				MarkdownDescription: "A default identity provider can be used for users with any user domain, group and type. This identity provider is used when none of the defined authentication rules meets the criteria.",
 				Optional: true,
 				Computed: true,
+				Validators: []validator.String{
+					stringvalidator.LengthBetween(1,128),
+				},
 			},
 			"authentication_rules": schema.ListNestedAttribute{
 				MarkdownDescription: "Rules to manage authentication. Each rule is evaluated by priority until the criteria of a rule are fulfilled.",
 				Optional: true,
+				Validators: []validator.List{
+					listvalidator.AlsoRequires(path.MatchRoot("authentication_rules").AtAnyListIndex().AtName("identity_provider_id")),
+					// listvalidator.AtLeastOneOf(path.MatchRoot("authentication_rules").AtAnyListIndex().AtName("user_type"),path.MatchRoot("authentication_rules").AtAnyListIndex().AtName("user_group"),path.MatchRoot("authentication_rules").AtAnyListIndex().AtName("user_email_domain"),path.MatchRoot("authentication_rules").AtAnyListIndex().AtName("ip_network_range")),
+				},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"identity_provider_id": schema.StringAttribute{
 							MarkdownDescription: "The identity provider to delegate authentication to when all the defined conditions are met.",
-							Required: true,
+							Optional: true,
 							Validators: []validator.String{
-								stringvalidator.AtLeastOneOf(path.MatchRoot("user_type"),path.MatchRoot("user_group"),path.MatchRoot("user_email_domain"),path.MatchRoot("ip_network_range")),
+								stringvalidator.LengthBetween(1,255),
+								stringvalidator.AtLeastOneOf(path.MatchRoot("user_type"), path.MatchRoot("user_group"), path.MatchRoot("user_email_domain"), path.MatchRoot("ip_network_range")),
 							},
 						},
 						"user_type": schema.StringAttribute{
@@ -180,6 +230,9 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 						"user_group": schema.StringAttribute{
 							MarkdownDescription: "The user group to be authenticated.",
 							Optional: true,
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(1,255),
+							},
 						},
 						"user_email_domain": schema.StringAttribute{
 							MarkdownDescription: "Valid email domain to be authenticated.",
@@ -359,6 +412,7 @@ func getApplicationRequest (ctx context.Context, plan applicationData) (*applica
 		GlobalAccount: plan.GlobalAccount.ValueString(),
 	}
 
+	diagnostics.Append(diags...)
 	if !plan.ParentApplicationId.IsNull() {
 		args.ParentApplicationId = plan.ParentApplicationId.ValueString()
 	}
