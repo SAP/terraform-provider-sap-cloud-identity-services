@@ -66,7 +66,7 @@ var appObjType = types.ObjectType {
 		"multi_tenant_app": types.BoolType,
 		"global_account": types.StringType,
 		"sso_type": types.StringType,
-		"subject_name_identitifer": types.ObjectType{
+		"subject_name_identifier": types.ObjectType{
 			AttrTypes: subjectNameIdentitfierObjType,
 		},
 		"assertion_attributes": types.ListType{
