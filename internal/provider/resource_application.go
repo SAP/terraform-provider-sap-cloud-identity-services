@@ -102,7 +102,10 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 				Optional: true,
 				Computed: true,
 				Validators: []validator.Object{
-					objectvalidator.AlsoRequires(path.MatchRoot("subject_name_identifier").AtName("source"),path.MatchRoot("subject_name_identifier").AtName("value")),
+					objectvalidator.AlsoRequires(
+						path.MatchRoot("subject_name_identifier").AtName("source"),
+						path.MatchRoot("subject_name_identifier").AtName("value"),
+					),
 				},
 				Attributes: map[string]schema.Attribute{
 					"source": schema.StringAttribute{
@@ -158,16 +161,18 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 			"advanced_assertion_attributes" : schema.ListNestedAttribute{
 				MarkdownDescription: "Identical to the assertion attributes, except that the assertion attributes can come from other Sources.",
 				Optional: true,
-				Computed: true,
 				Validators: []validator.List{
-					listvalidator.AlsoRequires(path.MatchRoot("advanced_assertion_attributes").AtAnyListIndex().AtName("source"),path.MatchRoot("advanced_assertion_attributes").AtAnyListIndex().AtName("attribute_name"),path.MatchRoot("advanced_assertion_attributes").AtAnyListIndex().AtName("attribute_value")),
+					listvalidator.AlsoRequires(
+						path.MatchRoot("advanced_assertion_attributes").AtAnyListIndex().AtName("source"),
+						path.MatchRoot("advanced_assertion_attributes").AtAnyListIndex().AtName("attribute_name"),
+						path.MatchRoot("advanced_assertion_attributes").AtAnyListIndex().AtName("attribute_value"),
+					),
 				},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"source": schema.StringAttribute{
 							MarkdownDescription: "Acceptable values: \"Corporate Idenity Provider\", \"Expression\"",
 							Optional: true,
-							Computed: true,
 							Validators: []validator.String{
 								stringvalidator.OneOf(sourceValues[1:]...),
 							},
@@ -175,7 +180,6 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 						"attribute_name": schema.StringAttribute{
 							MarkdownDescription: "Name of the attribute",
 							Optional: true,
-							Computed: true,
 							Validators: []validator.String{
 								stringvalidator.LengthBetween(1,512),
 							},
@@ -183,7 +187,6 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 						"attribute_value": schema.StringAttribute{
 							MarkdownDescription: "Value of the attribute",
 							Optional: true,
-							Computed: true,
 							Validators: []validator.String{
 								stringvalidator.LengthBetween(1,512),
 							},
@@ -208,7 +211,6 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 				Optional: true,
 				Validators: []validator.List{
 					listvalidator.AlsoRequires(path.MatchRoot("authentication_rules").AtAnyListIndex().AtName("identity_provider_id")),
-					// listvalidator.AtLeastOneOf(path.MatchRoot("authentication_rules").AtAnyListIndex().AtName("user_type"),path.MatchRoot("authentication_rules").AtAnyListIndex().AtName("user_group"),path.MatchRoot("authentication_rules").AtAnyListIndex().AtName("user_email_domain"),path.MatchRoot("authentication_rules").AtAnyListIndex().AtName("ip_network_range")),
 				},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
@@ -217,7 +219,6 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 							Optional: true,
 							Validators: []validator.String{
 								stringvalidator.LengthBetween(1,255),
-								stringvalidator.AtLeastOneOf(path.MatchRoot("user_type"), path.MatchRoot("user_group"), path.MatchRoot("user_email_domain"), path.MatchRoot("ip_network_range")),
 							},
 						},
 						"user_type": schema.StringAttribute{
@@ -225,6 +226,12 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 							Optional: true,
 							Validators: []validator.String{
 								stringvalidator.OneOf(userTypeValues...),
+								stringvalidator.AtLeastOneOf(
+									path.MatchRoot("authentication_rules").AtAnyListIndex().AtName("user_type"), 
+									path.MatchRoot("authentication_rules").AtAnyListIndex().AtName("user_group"), 
+									path.MatchRoot("authentication_rules").AtAnyListIndex().AtName("user_email_domain"), 
+									path.MatchRoot("authentication_rules").AtAnyListIndex().AtName("ip_network_range"),
+								),
 							},
 						},
 						"user_group": schema.StringAttribute{
@@ -284,17 +291,6 @@ func (r *applicationResource) Create(ctx context.Context, req resource.CreateReq
 	state, diags := applicationValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
 
-
-	// //the source of the subject name identifier cannot be determined with the help of the API response
-	// //hence it needs to be set with the help of the user provided config
-	// if config.SubjectNameIdentifier == nil {
-	// 	// if user does not configure the subject name identifier, there is 
-	// 	// a default value set in the application with the source as Identity Directory 
-	// 	state.SubjectNameIdentifier.Source = types.StringValue("Identity Directory")
-	// } else {
-	// 	state.SubjectNameIdentifier.Source = config.SubjectNameIdentifier.Source
-	// }
-
 	diags = resp.State.Set(ctx, &state)
 
 	resp.Diagnostics.Append(diags...)
@@ -316,16 +312,6 @@ func (r *applicationResource) Read(ctx context.Context, req resource.ReadRequest
 	state, diags := applicationValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
 
-	// //the source of the subject name identifier cannot be determined with the help of the API response
-	// //hence it needs to be set with the help of the user provided config
-	// if config.SubjectNameIdentifier == nil {
-	// 	// if user does not configure the subject name identifier, there is 
-	// 	// a default value set in the application with the source as Identity Directory 
-	// 	state.SubjectNameIdentifier.Source = types.StringValue("Identity Directory")
-	// } else {
-	// 	state.SubjectNameIdentifier.Source = config.SubjectNameIdentifier.Source
-	// }
-	
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 }
@@ -367,12 +353,6 @@ func (r *applicationResource) Update(ctx context.Context, req resource.UpdateReq
 
 	updatedState, diags := applicationValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
-
-	// if config.SubjectNameIdentifier != nil {
-	// 	updatedState.SubjectNameIdentifier.Source = config.SubjectNameIdentifier.Source
-	// } else {
-	// 	updatedState.SubjectNameIdentifier.Source = state.SubjectNameIdentifier.Source
-	// }
 
 	diags = resp.State.Set(ctx, &updatedState)
 	resp.Diagnostics.Append(diags...)

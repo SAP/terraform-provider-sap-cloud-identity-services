@@ -75,13 +75,15 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 	}
 
 	application.SubjectNameIdentifier = &subjectNameIdentifierData{}
+
+	//regex for expressions needed
 	if re.MatchString(a.AuthenticationSchema.SubjectNameIdentifier) {
 		match := re.FindStringSubmatch(a.AuthenticationSchema.SubjectNameIdentifier)
 		application.SubjectNameIdentifier.Value = types.StringValue(match[1])
-		application.SubjectNameIdentifier.Source = types.StringValue("Corporate Identity Provider")
+		application.SubjectNameIdentifier.Source = types.StringValue(sourceValues[1])
 	} else {
 		application.SubjectNameIdentifier.Value = types.StringValue(a.AuthenticationSchema.SubjectNameIdentifier)
-		application.SubjectNameIdentifier.Source = types.StringValue("Identity Directory")
+		application.SubjectNameIdentifier.Source = types.StringValue(sourceValues[0])
 	}
 
 	attributes := []assertionAttributesData{}
@@ -106,26 +108,30 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 			Inherited: types.BoolValue(attributeRes.Inherited),
 		}
 
-		//generalise these strings
 		if re.MatchString(attributeRes.AttributeValue) {
-			attribute.Source = types.StringValue("Corporate Identity Provider")
+			attribute.Source = types.StringValue(sourceValues[1])
 			match := re.FindStringSubmatch(attributeRes.AttributeValue)
 			attribute.AttributeValue = types.StringValue(match[1])
 
 		} else {
-			attribute.Source = types.StringValue("Expression")
+			attribute.Source = types.StringValue(sourceValues[2])
 			attribute.AttributeValue = types.StringValue(attributeRes.AttributeValue)
 		}
 
 		advancedAttributes = append(advancedAttributes, attribute)
 	}
-	application.AdvancedAssertionAttributes, diags = types.ListValueFrom(ctx, advancedAssertionAttributesObjType, advancedAttributes)
+
+	if len(advancedAttributes) > 0 {
+		application.AdvancedAssertionAttributes, diags = types.ListValueFrom(ctx, advancedAssertionAttributesObjType, advancedAttributes)
+	} else {
+		application.AdvancedAssertionAttributes = types.ListNull(advancedAssertionAttributesObjType)
+	}
+
 	diagnostics.Append(diags...) 
 
 	authRules := []authenticationRulesData{}
 	for _, authRulesRes := range a.AuthenticationSchema.ConditionalAuthentication{
 
-		//alt logic?
 		rule := authenticationRulesData{}
 
 		if len(authRulesRes.UserType)>0 		  	{ rule.UserType = types.StringValue(authRulesRes.UserType) } 
