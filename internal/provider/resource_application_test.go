@@ -32,6 +32,7 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestCheckResourceAttr("ias_application.testApp", "global_account", "unknown"),
 						resource.TestCheckResourceAttr("ias_application.testApp", "sso_type", "saml2"),
 						resource.TestCheckResourceAttr("ias_application.testApp", "subject_name_identifier.value", "uid"),
+						resource.TestCheckResourceAttr("ias_application.testApp", "assertion_attributes.0.attribute_value", "firstName"),
 					),
 				},
 				{
@@ -63,6 +64,7 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestCheckResourceAttr("ias_application.testApp", "global_account", "unknown"),
 						resource.TestCheckResourceAttr("ias_application.testApp", "sso_type", "saml2"),
 						resource.TestCheckResourceAttr("ias_application.testApp", "subject_name_identifier.value", "uid"),
+						resource.TestCheckResourceAttr("ias_application.testApp", "assertion_attributes.0.attribute_value", "firstName"),
 					),
 				},
 				{
@@ -77,6 +79,7 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestCheckResourceAttr("ias_application.testApp", "global_account", "unknown"),
 						resource.TestCheckResourceAttr("ias_application.testApp", "sso_type", "saml2"),
 						resource.TestCheckResourceAttr("ias_application.testApp", "subject_name_identifier.value", "uid"),
+						resource.TestCheckResourceAttr("ias_application.testApp", "assertion_attributes.0.attribute_value", "firstName"),
 					),
 				},
 			},
@@ -129,7 +132,114 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithSsoType("testApp", "test-app", "application for testing purposes", "this-is-not-a-valid-sso_type"),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute sso_type value must be one of: [\"openIdConnect\" \"saml2\"], got:\n \"%s\"","this-is-not-a-valid-sso_type")),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute sso_type value must be one of: \\[\"openIdConnect\" \"saml2\"], got:\n\"%s\"","this-is-not-a-valid-sso_type")),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - subject_name_identifier requires sub-attributes: source, value", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceApplicationWithSubjectNameIdentifier("testApp", "test-app", "application for testing purposes", "source = \"source\""),
+					ExpectError: regexp.MustCompile("Attribute \"subject_name_identifier.value\" must be specified when\n\"subject_name_identifier\" is specified"),
+				},
+				{
+					Config:      ResourceApplicationWithSubjectNameIdentifier("testApp", "test-app", "application for testing purposes", "value = \"value\""),
+					ExpectError: regexp.MustCompile("Attribute \"subject_name_identifier.source\" must be specified when\n\"subject_name_identifier\" is specified"),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - subject_name_identifier.source needs to be a valid value", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceApplicationWithSubjectNameIdentifier("testApp", "test-app", "application for testing purposes", "source = \"this-is-not-a-valid-source\", value = \"value\""),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute subject_name_identifier.source value must be one of: \\[\"Identity\nDirectory\" \"Corporate Identity Provider\" \"Expression\"], got:\n\"%s\"","this-is-not-a-valid-source")),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - assertion_attributes requires sub-attributes: attribute_name, attribute_value", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceApplicationWithAssertionAttributes("testApp", "test-app", "application for testing purposes", "attribute_value = \"value\""),
+					ExpectError: regexp.MustCompile("Attribute \"assertion_attributes\\[0].attribute_name\" must be specified when\n\"assertion_attributes\" is specified"),
+				},
+				{
+					Config:      ResourceApplicationWithAssertionAttributes("testApp", "test-app", "application for testing purposes", "attribute_name = \"name\""),
+					ExpectError: regexp.MustCompile("Attribute \"assertion_attributes\\[0].attribute_value\" must be specified when\n\"assertion_attributes\" is specified"),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - advanced_assertion_attributes requires sub-attributes: source, attribute_name, attribute_value", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceApplicationWithAdvancedAssertionAttributes("testApp", "test-app", "application for testing purposes", "source = \"source\", attribute_value = \"value\""),
+					ExpectError: regexp.MustCompile("Attribute \"advanced_assertion_attributes\\[0].attribute_name\" must be specified\nwhen \"advanced_assertion_attributes\" is specified"),
+				},
+				{
+					Config:      ResourceApplicationWithAdvancedAssertionAttributes("testApp", "test-app", "application for testing purposes", "attribute_name = \"name\", attribute_value = \"value\""),
+					ExpectError: regexp.MustCompile("Attribute \"advanced_assertion_attributes\\[0].source\" must be specified when\n\"advanced_assertion_attributes\" is specified"),
+				},
+				{
+					Config:      ResourceApplicationWithAdvancedAssertionAttributes("testApp", "test-app", "application for testing purposes", "source = \"source\", attribute_name = \"name\""),
+					ExpectError: regexp.MustCompile("Attribute \"advanced_assertion_attributes\\[0].attribute_value\" must be\nspecified when \"advanced_assertion_attributes\" is specified"),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - advanced_assertion_attributes.source needs to be a valid value", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceApplicationWithAdvancedAssertionAttributes("testApp", "test-app", "application for testing purposes", "source = \"this-is-not-a-valid-source\", attribute_name = \"name\", attribute_value = \"value\""),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute advanced_assertion_attributes\\[0].source value must be one of:\n\\[\"Corporate Identity Provider\" \"Expression\"], got:\n\"%s\"","this-is-not-a-valid-source")),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - authentication_rules requires sub-attribute: identity_provider_id", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceApplicationWithAuthenticationRules("testApp", "test-app", "application for testing purposes", "user_type = \"user\""),
+					ExpectError: regexp.MustCompile("Attribute \"authentication_rules\\[0].identity_provider_id\" must be specified\nwhen \"authentication_rules\" is specified"),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - authentication_rules requires atleast one of the following sub-attribute: user_type, user_group, user_email_domain, ip_network_range", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceApplicationWithAuthenticationRules("testApp", "test-app", "application for testing purposes", "identity_provider_id = \"664c660e25cff252c5c202dc\""),
+					ExpectError: regexp.MustCompile("At least one attribute out of\n\\[authentication_rules\\[\\*].user_type,authentication_rules\\[\\*].user_group,authentication_rules\\[\\*].user_email_domain,authentication_rules\\[\\*].ip_network_range]\nmust be specified"),
 				},
 			},
 		})
@@ -141,21 +251,21 @@ func TestResourceApplication(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      ResourceApplicationWithAuthenticationRules("testApp", "test-app", "application for testing purposes", "this-is-not-email-domain", "0.0.0.0"),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_rules[0].user_email_domain value must be a valid\nEmail Domain, got: %s", "this-is-not-email-domain")),
+					Config:      ResourceApplicationWithAuthenticationRules("testApp", "test-app", "application for testing purposes", "identity_provider_id = \"664c660e25cff252c5c202dc\", user_email_domain=\"this-is-not-email-domain\""),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_rules\\[0].user_email_domain value must be a valid\nEmail Domain, got: %s", "this-is-not-email-domain")),
 				},
 			},
 		})
 	})
 
-	t.Run("error path - ip is not a valid address", func(t *testing.T) {
+	t.Run("error path - ip address is invalid", func(t *testing.T) {
 		resource.Test(t, resource.TestCase{
 			IsUnitTest:               true,
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      ResourceApplicationWithAuthenticationRules("testApp", "test-app", "application for testing purposes", "test.com", "this-is-not-ip-address"),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_rules[0].ip_network_range value must be a valid IP\nAddress, got: %s", "this-is-not-ip-address")),
+					Config:      ResourceApplicationWithAuthenticationRules("testApp", "test-app", "application for testing purposes", "identity_provider_id = \"664c660e25cff252c5c202dc\", ip_network_range = \"this-is-not-ip-address\""),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_rules\\[0].ip_network_range value must be a valid IP\nAddress, got: %s", "this-is-not-ip-address")),
 				},
 			},
 		})
@@ -198,6 +308,42 @@ func ResourceApplicationWithoutAppName(resourceName string) string {
 	`, resourceName)
 }
 
+func ResourceApplicationWithSubjectNameIdentifier(resourceName string, appName string, description string, subAttribute string) string {
+	return fmt.Sprintf(`
+	resource "ias_application" "%s" {
+		name = "%s"
+		description = "%s"
+		subject_name_identifier = {
+			%s
+		}
+	}
+	`, resourceName, appName, description, subAttribute)
+}
+
+func ResourceApplicationWithAssertionAttributes(resourceName string, appName string, description string, subAttribute string) string {
+	return fmt.Sprintf(`
+	resource "ias_application" "%s" {
+		name = "%s"
+		description = "%s"
+		assertion_attributes = [
+			{	%s	}
+		]
+	}
+	`, resourceName, appName, description, subAttribute)
+}
+
+func ResourceApplicationWithAdvancedAssertionAttributes(resourceName string, appName string, description string, subAttribute string) string {
+	return fmt.Sprintf(`
+	resource "ias_application" "%s" {
+		name = "%s"
+		description = "%s"
+		advanced_assertion_attributes = [
+			{	%s	}
+		]
+	}
+	`, resourceName, appName, description, subAttribute)
+}
+
 func ResourceApplicationWithSsoType(resourceName string, appName string, description string, ssoType string) string {
 	return fmt.Sprintf(`
 	resource "ias_application" "%s" {
@@ -208,18 +354,16 @@ func ResourceApplicationWithSsoType(resourceName string, appName string, descrip
 	`, resourceName, appName, description, ssoType)
 }
 
-func ResourceApplicationWithAuthenticationRules(resourceName string, appName string, description string, emailDomain string, ipAddress string) string {
+func ResourceApplicationWithAuthenticationRules(resourceName string, appName string, description string, subAttribute string) string {
 	return fmt.Sprintf(`
 	resource "ias_application" "%s" {
 		name = "%s"
 		description = "%s"
 		authentication_rules = [
 			{
-				identity_provider_id = "664c660e25cff252c5c202dc",
-				user_email_domain = "%s"
-				ip_network_range = "%s"
+				%s
 			}
 		]
 	}
-	`, resourceName, appName, description, emailDomain, ipAddress)
+	`, resourceName, appName, description, subAttribute)
 }
