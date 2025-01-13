@@ -2,14 +2,14 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"terraform-provider-ias/internal/cli/apiObjects/users"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
-func TestResourceUser (t *testing.T) {
-	t. Parallel()
+func TestResourceUser(t *testing.T) {
 
 	schemas := []string{
 		"urn:ietf:params:scim:schemas:extension:sap:2.0:User",
@@ -23,17 +23,19 @@ func TestResourceUser (t *testing.T) {
 
 	emails := []users.Email{
 		{
-			Type: "work",
+      Type: "work",
 			Value: "joe.doe@test.com",
 		},
 	}
+
+	t.Parallel()
 
 	t.Run("happy path", func(t *testing.T) {
 		rec, user := setupVCR(t, "fixtures/resource_user")
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{
-			IsUnitTest: true,
+			IsUnitTest:               true,
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
@@ -45,6 +47,9 @@ func TestResourceUser (t *testing.T) {
 						resource.TestCheckResourceAttr("ias_user.testUser", "name.given_name", name.GivenName),
 						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.type", emails[0].Type),
 						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.value", emails[0].Value),
+						resource.TestCheckResourceAttr("ias_user.testUser", "active", "false"),
+						resource.TestCheckResourceAttr("ias_user.testUser", "status", "inactive"),
+						resource.TestCheckResourceAttr("ias_user.testUser", "user_type", "public"),
 					),
 				},
 			},
@@ -60,9 +65,9 @@ func TestResourceUser (t *testing.T) {
 			FamilyName: "Doe S",
 			GivenName: "Joe",
 		}
-
+    
 		resource.Test(t, resource.TestCase{
-			IsUnitTest: true,
+			IsUnitTest:               true,
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
@@ -74,6 +79,9 @@ func TestResourceUser (t *testing.T) {
 						resource.TestCheckResourceAttr("ias_user.testUser", "name.given_name", name.GivenName),
 						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.type", emails[0].Type),
 						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.value", emails[0].Value),
+						resource.TestCheckResourceAttr("ias_user.testUser", "active", "false"),
+						resource.TestCheckResourceAttr("ias_user.testUser", "status", "inactive"),
+						resource.TestCheckResourceAttr("ias_user.testUser", "user_type", "public"),
 					),
 				},
 				{
@@ -85,6 +93,9 @@ func TestResourceUser (t *testing.T) {
 						resource.TestCheckResourceAttr("ias_user.testUser", "name.given_name", updatedName.GivenName),
 						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.type", emails[0].Type),
 						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.value", emails[0].Value),
+						resource.TestCheckResourceAttr("ias_user.testUser", "active", "false"),
+						resource.TestCheckResourceAttr("ias_user.testUser", "status", "inactive"),
+						resource.TestCheckResourceAttr("ias_user.testUser", "user_type", "public"),
 					),
 				},
 			},
@@ -92,10 +103,91 @@ func TestResourceUser (t *testing.T) {
 
 	})
 
+	t.Run("error path - schemas cannot be empty", func(t *testing.T) {
+		rec, user := setupVCR(t, "fixtures/resource_user_empty_schemas")
+		defer stopQuietly(rec)
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+			Steps: []resource.TestStep{
+				{
+					Config:      providerConfig("", user) + ResourceUserWithoutSchemas("testUser", "Joe Doe", name, emails),
+					ExpectError: regexp.MustCompile("Provide a valid value for \"schemas\""),
+				},
+			},
+		})
+
+	})
+
+	t.Run("error path - username is mandatory", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceUserWithoutUserName("testUser", schemas, name, emails),
+					ExpectError: regexp.MustCompile("The argument \"user_name\" is required, but no definition was found."),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - name cannot be empty", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceUserWithoutName("testUser", "Joe Doe", schemas, emails),
+					ExpectError: regexp.MustCompile("Inappropriate value for attribute \"name\": attributes \"family_name\" and\n\"given_name\" are required."),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - emails cannot be empty", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceUserWithoutEmails("testUser", "Joe Doe", schemas, name),
+					ExpectError: regexp.MustCompile("Inappropriate value for attribute \"emails\": element 0: attributes \"type\" and\n\"value\" are required."),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - user type must be a valid value", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceUserWithUserType("testUser", "Joe Doe", schemas, name, emails, "this-is-not-a-valid-user-type"),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute user_type value must be one of: \\[\"public\" \"partner\" \"customer\"\n\"external\" \"onboardee\" \"employee\"\\], got: \"%s\"","this-is-not-a-valid-user-type")),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - status must be a valid value", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceUserWithStatus("testUser", "Joe Doe", schemas, name, emails, "this-is-not-a-valid-status"),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute status value must be one of: \\[\"active\" \"inactive\" \"new\"\\], got:\n\"%s\"","this-is-not-a-valid-status")),
+				},
+			},
+		})
+	})
 
 }
 
-func ResourceUser (resoureName string, userName string, schemas []string, name users.Name, emails []users.Email) string {
+func ResourceUser(resourceName string, userName string, schemas []string, name users.Name, emails []users.Email) string {
 	return fmt.Sprintf(`
 	resource "ias_user" "%s"{
 		schemas = [
@@ -114,5 +206,131 @@ func ResourceUser (resoureName string, userName string, schemas []string, name u
 			}
 		]
 	}
-	`, resoureName, schemas[0], schemas[1], userName, name.FamilyName, name.GivenName, emails[0].Type, emails[0].Value)
+	`, resourceName, schemas[0], schemas[1], userName, name.FamilyName, name.GivenName, emails[0].Type, emails[0].Value)
 }
+
+func ResourceUserWithoutSchemas(resourceName string, userName string, name users.Name, emails []users.Email) string {
+	return fmt.Sprintf(`
+	resource "ias_user" "%s"{
+		schemas = []
+		user_name = "%s"
+		name = {
+			family_name = "%s"
+			given_name = "%s"
+		}
+		emails = [
+			{
+				type = "%s"
+				value = "%s"
+			}
+		]
+	}
+	`, resourceName, userName, name.FamilyName, name.GivenName, emails[0].Type, emails[0].Value)
+}
+
+func ResourceUserWithoutUserName(resourceName string, schemas []string, name users.Name, emails []users.Email) string {
+	return fmt.Sprintf(`
+	resource "ias_user" "%s"{
+		schemas = [
+			"%s",
+			"%s"
+		]
+		name = {
+			family_name = "%s"
+			given_name = "%s"
+		}
+		emails = [
+			{
+				type = "%s"
+				value = "%s"
+			}
+		]
+	}
+	`, resourceName, schemas[0], schemas[1], name.FamilyName, name.GivenName, emails[0].Type, emails[0].Value)
+}
+
+func ResourceUserWithoutName(resourceName string, userName string, schemas []string, emails []users.Email) string {
+	return fmt.Sprintf(`
+	resource "ias_user" "%s"{
+		schemas = [
+			"%s",
+			"%s"
+		]
+		user_name = "%s"
+		name = {}
+		emails = [
+			{
+				type = "%s"
+				value = "%s"
+			}
+		]
+	}
+	`, resourceName, schemas[0], schemas[1], userName, emails[0].Type, emails[0].Value)
+}
+
+func ResourceUserWithoutEmails(resourceName string, userName string, schemas []string, name users.Name) string {
+	return fmt.Sprintf(`
+	resource "ias_user" "%s"{
+		schemas = [
+			"%s",
+			"%s"
+		]
+		user_name = "%s"
+		name = {
+			family_name = "%s"
+			given_name = "%s"
+		}
+		emails = [
+			{}
+		]
+	}
+	`, resourceName, schemas[0], schemas[1], userName, name.FamilyName, name.GivenName)
+}
+
+func ResourceUserWithUserType(resourceName string, userName string, schemas []string, name users.Name, emails []users.Email, userType string) string {
+	return fmt.Sprintf(`
+	resource "ias_user" "%s"{
+		schemas = [
+			"%s",
+			"%s"
+		]
+		user_name = "%s"
+		name = {
+			family_name = "%s"
+			given_name = "%s"
+		}
+		emails = [
+			{
+				type = "%s"
+				value = "%s"
+			}
+		]
+		user_type = "%s"
+	}
+	`, resourceName, schemas[0], schemas[1], userName, name.FamilyName, name.GivenName, emails[0].Type, emails[0].Value, userType)
+}
+
+func ResourceUserWithStatus(resourceName string, userName string, schemas []string, name users.Name, emails []users.Email, status string) string {
+	return fmt.Sprintf(`
+	resource "ias_user" "%s"{
+		schemas = [
+			"%s",
+			"%s"
+		]
+		user_name = "%s"
+		name = {
+			family_name = "%s"
+			given_name = "%s"
+		}
+		emails = [
+			{
+				type = "%s"
+				value = "%s"
+			}
+		]
+		status = "%s"
+	}
+	`, resourceName, schemas[0], schemas[1], userName, name.FamilyName, name.GivenName, emails[0].Type, emails[0].Value, status)
+}
+
+

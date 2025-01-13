@@ -35,8 +35,8 @@ func (a *ApplicationsCli) Get(ctx context.Context) (applications.ApplicationsRes
 	return app, nil
 }
 
-func (a *ApplicationsCli) GetByAppId(ctx context.Context, appId string) (applications.ApplicationResponse, error) {
-	var app applications.ApplicationResponse
+func (a *ApplicationsCli) GetByAppId(ctx context.Context, appId string) (applications.Application, error) {
+	var app applications.Application
 
 	res, err, _ := a.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", a.getUrl(), appId), nil, ApplicationHeader, nil)
 
@@ -50,18 +50,7 @@ func (a *ApplicationsCli) GetByAppId(ctx context.Context, appId string) (applica
 	return app, nil
 }
 
-type ApplicationCreateInput struct {
-	Id          			string 		`json:"id,omitempty"`
-	Name        			string 		`json:"name"`
-	Description 			string 		`json:"description"`
-	ParentApplicationId		string 		`json:"parentApplicationId,omitempty"`
-	MultiTenantApp			bool 		`json:"multiTenantApp"`
-	PrivacyPolicy			string 		`json:"privacyPolicy"`
-	TermsOfUse				string 		`json:"termsOfUse"`
-	GlobalAccount 			string 		`json:"globalAccount"`
-}
-
-func (a *ApplicationsCli) Create(ctx context.Context, args *ApplicationCreateInput) (string, error) {
+func (a *ApplicationsCli) Create(ctx context.Context, args *applications.Application) (string, error) {
 
 	var appId string
 
@@ -78,13 +67,7 @@ func (a *ApplicationsCli) Create(ctx context.Context, args *ApplicationCreateInp
 	return appId, nil
 }
 
-type ApplicationUpdateInput struct {
-	Id          string `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-}
-
-func (a *ApplicationsCli) Update(ctx context.Context, args *ApplicationUpdateInput) error {
+func (a *ApplicationsCli) Update(ctx context.Context, args *applications.Application) error {
 	_, err, _ := a.cliClient.Execute(ctx, "PUT", fmt.Sprintf("%s%s", a.getUrl(), args.Id), args, ApplicationHeader, nil)
 	return err
 }
