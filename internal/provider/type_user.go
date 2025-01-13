@@ -50,7 +50,6 @@ func userValueFrom(ctx context.Context, u users.User) (userData, diag.Diagnostic
 		Id:          types.StringValue(u.Id),
 		UserName:    types.StringValue(u.UserName),
 		DisplayName: types.StringValue(u.DisplayName),
-		// Password: 	 types.StringValue(u.Password),
 		Title: 		 types.StringValue(u.Title),
 		UserType:    types.StringValue(u.UserType),
 		Active: 	 types.BoolValue(u.Active),
