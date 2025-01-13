@@ -128,6 +128,9 @@ func TestIasProvider_AllResources (t *testing.T){
 
 	expectedResources := []string{
 		"ias_application",
+		"ias_user",
+		"ias_group",
+		"ias_schema",
 	}
 
 	ctx := context.Background()
@@ -149,6 +152,12 @@ func TestIasProvider_AllDataSources (t *testing.T){
 	expectedDataSources := []string{
 		"ias_application",
 		"ias_applications",
+		"ias_user",
+		"ias_users",
+		"ias_group",
+		"ias_groups",
+		"ias_schema",
+		"ias_schemas",
 	}
 
 	ctx := context.Background()
