@@ -17,6 +17,7 @@ type groupData struct {
 	Id				types.String 		`tfsdk:"id"`
 	Schemas 		types.Set 			`tfsdk:"schemas"`
 	DisplayName		types.String		`tfsdk:"display_name"`
+	Name 			types.String 		`tfsdk:"name"`
 	GroupMembers 	types.List 			`tfsdk:"group_members"`	
 	ExternalId 		types.String 		`tfsdk:"external_id"`
 	Description 	types.String 		`tfsdk:"description"`
@@ -27,12 +28,11 @@ type groupsData struct {
 }
 
 func groupValueFrom(ctx context.Context, g groups.Group) (groupData, diag.Diagnostics) {
-	var diagnostics, diags diag.Diagnostics
-
-	
+	var diagnostics, diags diag.Diagnostics	
 	group := groupData{
 		Id: 			types.StringValue(g.Id),
 		DisplayName: 	types.StringValue(g.DisplayName),
+		Name: 			types.StringValue(g.GroupExtension.Name),
 	}
 
 	group.Schemas, diags = types.SetValueFrom(ctx, types.StringType, g.Schemas)
@@ -56,10 +56,14 @@ func groupValueFrom(ctx context.Context, g groups.Group) (groupData, diag.Diagno
 
 		groupMembers = append(groupMembers, member)
 	}
-	group.GroupMembers, diags = types.ListValueFrom(ctx, membersObjType, groupMembers)
+	
+	if len(groupMembers) > 0 {
+		group.GroupMembers, diags = types.ListValueFrom(ctx, membersObjType, groupMembers)
+	} else {
+		group.GroupMembers = types.ListNull(membersObjType)
+	}
 	diagnostics.Append(diags...)
 	
-
 	return group, diagnostics
 }
 

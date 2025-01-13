@@ -18,19 +18,14 @@ func TestResourceUser(t *testing.T) {
 
 	name := users.Name{
 		FamilyName: "Doe",
-		GivenName:  "Joe",
+		GivenName: "Joe",
 	}
 
 	emails := []users.Email{
 		{
-			Type:  "work",
+      Type: "work",
 			Value: "joe.doe@test.com",
 		},
-	}
-
-	updatedName := users.Name{
-		FamilyName: "Doe S",
-		GivenName:  "Joe",
 	}
 
 	t.Parallel()
@@ -66,6 +61,11 @@ func TestResourceUser(t *testing.T) {
 		rec, user := setupVCR(t, "fixtures/resource_user_updated")
 		defer stopQuietly(rec)
 
+		updatedName := users.Name{
+			FamilyName: "Doe S",
+			GivenName: "Joe",
+		}
+    
 		resource.Test(t, resource.TestCase{
 			IsUnitTest:               true,
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
