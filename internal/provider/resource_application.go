@@ -21,7 +21,7 @@ import (
 
 var sourceValues 		= []string {"Identity Directory", "Corporate Identity Provider", "Expression"}
 var ssoValues 			= []string {"openIdConnect", "saml2"}
-var userTypeValues 		= []string {"public", "employee", "customer", "partner", "external", "onboardee"} 
+var usersTypeValues 		= []string {"public", "employee", "customer", "partner", "external", "onboardee"} 
 
 func newApplicationResource() resource.Resource {
 	return &applicationResource{}
@@ -225,7 +225,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 							MarkdownDescription: "The type of user to be authenticated.",
 							Optional: true,
 							Validators: []validator.String{
-								stringvalidator.OneOf(userTypeValues...),
+								stringvalidator.OneOf(usersTypeValues...),
 								stringvalidator.AtLeastOneOf(
 									path.MatchRoot("authentication_rules").AtAnyListIndex().AtName("user_type"), 
 									path.MatchRoot("authentication_rules").AtAnyListIndex().AtName("user_group"), 
