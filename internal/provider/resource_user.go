@@ -116,7 +116,7 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 							Optional: true,
 						},
 						"primary": schema.BoolAttribute{
-							MarkdownDescription: "Set the email to be primary or not.",
+							MarkdownDescription: "Set the email to be primary",
 							Computed: true,
 							Optional: true,
 						},
@@ -158,7 +158,7 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 				Computed: true,
 			},
 			"mail_verified": schema.BoolAttribute{
-				MarkdownDescription: "The attribute specifies if the e-mail of the newly created user is verified or not. So if the values of the mailVerified and sendMail are true, the user will receive e-mail and they will be able to log on. On the other hand, if the sendMail is true, but the mailVerified is false, the user will receive e-mail and they have to click the verification link in the e-mail. If the attribute \"verified\" is not passed in the request body, the default value of mailVerified is false.",
+				MarkdownDescription: "The attribute specifies if the e-mail of the newly created user is verified or not. So if the values of the \"mail_verified\" and \"send_mail\" attributes are true, the user will receive e-mail and they will be able to log on. On the other hand, if the \"send_mail\" is true, but the \"mail_verified\" is false, the user will receive e-mail and they have to click the verification link in the e-mail. If the attribute \"verified\" is not passed in the request body, the default value of \"mail_erified\" is false.",
 				Optional: true,
 				Computed: true,
 			},
