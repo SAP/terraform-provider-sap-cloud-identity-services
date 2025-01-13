@@ -11,26 +11,26 @@ import (
 func TestResourceUser (t *testing.T) {
 	t. Parallel()
 
+	schemas := []string{
+		"urn:ietf:params:scim:schemas:extension:sap:2.0:User",
+		"urn:ietf:params:scim:schemas:core:2.0:User",
+	}
+
+	name := users.Name{
+		FamilyName: "Doe",
+		GivenName: "Joe",
+	}
+
+	emails := []users.Email{
+		{
+			Type: "work",
+			Value: "joe.doe@test.com",
+		},
+	}
+
 	t.Run("happy path", func(t *testing.T) {
 		rec, user := setupVCR(t, "fixtures/resource_user")
 		defer stopQuietly(rec)
-
-		schemas := []string{
-			"urn:ietf:params:scim:schemas:extension:sap:2.0:User",
-			"urn:ietf:params:scim:schemas:core:2.0:User",
-		}
-
-		name := users.Name{
-			FamilyName: "Doe",
-			GivenName: "Joe",
-		}
-
-		emails := []users.Email{
-			{
-				Type: "work",
-				Value: "joe.doe@test.com",
-			},
-		}
 
 		resource.Test(t, resource.TestCase{
 			IsUnitTest: true,
@@ -55,23 +55,6 @@ func TestResourceUser (t *testing.T) {
 	t.Run("happy path - user update", func(t *testing.T) {
 		rec, user := setupVCR(t, "fixtures/resource_user_updated")
 		defer stopQuietly(rec)
-
-		schemas := []string{
-			"urn:ietf:params:scim:schemas:extension:sap:2.0:User",
-			"urn:ietf:params:scim:schemas:core:2.0:User",
-		}
-
-		name := users.Name{
-			FamilyName: "Doe",
-			GivenName: "Joe",
-		}
-
-		emails := []users.Email{
-			{
-				Type: "work",
-				Value: "joe.doe@test.com",
-			},
-		}
 
 		updatedName := users.Name{
 			FamilyName: "Doe S",
