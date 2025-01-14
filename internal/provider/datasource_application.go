@@ -172,7 +172,7 @@ func (d *applicationDataSource) Read(ctx context.Context, req datasource.ReadReq
 		return
 	}
 
-	res, err := d.cli.ApplicationConfiguration.Application.GetByAppId(ctx, config.Id.ValueString())
+	res, err := d.cli.Application.GetByAppId(ctx, config.Id.ValueString())
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving application", fmt.Sprintf("%s", err))
