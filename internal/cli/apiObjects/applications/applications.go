@@ -42,7 +42,7 @@ type UserAttribute struct {
 }
 
 type UserAccess struct {
-	Type						string 			`json:"type"`
+	Type						string 			`json:"type,omitempty"`
 	UserAttributesForAccess		UserAttribute	`json:"userAttributesForAccess"`
 }
 
@@ -114,33 +114,33 @@ type ConsumedApi struct {
 }		
 
 type AuthenticationSchema struct {
-	SsoType 							string 							`json:"ssoType"`
-	HomeUrl								string 							`json:"homeUrl"`
-	SubjectNameIdentifier				string 							`json:"subjectNameIdentifier"`
-	FallbackSubjectNameIdentifier		string 							`json:"fallbackSubjectNameIdentifier"`
-	SubjectNameIdentifierFunction		string 							`json:"subjectNameIdentifierFunction"`
-	RememberMeExpirationTimeInMonths	string 							`json:"rememberMeExpirationTimeInMonths"`
-	PasswordPolicy						string 							`json:"passwordPolicy"`
-	UserAccess							UserAccess 						`json:"userAccess"`
-	CompanyId							string 							`json:"companyId"`
-	ClientId							string 							`json:"clientId"`
-	ApiCertificates						[]ApiCertificateData			`json:"apiCertificates"`
-	JwtClientAuthCredentials			[]JwtClientAuthCredential		`json:"jwtClientAuthCredentials"`
-	AssertionAttributes					[]AssertionAttribute			`json:"assertionAttributes"`	
-	AdvancedAssertionAttributes			[]AdvancedAssertionAttribute 	`json:"advancedAssertionAttributes"`
-	DisabledInheritedProperties			DisabledInheritedProperties		`json:"disabledInheritedProperties,omitempty"`
-	SocialSignOn						bool 							`json:"socialSignOn,omitempty"`
-	SpnegoEnabled						bool 							`json:"spnegoEnabled,omitempty"`
-	BiometricAuthenticationEnabled		bool 							`json:"biometricAuthenticationEnabled,omitempty"`
-	ForceAuthentication					bool 							`json:"forceAuthentication,omitempty"`
-	ConcurrentAccess					[]string						`json:"concurrentAccess,omitempty"`
-	TrustAllCorporateIdentityProviders	bool 							`json:"trustAllCorporateIdentityProviders,omitempty"`
-	AllowIasUsers						bool 							`json:"allowIasUsers,omitempty"`
+	SsoType 							string 							`json:"ssoType,omitempty"`
+	SubjectNameIdentifier				string 							`json:"subjectNameIdentifier,omitempty"`
+	AssertionAttributes					[]AssertionAttribute			`json:"assertionAttributes,omitempty"`	
+	AdvancedAssertionAttributes			[]AdvancedAssertionAttribute 	`json:"advancedAssertionAttributes,omitempty"`
 	DefaultAuthenticatingIdpId			string 							`json:"defaultAuthenticatingIdpId,omitempty"`
 	ConditionalAuthentication			[]AuthenicationRule				`json:"conditionalAuthentication,omitempty"`
-	ConsumedServices					[]ConsumedService				`json:"consumedServices,omitempty"`
-	ProvidedApis						[]ProvidedApi 					`json:"providedApis,omitempty"`
-	ConsumedApis						[]ConsumedApi 					`json:"consumedApis,omitempty"`
+	// HomeUrl								string 							`json:"homeUrl"`
+	// FallbackSubjectNameIdentifier		string 							`json:"fallbackSubjectNameIdentifier,omitempty"`
+	// SubjectNameIdentifierFunction		string 							`json:"subjectNameIdentifierFunction,omitempty"`
+	// RememberMeExpirationTimeInMonths	string 							`json:"rememberMeExpirationTimeInMonths,omitempty"`
+	// PasswordPolicy						string 							`json:"passwordPolicy"`
+	// UserAccess							UserAccess 						`json:"userAccess,omitempty"`
+	// CompanyId							string 							`json:"companyId"`
+	// ClientId							string 							`json:"clientId"`
+	// ApiCertificates						[]ApiCertificateData			`json:"apiCertificates"`
+	// JwtClientAuthCredentials			[]JwtClientAuthCredential		`json:"jwtClientAuthCredentials"`
+	// DisabledInheritedProperties			DisabledInheritedProperties		`json:"disabledInheritedProperties,omitempty"`
+	// SocialSignOn						bool 							`json:"socialSignOn,omitempty"`
+	// SpnegoEnabled						bool 							`json:"spnegoEnabled,omitempty"`
+	// BiometricAuthenticationEnabled		bool 							`json:"biometricAuthenticationEnabled,omitempty"`
+	// ForceAuthentication					bool 							`json:"forceAuthentication,omitempty"`
+	// ConcurrentAccess					[]string						`json:"concurrentAccess,omitempty"`
+	// TrustAllCorporateIdentityProviders	bool 							`json:"trustAllCorporateIdentityProviders,omitempty"`
+	// AllowIasUsers						bool 							`json:"allowIasUsers,omitempty"`
+	// ConsumedServices					[]ConsumedService				`json:"consumedServices,omitempty"`
+	// ProvidedApis						[]ProvidedApi 					`json:"providedApis,omitempty"`
+	// ConsumedApis						[]ConsumedApi 					`json:"consumedApis,omitempty"`
 	// riskBasedAuthentication
 	// smsVerificationConfig
 	// captchaConfig
@@ -151,24 +151,25 @@ type AuthenticationSchema struct {
 	// restApiAuthentication
 }
 
-type ApplicationResponse struct {
-	Id						string 		`json:"id"`
-	Meta 					Meta 		`json:"meta,omitempty"`
-	Name 					string 		`json:"name"`
-	Description				string 		`json:"description,omitempty"`
-	ParentApplicationId 	string 		`json:"parentApplicationId,omitempty"`
-	MultiTenantApp 			bool 		`json:"multiTenantApp,omitempty"`	//only for SAP internal use
-	PrivacyPolicy 			string 		`json:"privacyPolicy,omitempty"`
-	TermsOfUse 				string 		`json:"termsOfUse,omitempty"`
-	GlobalAccount 			string 		`json:"globalAccount,omitempty"`
-	Schemas 				[]string 	`json:"schemas,omitempty"`
-	Branding 				Branding 	`json:"branding,omitempty"`
+type Application struct {
+	Id						string 					`json:"id"`
+	Name 					string 					`json:"name"`
+	Description				string 					`json:"description,omitempty"`
+	ParentApplicationId 	string 					`json:"parentApplicationId,omitempty"`
+	MultiTenantApp 			bool 					`json:"multiTenantApp,omitempty"`	//only for SAP internal use
+	GlobalAccount 			string 					`json:"globalAccount,omitempty"`
+	Schemas 				[]string 				`json:"schemas,omitempty"`
+	AuthenticationSchema    AuthenticationSchema	`json:"urn:sap:identity:application:schemas:extension:sci:1.0:Authentication"`
+	// Meta 					Meta 					`json:"meta,omitempty"`
+	// PrivacyPolicy 			string 					`json:"privacyPolicy,omitempty"`
+	// TermsOfUse 				string 					`json:"termsOfUse,omitempty"`
+	// Branding 				Branding 				`json:"branding,omitempty"`
 }
 
 type ApplicationsResponse struct {
 	TotalResults	int 					`json:"totalResults,omitempty"`
 	ItemsPerPage	int 					`json:"itemsPerPage,omitempty"`
 	NextCursor		string 					`json:"nextCursor,omitempty"`
-	Applications	[]ApplicationResponse	`json:"applications,omitempty"`
+	Applications	[]Application	`json:"applications,omitempty"`
 }
 

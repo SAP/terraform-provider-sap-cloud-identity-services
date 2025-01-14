@@ -27,13 +27,21 @@ type nameData struct {
 
 type userData struct {
 	//INPUT
-	Id 				types.String `tfsdk:"id"`
+	Id 				types.String 	`tfsdk:"id"`
 	//OUTPUT
-	Schemas 		types.Set 	 `tfsdk:"schemas"`
-	UserName 		types.String `tfsdk:"user_name"`
-	Name        	types.Object `tfsdk:"name"`
-	Emails			types.Set 	 `tfsdk:"emails"` 				
-}	
+	Schemas 		types.Set 	 	`tfsdk:"schemas"`
+	UserName 		types.String 	`tfsdk:"user_name"`
+	Name        	types.Object 	`tfsdk:"name"`
+	DisplayName 	types.String 	`tfsdk:"display_name"`
+	Emails			types.Set 	 	`tfsdk:"emails"` 
+	Password 		types.String 	`tfsdk:"password"`
+	Title 			types.String 	`tfsdk:"title"`
+	UserType 		types.String 	`tfsdk:"user_type"`
+	Active 			types.Bool 		`tfsdk:"active"`
+	SendMail 		types.Bool 		`tfsdk:"send_mail"`
+	MailVerified 	types.Bool 		`tfsdk:"mail_verified"`
+	Status 			types.String	`tfsdk:"status"`
+}		
 
 func userValueFrom(ctx context.Context, u users.User) (userData, diag.Diagnostics) {
 	var diagnostics, diags diag.Diagnostics
@@ -41,6 +49,13 @@ func userValueFrom(ctx context.Context, u users.User) (userData, diag.Diagnostic
 	user := userData{
 		Id:          types.StringValue(u.Id),
 		UserName:    types.StringValue(u.UserName),
+		DisplayName: types.StringValue(u.DisplayName),
+		Title: 		 types.StringValue(u.Title),
+		UserType:    types.StringValue(u.UserType),
+		Active: 	 types.BoolValue(u.Active),
+		SendMail:    types.BoolValue(u.SAPExtension.SendMail),
+		MailVerified: types.BoolValue(u.SAPExtension.MailVerified),
+		Status:      types.StringValue(u.SAPExtension.Status),
 	}
 
 	user.Schemas, diags = types.SetValueFrom(ctx, types.StringType, u.Schemas)

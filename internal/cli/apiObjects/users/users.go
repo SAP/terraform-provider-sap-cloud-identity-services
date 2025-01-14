@@ -1,5 +1,52 @@
 package users
 
+type CorporateGroup struct {
+	Value 	string 		`json:"value"`
+}
+
+type SAPExtension struct {
+	// LoginTime				string 		`json:"loginTime"`
+	SourceSystem			int			`json:"sourceSystem"`
+	SourceSystemId			string 		`json:"sourceSystemId"`
+	ApplicationId			string 		`json:"applicationId"`
+	EmailTemplateSetId		string 		`json:"emailTemplateSetId"`
+	SendMail				bool 		`json:"sendMail"`
+	TargetUrl				string 		`json:"targetUrl"`
+	MailVerified			bool 		`json:"mailVerified"`
+	// UserUuid				string 		`json:"userUuid"`
+	// UserUuidHistory			string 		`json:"userUuidHistory"` 		//read only
+	UserId					string 		`json:"userId"`
+	// SapUserName				string 		`json:"sapUserName"`
+	Status					string 		`json:"status,omitempty"`
+	TotpEnabled				bool 		`json:"totpEnabled"`
+	WebAuthEnabled			bool 		`json:"webAuthEnabled"`
+	// Industry				string 		`json:"industry"`
+	// CompanyRelationship		string 		`json:"companyRelationship"`
+	MfaEnabled				bool 		`json:"mfaEnabled"`
+	// contactPreferences
+	// socialIdentities
+	// passwordDetails
+	// emails
+	// addresses
+	CorporateGroups 		[]CorporateGroup 	`json:"corporateGroups"`
+	// ValidFrom				string 		`json:"validFrom"`
+	// ValidTo					string 		`json:"validTo"`
+}
+
+type Manager struct{
+	DisplayName 	string 		`json:"displayName"`
+	Value 			string 		`json:"value"`
+}
+
+type EnterpriseUser struct {
+	Division 			string 		`json:"division"`
+	CostCenter  		string		`json:"costCenter"`
+	Organization 		string 		`json:"organization"`
+	Department 			string 		`json:"department"`
+	EmployeeNumber 		string 		`json:"employeeNumber"`
+	Manager 			Manager 	`json:"manager"`
+}
+
 type Name struct{
 	FamilyName 		string 		`json:"familyName"`
 	GivenName 		string 		`json:"givenName"`
@@ -85,6 +132,8 @@ type User struct {
 	Addresses 			[]Address 		`json:"addresses,omitempty"`
 	Entitlements 		[]Enititlement 	`json:"entitlements,omitempty"`
 	Roles 				[]Role 			`json:"roles,omitempty"`
+	// EnterpriseUser      EnterpriseUser  `json:"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"`
+	SAPExtension 		SAPExtension	`json:"urn:ietf:params:scim:schemas:extension:sap:2.0:User"`
 }
 
 type UsersResponse struct {
