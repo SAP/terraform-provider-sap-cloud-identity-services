@@ -3,11 +3,13 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strings"
 	"terraform-provider-ias/internal/cli"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+
 	// "github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -77,38 +79,44 @@ func (d *schemasDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"id" : schema.StringAttribute{
-							Computed: true,
-							//maybe add a regex
 							MarkdownDescription: "A unique id by which the schema can be referenced in other entities",
+							Computed: true,
 						},
 						"name" : schema.StringAttribute{
-							Computed: true,
 							MarkdownDescription: "A unique name for the schema",
-						},
-						//meta
-						"description" : schema.StringAttribute{
 							Computed: true,
-							MarkdownDescription: "A description for the schema",
-						},
-						"schemas" : schema.SetAttribute{
-							ElementType: types.StringType,
-							Computed: true,
-							//MarkDown
-						},
-						"external_id" : schema.StringAttribute{
-							Computed: true,
-							// MarkdownDescription: ,
 						},
 						"attributes" : schema.ListNestedAttribute{
+							MarkdownDescription: "The list of attribites that comprise the schema",
+							Computed: true,
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
 									"name" : schema.StringAttribute{
 										Computed: true,
-										MarkdownDescription: "Name of the attribute",
+										MarkdownDescription: "The attribute name. Only alphanumeric characters and underscores are allowed.",
 									},
 									"type" : schema.StringAttribute{
 										Computed: true,
-										MarkdownDescription: "Type of the attribute",
+										MarkdownDescription: fmt.Sprintf("The attribute data type. Valid values include : %s", strings.Join(attributeDataTypes, ",")),
+									},
+									"mutability": schema.StringAttribute{
+										Computed: true,
+										MarkdownDescription: fmt.Sprintf("Control the Read or Write access of the attribute. Valid values include : %s", strings.Join(attributeMutabilityValues,",")),
+									},
+									"returned": schema.StringAttribute{
+										Computed: true,
+										//description must be enhanced
+										MarkdownDescription: fmt.Sprintf("Valid values include : %s", strings.Join(attributeReturnValues,",")),
+									},
+									"uniqueness": schema.StringAttribute{
+										Computed: true,
+										// description must be enhanced
+										MarkdownDescription: fmt.Sprintf("Define the context in which the attribute must be unique. Valid values include : %s", strings.Join(attributeReturnValues,",")),
+									},
+									"canonical_values": schema.ListAttribute{
+										ElementType: types.StringType,
+										Computed: true,
+										MarkdownDescription: "A collection of suggested canonical values that may be used",
 									},
 									"multivalued" : schema.BoolAttribute{
 										Computed: true,
@@ -116,36 +124,33 @@ func (d *schemasDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 									},
 									"description" : schema.StringAttribute{
 										Computed: true,
-										MarkdownDescription: "Description for the attribute",
+										MarkdownDescription: "A brief description for the attribute",
 									},
 									"required": schema.BoolAttribute{
 										Computed: true,
-										MarkdownDescription: "Set a restriction on attribute, it it can be optional or not",
-									},
-									"canonical_values": schema.ListAttribute{
-										ElementType: types.StringType,
-										Computed: true,
-										// MarkdownDescription: ,
+										//enhance description
+										MarkdownDescription: "Set a restriction on whether the attribute may be mandatory or not",
 									},
 									"case_exact": schema.BoolAttribute{
 										Computed: true,
-										// MarkdownDescription: "Set a restriction on attribute",
-									},
-									"mutability": schema.StringAttribute{
-										Computed: true,
-										MarkdownDescription: "Read or Write access",
-									},
-									"returned": schema.StringAttribute{
-										Computed: true,
-										// 
-									},
-									"uniqueness": schema.StringAttribute{
-										Computed: true,
-										// MarkdownDescription: ,
+										//enhance description
+										MarkdownDescription: "Set a restriction on whether the attribute may be case-sensitive or not",
 									},
 								},
 							},
+						},
+						"schemas" : schema.SetAttribute{
+							ElementType: types.StringType,
 							Computed: true,
+							//MarkdownDescription
+						},
+						"description" : schema.StringAttribute{
+							Computed: true,
+							MarkdownDescription: "A description for the schema",
+						},
+						"external_id" : schema.StringAttribute{
+							Computed: true,
+							MarkdownDescription: "Unique and global identifier for the given schema",
 						},
 					},
 				},

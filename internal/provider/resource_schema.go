@@ -3,15 +3,27 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strings"
 	"terraform-provider-ias/internal/cli"
 	"terraform-provider-ias/internal/cli/apiObjects/schemas"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
+
+var attributeDataTypes 			 = []string{"string", "boolean", "decimal", "integer", "dateTime", "binary", "reference", "complex"}
+var attributeMutabilityValues    = []string{"readOnly", "readWrite", "writeOnly", "immutable"}
+var attributeReturnValues 		 = []string{"always", "never", "default", "request"}
+var attributeUniquenessValues    = []string{"none", "server", "global"}
 
 func newSchemaResource() resource.Resource {
 	return &schemaResource{}
@@ -38,42 +50,64 @@ func (r *schemaResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 
 		Attributes: map[string]schema.Attribute{
 			"id" : schema.StringAttribute{
-				Required: true,
-				//maybe add a regex
 				MarkdownDescription: "A unique id by which the schema can be referenced in other entities",
+				Required: true,
+				//add a regex check
 			},
 			"name" : schema.StringAttribute{
-				Required: true,
 				MarkdownDescription: "A unique name for the schema",
+				Required: true,
 			},
 			"attributes" : schema.ListNestedAttribute{
-				//cap at 20
+				MarkdownDescription: "The list of attribites that comprise the schema",
+				Required: true,
+				Validators: []validator.List{
+					listvalidator.SizeAtMost(20),
+				},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"name" : schema.StringAttribute{
 							Required: true,
-							MarkdownDescription: "Name of the attribute",
+							MarkdownDescription: "The attribute name. Only alphanumeric characters and underscores are allowed.",
+							Validators: []validator.String{
+								stringvalidator.LengthBetween(2,20),
+								ValidAttributeName(),
+							},
 						},
 						"type" : schema.StringAttribute{
 							Required: true,
-							MarkdownDescription: "Type of the attribute",
+							MarkdownDescription: fmt.Sprintf("The attribute data type. Valid values include : %s", strings.Join(attributeDataTypes, ",")),
+							Validators: []validator.String{
+								stringvalidator.OneOf(attributeDataTypes...),
+							},
 						},
 						"mutability": schema.StringAttribute{
 							Required: true,
-							MarkdownDescription: "Read or Write access",
+							MarkdownDescription: fmt.Sprintf("Control the Read or Write access of the attribute. Valid values include : %s", strings.Join(attributeMutabilityValues,",")),
+							Validators: []validator.String{
+								stringvalidator.OneOf(attributeMutabilityValues...),
+							},
 						},
 						"returned": schema.StringAttribute{
 							Required: true,
-							// 
+							//description must be enhanced
+							MarkdownDescription: fmt.Sprintf("Valid values include : %s", strings.Join(attributeReturnValues,",")),
+							Validators: []validator.String{
+								stringvalidator.OneOf(attributeReturnValues...),
+							},
 						},
 						"uniqueness": schema.StringAttribute{
 							Required: true,
-							// MarkdownDescription: ,
+							// description must be enhanced
+							MarkdownDescription: fmt.Sprintf("Define the context in which the attribute must be unique. Valid values include : %s", strings.Join(attributeUniquenessValues,",")),
+							Validators: []validator.String{
+								stringvalidator.OneOf(attributeUniquenessValues...),
+							},
 						},
 						"canonical_values": schema.ListAttribute{
 							ElementType: types.StringType,
 							Optional: true,
-							// MarkdownDescription: ,
+							MarkdownDescription: "A collection of suggested canonical values that may be used",
 						},
 						"multivalued" : schema.BoolAttribute{
 							Optional: true,
@@ -82,38 +116,47 @@ func (r *schemaResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 						},
 						"description" : schema.StringAttribute{
 							Optional: true,
-							Computed: true,
-							MarkdownDescription: "Description for the attribute",
+							MarkdownDescription: "A brief description for the attribute",
 						},
 						"required": schema.BoolAttribute{
 							Optional: true,
 							Computed: true,
-							MarkdownDescription: "Set a restriction on attribute, it it can be optional or not",
+							//enhance description
+							MarkdownDescription: "Set a restriction on whether the attribute may be mandatory or not",
 						},
 						"case_exact": schema.BoolAttribute{
 							Optional: true,
 							Computed: true,
-							// MarkdownDescription: "Set a restriction on attribute",
+							//enhance description
+							MarkdownDescription: "Set a restriction on whether the attribute may be case-sensitive or not",
 						},
 					},
 				},
-				Required: true,
 			},
 			"schemas" : schema.SetAttribute{
 				ElementType: types.StringType,
-				Required: true,
-				//MarkDown
-			},
-			//meta
-			"description" : schema.StringAttribute{
 				Optional: true,
 				Computed: true,
+				//MarkdownDescription
+				Default: setdefault.StaticValue(
+					types.SetValueMust(
+						types.StringType,
+						[]attr.Value{
+							types.StringValue("urn:ietf:params:scim:schemas:core:2.0:Schema"),
+						},
+					),
+				),
+				Validators: []validator.Set{
+					setvalidator.SizeAtLeast(1),
+				},
+			},
+			"description" : schema.StringAttribute{
+				Optional: true,
 				MarkdownDescription: "A description for the schema",
 			},
 			"external_id" : schema.StringAttribute{
 				Optional: true,
-				Computed: true,
-				// MarkdownDescription: ,
+				MarkdownDescription: "Unique and global identifier for the given schema",
 			},
 		},
 	}
@@ -164,7 +207,8 @@ func (r *schemaResource) Create(ctx context.Context, req resource.CreateRequest,
 }
 
 func (r *schemaResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	//This resource does not suppport updates
+	resp.Diagnostics.AddError("Invalid Operation","The resource \"Schema\" does not support updates.")
+	return
 }
 
 func (r *schemaResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) { 
@@ -213,6 +257,7 @@ func getSchemaRequest(ctx context.Context, plan schemaData) (*schemas.Schema, di
 		args.ExternalId = plan.ExternalId.ValueString()
 	}
 
+	args.Attributes = []schemas.Attribute{}
 	for _, attribute := range attributes{
 		schemaAttribute := schemas.Attribute{
 			Name: attribute.Name.ValueString(),

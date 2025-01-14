@@ -65,10 +65,13 @@ func schemaValueFrom (ctx context.Context, s schemas.Schema) (schemaData, diag.D
 
 		if len(attributeRes.Description) > 0 {
 			attribute.Description = types.StringValue(attributeRes.Description)
+		} else {
+			attribute.Description = types.StringNull()
 		}
 
 		attribute.CanonicalValues, diags = types.ListValueFrom(ctx, types.StringType, attributeRes.CanonicalValues)
 		diagnostics.Append(diags...)
+		
 
 		attributes = append(attributes, attribute)
 	}
