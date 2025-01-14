@@ -3,16 +3,23 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strings"
 	"terraform-provider-ias/internal/cli"
 	"terraform-provider-ias/internal/cli/apiObjects/groups"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
+
+var memberTypeValues = []string{"User", "Group"}
 
 func newGroupResource() resource.Resource{
 	return &groupResource{}
@@ -39,47 +46,70 @@ func (r *groupResource) Schema(_ context.Context, _ resource.SchemaRequest, resp
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed: true,
-				// MarkdownDescription: ,
+				MarkdownDescription: "Unique ID of the group.",
 				Validators: []validator.String{
 					ValidUUID(),
 				},
 			},
 			"schemas": schema.SetAttribute{
-				Required: true,
-				ElementType: types.StringType,
 				// MarkdownDescription: ,
+				Optional: true,
+				Computed: true,
+				ElementType: types.StringType,
+				Default: setdefault.StaticValue(
+					types.SetValueMust(
+						types.StringType,
+						[]attr.Value{
+							types.StringValue("urn:ietf:params:scim:schemas:core:2.0:Group"),
+							types.StringValue("urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"),
+						},
+					),
+				),
+				Validators: []validator.Set{
+					setvalidator.SizeAtLeast(1),
+				},
 			},
 			"display_name": schema.StringAttribute{
+				MarkdownDescription: "Display Name of the group.",
 				Required: true,
-				// MarkdownDescription: ,
+			},
+			"name": schema.StringAttribute{
+				MarkdownDescription: "Provide a unique name for the group.",
+				Optional: true,
+				Computed: true,
 			},
 			"group_members": schema.ListNestedAttribute{
+				MarkdownDescription: "Specify the members to be part of the group.",
+				Optional: true,
+				Computed: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"value": schema.StringAttribute{
 							Required: true,
 							MarkdownDescription: "SCIM ID of the user or the group",
-							//see if any check can be placed to validate the ID
+							Validators: []validator.String{
+								ValidUUID(),
+							},
 						},
 						"type": schema.StringAttribute{
 							Optional: true,
 							Computed: true,
-							MarkdownDescription: "Type of the member added to the group",
-							//check to only add specific type
+							MarkdownDescription: fmt.Sprintf("Type of the member added to the group. Valid Values can be one of the following : %s",strings.Join(memberTypeValues, ",")),
+							Validators: []validator.String{
+								stringvalidator.OneOf(memberTypeValues...),
+							},
 						},
 					},
 				},
-				Optional: true,
-				Computed: true,
 			},
 			"description": schema.StringAttribute{
+				MarkdownDescription: "Briefly describe the nature of the group.",
 				Optional: true,
 				Computed: true,
-				//MarkdownDescription
 			},
 			"external_id": schema.StringAttribute{
+				MarkdownDescription: "Unique and global identifier for the given group",
 				Computed: true,
-				// MarkdownDescription: ,
 			},
 		},
 	}
@@ -96,6 +126,9 @@ func (r *groupResource) Create(ctx context.Context, req resource.CreateRequest, 
 	resp.Diagnostics.Append(diags...)
 
 	res, err := r.cli.Group.Create(ctx, args)
+	if resp.Diagnostics.HasError(){
+		return 
+	}
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error creating user", fmt.Sprintf("%s",err))
@@ -193,11 +226,7 @@ func getGroupRequest(ctx context.Context, plan groupData) (*groups.Group, diag.D
 	var schemas []string
 	diags := plan.Schemas.ElementsAs(ctx, &schemas, true)
 	diagnostics.Append(diags...)
-
-	var members []memberData
-	diags = plan.GroupMembers.ElementsAs(ctx, &members, true)
-	diagnostics.Append(diags...)
-
+	
 	args := &groups.Group{
 		Schemas: schemas,
 		DisplayName: plan.DisplayName.ValueString(),
@@ -207,16 +236,26 @@ func getGroupRequest(ctx context.Context, plan groupData) (*groups.Group, diag.D
 		args.GroupExtension.Description = plan.Description.ValueString()
 	}
 
-	for _, member := range members {
-		groupMember := groups.GroupMember{
-			Value: member.Value.ValueString(),
-		}
+	if !plan.Name.IsNull()  {
+		args.GroupExtension.Name = plan.Name.ValueString()
+	}
 
-		if !member.Type.IsNull() {
-			groupMember.Type = member.Type.ValueString()
-		}
+	var members []memberData
+	diags = plan.GroupMembers.ElementsAs(ctx, &members, true)
+	diagnostics.Append(diags...)
 
-		args.GroupMembers = append(args.GroupMembers, groupMember)
+	if !plan.GroupMembers.IsNull(){
+		for _, member := range members {
+			groupMember := groups.GroupMember{
+				Value: member.Value.ValueString(),
+			}
+
+			if !member.Type.IsNull() {
+				groupMember.Type = member.Type.ValueString()
+			}
+
+			args.GroupMembers = append(args.GroupMembers, groupMember)
+		}
 	}
 
 	return args, diagnostics

@@ -8,12 +8,12 @@ import (
 )
 
 
-func TestDataSourceApplications(t *testing.T) {
+func TestDataSourceSchemas(t *testing.T) {
 
 	t.Parallel()
 
 	t.Run("happy path", func (t *testing.T) {
-		rec, user := setupVCR(t, "fixtures/datasource_applications_all")
+		rec, user := setupVCR(t, "fixtures/datasource_schemas_all")
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{
@@ -21,10 +21,9 @@ func TestDataSourceApplications(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + DataSourceApplications("allApps"),
+					Config: providerConfig("", user) + DataSourceSchemas("allSchemas"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						//fixture needs to re-recorded after cleanup, no. of apps needs to be modified accordingly
-						resource.TestCheckResourceAttr("data.ias_applications.allApps", "values.#", "21"),
+						resource.TestCheckResourceAttr("data.ias_schemas.allSchemas", "values.#", "13"),
 					),
 				},
 			},
@@ -34,9 +33,9 @@ func TestDataSourceApplications(t *testing.T) {
 
 }
 
-func DataSourceApplications(datasourceName string) string {
+func DataSourceSchemas(datasourceName string) string {
 	return fmt.Sprintf(`
-	data "ias_applications" "%s"{
+	data "ias_schemas" "%s"{
 
 	}
 	`, datasourceName)

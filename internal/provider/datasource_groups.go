@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strings"
 	"terraform-provider-ias/internal/cli"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -30,6 +31,7 @@ var groupObjType = types.ObjectType{
 			ElemType: types.StringType,
 		},
 		"display_name": types.StringType,
+		"name": types.StringType,
 		"group_members": types.ListType{
 			ElemType: membersObjType,
 		},
@@ -63,7 +65,7 @@ func (d *groupsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 					Attributes: map[string]schema.Attribute{
 						"id": schema.StringAttribute{
 							Computed: true,
-							// MarkdownDescription: ,
+							MarkdownDescription: "Unique ID of the group.",
 							Validators: []validator.String{
 								ValidUUID(),
 							},
@@ -75,29 +77,35 @@ func (d *groupsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 						},
 						"display_name": schema.StringAttribute{
 							Computed: true,
-							// MarkdownDescription: ,
+							MarkdownDescription: "Display Name of the group.",
+						},
+						"name": schema.StringAttribute{
+							MarkdownDescription: "Provide a unique name for the group.",
+							Computed: true,
 						},
 						"group_members": schema.ListNestedAttribute{
+							Computed: true,
+							MarkdownDescription: "Specify the members to be part of the group.",
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
 									"value": schema.StringAttribute{
 										Computed: true,
-										// MarkdownDescription: ,
+										MarkdownDescription: "SCIM ID of the user or the group",
 									},
 									"type": schema.StringAttribute{
 										Computed: true,
-										// MarkdownDescription: ,
+										MarkdownDescription: fmt.Sprintf("Type of the member added to the group. Valid Values can be one of the following : %s",strings.Join(memberTypeValues, ",")),
 									},
 								},
 							},
-							Computed: true,
 						},
 						"external_id": schema.StringAttribute{
 							Computed: true,
-							// MarkdownDescription: ,
+							MarkdownDescription: "Unique and global identifier for the given group",
 						},
 						"description": schema.StringAttribute{
 							Computed: true,
+							MarkdownDescription: "Briefly describe the nature of the group.",
 						},
 					},
 				},

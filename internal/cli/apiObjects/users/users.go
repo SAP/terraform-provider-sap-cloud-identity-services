@@ -17,7 +17,7 @@ type SAPExtension struct {
 	// UserUuidHistory			string 		`json:"userUuidHistory"` 		//read only
 	UserId					string 		`json:"userId"`
 	// SapUserName				string 		`json:"sapUserName"`
-	Status					string 		`json:"status"`
+	Status					string 		`json:"status,omitempty"`
 	TotpEnabled				bool 		`json:"totpEnabled"`
 	WebAuthEnabled			bool 		`json:"webAuthEnabled"`
 	// Industry				string 		`json:"industry"`

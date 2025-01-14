@@ -25,10 +25,16 @@ func TestDataSourceUser(t *testing.T) {
 					Config: providerConfig("", user) + DataSourceUser("testUser", "Test User"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("data.ias_user.testUser","id",regexpUUID),
+
 						resource.TestCheckResourceAttr("data.ias_user.testUser","name.given_name","Test"),
 						resource.TestCheckResourceAttr("data.ias_user.testUser","name.family_name","User"),
-						resource.TestCheckResourceAttr("data.ias_user.testUser","emails.0.value","test.user@sap.com"),
+						resource.TestCheckResourceAttr("data.ias_user.testUser","user_name","Test"),
+						resource.TestCheckResourceAttr("data.ias_user.testUser","emails.0.value","test.user2@gmail.com"),
 						resource.TestCheckResourceAttr("data.ias_user.testUser","emails.0.primary","true"),
+						resource.TestCheckResourceAttr("data.ias_user.testUser","emails.1.value","test.user1@sap.com"),
+						resource.TestCheckResourceAttr("data.ias_user.testUser","emails.1.type","work"),
+						resource.TestCheckResourceAttr("data.ias_user.testUser","status","inactive"),
+						resource.TestCheckResourceAttr("data.ias_user.testUser","user_type","public"),
 					),
 				},
 			},
