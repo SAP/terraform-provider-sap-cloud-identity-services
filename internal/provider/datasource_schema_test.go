@@ -43,20 +43,7 @@ func TestDataSourceSchema(t *testing.T) {
 
 	})
 
-	//after regex has been set for schema i
-	// t.Run("error path - invalid schema id", func(t *testing.T){
-		
-	// 	resource.Test(t, resource.TestCase{
-	// 		IsUnitTest: true,
-	// 		ProtoV6ProviderFactories: getTestProviders(nil),
-	// 		Steps: []resource.TestStep{
-	// 			{
-	// 				Config: DataSourceSchemaById("testSchema", "invalid-uuid"),
-	// 				ExpectError: regexp.MustCompile(`Attribute id value must be a valid UUID, got: invalid-uuid`),
-	// 			},
-	// 		},
-	// 	})
-	// })
+	// if regex is added for schema id, add a test
 
 	t.Run("error path - schema id is mandatory", func(t *testing.T){
 		

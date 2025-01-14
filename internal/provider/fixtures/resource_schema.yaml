@@ -1,0 +1,213 @@
+---
+version: 2
+interactions:
+    - id: 0
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 250
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: |
+            {"id":"urn:ietf:scim:schemas:Terraform","name":"Terraform","meta":{},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Schema"],"attributes":[{"name":"test_attribute","type":"string","mutability":"readWrite","returned":"never","uniqueness":"none"}]}
+        form: {}
+        headers:
+            Accept:
+                - '*/*'
+            Authorization:
+                - redacted
+            Content-Type:
+                - application/scim+json
+            Dataserviceversion:
+                - "2.0"
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Schemas/
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 585
+        uncompressed: false
+        body: '{"id":"urn:ietf:scim:schemas:Terraform","meta":{"created":"2025-01-14T19:29:17.126742529Z","lastModified":"2025-01-14T19:29:17.126742529Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Schemas/urn%3Aietf%3Ascim%3Aschemas%3ATerraform","version":"c2ce2dab-8661-4b4a-bce8-9ca97c772ffd","resourceType":"Schema"},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Schema"],"name":"Terraform","attributes":[{"name":"test_attribute","type":"string","multiValued":false,"required":false,"caseExact":false,"mutability":"readWrite","returned":"never","uniqueness":"none"}]}'
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+            Content-Length:
+                - "585"
+            Content-Type:
+                - application/scim+json
+            Date:
+                - Tue, 14 Jan 2025 19:29:16 GMT
+            Etag:
+                - '"c2ce2dab-8661-4b4a-bce8-9ca97c772ffd"'
+            Location:
+                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Schemas/urn%3Aietf%3Ascim%3Aschemas%3ATerraform
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains; preload
+            Vary:
+                - X-CSP-STRIP
+            X-Content-Type-Options:
+                - nosniff
+            X-Ids-Id:
+                - F100303A-55D0-49F6-98AB-4BB7DBF5C716
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-dzbhq
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Robots-Tag:
+                - none
+        status: '201 '
+        code: 201
+        duration: 1.116269948s
+    - id: 1
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            Accept:
+                - '*/*'
+            Authorization:
+                - redacted
+            Content-Type:
+                - application/scim+json
+            Dataserviceversion:
+                - "2.0"
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Schemas/urn:ietf:scim:schemas:Terraform
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: -1
+        uncompressed: true
+        body: '{"id":"urn:ietf:scim:schemas:Terraform","meta":{"created":"2025-01-14T19:29:17Z","lastModified":"2025-01-14T19:29:17Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Schemas/urn%3Aietf%3Ascim%3Aschemas%3ATerraform","version":"c2ce2dab-8661-4b4a-bce8-9ca97c772ffd","resourceType":"Schema"},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Schema"],"name":"Terraform","attributes":[{"name":"test_attribute","type":"string","multiValued":false,"required":false,"caseExact":false,"mutability":"readWrite","returned":"never","uniqueness":"none"}]}'
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+            Content-Type:
+                - application/scim+json
+            Date:
+                - Tue, 14 Jan 2025 19:29:16 GMT
+            Etag:
+                - '"c2ce2dab-8661-4b4a-bce8-9ca97c772ffd-gzip"'
+            Location:
+                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Schemas/urn%3Aietf%3Ascim%3Aschemas%3ATerraform
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains; preload
+            Vary:
+                - Accept-Encoding,X-CSP-STRIP
+            X-Content-Type-Options:
+                - nosniff
+            X-Ids-Id:
+                - 0060834C-CF3B-4DBB-A007-CD194F8F3ED3
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-dzbhq
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Robots-Tag:
+                - none
+        status: '200 '
+        code: 200
+        duration: 250.349947ms
+    - id: 2
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            Accept:
+                - '*/*'
+            Authorization:
+                - redacted
+            Content-Type:
+                - application/scim+json
+            Dataserviceversion:
+                - "2.0"
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Schemas/urn:ietf:scim:schemas:Terraform
+        method: DELETE
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 0
+        uncompressed: false
+        body: ""
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+            Date:
+                - Tue, 14 Jan 2025 19:29:17 GMT
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains; preload
+            Vary:
+                - X-CSP-STRIP
+            X-Content-Type-Options:
+                - nosniff
+            X-Ids-Id:
+                - 8FC8AC20-DC06-4F4D-AE40-59B35204F669
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-dzbhq
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Robots-Tag:
+                - none
+        status: '204 '
+        code: 204
+        duration: 245.249608ms
