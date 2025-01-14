@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"strings"
 
 	"io"
 
@@ -80,29 +81,48 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 
 	if res.StatusCode >= 400 {
 
-		type ErrorDetail struct {
-			Message string `json:"message"`
-		}
+		if strings.Contains(reqHeader,"scim") {
 
-		type Error struct {
-			Code    int           `json:"code"`
-			Message string        `json:"message"`
-			Details []ErrorDetail `json:"details"`
-		}
+			type ScimError struct {
+				Detail 		string 		`json:"detail"`
+				Schemas     []string 	`json:"schemas"`
+				Status 		string 		`json:"status"`
+			}
 
-		var responseError struct {
-			Error Error `json:"error"`
-		}
-		
-		if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
-			err = fmt.Errorf(responseError.Error.Message)
+			var responseError ScimError
 
-			for i:=0; i<len(responseError.Error.Details); i++ {
-				err = fmt.Errorf(fmt.Sprintf("%v \n%s",err,responseError.Error.Details[0].Message))
+			if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
+				err = fmt.Errorf(responseError.Detail)
+			}  else {
+				err = fmt.Errorf("responded with unknown error : %s", responseError.Status)
 			}
 
 		} else {
-			err = fmt.Errorf("responded with unknown error : %d", responseError.Error.Code)
+
+			type ErrorDetail struct {
+				Message string `json:"message"`
+			}
+	
+			type ApplicationError struct {
+				Code    int           `json:"code"`
+				Message string        `json:"message"`
+				Details []ErrorDetail `json:"details"`
+			}
+
+			var responseError struct {
+				Error 		ApplicationError	`json:"error"`	
+			}
+			
+			if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
+				err = fmt.Errorf(responseError.Error.Message)
+	
+				for i:=0; i<len(responseError.Error.Details); i++ {
+					err = fmt.Errorf(fmt.Sprintf("%v \n%s",err,responseError.Error.Details[0].Message))
+				}
+			}  else {
+				err = fmt.Errorf("responded with unknown error : %d", responseError.Error.Code)
+			}
+
 		}
 
 		return nil, err, out
