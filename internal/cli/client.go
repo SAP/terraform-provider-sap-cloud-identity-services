@@ -97,10 +97,6 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 				err = fmt.Errorf("responded with unknown error : %s", responseError.Status)
 			}
 
-			if len(responseError.Error.Message)>0 {
-				err = fmt.Errorf(fmt.Sprintf("\n%v \n%s",err,responseError.Error.Message))
-			}
-
 
 		} else {
 
