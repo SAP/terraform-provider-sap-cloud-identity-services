@@ -196,7 +196,7 @@ func (d *usersDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
 
-	res, err := d.cli.Directory.User.Get(ctx)
+	res, err := d.cli.User.Get(ctx)
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving users", fmt.Sprintf("%s", err))

@@ -3,13 +3,17 @@ package cli
 func NewIasClient(cliClient *Client) *IasClient {
 	return &IasClient{
 		Client: cliClient,
-		Directory: NewDirectoryCli(cliClient),
-		ApplicationConfiguration: NewApplicationConfigurationCli(cliClient),
+		Application: NewApplicationCli(cliClient),
+		User: NewUserCli(cliClient),
+		Schema: NewSchemaCli(cliClient),
+		Group: NewGroupCli(cliClient),
 	}
 }
 
 type IasClient struct{
 	*Client
-	Directory DirectoryCli
-	ApplicationConfiguration ApplicationConfigurationCli
+	Application ApplicationsCli
+	User 	UsersCli
+	Schema 	SchemasCli
+	Group 	GroupsCli
 }
