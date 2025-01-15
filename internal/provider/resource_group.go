@@ -125,11 +125,10 @@ func (r *groupResource) Create(ctx context.Context, req resource.CreateRequest, 
 	args, diags := getGroupRequest(ctx, plan)
 	resp.Diagnostics.Append(diags...)
 
+	res, err := r.cli.Group.Create(ctx, args)
 	if resp.Diagnostics.HasError(){
 		return 
 	}
-
-	res, err := r.cli.Directory.Group.Create(ctx, args)
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error creating user", fmt.Sprintf("%s",err))
@@ -149,7 +148,7 @@ func (r *groupResource) Read(ctx context.Context, req resource.ReadRequest, resp
 	diags := req.State.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
 
-	res, err := r.cli.Directory.Group.GetByGroupId(ctx, config.Id.ValueString())
+	res, err := r.cli.Group.GetByGroupId(ctx, config.Id.ValueString())
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving user", fmt.Sprintf("%s",err))
@@ -183,7 +182,7 @@ func (r *groupResource) Update(ctx context.Context, req resource.UpdateRequest, 
 
 	args.Id = state.Id.ValueString()
 
-	res, err := r.cli.Directory.Group.Update(ctx, args)
+	res, err := r.cli.Group.Update(ctx, args)
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error updating application", fmt.Sprintf("%s",err))
@@ -208,7 +207,7 @@ func (r *groupResource) Delete(ctx context.Context, req resource.DeleteRequest, 
 		return 
 	}
 
-	err := r.cli.Directory.Group.Delete(ctx, config.Id.ValueString())
+	err := r.cli.Group.Delete(ctx, config.Id.ValueString())
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error deleting user", fmt.Sprintf("%s",err))
