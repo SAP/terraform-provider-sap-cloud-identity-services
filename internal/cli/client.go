@@ -92,7 +92,7 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 			var responseError ScimError
 
 			if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
-				err = fmt.Errorf(responseError.Detail)
+				err = fmt.Errorf("%s",responseError.Detail)
 			}  else {
 				err = fmt.Errorf("responded with unknown error : %s", responseError.Status)
 			}
@@ -115,10 +115,10 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 			}
 			
 			if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
-				err = fmt.Errorf(responseError.Error.Message)
+				err = fmt.Errorf("%s",responseError.Error.Message)
 	
 				for i:=0; i<len(responseError.Error.Details); i++ {
-					err = fmt.Errorf(fmt.Sprintf("%v \n%s",err,responseError.Error.Details[0].Message))
+					err = fmt.Errorf("%v \n%s",err,responseError.Error.Details[0].Message)
 				}
 			}  else {
 				err = fmt.Errorf("responded with unknown error : %d", responseError.Error.Code)
