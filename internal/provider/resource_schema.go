@@ -208,7 +208,6 @@ func (r *schemaResource) Create(ctx context.Context, req resource.CreateRequest,
 
 func (r *schemaResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	resp.Diagnostics.AddError("Invalid Operation","The resource \"Schema\" does not support updates.")
-	return
 }
 
 func (r *schemaResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) { 

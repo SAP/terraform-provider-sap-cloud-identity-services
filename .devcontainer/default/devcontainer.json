@@ -1,0 +1,27 @@
+{
+	"name": "Terraform Provider for SAP Cloud Identity Service",
+	"image": "mcr.microsoft.com/devcontainers/go:1.23-bullseye",
+	"features": {
+		"ghcr.io/devcontainers/features/github-cli:1": {},
+		"ghcr.io/devcontainers/features/terraform:1": {},
+		"ghcr.io/robbert229/devcontainer-features/opentofu:1": {
+			"version": "1.9.0"
+		}
+	},
+	"customizations": {
+		"vscode": {
+			"settings": {},
+			"extensions": [
+				"golang.go",
+				"HashiCorp.terraform",
+				"ms-vscode.makefile-tools"
+			]
+		},
+		"codespaces": {}
+	},
+	"postCreateCommand": "cp ./config/provider-config.txt ~/.terraformrc",
+	"hostRequirements": {
+		"memory": "4gb"
+	},
+	"remoteUser": "vscode"
+}
