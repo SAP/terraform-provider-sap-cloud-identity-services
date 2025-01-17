@@ -102,15 +102,22 @@ jobs:
           terraform_version: ${{ matrix.terraform }}
           terraform_wrapper: false
       - run: go mod download
-      - env:
-          TF_ACC: "1"
-        run: go test -v -cover -coverprofile=cover.out -timeout=1800s -parallel=4 ./...
-        timeout-minutes: 20
-      # Determine stripped version of Terraform
       - run: echo "CURRENT_TF_VERSION=$(echo ${{ matrix.terraform }} | sed 's/[^a-zA-Z0-9]//g')" >> $GITHUB_ENV
-      # Upload coverage report for latest Terraform version only to avoid nameing issues in upload (see also https://github.com/actions/upload-artifact/tree/v4/?tab=readme-ov-file#breaking-changes)
+      - if: ${{env.CURRENT_TF_VERSION != env.SONAR_CLOUD_TF_VERSION}}
+        env:
+          TF_ACC: "1"
+        run: go test -v -timeout=1800s -parallel=4 ./...
+        timeout-minutes: 30
+      - if: ${{ env.CURRENT_TF_VERSION == env.SONAR_CLOUD_TF_VERSION}}
+        env:
+          TF_ACC: "1"
+        uses: robherley/go-test-action@v0
+        with: 
+          testArguments: -v -cover -coverprofile=cover.out -timeout=1800s -parallel=4 ./...
+        timeout-minutes: 30
+        # Upload coverage report for latest Terraform version only to avoid naming issues in upload (see also https://github.com/actions/upload-artifact/tree/v4/?tab=readme-ov-file#breaking-changes)
       - uses: actions/upload-artifact@v4
-        if: ${{ env.CURRENT_TF_VERSION == env.SONAR_CLOUD_TF_VERSION}}
+        if: ${{ env.CURRENT_TF_VERSION == env.SONAR_CLOUD_TF_VERSION}}  
         with:
           name: coverage-report
           path: cover.out
