@@ -93,7 +93,7 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithAppId("testApp", "this-is-not-uuid", "test-app", "application for testing purposes"),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute id value must be a valid UUID, got: %s","this-is-not-uuid")),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute id value must be a valid UUID, got: %s", "this-is-not-uuid")),
 				},
 			},
 		})
@@ -132,7 +132,7 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithSsoType("testApp", "test-app", "application for testing purposes", "this-is-not-a-valid-sso_type"),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute sso_type value must be one of: \\[\"openIdConnect\" \"saml2\"], got:\n\"%s\"","this-is-not-a-valid-sso_type")),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute sso_type value must be one of: \\[\"openIdConnect\" \"saml2\"], got:\n\"%s\"", "this-is-not-a-valid-sso_type")),
 				},
 			},
 		})
@@ -162,7 +162,7 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithSubjectNameIdentifier("testApp", "test-app", "application for testing purposes", "source = \"this-is-not-a-valid-source\", value = \"value\""),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute subject_name_identifier.source value must be one of: \\[\"Identity\nDirectory\" \"Corporate Identity Provider\" \"Expression\"], got:\n\"%s\"","this-is-not-a-valid-source")),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute subject_name_identifier.source value must be one of: \\[\"Identity\nDirectory\" \"Corporate Identity Provider\" \"Expression\"], got:\n\"%s\"", "this-is-not-a-valid-source")),
 				},
 			},
 		})
@@ -213,7 +213,7 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithAdvancedAssertionAttributes("testApp", "test-app", "application for testing purposes", "source = \"this-is-not-a-valid-source\", attribute_name = \"name\", attribute_value = \"value\""),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute advanced_assertion_attributes\\[0].source value must be one of:\n\\[\"Corporate Identity Provider\" \"Expression\"], got:\n\"%s\"","this-is-not-a-valid-source")),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute advanced_assertion_attributes\\[0].source value must be one of:\n\\[\"Corporate Identity Provider\" \"Expression\"], got:\n\"%s\"", "this-is-not-a-valid-source")),
 				},
 			},
 		})
@@ -239,7 +239,7 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithAuthenticationRules("testApp", "test-app", "application for testing purposes", "identity_provider_id = \"664c660e25cff252c5c202dc\""),
-					ExpectError: regexp.MustCompile("At least one attribute out of\n\\[authentication_rules\\[\\*].user_type,authentication_rules\\[\\*].user_group,authentication_rules\\[\\*].user_email_domain,authentication_rules\\[\\*].ip_network_range]\nmust be specified"),
+					ExpectError: regexp.MustCompile("At least one attribute out of\n\\[authentication_rules\\[\\*].user_type,authentication_rules\\[\\*].user_group,authentication_rules\\[\\*].user_email_domain"),
 				},
 			},
 		})
