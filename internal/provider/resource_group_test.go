@@ -37,7 +37,7 @@ func TestResourceGroup (t *testing.T) {
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("ias_group.testGroup", "id", regexpUUID),
 						resource.TestCheckResourceAttr("ias_group.testGroup", "display_name", "Terraform Group"),
-						resource.TestCheckResourceAttr("ias_group.testGroup", "description", "For testing purposes"),
+						resource.TestCheckResourceAttr("ias_group.testGroup", "group_extension.description", "For testing purposes"),
 						resource.TestCheckResourceAttr("ias_group.testGroup", "group_members.0.value", members[0].Value),
 						resource.TestCheckResourceAttr("ias_group.testGroup", "group_members.0.type", members[0].Type),
 					),
@@ -60,7 +60,7 @@ func TestResourceGroup (t *testing.T) {
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("ias_group.testGroup", "id", regexpUUID),
 						resource.TestCheckResourceAttr("ias_group.testGroup", "display_name", "Terraform Group"),
-						resource.TestCheckResourceAttr("ias_group.testGroup", "description", "For testing purposes"),
+						resource.TestCheckResourceAttr("ias_group.testGroup", "group_extension.description", "For testing purposes"),
 						resource.TestCheckResourceAttr("ias_group.testGroup", "group_members.0.value", members[0].Value),
 						resource.TestCheckResourceAttr("ias_group.testGroup", "group_members.0.type", members[0].Type),
 					),
@@ -70,7 +70,7 @@ func TestResourceGroup (t *testing.T) {
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("ias_group.testGroup", "id", regexpUUID),
 						resource.TestCheckResourceAttr("ias_group.testGroup", "display_name", "Updated Terraform Group"),
-						resource.TestCheckResourceAttr("ias_group.testGroup", "description", "For testing purposes"),
+						resource.TestCheckResourceAttr("ias_group.testGroup", "group_extension.description", "For testing purposes"),
 						resource.TestCheckResourceAttr("ias_group.testGroup", "group_members.0.value", members[0].Value),
 						resource.TestCheckResourceAttr("ias_group.testGroup", "group_members.0.type", members[0].Type),
 					),
@@ -157,15 +157,17 @@ func ResourceGroup (resoureName string, displayName string, schemas []string, de
 			"%s"
 		]
 		display_name = "%s"
-		description = "%s"
 		group_members = [
 			{
 				value = "%s",
 				type = "%s"
 			}
 		]
+		group_extension = {
+			description = "%s"
+		}
 	}
-	`, resoureName, schemas[0], schemas[1], displayName, description, members[0].Value, members[0].Type)
+	`, resoureName, schemas[0], schemas[1], displayName, members[0].Value, members[0].Type, description)
 }
 
 func ResourceGroupWithoutSchemas (resoureName string, displayName string) string {
