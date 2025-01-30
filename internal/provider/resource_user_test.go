@@ -48,7 +48,7 @@ func TestResourceUser(t *testing.T) {
 						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.type", emails[0].Type),
 						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.value", emails[0].Value),
 						resource.TestCheckResourceAttr("ias_user.testUser", "active", "false"),
-						resource.TestCheckResourceAttr("ias_user.testUser", "status", "inactive"),
+						resource.TestCheckResourceAttr("ias_user.testUser", "sap_extension_user.status", "inactive"),
 						resource.TestCheckResourceAttr("ias_user.testUser", "user_type", "public"),
 					),
 				},
@@ -80,7 +80,7 @@ func TestResourceUser(t *testing.T) {
 						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.type", emails[0].Type),
 						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.value", emails[0].Value),
 						resource.TestCheckResourceAttr("ias_user.testUser", "active", "false"),
-						resource.TestCheckResourceAttr("ias_user.testUser", "status", "inactive"),
+						resource.TestCheckResourceAttr("ias_user.testUser", "sap_extension_user.status", "inactive"),
 						resource.TestCheckResourceAttr("ias_user.testUser", "user_type", "public"),
 					),
 				},
@@ -94,7 +94,7 @@ func TestResourceUser(t *testing.T) {
 						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.type", emails[0].Type),
 						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.value", emails[0].Value),
 						resource.TestCheckResourceAttr("ias_user.testUser", "active", "false"),
-						resource.TestCheckResourceAttr("ias_user.testUser", "status", "inactive"),
+						resource.TestCheckResourceAttr("ias_user.testUser", "sap_extension_user.status", "inactive"),
 						resource.TestCheckResourceAttr("ias_user.testUser", "user_type", "public"),
 					),
 				},
@@ -179,7 +179,7 @@ func TestResourceUser(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceUserWithStatus("testUser", "Joe Doe", schemas, name, emails, "this-is-not-a-valid-status"),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute status value must be one of: \\[\"active\" \"inactive\" \"new\"\\], got:\n\"%s\"","this-is-not-a-valid-status")),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute sap_extension_user.status value must be one of: \\[\"active\"\n\"inactive\" \"new\"\\], got: \"%s\"","this-is-not-a-valid-status")),
 				},
 			},
 		})
@@ -328,7 +328,9 @@ func ResourceUserWithStatus(resourceName string, userName string, schemas []stri
 				value = "%s"
 			}
 		]
-		status = "%s"
+		sap_extension_user = {
+			status = "%s"
+		}
 	}
 	`, resourceName, schemas[0], schemas[1], userName, name.FamilyName, name.GivenName, emails[0].Type, emails[0].Value, status)
 }

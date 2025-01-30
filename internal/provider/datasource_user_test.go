@@ -33,7 +33,7 @@ func TestDataSourceUser(t *testing.T) {
 						resource.TestCheckResourceAttr("data.ias_user.testUser","emails.0.primary","true"),
 						resource.TestCheckResourceAttr("data.ias_user.testUser","emails.1.value","test.user1@sap.com"),
 						resource.TestCheckResourceAttr("data.ias_user.testUser","emails.1.type","work"),
-						resource.TestCheckResourceAttr("data.ias_user.testUser","status","inactive"),
+						resource.TestCheckResourceAttr("data.ias_user.testUser","sap_extension_user.status","inactive"),
 						resource.TestCheckResourceAttr("data.ias_user.testUser","user_type","public"),
 					),
 				},
