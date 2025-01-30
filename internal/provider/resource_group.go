@@ -17,6 +17,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
 
 var memberTypeValues = []string{"User", "Group"}
@@ -73,11 +74,6 @@ func (r *groupResource) Schema(_ context.Context, _ resource.SchemaRequest, resp
 				MarkdownDescription: "Display Name of the group.",
 				Required: true,
 			},
-			"name": schema.StringAttribute{
-				MarkdownDescription: "Provide a unique name for the group.",
-				Optional: true,
-				Computed: true,
-			},
 			"group_members": schema.ListNestedAttribute{
 				MarkdownDescription: "Specify the members to be part of the group.",
 				Optional: true,
@@ -102,14 +98,26 @@ func (r *groupResource) Schema(_ context.Context, _ resource.SchemaRequest, resp
 					},
 				},
 			},
-			"description": schema.StringAttribute{
-				MarkdownDescription: "Briefly describe the nature of the group.",
-				Optional: true,
-				Computed: true,
-			},
 			"external_id": schema.StringAttribute{
 				MarkdownDescription: "Unique and global identifier for the given group",
 				Computed: true,
+			},
+			"group_extension" : schema.SingleNestedAttribute{
+				// MarkdownDescription: ,
+				Optional: true,
+				Computed: true,
+				Attributes: map[string]schema.Attribute{
+					"name": schema.StringAttribute{
+						MarkdownDescription: "Provide a unique name for the group.",
+						Optional: true,
+						Computed: true,
+					},
+					"description": schema.StringAttribute{
+						MarkdownDescription: "Briefly describe the nature of the group.",
+						Optional: true,
+						Computed: true,
+					},
+				},
 			},
 		},
 	}
@@ -232,14 +240,6 @@ func getGroupRequest(ctx context.Context, plan groupData) (*groups.Group, diag.D
 		DisplayName: plan.DisplayName.ValueString(),
 	}
 
-	if !plan.Description.IsNull() {
-		args.GroupExtension.Description = plan.Description.ValueString()
-	}
-
-	if !plan.Name.IsNull()  {
-		args.GroupExtension.Name = plan.Name.ValueString()
-	}
-
 	var members []memberData
 	diags = plan.GroupMembers.ElementsAs(ctx, &members, true)
 	diagnostics.Append(diags...)
@@ -256,6 +256,16 @@ func getGroupRequest(ctx context.Context, plan groupData) (*groups.Group, diag.D
 
 			args.GroupMembers = append(args.GroupMembers, groupMember)
 		}
+	}
+
+	if !plan.GroupExtension.IsNull() && !plan.GroupExtension.IsUnknown(){
+
+		var groupExtension groupExtensionData
+		diags = plan.GroupExtension.As(ctx, &groupExtension, basetypes.ObjectAsOptions{})
+		diagnostics.Append(diags...)
+
+		args.GroupExtension.Name = groupExtension.Name.ValueString()
+		args.GroupExtension.Description = groupExtension.Description.ValueString()
 	}
 
 	return args, diagnostics

@@ -17,6 +17,11 @@ func newGroupsDataSource() datasource.DataSource{
 	return &groupsDataSource{}
 }
 
+var groupExtensionObjType = map[string]attr.Type{
+	"name": types.StringType,
+	"description": types.StringType,
+}
+
 var membersObjType = types.ObjectType{
 	AttrTypes: map[string]attr.Type{
 		"value": types.StringType,
@@ -31,12 +36,13 @@ var groupObjType = types.ObjectType{
 			ElemType: types.StringType,
 		},
 		"display_name": types.StringType,
-		"name": types.StringType,
 		"group_members": types.ListType{
 			ElemType: membersObjType,
 		},
 		"external_id": types.StringType,
-		"description": types.StringType,
+		"group_extension": types.ObjectType{
+			AttrTypes: groupExtensionObjType,
+		},
 	},	
 }
 
@@ -79,10 +85,6 @@ func (d *groupsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 							Computed: true,
 							MarkdownDescription: "Display Name of the group.",
 						},
-						"name": schema.StringAttribute{
-							MarkdownDescription: "Provide a unique name for the group.",
-							Computed: true,
-						},
 						"group_members": schema.ListNestedAttribute{
 							Computed: true,
 							MarkdownDescription: "Specify the members to be part of the group.",
@@ -103,9 +105,19 @@ func (d *groupsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 							Computed: true,
 							MarkdownDescription: "Unique and global identifier for the given group",
 						},
-						"description": schema.StringAttribute{
+						"group_extension": schema.SingleNestedAttribute{
+							// MarkdownDescription: ,
 							Computed: true,
-							MarkdownDescription: "Briefly describe the nature of the group.",
+							Attributes: map[string]schema.Attribute{
+								"name": schema.StringAttribute{
+									MarkdownDescription: "Provide a unique name for the group.",
+									Computed: true,
+								},
+								"description": schema.StringAttribute{
+									Computed: true,
+									MarkdownDescription: "Briefly describe the nature of the group.",
+								},
+							},
 						},
 					},
 				},

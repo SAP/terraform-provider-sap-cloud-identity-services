@@ -52,10 +52,6 @@ func (d *groupDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, 
 				Computed: true,
 				MarkdownDescription: "Display Name of the group.",
 			},
-			"name": schema.StringAttribute{
-				MarkdownDescription: "Provide a unique name for the group.",
-				Computed: true,
-			},
 			"group_members": schema.ListNestedAttribute{
 				Computed: true,
 				MarkdownDescription: "Specify the members to be part of the group.",
@@ -76,9 +72,19 @@ func (d *groupDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, 
 				Computed: true,
 				MarkdownDescription: "Unique and global identifier for the given group",
 			},
-			"description": schema.StringAttribute{
+			"group_extension": schema.SingleNestedAttribute{
+				// MarkdownDescription: ,
 				Computed: true,
-				MarkdownDescription: "Briefly describe the nature of the group.",
+				Attributes: map[string]schema.Attribute{
+					"name": schema.StringAttribute{
+						MarkdownDescription: "Provide a unique name for the group.",
+						Computed: true,
+					},
+					"description": schema.StringAttribute{
+						Computed: true,
+						MarkdownDescription: "Briefly describe the nature of the group.",
+					},
+				},
 			},
 		},
 
