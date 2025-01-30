@@ -24,21 +24,27 @@ type usersData struct{
 	Values 	types.List 		`tfsdk:"values"`
 }
 
+var sapExtensionUserObjType = map[string]attr.Type{
+	"send_mail": 		types.BoolType,
+	"mail_verified": 	types.BoolType,
+	"status": 			types.StringType,
+}
+
 var nameObjType =  map[string]attr.Type{
-	"family_name": types.StringType,
-	"given_name": types.StringType,
-	"formatted": types.StringType,
-	"middle_name": types.StringType,
-	"honoric_prefix": types.StringType,
-	"honoric_suffix": types.StringType,
+	"family_name": 		types.StringType,
+	"given_name": 		types.StringType,
+	"formatted": 		types.StringType,
+	"middle_name": 		types.StringType,
+	"honoric_prefix": 	types.StringType,
+	"honoric_suffix": 	types.StringType,
 }
 
 var emailObjType = types.ObjectType{
 	AttrTypes: map[string]attr.Type{
-		"value": types.StringType,
-		"type": types.StringType,
-		"display": types.StringType,
-		"primary": types.BoolType,
+		"value": 	types.StringType,
+		"type": 	types.StringType,
+		"display": 	types.StringType,
+		"primary": 	types.BoolType,
 	},
 }
 
@@ -60,9 +66,9 @@ var userObjType = types.ObjectType{
 		"title": types.StringType,
 		"user_type": types.StringType,
 		"active": types.BoolType,
-		"send_mail": types.BoolType,
-		"mail_verified": types.BoolType,
-		"status": types.StringType,
+		"sap_extension_user": types.ObjectType{
+			AttrTypes: sapExtensionUserObjType,
+		},
 	},
 }
 
@@ -169,17 +175,23 @@ func (d *usersDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, 
 							MarkdownDescription: "Determines whether the user is active or not.The default value for the attribute is false.",
 							Computed: true,
 						},
-						"send_mail": schema.BoolAttribute{
-							MarkdownDescription: "Specifies if an activation mail should be sent. The value of the attribute only matters when creating the user.",
-							Computed: true,
-						},
-						"mail_verified": schema.BoolAttribute{
-							MarkdownDescription: "The attribute specifies if the e-mail of the newly created user is verified or not. So if the values of the \"mail_verified\" and \"send_mail\" attributes are true, the user will receive e-mail and they will be able to log on. On the other hand, if the \"send_mail\" is true, but the \"mail_verified\" is false, the user will receive e-mail and they have to click the verification link in the e-mail. If the attribute \"verified\" is not passed in the request body, the default value of \"mail_erified\" is false.",
-							Computed: true,
-						},
-						"status": schema.StringAttribute{
-							MarkdownDescription: "Specifies if the user is created as active, inactive or new. If the attribute \"active\" is not passed in the request body, the default value of the attribute \"status\" is inactive.",
-							Computed: true,
+						"sap_extension_user": schema.SingleNestedAttribute{
+							// MarkdownDescription
+							Computed : true,
+							Attributes: map[string]schema.Attribute{
+								"send_mail": schema.BoolAttribute{
+									MarkdownDescription: "Specifies if an activation mail should be sent. The value of the attribute only matters when creating the user.",
+									Computed: true,
+								},
+								"mail_verified": schema.BoolAttribute{
+									MarkdownDescription: "The attribute specifies if the e-mail of the newly created user is verified or not. So if the values of the \"mail_verified\" and \"send_mail\" attributes are true, the user will receive e-mail and they will be able to log on. On the other hand, if the \"send_mail\" is true, but the \"mail_verified\" is false, the user will receive e-mail and they have to click the verification link in the e-mail. If the attribute \"verified\" is not passed in the request body, the default value of \"mail_erified\" is false.",
+									Computed: true,
+								},
+								"status": schema.StringAttribute{
+									MarkdownDescription: "Specifies if the user is created as active, inactive or new. If the attribute \"active\" is not passed in the request body, the default value of the attribute \"status\" is inactive.",
+									Computed: true,
+								},
+							},
 						},
 					},
 				},
