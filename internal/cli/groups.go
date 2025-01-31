@@ -24,7 +24,7 @@ func (g *GroupsCli) Get(ctx context.Context) (groups.GroupsResponse, error) {
 
 	res, err, _ := g.cliClient.Execute(ctx, "GET", g.getUrl(), nil, DirectoryHeader, nil)
 
-	if err!=nil{
+	if err != nil {
 		return groups, err
 	}
 
@@ -76,15 +76,15 @@ func (g *GroupsCli) Update(ctx context.Context, args *groups.Group) (groups.Grou
 		return group, err
 	}
 
-	if err = json.Unmarshal(res, &group); err != nil{
+	if err = json.Unmarshal(res, &group); err != nil {
 		return group, err
 	}
 
 	return group, nil
 }
 
-func (g *GroupsCli) Delete(ctx context.Context, groupId string) (error) {
-	
+func (g *GroupsCli) Delete(ctx context.Context, groupId string) error {
+
 	_, err, _ := g.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", g.getUrl(), groupId), nil, DirectoryHeader, nil)
 
 	return err

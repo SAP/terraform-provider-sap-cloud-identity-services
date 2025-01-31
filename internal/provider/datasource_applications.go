@@ -102,7 +102,7 @@ func (d *applicationsDataSource) Metadata(_ context.Context, req datasource.Meta
 
 func (d *applicationsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-
+		MarkdownDescription: `Gets a list of applications from the SAP Cloud Identity services.`,
 		Attributes: map[string]schema.Attribute{
 			"values": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{

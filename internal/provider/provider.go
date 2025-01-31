@@ -43,6 +43,7 @@ func (p *IasProvider) Metadata(_ context.Context, _ provider.MetadataRequest, re
 
 func (p *IasProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		MarkdownDescription: `The Terraform provider for SAP Cloud Identity Services enables you to automate the provisioning, management, and configuration of resources in the [SAP Cloud Identity Services](https://help.sap.com/docs/cloud-identity-services). By leveraging this provider, you can simplify and streamline the configuration of applications, groups, schemas and users.`,
 		Attributes: map[string]schema.Attribute{
 			"tenant_url": schema.StringAttribute{
 				MarkdownDescription: "The URL of the IAS tenant",
