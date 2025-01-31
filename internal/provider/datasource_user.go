@@ -37,7 +37,7 @@ func (d *userDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Unique ID of the resource.",
-				Required: true,
+				Required:            true,
 				Validators: []validator.String{
 					ValidUUID(),
 				},
@@ -45,22 +45,22 @@ func (d *userDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 			"schemas": schema.SetAttribute{
 				// MarkdownDescription: "",
 				ElementType: types.StringType,
-				Computed: true,
+				Computed:    true,
 			},
 			"user_name": schema.StringAttribute{
 				MarkdownDescription: "Unique user name of the user.",
-				Computed: true,
+				Computed:            true,
 			},
 			"name": schema.SingleNestedAttribute{
 				MarkdownDescription: "Name of the user",
 				Attributes: map[string]schema.Attribute{
 					"family_name": schema.StringAttribute{
 						MarkdownDescription: "The following characters: <, >, : are not allowed.",
-						Computed: true,
+						Computed:            true,
 					},
 					"given_name": schema.StringAttribute{
 						MarkdownDescription: "The following characters: <, >, : are not allowed.",
-						Computed: true,
+						Computed:            true,
 					},
 					"formatted": schema.StringAttribute{
 						Computed: true,
@@ -83,18 +83,18 @@ func (d *userDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 					Attributes: map[string]schema.Attribute{
 						"value": schema.StringAttribute{
 							MarkdownDescription: "Value of the email of the user.",
-							Computed: true,
+							Computed:            true,
 						},
 						"type": schema.StringAttribute{
 							MarkdownDescription: "Type of the email of the user.",
-							Computed: true,
+							Computed:            true,
 						},
 						"display": schema.StringAttribute{
 							Computed: true,
 						},
 						"primary": schema.BoolAttribute{
 							MarkdownDescription: "Set the email to be primary",
-							Computed: true,
+							Computed:            true,
 						},
 					},
 				},
@@ -102,39 +102,43 @@ func (d *userDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 			},
 			"password": schema.StringAttribute{
 				MarkdownDescription: "The password to be set for the user.",
-				Computed: true,
+				Computed:            true,
 			},
 			"display_name": schema.StringAttribute{
 				MarkdownDescription: "The name to be displayed for the user.",
-				Computed: true,
+				Computed:            true,
 			},
 			"title": schema.StringAttribute{
 				MarkdownDescription: "The title to be given for the user.",
-				Computed: true,
+				Computed:            true,
 			},
 			"user_type": schema.StringAttribute{
 				MarkdownDescription: "Specifies the type of the user.The default type is \"public\".",
-				Computed: true,
+				Computed:            true,
 			},
 			"active": schema.BoolAttribute{
 				MarkdownDescription: "Determines whether the user is active or not.The default value for the attribute is false.",
-				Computed: true,
+				Computed:            true,
 			},
-			"send_mail": schema.BoolAttribute{
-				MarkdownDescription: "Specifies if an activation mail should be sent. The value of the attribute only matters when creating the user.",
+			"sap_extension_user": schema.SingleNestedAttribute{
+				// MarkdownDescription
 				Computed: true,
+				Attributes: map[string]schema.Attribute{
+					"send_mail": schema.BoolAttribute{
+						MarkdownDescription: "Specifies if an activation mail should be sent. The value of the attribute only matters when creating the user.",
+						Computed:            true,
+					},
+					"mail_verified": schema.BoolAttribute{
+						MarkdownDescription: "The attribute specifies if the e-mail of the newly created user is verified or not. So if the values of the \"mail_verified\" and \"send_mail\" attributes are true, the user will receive e-mail and they will be able to log on. On the other hand, if the \"send_mail\" is true, but the \"mail_verified\" is false, the user will receive e-mail and they have to click the verification link in the e-mail. If the attribute \"verified\" is not passed in the request body, the default value of \"mail_erified\" is false.",
+						Computed:            true,
+					},
+					"status": schema.StringAttribute{
+						MarkdownDescription: "Specifies if the user is created as active, inactive or new. If the attribute \"active\" is not passed in the request body, the default value of the attribute \"status\" is inactive.",
+						Computed:            true,
+					},
+				},
 			},
-			"mail_verified": schema.BoolAttribute{
-				MarkdownDescription: "The attribute specifies if the e-mail of the newly created user is verified or not. So if the values of the \"mail_verified\" and \"send_mail\" attributes are true, the user will receive e-mail and they will be able to log on. On the other hand, if the \"send_mail\" is true, but the \"mail_verified\" is false, the user will receive e-mail and they have to click the verification link in the e-mail. If the attribute \"verified\" is not passed in the request body, the default value of \"mail_erified\" is false.",
-				Computed: true,
-			},
-			"status": schema.StringAttribute{
-				MarkdownDescription: "Specifies if the user is created as active, inactive or new. If the attribute \"active\" is not passed in the request body, the default value of the attribute \"status\" is inactive.",
-				Optional: true,
-				Computed: true,
-			},
-		},	
-
+		},
 	}
 }
 

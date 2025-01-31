@@ -16,7 +16,7 @@ func TestDataSourceGroups(t *testing.T) {
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{
-			IsUnitTest: true,
+			IsUnitTest:               true,
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{

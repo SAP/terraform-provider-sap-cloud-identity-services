@@ -7,17 +7,16 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
-
 func TestDataSourceSchemas(t *testing.T) {
 
 	t.Parallel()
 
-	t.Run("happy path", func (t *testing.T) {
+	t.Run("happy path", func(t *testing.T) {
 		rec, user := setupVCR(t, "fixtures/datasource_schemas_all")
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{
-			IsUnitTest: true,
+			IsUnitTest:               true,
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{

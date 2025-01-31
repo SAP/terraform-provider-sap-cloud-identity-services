@@ -20,10 +20,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-var attributeDataTypes 			 = []string{"string", "boolean", "decimal", "integer", "dateTime", "binary", "reference", "complex"}
-var attributeMutabilityValues    = []string{"readOnly", "readWrite", "writeOnly", "immutable"}
-var attributeReturnValues 		 = []string{"always", "never", "default", "request"}
-var attributeUniquenessValues    = []string{"none", "server", "global"}
+var attributeDataTypes = []string{"string", "boolean", "decimal", "integer", "dateTime", "binary", "reference", "complex"}
+var attributeMutabilityValues = []string{"readOnly", "readWrite", "writeOnly", "immutable"}
+var attributeReturnValues = []string{"always", "never", "default", "request"}
+var attributeUniquenessValues = []string{"none", "server", "global"}
 
 func newSchemaResource() resource.Resource {
 	return &schemaResource{}
@@ -49,41 +49,41 @@ func (r *schemaResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 	resp.Schema = schema.Schema{
 
 		Attributes: map[string]schema.Attribute{
-			"id" : schema.StringAttribute{
+			"id": schema.StringAttribute{
 				MarkdownDescription: "A unique id by which the schema can be referenced in other entities",
-				Required: true,
+				Required:            true,
 				//add a regex check
 			},
-			"name" : schema.StringAttribute{
+			"name": schema.StringAttribute{
 				MarkdownDescription: "A unique name for the schema",
-				Required: true,
+				Required:            true,
 			},
-			"attributes" : schema.ListNestedAttribute{
+			"attributes": schema.ListNestedAttribute{
 				MarkdownDescription: "The list of attribites that comprise the schema",
-				Required: true,
+				Required:            true,
 				Validators: []validator.List{
 					listvalidator.SizeAtMost(20),
 				},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
-						"name" : schema.StringAttribute{
-							Required: true,
+						"name": schema.StringAttribute{
+							Required:            true,
 							MarkdownDescription: "The attribute name. Only alphanumeric characters and underscores are allowed.",
 							Validators: []validator.String{
-								stringvalidator.LengthBetween(2,20),
+								stringvalidator.LengthBetween(2, 20),
 								ValidAttributeName(),
 							},
 						},
-						"type" : schema.StringAttribute{
-							Required: true,
+						"type": schema.StringAttribute{
+							Required:            true,
 							MarkdownDescription: fmt.Sprintf("The attribute data type. Valid values include : %s", strings.Join(attributeDataTypes, ",")),
 							Validators: []validator.String{
 								stringvalidator.OneOf(attributeDataTypes...),
 							},
 						},
 						"mutability": schema.StringAttribute{
-							Required: true,
-							MarkdownDescription: fmt.Sprintf("Control the Read or Write access of the attribute. Valid values include : %s", strings.Join(attributeMutabilityValues,",")),
+							Required:            true,
+							MarkdownDescription: fmt.Sprintf("Control the Read or Write access of the attribute. Valid values include : %s", strings.Join(attributeMutabilityValues, ",")),
 							Validators: []validator.String{
 								stringvalidator.OneOf(attributeMutabilityValues...),
 							},
@@ -91,7 +91,7 @@ func (r *schemaResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 						"returned": schema.StringAttribute{
 							Required: true,
 							//description must be enhanced
-							MarkdownDescription: fmt.Sprintf("Valid values include : %s", strings.Join(attributeReturnValues,",")),
+							MarkdownDescription: fmt.Sprintf("Valid values include : %s", strings.Join(attributeReturnValues, ",")),
 							Validators: []validator.String{
 								stringvalidator.OneOf(attributeReturnValues...),
 							},
@@ -99,23 +99,23 @@ func (r *schemaResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 						"uniqueness": schema.StringAttribute{
 							Required: true,
 							// description must be enhanced
-							MarkdownDescription: fmt.Sprintf("Define the context in which the attribute must be unique. Valid values include : %s", strings.Join(attributeUniquenessValues,",")),
+							MarkdownDescription: fmt.Sprintf("Define the context in which the attribute must be unique. Valid values include : %s", strings.Join(attributeUniquenessValues, ",")),
 							Validators: []validator.String{
 								stringvalidator.OneOf(attributeUniquenessValues...),
 							},
 						},
 						"canonical_values": schema.ListAttribute{
-							ElementType: types.StringType,
-							Optional: true,
+							ElementType:         types.StringType,
+							Optional:            true,
 							MarkdownDescription: "A collection of suggested canonical values that may be used",
 						},
-						"multivalued" : schema.BoolAttribute{
+						"multivalued": schema.BoolAttribute{
 							Optional: true,
 							Computed: true,
 							// MarkDownDescription
 						},
-						"description" : schema.StringAttribute{
-							Optional: true,
+						"description": schema.StringAttribute{
+							Optional:            true,
 							MarkdownDescription: "A brief description for the attribute",
 						},
 						"required": schema.BoolAttribute{
@@ -133,10 +133,10 @@ func (r *schemaResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 					},
 				},
 			},
-			"schemas" : schema.SetAttribute{
+			"schemas": schema.SetAttribute{
 				ElementType: types.StringType,
-				Optional: true,
-				Computed: true,
+				Optional:    true,
+				Computed:    true,
 				//MarkdownDescription
 				Default: setdefault.StaticValue(
 					types.SetValueMust(
@@ -150,12 +150,12 @@ func (r *schemaResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 					setvalidator.SizeAtLeast(1),
 				},
 			},
-			"description" : schema.StringAttribute{
-				Optional: true,
+			"description": schema.StringAttribute{
+				Optional:            true,
 				MarkdownDescription: "A description for the schema",
 			},
-			"external_id" : schema.StringAttribute{
-				Optional: true,
+			"external_id": schema.StringAttribute{
+				Optional:            true,
 				MarkdownDescription: "Unique and global identifier for the given schema",
 			},
 		},
@@ -178,7 +178,6 @@ func (r *schemaResource) Read(ctx context.Context, req resource.ReadRequest, res
 	state, diags := schemaValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
 
-	
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 }
@@ -194,8 +193,8 @@ func (r *schemaResource) Create(ctx context.Context, req resource.CreateRequest,
 
 	res, err := r.cli.Schema.Create(ctx, args)
 
-	if err!=nil {
-		resp.Diagnostics.AddError("Error creating schema", fmt.Sprintf("%s",err))
+	if err != nil {
+		resp.Diagnostics.AddError("Error creating schema", fmt.Sprintf("%s", err))
 		return
 	}
 
@@ -207,11 +206,11 @@ func (r *schemaResource) Create(ctx context.Context, req resource.CreateRequest,
 }
 
 func (r *schemaResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	resp.Diagnostics.AddError("Invalid Operation","The resource \"Schema\" does not support updates.")
+	resp.Diagnostics.AddError("Invalid Operation", "The resource \"Schema\" does not support updates.")
 }
 
-func (r *schemaResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) { 
-	
+func (r *schemaResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+
 	var config schemaData
 	diags := req.State.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
@@ -223,16 +222,15 @@ func (r *schemaResource) Delete(ctx context.Context, req resource.DeleteRequest,
 
 	err := r.cli.Schema.Delete(ctx, config.Id.ValueString())
 
-	if err!=nil {
+	if err != nil {
 		resp.Diagnostics.AddError("Error deleting schema", fmt.Sprintf("%s", err))
 		return
 	}
 }
 
-
 func getSchemaRequest(ctx context.Context, plan schemaData) (*schemas.Schema, diag.Diagnostics) {
-	
-	var diagnostics  diag.Diagnostics
+
+	var diagnostics diag.Diagnostics
 
 	var schemaList []string
 	diags := plan.Schemas.ElementsAs(ctx, &schemaList, true)
@@ -242,9 +240,9 @@ func getSchemaRequest(ctx context.Context, plan schemaData) (*schemas.Schema, di
 	diags = plan.Attributes.ElementsAs(ctx, &attributes, true)
 	diagnostics.Append(diags...)
 
-	args := &schemas.Schema {
-		Id: plan.Id.ValueString(),
-		Name: plan.Name.ValueString(),
+	args := &schemas.Schema{
+		Id:      plan.Id.ValueString(),
+		Name:    plan.Name.ValueString(),
 		Schemas: schemaList,
 	}
 
@@ -257,17 +255,17 @@ func getSchemaRequest(ctx context.Context, plan schemaData) (*schemas.Schema, di
 	}
 
 	args.Attributes = []schemas.Attribute{}
-	for _, attribute := range attributes{
+	for _, attribute := range attributes {
 		schemaAttribute := schemas.Attribute{
-			Name: attribute.Name.ValueString(),
-			Type: attribute.Type.ValueString(),
-			Mutability: attribute.Mutability.ValueString(),
-			Returned: attribute.Returned.ValueString(),
-			Uniqueness: attribute.Uniqueness.ValueString(),
+			Name:        attribute.Name.ValueString(),
+			Type:        attribute.Type.ValueString(),
+			Mutability:  attribute.Mutability.ValueString(),
+			Returned:    attribute.Returned.ValueString(),
+			Uniqueness:  attribute.Uniqueness.ValueString(),
 			Multivalued: attribute.Multivalued.ValueBool(),
 			Description: attribute.Description.ValueString(),
-			Required: attribute.Required.ValueBool(),
-			CaseExact: attribute.CaseExact.ValueBool(),
+			Required:    attribute.Required.ValueBool(),
+			CaseExact:   attribute.CaseExact.ValueBool(),
 		}
 
 		if !attribute.CanonicalValues.IsNull() {
@@ -276,7 +274,7 @@ func getSchemaRequest(ctx context.Context, plan schemaData) (*schemas.Schema, di
 			diagnostics.Append(diags...)
 			schemaAttribute.CanonicalValues = canonicalValues
 		}
-	
+
 		args.Attributes = append(args.Attributes, schemaAttribute)
 	}
 

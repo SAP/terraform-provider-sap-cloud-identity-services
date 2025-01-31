@@ -30,9 +30,9 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestCheckResourceAttr("ias_application.testApp", "description", "application for testing purposes"),
 						resource.TestCheckResourceAttr("ias_application.testApp", "multi_tenant_app", "false"),
 						resource.TestCheckResourceAttr("ias_application.testApp", "global_account", "unknown"),
-						resource.TestCheckResourceAttr("ias_application.testApp", "sso_type", "saml2"),
-						resource.TestCheckResourceAttr("ias_application.testApp", "subject_name_identifier.value", "uid"),
-						resource.TestCheckResourceAttr("ias_application.testApp", "assertion_attributes.0.attribute_value", "firstName"),
+						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.sso_type", "saml2"),
+						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.subject_name_identifier.value", "uid"),
+						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.assertion_attributes.0.attribute_value", "firstName"),
 					),
 				},
 				{
@@ -62,9 +62,9 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestCheckResourceAttr("ias_application.testApp", "global_account", "unknown"),
 						resource.TestCheckResourceAttr("ias_application.testApp", "multi_tenant_app", "false"),
 						resource.TestCheckResourceAttr("ias_application.testApp", "global_account", "unknown"),
-						resource.TestCheckResourceAttr("ias_application.testApp", "sso_type", "saml2"),
-						resource.TestCheckResourceAttr("ias_application.testApp", "subject_name_identifier.value", "uid"),
-						resource.TestCheckResourceAttr("ias_application.testApp", "assertion_attributes.0.attribute_value", "firstName"),
+						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.sso_type", "saml2"),
+						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.subject_name_identifier.value", "uid"),
+						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.assertion_attributes.0.attribute_value", "firstName"),
 					),
 				},
 				{
@@ -77,9 +77,9 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestCheckResourceAttr("ias_application.testApp", "global_account", "unknown"),
 						resource.TestCheckResourceAttr("ias_application.testApp", "multi_tenant_app", "false"),
 						resource.TestCheckResourceAttr("ias_application.testApp", "global_account", "unknown"),
-						resource.TestCheckResourceAttr("ias_application.testApp", "sso_type", "saml2"),
-						resource.TestCheckResourceAttr("ias_application.testApp", "subject_name_identifier.value", "uid"),
-						resource.TestCheckResourceAttr("ias_application.testApp", "assertion_attributes.0.attribute_value", "firstName"),
+						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.sso_type", "saml2"),
+						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.subject_name_identifier.value", "uid"),
+						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.assertion_attributes.0.attribute_value", "firstName"),
 					),
 				},
 			},
@@ -132,7 +132,7 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithSsoType("testApp", "test-app", "application for testing purposes", "this-is-not-a-valid-sso_type"),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute sso_type value must be one of: \\[\"openIdConnect\" \"saml2\"], got:\n\"%s\"", "this-is-not-a-valid-sso_type")),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_schema.sso_type value must be one of:\n\\[\"openIdConnect\" \"saml2\"], got: \"%s\"", "this-is-not-a-valid-sso_type")),
 				},
 			},
 		})
@@ -145,11 +145,11 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithSubjectNameIdentifier("testApp", "test-app", "application for testing purposes", "source = \"source\""),
-					ExpectError: regexp.MustCompile("Attribute \"subject_name_identifier.value\" must be specified when\n\"subject_name_identifier\" is specified"),
+					ExpectError: regexp.MustCompile("Attribute \"authentication_schema.subject_name_identifier.value\" must be\nspecified when \"authentication_schema.subject_name_identifier\" is specified"),
 				},
 				{
 					Config:      ResourceApplicationWithSubjectNameIdentifier("testApp", "test-app", "application for testing purposes", "value = \"value\""),
-					ExpectError: regexp.MustCompile("Attribute \"subject_name_identifier.source\" must be specified when\n\"subject_name_identifier\" is specified"),
+					ExpectError: regexp.MustCompile("Attribute \"authentication_schema.subject_name_identifier.source\" must be\nspecified when \"authentication_schema.subject_name_identifier\" is specified"),
 				},
 			},
 		})
@@ -162,7 +162,7 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithSubjectNameIdentifier("testApp", "test-app", "application for testing purposes", "source = \"this-is-not-a-valid-source\", value = \"value\""),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute subject_name_identifier.source value must be one of: \\[\"Identity\nDirectory\" \"Corporate Identity Provider\" \"Expression\"], got:\n\"%s\"", "this-is-not-a-valid-source")),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_schema.subject_name_identifier.source value must be\none of: \\[\"Identity Directory\" \"Corporate Identity Provider\" \"Expression\"],\ngot: \"%s\"", "this-is-not-a-valid-source")),
 				},
 			},
 		})
@@ -175,11 +175,11 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithAssertionAttributes("testApp", "test-app", "application for testing purposes", "attribute_value = \"value\""),
-					ExpectError: regexp.MustCompile("Attribute \"assertion_attributes\\[0].attribute_name\" must be specified when\n\"assertion_attributes\" is specified"),
+					ExpectError: regexp.MustCompile("Attribute \"authentication_schema.assertion_attributes\\[0].attribute_name\" must\nbe specified when \"authentication_schema.assertion_attributes\" is specified"),
 				},
 				{
 					Config:      ResourceApplicationWithAssertionAttributes("testApp", "test-app", "application for testing purposes", "attribute_name = \"name\""),
-					ExpectError: regexp.MustCompile("Attribute \"assertion_attributes\\[0].attribute_value\" must be specified when\n\"assertion_attributes\" is specified"),
+					ExpectError: regexp.MustCompile("Attribute \"authentication_schema.assertion_attributes\\[0].attribute_value\"\nmust be specified when \"authentication_schema.assertion_attributes\" is\nspecified"),
 				},
 			},
 		})
@@ -192,15 +192,15 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithAdvancedAssertionAttributes("testApp", "test-app", "application for testing purposes", "source = \"source\", attribute_value = \"value\""),
-					ExpectError: regexp.MustCompile("Attribute \"advanced_assertion_attributes\\[0].attribute_name\" must be specified\nwhen \"advanced_assertion_attributes\" is specified"),
+					ExpectError: regexp.MustCompile("Attribute\n\"authentication_schema.advanced_assertion_attributes\\[0].attribute_name\" must\nbe specified when \"authentication_schema.advanced_assertion_attributes\" is\nspecified"),
 				},
 				{
 					Config:      ResourceApplicationWithAdvancedAssertionAttributes("testApp", "test-app", "application for testing purposes", "attribute_name = \"name\", attribute_value = \"value\""),
-					ExpectError: regexp.MustCompile("Attribute \"advanced_assertion_attributes\\[0].source\" must be specified when\n\"advanced_assertion_attributes\" is specified"),
+					ExpectError: regexp.MustCompile("Attribute \"authentication_schema.advanced_assertion_attributes\\[0].source\"\nmust be specified when \"authentication_schema.advanced_assertion_attributes\"\nis specified"),
 				},
 				{
 					Config:      ResourceApplicationWithAdvancedAssertionAttributes("testApp", "test-app", "application for testing purposes", "source = \"source\", attribute_name = \"name\""),
-					ExpectError: regexp.MustCompile("Attribute \"advanced_assertion_attributes\\[0].attribute_value\" must be\nspecified when \"advanced_assertion_attributes\" is specified"),
+					ExpectError: regexp.MustCompile("Attribute\n\"authentication_schema.advanced_assertion_attributes\\[0].attribute_value\" must\nbe specified when \"authentication_schema.advanced_assertion_attributes\" is\nspecified"),
 				},
 			},
 		})
@@ -213,7 +213,7 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithAdvancedAssertionAttributes("testApp", "test-app", "application for testing purposes", "source = \"this-is-not-a-valid-source\", attribute_name = \"name\", attribute_value = \"value\""),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute advanced_assertion_attributes\\[0].source value must be one of:\n\\[\"Corporate Identity Provider\" \"Expression\"], got:\n\"%s\"", "this-is-not-a-valid-source")),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_schema.advanced_assertion_attributes\\[0].source value\nmust be one of: \\[\"Corporate Identity Provider\" \"Expression\"], got:\n\"%s\"", "this-is-not-a-valid-source")),
 				},
 			},
 		})
@@ -226,7 +226,7 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithAuthenticationRules("testApp", "test-app", "application for testing purposes", "user_type = \"user\""),
-					ExpectError: regexp.MustCompile("Attribute \"authentication_rules\\[0].identity_provider_id\" must be specified\nwhen \"authentication_rules\" is specified"),
+					ExpectError: regexp.MustCompile("Attribute\n\"authentication_schema.authentication_rules\\[0].identity_provider_id\" must be\nspecified when \"authentication_schema.authentication_rules\" is specified"),
 				},
 			},
 		})
@@ -239,7 +239,7 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithAuthenticationRules("testApp", "test-app", "application for testing purposes", "identity_provider_id = \"664c660e25cff252c5c202dc\""),
-					ExpectError: regexp.MustCompile("At least one attribute out of\n\\[authentication_rules\\[\\*].user_type,authentication_rules\\[\\*].user_group,authentication_rules\\[\\*].user_email_domain"),
+					ExpectError: regexp.MustCompile("At least one attribute out of\n\\[authentication_schema.authentication_rules\\[\\*].user_type,authentication_schema.authentication_rules\\[\\*].user_group,authentication_schema.authentication_rules\\[\\*].user_email_domain"),
 				},
 			},
 		})
@@ -252,7 +252,7 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithAuthenticationRules("testApp", "test-app", "application for testing purposes", "identity_provider_id = \"664c660e25cff252c5c202dc\", user_email_domain=\"this-is-not-email-domain\""),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_rules\\[0].user_email_domain value must be a valid\nEmail Domain, got: %s", "this-is-not-email-domain")),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_schema.authentication_rules\\[0].user_email_domain\nvalue must be a valid Email Domain, got: %s", "this-is-not-email-domain")),
 				},
 			},
 		})
@@ -265,7 +265,7 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithAuthenticationRules("testApp", "test-app", "application for testing purposes", "identity_provider_id = \"664c660e25cff252c5c202dc\", ip_network_range = \"this-is-not-ip-address\""),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_rules\\[0].ip_network_range value must be a valid IP\nAddress, got: %s", "this-is-not-ip-address")),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_schema.authentication_rules\\[0].ip_network_range\nvalue must be a valid IP Address, got: %s", "this-is-not-ip-address")),
 				},
 			},
 		})
@@ -313,8 +313,10 @@ func ResourceApplicationWithSubjectNameIdentifier(resourceName string, appName s
 	resource "ias_application" "%s" {
 		name = "%s"
 		description = "%s"
-		subject_name_identifier = {
-			%s
+		authentication_schema = {
+			subject_name_identifier = {
+				%s
+			}
 		}
 	}
 	`, resourceName, appName, description, subAttribute)
@@ -325,9 +327,11 @@ func ResourceApplicationWithAssertionAttributes(resourceName string, appName str
 	resource "ias_application" "%s" {
 		name = "%s"
 		description = "%s"
-		assertion_attributes = [
-			{	%s	}
-		]
+		authentication_schema = {
+			assertion_attributes = [
+				{	%s	}
+			]
+		}
 	}
 	`, resourceName, appName, description, subAttribute)
 }
@@ -337,9 +341,11 @@ func ResourceApplicationWithAdvancedAssertionAttributes(resourceName string, app
 	resource "ias_application" "%s" {
 		name = "%s"
 		description = "%s"
-		advanced_assertion_attributes = [
-			{	%s	}
-		]
+		authentication_schema = {
+			advanced_assertion_attributes = [
+				{	%s	}
+			]
+		}
 	}
 	`, resourceName, appName, description, subAttribute)
 }
@@ -349,7 +355,9 @@ func ResourceApplicationWithSsoType(resourceName string, appName string, descrip
 	resource "ias_application" "%s" {
 		name = "%s"
 		description = "%s"
-		sso_type = "%s"
+		authentication_schema = {
+			sso_type = "%s"
+		}
 	}
 	`, resourceName, appName, description, ssoType)
 }
@@ -359,11 +367,13 @@ func ResourceApplicationWithAuthenticationRules(resourceName string, appName str
 	resource "ias_application" "%s" {
 		name = "%s"
 		description = "%s"
-		authentication_rules = [
-			{
-				%s
-			}
-		]
+		authentication_schema = {
+			authentication_rules = [
+				{
+					%s
+				}
+			]
+		}
 	}
 	`, resourceName, appName, description, subAttribute)
 }

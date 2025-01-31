@@ -18,8 +18,8 @@ import (
 )
 
 var emailTypeValues = []string{"work", "home", "other"}
-var userTypeValues  = []string{"public", "partner", "customer", "external", "onboardee", "employee"}
-var activeValues    = []string{"active", "inactive", "new"}
+var userTypeValues = []string{"public", "partner", "customer", "external", "onboardee", "employee"}
+var activeValues = []string{"active", "inactive", "new"}
 
 func newUserResource() resource.Resource {
 	return &userResource{}
@@ -46,7 +46,7 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Unique ID of the resource.",
-				Computed: true,
+				Computed:            true,
 				Validators: []validator.String{
 					ValidUUID(),
 				},
@@ -54,23 +54,23 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 			"schemas": schema.SetAttribute{
 				// MarkdownDescription: "",
 				ElementType: types.StringType,
-				Required: true,
+				Required:    true,
 			},
 			"user_name": schema.StringAttribute{
 				MarkdownDescription: "Unique user name of the user.",
-				Required: true,
+				Required:            true,
 			},
 			"name": schema.SingleNestedAttribute{
 				MarkdownDescription: "Name of the user",
-				Required: true,
+				Required:            true,
 				Attributes: map[string]schema.Attribute{
 					"family_name": schema.StringAttribute{
 						MarkdownDescription: "The following characters: <, >, : are not allowed.",
-						Required: true,
+						Required:            true,
 					},
 					"given_name": schema.StringAttribute{
 						MarkdownDescription: "The following characters: <, >, : are not allowed.",
-						Required: true,
+						Required:            true,
 					},
 					"formatted": schema.StringAttribute{
 						// MarkdownDescription: ,
@@ -96,16 +96,16 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 			},
 			"emails": schema.SetNestedAttribute{
 				MarkdownDescription: "Email of the user.",
-				Required: true,
+				Required:            true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"value": schema.StringAttribute{
 							MarkdownDescription: "Value of the email of the user.",
-							Required: true,
+							Required:            true,
 						},
 						"type": schema.StringAttribute{
 							MarkdownDescription: "Type of the email of the user.",
-							Required: true,
+							Required:            true,
 							Validators: []validator.String{
 								stringvalidator.OneOf(emailTypeValues...),
 							},
@@ -117,60 +117,67 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 						},
 						"primary": schema.BoolAttribute{
 							MarkdownDescription: "Set the email to be primary",
-							Computed: true,
-							Optional: true,
+							Computed:            true,
+							Optional:            true,
 						},
 					},
 				},
 			},
 			"password": schema.StringAttribute{
 				MarkdownDescription: "The password to be set for the user.",
-				Optional: true,
-				Sensitive: true,
+				Optional:            true,
+				Sensitive:           true,
 				//regex to check validity, if check is added, add a test
 			},
 			"display_name": schema.StringAttribute{
 				MarkdownDescription: "The name to be displayed for the user.",
-				Optional: true,
-				Computed: true,
+				Optional:            true,
+				Computed:            true,
 			},
 			"title": schema.StringAttribute{
 				MarkdownDescription: "The title to be given for the user.",
-				Optional: true,
-				Computed: true,
+				Optional:            true,
+				Computed:            true,
 			},
 			"user_type": schema.StringAttribute{
 				MarkdownDescription: "Specifies the type of the user.The default type is \"public\".",
-				Optional: true,
-				Computed: true,
+				Optional:            true,
+				Computed:            true,
 				Validators: []validator.String{
 					stringvalidator.OneOf(userTypeValues...),
 				},
 			},
 			"active": schema.BoolAttribute{
 				MarkdownDescription: "Determines whether the user is active or not.The default value for the attribute is false.",
-				Optional: true,
-				Computed: true,
+				Optional:            true,
+				Computed:            true,
 			},
-			"send_mail": schema.BoolAttribute{
-				MarkdownDescription: "Specifies if an activation mail should be sent. The value of the attribute only matters when creating the user.",
+			"sap_extension_user": schema.SingleNestedAttribute{
+				// MarkdownDescription:
 				Optional: true,
 				Computed: true,
-			},
-			"mail_verified": schema.BoolAttribute{
-				MarkdownDescription: "The attribute specifies if the e-mail of the newly created user is verified or not. So if the values of the \"mail_verified\" and \"send_mail\" attributes are true, the user will receive e-mail and they will be able to log on. On the other hand, if the \"send_mail\" is true, but the \"mail_verified\" is false, the user will receive e-mail and they have to click the verification link in the e-mail. If the attribute \"verified\" is not passed in the request body, the default value of \"mail_erified\" is false.",
-				Optional: true,
-				Computed: true,
-			},
-			"status": schema.StringAttribute{
-				MarkdownDescription: "Specifies if the user is created as active, inactive or new. If the attribute \"active\" is not passed in the request body, the default value of the attribute \"status\" is inactive.",
-				Optional: true,
-				Computed: true,
-				Validators: []validator.String{
-					stringvalidator.OneOf(activeValues...),
+				Attributes: map[string]schema.Attribute{
+					"send_mail": schema.BoolAttribute{
+						MarkdownDescription: "Specifies if an activation mail should be sent. The value of the attribute only matters when creating the user.",
+						Optional:            true,
+						Computed:            true,
+					},
+					"mail_verified": schema.BoolAttribute{
+						MarkdownDescription: "The attribute specifies if the e-mail of the newly created user is verified or not. So if the values of the \"mail_verified\" and \"send_mail\" attributes are true, the user will receive e-mail and they will be able to log on. On the other hand, if the \"send_mail\" is true, but the \"mail_verified\" is false, the user will receive e-mail and they have to click the verification link in the e-mail. If the attribute \"verified\" is not passed in the request body, the default value of \"mail_erified\" is false.",
+						Optional:            true,
+						Computed:            true,
+					},
+					"status": schema.StringAttribute{
+						MarkdownDescription: "Specifies if the user is created as active, inactive or new. If the attribute \"active\" is not passed in the request body, the default value of the attribute \"status\" is inactive.",
+						Optional:            true,
+						Computed:            true,
+						Validators: []validator.String{
+							stringvalidator.OneOf(activeValues...),
+						},
+					},
 				},
 			},
-		},	
+		},
 	}
 }
 
@@ -183,6 +190,9 @@ func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, r
 
 	args, diags := getUserRequest(ctx, plan)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	res, err := r.cli.User.Create(ctx, args)
 	if resp.Diagnostics.HasError() {
@@ -208,7 +218,7 @@ func (r *userResource) Read(ctx context.Context, req resource.ReadRequest, resp 
 	var config userData
 	diags := req.State.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
-	
+
 	res, err := r.cli.User.GetByUserId(ctx, config.Id.ValueString())
 
 	if err != nil {
@@ -273,7 +283,7 @@ func (r *userResource) Delete(ctx context.Context, req resource.DeleteRequest, r
 
 	err := r.cli.User.Delete(ctx, config.Id.ValueString())
 
-	if err!=nil{
+	if err != nil {
 		resp.Diagnostics.AddError("Error deleting user", fmt.Sprintf("%s", err))
 		return
 	}
@@ -283,61 +293,64 @@ func (r *userResource) ImportState(ctx context.Context, req resource.ImportState
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
 
-func getUserRequest(ctx context.Context, plan userData) (*users.User, diag.Diagnostics){
+func getUserRequest(ctx context.Context, plan userData) (*users.User, diag.Diagnostics) {
 
-	var diagnostics  diag.Diagnostics
+	var diagnostics diag.Diagnostics
 
 	var schemas []string
 	diags := plan.Schemas.ElementsAs(ctx, &schemas, true)
 	diagnostics.Append(diags...)
 
-	if len(schemas) == 0{
-		diagnostics.AddError("The Schemas attribute cannot be Null or Empty","Provide a valid value for \"schemas\"")
+	if len(schemas) == 0 {
+		diagnostics.AddError("The Schemas attribute cannot be Null or Empty", "Provide a valid value for \"schemas\"")
 		return nil, diagnostics
 	}
 
 	var name nameData
 	diags = plan.Name.As(ctx, &name, basetypes.ObjectAsOptions{})
 	diagnostics.Append(diags...)
-	
+
 	var emails []emailData
 	diags = plan.Emails.ElementsAs(ctx, &emails, true)
 	diagnostics.Append(diags...)
 
 	args := &users.User{
-		Schemas: schemas,
+		Schemas:  schemas,
 		UserName: plan.UserName.ValueString(),
 		Name: users.Name{
-			FamilyName: name.FamilyName.ValueString(),
-			GivenName: name.GivenName.ValueString(),
-			Formatted: name.Formatted.ValueString(),
-			MiddleName: name.MiddleName.ValueString(),
+			FamilyName:    name.FamilyName.ValueString(),
+			GivenName:     name.GivenName.ValueString(),
+			Formatted:     name.Formatted.ValueString(),
+			MiddleName:    name.MiddleName.ValueString(),
 			HonoricPrefix: name.HonoricPrefix.ValueString(),
 			HonoricSuffix: name.HonoricSuffix.ValueString(),
 		},
 		DisplayName: plan.DisplayName.ValueString(),
-		Password: plan.Password.ValueString(),
-		Title: plan.Title.ValueString(),
-		UserType: plan.UserType.ValueString(),
-		Active: plan.Active.ValueBool(),
-		SAPExtension: users.SAPExtension{
-			SendMail: plan.SendMail.ValueBool(),
-			MailVerified: plan.MailVerified.ValueBool(),
-		},
+		Password:    plan.Password.ValueString(),
+		Title:       plan.Title.ValueString(),
+		UserType:    plan.UserType.ValueString(),
+		Active:      plan.Active.ValueBool(),
 	}
 
-	if !plan.Status.IsNull() && !plan.Status.IsUnknown() {
-		args.SAPExtension.Status = plan.Status.ValueString()
-	} 
+	if !plan.SapExtensionUser.IsNull() && !plan.SapExtensionUser.IsUnknown() {
 
-	for _, email := range emails{
+		var sapExtensionUser sapExtensionUserData
+		diags = plan.SapExtensionUser.As(ctx, &sapExtensionUser, basetypes.ObjectAsOptions{})
+		diagnostics.Append(diags...)
+
+		args.SAPExtension.SendMail = sapExtensionUser.SendMail.ValueBool()
+		args.SAPExtension.MailVerified = sapExtensionUser.MailVerified.ValueBool()
+		args.SAPExtension.Status = sapExtensionUser.Status.ValueString()
+	}
+
+	for _, email := range emails {
 		userEmail := users.Email{
-			Value: email.Value.ValueString(),
-			Type: email.Type.ValueString(),
+			Value:   email.Value.ValueString(),
+			Type:    email.Type.ValueString(),
 			Display: email.Display.ValueString(),
 			Primary: email.Primary.ValueBool(),
 		}
-		args.Emails = append([]users.Email{userEmail},args.Emails...)
+		args.Emails = append([]users.Email{userEmail}, args.Emails...)
 	}
 
 	return args, diagnostics

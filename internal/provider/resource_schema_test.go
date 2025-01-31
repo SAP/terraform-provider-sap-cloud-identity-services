@@ -16,10 +16,10 @@ func TestResourceSchema(t *testing.T) {
 	t.Run("happy path", func(t *testing.T) {
 
 		schemaAttributes := schemas.Attribute{
-			Name: "test_attribute",
-			Type: "string",
+			Name:       "test_attribute",
+			Type:       "string",
 			Mutability: "readWrite",
-			Returned: "never",
+			Returned:   "never",
 			Uniqueness: "none",
 		}
 
@@ -85,7 +85,7 @@ func TestResourceSchema(t *testing.T) {
 				},
 			},
 		})
-	})	
+	})
 
 	t.Run("error path - schema attributes has mandatory parameters : name, type, mutability, returned, uniqueness", func(t *testing.T) {
 
@@ -99,30 +99,30 @@ func TestResourceSchema(t *testing.T) {
 				},
 			},
 		})
-	})	
+	})
 
 	t.Run("error path - schema attributes.name must be a valid value", func(t *testing.T) {
 
 		schemaAttributes := []schemas.Attribute{
 			{
-				Name: "an-invalid-name",
-				Type: "string",
+				Name:       "an-invalid-name",
+				Type:       "string",
 				Mutability: "readWrite",
-				Returned: "never",
+				Returned:   "never",
 				Uniqueness: "none",
 			},
 			{
-				Name: "@n_invalid_name",
-				Type: "string",
+				Name:       "@n_invalid_name",
+				Type:       "string",
 				Mutability: "readWrite",
-				Returned: "never",
+				Returned:   "never",
 				Uniqueness: "none",
 			},
 			{
-				Name: "1_an_invalid_name",
-				Type: "string",
+				Name:       "1_an_invalid_name",
+				Type:       "string",
 				Mutability: "readWrite",
-				Returned: "never",
+				Returned:   "never",
 				Uniqueness: "none",
 			},
 		}
@@ -133,28 +133,28 @@ func TestResourceSchema(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceSchema("testSchema", "urn:ietf:scim:schemas:Terraform", "Terraform", schemaAttributes[0]),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].name value must be a valid name. Must start with an\nalphabet and should contain only alphanumeric characters and underscores,\ngot: %s",schemaAttributes[0].Name)),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].name value must be a valid name. Must start with an\nalphabet and should contain only alphanumeric characters and underscores,\ngot: %s", schemaAttributes[0].Name)),
 				},
 				{
 					Config:      ResourceSchema("testSchema", "urn:ietf:scim:schemas:Terraform", "Terraform", schemaAttributes[1]),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].name value must be a valid name. Must start with an\nalphabet and should contain only alphanumeric characters and underscores,\ngot: %s",schemaAttributes[1].Name)),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].name value must be a valid name. Must start with an\nalphabet and should contain only alphanumeric characters and underscores,\ngot: %s", schemaAttributes[1].Name)),
 				},
 				{
 					Config:      ResourceSchema("testSchema", "urn:ietf:scim:schemas:Terraform", "Terraform", schemaAttributes[1]),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].name value must be a valid name. Must start with an\nalphabet and should contain only alphanumeric characters and underscores,\ngot: %s",schemaAttributes[1].Name)),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].name value must be a valid name. Must start with an\nalphabet and should contain only alphanumeric characters and underscores,\ngot: %s", schemaAttributes[1].Name)),
 				},
 			},
 		})
-	})	
+	})
 
 	t.Run("error path - schema attributes.type must be a valid value", func(t *testing.T) {
 
 		schemaAttributes := []schemas.Attribute{
 			{
-				Name: "test_attribute",
-				Type: "an_invalid_value",
+				Name:       "test_attribute",
+				Type:       "an_invalid_value",
 				Mutability: "readWrite",
-				Returned: "never",
+				Returned:   "never",
 				Uniqueness: "none",
 			},
 		}
@@ -165,20 +165,20 @@ func TestResourceSchema(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceSchema("testSchema", "urn:ietf:scim:schemas:Terraform", "Terraform", schemaAttributes[0]),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].type value must be one of: \\[\"string\" \"boolean\"\n\"decimal\" \"integer\" \"dateTime\" \"binary\" \"reference\" \"complex\"], got:\n\"%s\"",schemaAttributes[0].Type)),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].type value must be one of: \\[\"string\" \"boolean\"\n\"decimal\" \"integer\" \"dateTime\" \"binary\" \"reference\" \"complex\"], got:\n\"%s\"", schemaAttributes[0].Type)),
 				},
 			},
 		})
-	})	
-	
+	})
+
 	t.Run("error path - schema attributes.mutability must be a valid value", func(t *testing.T) {
 
 		schemaAttributes := []schemas.Attribute{
 			{
-				Name: "test_attribute",
-				Type: "integer",
+				Name:       "test_attribute",
+				Type:       "integer",
 				Mutability: "an_invalid_value",
-				Returned: "never",
+				Returned:   "never",
 				Uniqueness: "none",
 			},
 		}
@@ -189,7 +189,7 @@ func TestResourceSchema(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceSchema("testSchema", "urn:ietf:scim:schemas:Terraform", "Terraform", schemaAttributes[0]),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].mutability value must be one of: \\[\"readOnly\"\n\"readWrite\" \"writeOnly\" \"immutable\"], got: \"%s\"",schemaAttributes[0].Mutability)),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].mutability value must be one of: \\[\"readOnly\"\n\"readWrite\" \"writeOnly\" \"immutable\"], got: \"%s\"", schemaAttributes[0].Mutability)),
 				},
 			},
 		})
@@ -199,10 +199,10 @@ func TestResourceSchema(t *testing.T) {
 
 		schemaAttributes := []schemas.Attribute{
 			{
-				Name: "test_attribute",
-				Type: "integer",
+				Name:       "test_attribute",
+				Type:       "integer",
 				Mutability: "readWrite",
-				Returned: "an_invalid_value",
+				Returned:   "an_invalid_value",
 				Uniqueness: "none",
 			},
 		}
@@ -213,7 +213,7 @@ func TestResourceSchema(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceSchema("testSchema", "urn:ietf:scim:schemas:Terraform", "Terraform", schemaAttributes[0]),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].returned value must be one of: \\[\"always\" \"never\"\n\"default\" \"request\"], got: \"%s\"",schemaAttributes[0].Returned)),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].returned value must be one of: \\[\"always\" \"never\"\n\"default\" \"request\"], got: \"%s\"", schemaAttributes[0].Returned)),
 				},
 			},
 		})
@@ -223,10 +223,10 @@ func TestResourceSchema(t *testing.T) {
 
 		schemaAttributes := []schemas.Attribute{
 			{
-				Name: "test_attribute",
-				Type: "integer",
+				Name:       "test_attribute",
+				Type:       "integer",
 				Mutability: "readWrite",
-				Returned: "never",
+				Returned:   "never",
 				Uniqueness: "an_invalid_value",
 			},
 		}
@@ -237,13 +237,12 @@ func TestResourceSchema(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceSchema("testSchema", "urn:ietf:scim:schemas:Terraform", "Terraform", schemaAttributes[0]),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].uniqueness value must be one of: \\[\"none\" \"server\"\n\"global\"], got: \"%s\"",schemaAttributes[0].Uniqueness)),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].uniqueness value must be one of: \\[\"none\" \"server\"\n\"global\"], got: \"%s\"", schemaAttributes[0].Uniqueness)),
 				},
 			},
 		})
 	})
 
-	
 }
 
 func ResourceSchema(resourceName string, schemaId string, schemaName string, schemaAttributes schemas.Attribute) string {

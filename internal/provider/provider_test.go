@@ -21,8 +21,8 @@ import (
 )
 
 type User struct {
-	Username 	string
-	Password 	string
+	Username string
+	Password string
 }
 
 func providerConfig(_ string, testUser User) string {
@@ -38,7 +38,7 @@ func providerConfig(_ string, testUser User) string {
 
 func getTestProviders(httpClient *http.Client) map[string]func() (tfprotov6.ProviderServer, error) {
 	iasProvider := NewWithClient(httpClient)
-	
+
 	return map[string]func() (tfprotov6.ProviderServer, error){
 		"ias": providerserver.NewProtocol6WithError(iasProvider),
 	}
@@ -59,7 +59,7 @@ func setupVCR(t *testing.T, cassetteName string) (*recorder.Recorder, User) {
 		RealTransport:      http.DefaultTransport,
 	})
 
-	var  testUser User
+	var testUser User
 	if rec.IsRecording() {
 		t.Logf("ATTENTION: Recording '%s'", cassetteName)
 		testUser.Username = os.Getenv("ias_username")
@@ -81,7 +81,7 @@ func setupVCR(t *testing.T, cassetteName string) (*recorder.Recorder, User) {
 	return rec, testUser
 }
 
-func requestMatcher(t *testing.T) (cassette.MatcherFunc) {
+func requestMatcher(t *testing.T) cassette.MatcherFunc {
 	return func(r *http.Request, i cassette.Request) bool {
 		if r.Method != i.Method || r.URL.String() != i.URL {
 			return false
@@ -99,7 +99,7 @@ func requestMatcher(t *testing.T) (cassette.MatcherFunc) {
 	}
 }
 
-func redactAuthorizationToken() (recorder.HookFunc) {
+func redactAuthorizationToken() recorder.HookFunc {
 	return func(i *cassette.Interaction) error {
 
 		redact := func(headers map[string][]string) {
@@ -117,14 +117,13 @@ func redactAuthorizationToken() (recorder.HookFunc) {
 	}
 }
 
-
 func stopQuietly(rec *recorder.Recorder) {
 	if err := rec.Stop(); err != nil {
 		panic(err)
 	}
 }
 
-func TestIasProvider_AllResources (t *testing.T){
+func TestIasProvider_AllResources(t *testing.T) {
 
 	expectedResources := []string{
 		"ias_application",
@@ -147,7 +146,7 @@ func TestIasProvider_AllResources (t *testing.T){
 	assert.ElementsMatch(t, expectedResources, registeredResources)
 }
 
-func TestIasProvider_AllDataSources (t *testing.T){
+func TestIasProvider_AllDataSources(t *testing.T) {
 
 	expectedDataSources := []string{
 		"ias_application",
