@@ -15,13 +15,14 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 )
 
 var sourceValues 		= []string {"Identity Directory", "Corporate Identity Provider", "Expression"}
 var ssoValues 			= []string {"openIdConnect", "saml2"}
-var usersTypeValues 		= []string {"public", "employee", "customer", "partner", "external", "onboardee"} 
+var usersTypeValues 	= []string {"public", "employee", "customer", "partner", "external", "onboardee"} 
 
 func newApplicationResource() resource.Resource {
 	return &applicationResource{}
@@ -89,172 +90,183 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 					stringvalidator.LengthBetween(1,255),
 				},
 			},
-			"sso_type": schema.StringAttribute{
-				MarkdownDescription: "The preferred protocol for the application. Acceptable values: \"openIdConnect\", \"saml2\"",
+			"authentication_schema": schema.SingleNestedAttribute{
 				Optional: true,
 				Computed: true,
-				Validators: []validator.String{
-					stringvalidator.OneOf(ssoValues...),
-				},
-			},
-			"subject_name_identifier" : schema.SingleNestedAttribute{
-				MarkdownDescription: "The attribute by which the application uses to identify the users. Identity Authentication sends the attribute to the application as subject in OpenID Connect tokens.",
-				Optional: true,
-				Computed: true,
-				Validators: []validator.Object{
-					objectvalidator.AlsoRequires(
-						path.MatchRoot("subject_name_identifier").AtName("source"),
-						path.MatchRoot("subject_name_identifier").AtName("value"),
-					),
-				},
 				Attributes: map[string]schema.Attribute{
-					"source": schema.StringAttribute{
-						MarkdownDescription: "Acceptable values: \"Identity Directory\", \"Corporate Idenity Provider\", \"Expression\"",
+					"sso_type": schema.StringAttribute{
+						MarkdownDescription: "The preferred protocol for the application. Acceptable values: \"openIdConnect\", \"saml2\"",
 						Optional: true,
 						Computed: true,
 						Validators: []validator.String{
-							stringvalidator.OneOf(sourceValues...),
+							stringvalidator.OneOf(ssoValues...),
 						},
 					},
-					"value": schema.StringAttribute{
-						MarkdownDescription: "If the source is Identity Directory, the only acceptable values are \" none\", \"uid\", \"mail\", \"loginName\", \"displayName\", \"personnelNumber\", \"userUuid\"",
+					"subject_name_identifier" : schema.SingleNestedAttribute{
+						MarkdownDescription: "The attribute by which the application uses to identify the users. Identity Authentication sends the attribute to the application as subject in OpenID Connect tokens.",
+						Optional: true,
+						Computed: true,
+						Validators: []validator.Object{
+							objectvalidator.AlsoRequires(
+								path.MatchRoot("authentication_schema").AtName("subject_name_identifier").AtName("source"),
+								path.MatchRoot("authentication_schema").AtName("subject_name_identifier").AtName("value"),
+							),
+						},
+						Attributes: map[string]schema.Attribute{
+							"source": schema.StringAttribute{
+								MarkdownDescription: "Acceptable values: \"Identity Directory\", \"Corporate Idenity Provider\", \"Expression\"",
+								Optional: true,
+								Computed: true,
+								Validators: []validator.String{
+									stringvalidator.OneOf(sourceValues...),
+								},
+							},
+							"value": schema.StringAttribute{
+								MarkdownDescription: "If the source is Identity Directory, the only acceptable values are \" none\", \"uid\", \"mail\", \"loginName\", \"displayName\", \"personnelNumber\", \"userUuid\"",
+								Optional: true,
+								Computed: true,
+								Validators: []validator.String{
+									stringvalidator.LengthBetween(1,255),
+								},
+							},
+						},
+					},
+					"assertion_attributes": schema.ListNestedAttribute{
+						MarkdownDescription: "User attributes to be sent to the application. The Source of these attributes is always the Identity Directory, thus only valid attribute values will be accepted.",
+						Optional: true,
+						Computed: true,
+						Validators: []validator.List{
+							listvalidator.AlsoRequires(
+								path.MatchRoot("authentication_schema").AtName("assertion_attributes").AtAnyListIndex().AtName("attribute_name"),
+								path.MatchRoot("authentication_schema").AtName("assertion_attributes").AtAnyListIndex().AtName("attribute_value"),
+							),
+						},
+						NestedObject: schema.NestedAttributeObject{
+							Attributes: map[string]schema.Attribute{
+								"attribute_name": schema.StringAttribute{
+									MarkdownDescription: "Name of the attribute",
+									Optional: true,
+									Computed: true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1,255),
+									},
+								},
+								"attribute_value": schema.StringAttribute{
+									MarkdownDescription: "Value of the attribute.",
+									Optional: true,
+									Computed: true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1,255),
+									},
+								},
+								"inherited": schema.BoolAttribute{
+									MarkdownDescription: "Indicates whether the attribute has been inherited from a parent application.",
+									Computed: true,
+								},
+							},
+						},
+					},
+					"advanced_assertion_attributes" : schema.ListNestedAttribute{
+						MarkdownDescription: "Identical to the assertion attributes, except that the assertion attributes can come from other Sources.",
+						Optional: true,
+						Validators: []validator.List{
+							listvalidator.AlsoRequires(
+								path.MatchRoot("authentication_schema").AtName("advanced_assertion_attributes").AtAnyListIndex().AtName("source"),
+								path.MatchRoot("authentication_schema").AtName("advanced_assertion_attributes").AtAnyListIndex().AtName("attribute_name"),
+								path.MatchRoot("authentication_schema").AtName("advanced_assertion_attributes").AtAnyListIndex().AtName("attribute_value"),
+							),
+						},
+						NestedObject: schema.NestedAttributeObject{
+							Attributes: map[string]schema.Attribute{
+								"source": schema.StringAttribute{
+									MarkdownDescription: "Acceptable values: \"Corporate Idenity Provider\", \"Expression\"",
+									Optional: true,
+									Validators: []validator.String{
+										stringvalidator.OneOf(sourceValues[1:]...),
+									},
+								},
+								"attribute_name": schema.StringAttribute{
+									MarkdownDescription: "Name of the attribute",
+									Optional: true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1,512),
+									},
+								},
+								"attribute_value": schema.StringAttribute{
+									MarkdownDescription: "Value of the attribute",
+									Optional: true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1,512),
+									},
+								},
+								"inherited": schema.BoolAttribute{
+									MarkdownDescription: "Indicates whether the attribute has been inherited from a parent application.",
+									Computed: true,
+								},
+							},
+						},
+					},
+					"default_authenticating_idp" : schema.StringAttribute{
+						MarkdownDescription: "A default identity provider can be used for users with any user domain, group and type. This identity provider is used when none of the defined authentication rules meets the criteria.",
 						Optional: true,
 						Computed: true,
 						Validators: []validator.String{
-							stringvalidator.LengthBetween(1,255),
+							stringvalidator.LengthBetween(1,128),
 						},
 					},
+					"authentication_rules": schema.ListNestedAttribute{
+						MarkdownDescription: "Rules to manage authentication. Each rule is evaluated by priority until the criteria of a rule are fulfilled.",
+						Optional: true,
+						Validators: []validator.List{
+							listvalidator.AlsoRequires(
+								path.MatchRoot("authentication_schema").AtName("authentication_rules").AtAnyListIndex().AtName("identity_provider_id"),
+							),
+						},
+						NestedObject: schema.NestedAttributeObject{
+							Attributes: map[string]schema.Attribute{
+								"identity_provider_id": schema.StringAttribute{
+									MarkdownDescription: "The identity provider to delegate authentication to when all the defined conditions are met.",
+									Optional: true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1,255),
+									},
+								},
+								"user_type": schema.StringAttribute{
+									MarkdownDescription: "The type of user to be authenticated.",
+									Optional: true,
+									Validators: []validator.String{
+										stringvalidator.OneOf(usersTypeValues...),
+										stringvalidator.AtLeastOneOf(
+											path.MatchRoot("authentication_schema").AtName("authentication_rules").AtAnyListIndex().AtName("user_type"), 
+											path.MatchRoot("authentication_schema").AtName("authentication_rules").AtAnyListIndex().AtName("user_group"), 
+											path.MatchRoot("authentication_schema").AtName("authentication_rules").AtAnyListIndex().AtName("user_email_domain"), 
+											path.MatchRoot("authentication_schema").AtName("authentication_rules").AtAnyListIndex().AtName("ip_network_range"),
+										),
+									},
+								},
+								"user_group": schema.StringAttribute{
+									MarkdownDescription: "The user group to be authenticated.",
+									Optional: true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1,255),
+									},
+								},
+								"user_email_domain": schema.StringAttribute{
+									MarkdownDescription: "Valid email domain to be authenticated.",
+									Optional: true,
+									Validators: []validator.String{
+										ValidEmailDomain(),
+									},
+								},
+								"ip_network_range": schema.StringAttribute{
+									MarkdownDescription: "Valid IP range to be authenticated.",
+									Optional: true,
+									Validators: []validator.String{
+										ValidIPAddress(),
+									},
+								},
+							},
 				},
-			},
-			"assertion_attributes": schema.ListNestedAttribute{
-				MarkdownDescription: "User attributes to be sent to the application. The Source of these attributes is always the Identity Directory, thus only valid attribute values will be accepted.",
-				Optional: true,
-				Computed: true,
-				Validators: []validator.List{
-					listvalidator.AlsoRequires(path.MatchRoot("assertion_attributes").AtAnyListIndex().AtName("attribute_name"),path.MatchRoot("assertion_attributes").AtAnyListIndex().AtName("attribute_value")),
-				},
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"attribute_name": schema.StringAttribute{
-							MarkdownDescription: "Name of the attribute",
-							Optional: true,
-							Computed: true,
-							Validators: []validator.String{
-								stringvalidator.LengthBetween(1,255),
-							},
-						},
-						"attribute_value": schema.StringAttribute{
-							MarkdownDescription: "Value of the attribute.",
-							Optional: true,
-							Computed: true,
-							Validators: []validator.String{
-								stringvalidator.LengthBetween(1,255),
-							},
-						},
-						"inherited": schema.BoolAttribute{
-							MarkdownDescription: "Indicates whether the attribute has been inherited from a parent application.",
-							Computed: true,
-						},
-					},
-				},
-			},
-			"advanced_assertion_attributes" : schema.ListNestedAttribute{
-				MarkdownDescription: "Identical to the assertion attributes, except that the assertion attributes can come from other Sources.",
-				Optional: true,
-				Validators: []validator.List{
-					listvalidator.AlsoRequires(
-						path.MatchRoot("advanced_assertion_attributes").AtAnyListIndex().AtName("source"),
-						path.MatchRoot("advanced_assertion_attributes").AtAnyListIndex().AtName("attribute_name"),
-						path.MatchRoot("advanced_assertion_attributes").AtAnyListIndex().AtName("attribute_value"),
-					),
-				},
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"source": schema.StringAttribute{
-							MarkdownDescription: "Acceptable values: \"Corporate Idenity Provider\", \"Expression\"",
-							Optional: true,
-							Validators: []validator.String{
-								stringvalidator.OneOf(sourceValues[1:]...),
-							},
-						},
-						"attribute_name": schema.StringAttribute{
-							MarkdownDescription: "Name of the attribute",
-							Optional: true,
-							Validators: []validator.String{
-								stringvalidator.LengthBetween(1,512),
-							},
-						},
-						"attribute_value": schema.StringAttribute{
-							MarkdownDescription: "Value of the attribute",
-							Optional: true,
-							Validators: []validator.String{
-								stringvalidator.LengthBetween(1,512),
-							},
-						},
-						"inherited": schema.BoolAttribute{
-							MarkdownDescription: "Indicates whether the attribute has been inherited from a parent application.",
-							Computed: true,
-						},
-					},
-				},
-			},
-			"default_authenticating_idp" : schema.StringAttribute{
-				MarkdownDescription: "A default identity provider can be used for users with any user domain, group and type. This identity provider is used when none of the defined authentication rules meets the criteria.",
-				Optional: true,
-				Computed: true,
-				Validators: []validator.String{
-					stringvalidator.LengthBetween(1,128),
-				},
-			},
-			"authentication_rules": schema.ListNestedAttribute{
-				MarkdownDescription: "Rules to manage authentication. Each rule is evaluated by priority until the criteria of a rule are fulfilled.",
-				Optional: true,
-				Validators: []validator.List{
-					listvalidator.AlsoRequires(path.MatchRoot("authentication_rules").AtAnyListIndex().AtName("identity_provider_id")),
-				},
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"identity_provider_id": schema.StringAttribute{
-							MarkdownDescription: "The identity provider to delegate authentication to when all the defined conditions are met.",
-							Optional: true,
-							Validators: []validator.String{
-								stringvalidator.LengthBetween(1,255),
-							},
-						},
-						"user_type": schema.StringAttribute{
-							MarkdownDescription: "The type of user to be authenticated.",
-							Optional: true,
-							Validators: []validator.String{
-								stringvalidator.OneOf(usersTypeValues...),
-								stringvalidator.AtLeastOneOf(
-									path.MatchRoot("authentication_rules").AtAnyListIndex().AtName("user_type"), 
-									path.MatchRoot("authentication_rules").AtAnyListIndex().AtName("user_group"), 
-									path.MatchRoot("authentication_rules").AtAnyListIndex().AtName("user_email_domain"), 
-									path.MatchRoot("authentication_rules").AtAnyListIndex().AtName("ip_network_range"),
-								),
-							},
-						},
-						"user_group": schema.StringAttribute{
-							MarkdownDescription: "The user group to be authenticated.",
-							Optional: true,
-							Validators: []validator.String{
-								stringvalidator.LengthBetween(1,255),
-							},
-						},
-						"user_email_domain": schema.StringAttribute{
-							MarkdownDescription: "Valid email domain to be authenticated.",
-							Optional: true,
-							Validators: []validator.String{
-								ValidEmailDomain(),
-							},
-						},
-						"ip_network_range": schema.StringAttribute{
-							MarkdownDescription: "Valid IP range to be authenticated.",
-							Optional: true,
-							Validators: []validator.String{
-								ValidIPAddress(),
-							},
-						},
 					},
 				},
 			},
@@ -397,77 +409,84 @@ func getApplicationRequest (ctx context.Context, plan applicationData) (*applica
 		args.ParentApplicationId = plan.ParentApplicationId.ValueString()
 	}
 
-	if plan.SubjectNameIdentifier!=nil && !plan.SubjectNameIdentifier.Source.IsNull() {
+	if !plan.AuthenticationSchema.IsNull() && !plan.AuthenticationSchema.IsUnknown() {
 
-		if plan.SubjectNameIdentifier.Source.ValueString() == "Identity Directory" || plan.SubjectNameIdentifier.Source.ValueString() == "Expression" {
-			args.AuthenticationSchema.SubjectNameIdentifier = plan.SubjectNameIdentifier.Value.ValueString()
-		} else {
-			args.AuthenticationSchema.SubjectNameIdentifier = "${corporateIdP."+plan.SubjectNameIdentifier.Value.ValueString()+"}"
-		}
-	}
-
-	if !plan.AssertionAttributes.IsNull() {
-
-		var attributes []assertionAttributesData
-		diags := plan.AssertionAttributes.ElementsAs(ctx, &attributes, true)
+		var authenticationSchema authenticationSchemaData
+		diags = plan.AuthenticationSchema.As(ctx, &authenticationSchema, basetypes.ObjectAsOptions{})
 		diagnostics.Append(diags...)
 
-		for _, attribute := range attributes {
+		if authenticationSchema.SubjectNameIdentifier!=nil && !authenticationSchema.SubjectNameIdentifier.Source.IsNull() {
 
-			assertionAttribute := applications.AssertionAttribute{
-				AssertionAttributeName: attribute.AttributeName.ValueString(),
-				UserAttributeName: attribute.AttributeValue.ValueString(),
+			if authenticationSchema.SubjectNameIdentifier.Source.ValueString() == "Identity Directory" || authenticationSchema.SubjectNameIdentifier.Source.ValueString() == "Expression" {
+				args.AuthenticationSchema.SubjectNameIdentifier = authenticationSchema.SubjectNameIdentifier.Value.ValueString()
+			} else {
+				args.AuthenticationSchema.SubjectNameIdentifier = "${corporateIdP."+authenticationSchema.SubjectNameIdentifier.Value.ValueString()+"}"
 			}
-			args.AuthenticationSchema.AssertionAttributes = append(args.AuthenticationSchema.AssertionAttributes, assertionAttribute)
-		
-		}	
-	}
+		}
 
-	if !plan.AdvancedAssertionAttributes.IsNull() {
+		if !authenticationSchema.AssertionAttributes.IsNull() {
 
-		var advancedAssertionAttributes []advancedAssertionAttributesData
-		diags := plan.AdvancedAssertionAttributes.ElementsAs(ctx, &advancedAssertionAttributes, true)
-		diagnostics.Append(diags...)
+			var attributes []assertionAttributesData
+			diags := authenticationSchema.AssertionAttributes.ElementsAs(ctx, &attributes, true)
+			diagnostics.Append(diags...)
 
-		for _, attribute := range advancedAssertionAttributes {
+			for _, attribute := range attributes {
 
-				if attribute.Source == types.StringValue("Corporate Identity Provider") {
-
-					assertionAttribute := applications.AdvancedAssertionAttribute{
-						AttributeName: attribute.AttributeName.ValueString(),
-						AttributeValue:  "${corporateIdP."+attribute.AttributeValue.ValueString()+"}",
-					}
-					args.AuthenticationSchema.AdvancedAssertionAttributes = append(args.AuthenticationSchema.AdvancedAssertionAttributes, assertionAttribute)
-
-				} else {
-
-					assertionAttribute := applications.AdvancedAssertionAttribute{
-						AttributeName: attribute.AttributeName.ValueString(),
-						AttributeValue: attribute.AttributeValue.ValueString(),
-					}
-					args.AuthenticationSchema.AdvancedAssertionAttributes = append(args.AuthenticationSchema.AdvancedAssertionAttributes, assertionAttribute)
-
+				assertionAttribute := applications.AssertionAttribute{
+					AssertionAttributeName: attribute.AttributeName.ValueString(),
+					UserAttributeName: attribute.AttributeValue.ValueString(),
 				}
-		}
-	}
-
-	if !plan.AuthenticationRules.IsNull(){
-
-		var authrules []authenticationRulesData
-		diags = plan.AuthenticationRules.ElementsAs(ctx, &authrules, true)
-		diagnostics.Append(diags...)
-
-		for _, rule := range authrules{
+				args.AuthenticationSchema.AssertionAttributes = append(args.AuthenticationSchema.AssertionAttributes, assertionAttribute)
 			
-			authrule := applications.AuthenicationRule{
-				UserType: rule.UserType.ValueString(),
-				UserGroup: rule.UserGroup.ValueString(),
-				UserEmailDomain: rule.UserEmailDomain.ValueString(),
-				IdentityProviderId: rule.IdentityProviderId.ValueString(),
-				IpNetworkRange: rule.IpNetworkRange.ValueString(),
-			}
+			}	
+		}
 
-			args.AuthenticationSchema.ConditionalAuthentication = append(args.AuthenticationSchema.ConditionalAuthentication, authrule)
+		if !authenticationSchema.AdvancedAssertionAttributes.IsNull() {
+
+			var advancedAssertionAttributes []advancedAssertionAttributesData
+			diags := authenticationSchema.AdvancedAssertionAttributes.ElementsAs(ctx, &advancedAssertionAttributes, true)
+			diagnostics.Append(diags...)
+
+			for _, attribute := range advancedAssertionAttributes {
+
+					if attribute.Source == types.StringValue("Corporate Identity Provider") {
+
+						assertionAttribute := applications.AdvancedAssertionAttribute{
+							AttributeName: attribute.AttributeName.ValueString(),
+							AttributeValue:  "${corporateIdP."+attribute.AttributeValue.ValueString()+"}",
+						}
+						args.AuthenticationSchema.AdvancedAssertionAttributes = append(args.AuthenticationSchema.AdvancedAssertionAttributes, assertionAttribute)
+
+					} else {
+
+						assertionAttribute := applications.AdvancedAssertionAttribute{
+							AttributeName: attribute.AttributeName.ValueString(),
+							AttributeValue: attribute.AttributeValue.ValueString(),
+						}
+						args.AuthenticationSchema.AdvancedAssertionAttributes = append(args.AuthenticationSchema.AdvancedAssertionAttributes, assertionAttribute)
+
+					}
+			}
+		}
+
+		if !authenticationSchema.AuthenticationRules.IsNull(){
+
+			var authrules []authenticationRulesData
+			diags = authenticationSchema.AuthenticationRules.ElementsAs(ctx, &authrules, true)
+			diagnostics.Append(diags...)
+
+			for _, rule := range authrules{
+				
+				authrule := applications.AuthenicationRule{
+					UserType: rule.UserType.ValueString(),
+					UserGroup: rule.UserGroup.ValueString(),
+					UserEmailDomain: rule.UserEmailDomain.ValueString(),
+					IdentityProviderId: rule.IdentityProviderId.ValueString(),
+					IpNetworkRange: rule.IpNetworkRange.ValueString(),
+				}
+
+				args.AuthenticationSchema.ConditionalAuthentication = append(args.AuthenticationSchema.ConditionalAuthentication, authrule)
+			}
 		}
 	}
 
