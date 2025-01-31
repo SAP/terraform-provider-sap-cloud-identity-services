@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
-func TestResourceGroup (t *testing.T) {
+func TestResourceGroup(t *testing.T) {
 	t.Parallel()
 
 	schemas := []string{
@@ -20,7 +20,7 @@ func TestResourceGroup (t *testing.T) {
 	members := []groups.GroupMember{
 		{
 			Value: "80f858a3-28ce-437e-ba31-d3358a5bdbfa",
-			Type: "User",
+			Type:  "User",
 		},
 	}
 
@@ -29,11 +29,11 @@ func TestResourceGroup (t *testing.T) {
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{
-			IsUnitTest: true,
+			IsUnitTest:               true,
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + ResourceGroup("testGroup", "Terraform Group", schemas, "For testing purposes",members),
+					Config: providerConfig("", user) + ResourceGroup("testGroup", "Terraform Group", schemas, "For testing purposes", members),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("ias_group.testGroup", "id", regexpUUID),
 						resource.TestCheckResourceAttr("ias_group.testGroup", "display_name", "Terraform Group"),
@@ -52,11 +52,11 @@ func TestResourceGroup (t *testing.T) {
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{
-			IsUnitTest: true,
+			IsUnitTest:               true,
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + ResourceGroup("testGroup", "Terraform Group", schemas, "For testing purposes",members),
+					Config: providerConfig("", user) + ResourceGroup("testGroup", "Terraform Group", schemas, "For testing purposes", members),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("ias_group.testGroup", "id", regexpUUID),
 						resource.TestCheckResourceAttr("ias_group.testGroup", "display_name", "Terraform Group"),
@@ -66,7 +66,7 @@ func TestResourceGroup (t *testing.T) {
 					),
 				},
 				{
-					Config: providerConfig("", user) + ResourceGroup("testGroup", "Updated Terraform Group", schemas, "For testing purposes",members),
+					Config: providerConfig("", user) + ResourceGroup("testGroup", "Updated Terraform Group", schemas, "For testing purposes", members),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("ias_group.testGroup", "id", regexpUUID),
 						resource.TestCheckResourceAttr("ias_group.testGroup", "display_name", "Updated Terraform Group"),
@@ -110,8 +110,8 @@ func TestResourceGroup (t *testing.T) {
 
 		members := []groups.GroupMember{
 			{
-				Value : "this-is-not-a-valid-UUID",
-				Type : "User",
+				Value: "this-is-not-a-valid-UUID",
+				Type:  "User",
 			},
 		}
 
@@ -121,7 +121,7 @@ func TestResourceGroup (t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceGroup("testGroup", "Terraform Group", schemas, "For testing purposes", members),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute group_members\\[0].value value must be a valid UUID, got:\n%s","this-is-not-a-valid-UUID")),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute group_members\\[0].value value must be a valid UUID, got:\n%s", "this-is-not-a-valid-UUID")),
 				},
 			},
 		})
@@ -131,8 +131,8 @@ func TestResourceGroup (t *testing.T) {
 
 		members := []groups.GroupMember{
 			{
-				Value : "user-id",
-				Type : "this-is-not-a-valid-member-type",
+				Value: "user-id",
+				Type:  "this-is-not-a-valid-member-type",
 			},
 		}
 
@@ -142,14 +142,14 @@ func TestResourceGroup (t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceGroup("testGroup", "Terraform Group", schemas, "For testing purposes", members),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute group_members\\[0].type value must be one of: \\[\"User\" \"Group\"], got:\n\"%s\"","this-is-not-a-valid-member-type")),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute group_members\\[0].type value must be one of: \\[\"User\" \"Group\"], got:\n\"%s\"", "this-is-not-a-valid-member-type")),
 				},
 			},
 		})
 	})
 }
 
-func ResourceGroup (resoureName string, displayName string, schemas []string, description string, members []groups.GroupMember) string {
+func ResourceGroup(resoureName string, displayName string, schemas []string, description string, members []groups.GroupMember) string {
 	return fmt.Sprintf(`
 	resource "ias_group" "%s"{
 		schemas = [
@@ -170,7 +170,7 @@ func ResourceGroup (resoureName string, displayName string, schemas []string, de
 	`, resoureName, schemas[0], schemas[1], displayName, members[0].Value, members[0].Type, description)
 }
 
-func ResourceGroupWithoutSchemas (resoureName string, displayName string) string {
+func ResourceGroupWithoutSchemas(resoureName string, displayName string) string {
 	return fmt.Sprintf(`
 	resource "ias_group" "%s"{
 		schemas = []
@@ -179,7 +179,7 @@ func ResourceGroupWithoutSchemas (resoureName string, displayName string) string
 	`, resoureName, displayName)
 }
 
-func ResourceGroupWithoutDisplayName (resoureName string) string {
+func ResourceGroupWithoutDisplayName(resoureName string) string {
 	return fmt.Sprintf(`
 	resource "ias_group" "%s"{
 	}

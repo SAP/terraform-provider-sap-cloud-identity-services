@@ -20,7 +20,7 @@ type groupDataSource struct {
 	cli *cli.IasClient
 }
 
-func (d *groupDataSource) Configure(_ context.Context, req datasource.ConfigureRequest, _ *datasource.ConfigureResponse) { 
+func (d *groupDataSource) Configure(_ context.Context, req datasource.ConfigureRequest, _ *datasource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
@@ -28,16 +28,16 @@ func (d *groupDataSource) Configure(_ context.Context, req datasource.ConfigureR
 	d.cli = req.ProviderData.(*cli.IasClient)
 }
 
-func (d *groupDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) { 
+func (d *groupDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_group"
 }
 
-func (d *groupDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) { 
+func (d *groupDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				Required: true,
+				Required:            true,
 				MarkdownDescription: "Unique ID of the group.",
 				Validators: []validator.String{
 					ValidUUID(),
@@ -45,31 +45,31 @@ func (d *groupDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, 
 			},
 			"schemas": schema.SetAttribute{
 				ElementType: types.StringType,
-				Computed: true,
+				Computed:    true,
 				//MarkdownDescription:
 			},
 			"display_name": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
 				MarkdownDescription: "Display Name of the group.",
 			},
 			"group_members": schema.ListNestedAttribute{
-				Computed: true,
+				Computed:            true,
 				MarkdownDescription: "Specify the members to be part of the group.",
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"value": schema.StringAttribute{
-							Computed: true,
+							Computed:            true,
 							MarkdownDescription: "SCIM ID of the user or the group",
 						},
 						"type": schema.StringAttribute{
-							Computed: true,
-							MarkdownDescription: fmt.Sprintf("Type of the member added to the group. Valid Values can be one of the following : %s",strings.Join(memberTypeValues, ",")),
+							Computed:            true,
+							MarkdownDescription: fmt.Sprintf("Type of the member added to the group. Valid Values can be one of the following : %s", strings.Join(memberTypeValues, ",")),
 						},
 					},
 				},
 			},
 			"external_id": schema.StringAttribute{
-				Computed: true,
+				Computed:            true,
 				MarkdownDescription: "Unique and global identifier for the given group",
 			},
 			"group_extension": schema.SingleNestedAttribute{
@@ -78,21 +78,20 @@ func (d *groupDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, 
 				Attributes: map[string]schema.Attribute{
 					"name": schema.StringAttribute{
 						MarkdownDescription: "Provide a unique name for the group.",
-						Computed: true,
+						Computed:            true,
 					},
 					"description": schema.StringAttribute{
-						Computed: true,
+						Computed:            true,
 						MarkdownDescription: "Briefly describe the nature of the group.",
 					},
 				},
 			},
 		},
-
 	}
 }
 
-func (d *groupDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) { 
-	
+func (d *groupDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+
 	var config groupData
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)

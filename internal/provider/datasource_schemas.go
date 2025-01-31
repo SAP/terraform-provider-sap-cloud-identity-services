@@ -22,37 +22,37 @@ type schemasDataSource struct {
 	cli *cli.IasClient
 }
 
-type schemasData struct{
-	Values 	types.List 		`tfsdk:"values"`
+type schemasData struct {
+	Values types.List `tfsdk:"values"`
 }
 
 var attributeObjType = types.ObjectType{
 	AttrTypes: map[string]attr.Type{
-		"name" : types.StringType,
-		"type" : types.StringType,
-		"multivalued" : types.BoolType,
-		"description" : types.StringType,
-		"required" : types.BoolType,
-		"canonical_values" : types.ListType{
+		"name":        types.StringType,
+		"type":        types.StringType,
+		"multivalued": types.BoolType,
+		"description": types.StringType,
+		"required":    types.BoolType,
+		"canonical_values": types.ListType{
 			ElemType: types.StringType,
 		},
-		"case_exact" : types.BoolType,
-		"mutability" : types.StringType,
-		"returned" : types.StringType,
-		"uniqueness" : types.StringType,
+		"case_exact": types.BoolType,
+		"mutability": types.StringType,
+		"returned":   types.StringType,
+		"uniqueness": types.StringType,
 	},
 }
 
 var schemaObjType = types.ObjectType{
 	AttrTypes: map[string]attr.Type{
-		"id" : types.StringType,
-		"name" : types.StringType,
-		"description" : types.StringType,
-		"schemas" : types.SetType{
+		"id":          types.StringType,
+		"name":        types.StringType,
+		"description": types.StringType,
+		"schemas": types.SetType{
 			ElemType: types.StringType,
 		},
-		"external_id" : types.StringType,
-		"attributes" : types.ListType{
+		"external_id": types.StringType,
+		"attributes": types.ListType{
 			ElemType: attributeObjType,
 		},
 	},
@@ -74,56 +74,56 @@ func (d *schemasDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 	resp.Schema = schema.Schema{
 
 		Attributes: map[string]schema.Attribute{
-			
+
 			"values": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
-						"id" : schema.StringAttribute{
+						"id": schema.StringAttribute{
 							MarkdownDescription: "A unique id by which the schema can be referenced in other entities",
-							Computed: true,
+							Computed:            true,
 						},
-						"name" : schema.StringAttribute{
+						"name": schema.StringAttribute{
 							MarkdownDescription: "A unique name for the schema",
-							Computed: true,
+							Computed:            true,
 						},
-						"attributes" : schema.ListNestedAttribute{
+						"attributes": schema.ListNestedAttribute{
 							MarkdownDescription: "The list of attribites that comprise the schema",
-							Computed: true,
+							Computed:            true,
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
-									"name" : schema.StringAttribute{
-										Computed: true,
+									"name": schema.StringAttribute{
+										Computed:            true,
 										MarkdownDescription: "The attribute name. Only alphanumeric characters and underscores are allowed.",
 									},
-									"type" : schema.StringAttribute{
-										Computed: true,
+									"type": schema.StringAttribute{
+										Computed:            true,
 										MarkdownDescription: fmt.Sprintf("The attribute data type. Valid values include : %s", strings.Join(attributeDataTypes, ",")),
 									},
 									"mutability": schema.StringAttribute{
-										Computed: true,
-										MarkdownDescription: fmt.Sprintf("Control the Read or Write access of the attribute. Valid values include : %s", strings.Join(attributeMutabilityValues,",")),
+										Computed:            true,
+										MarkdownDescription: fmt.Sprintf("Control the Read or Write access of the attribute. Valid values include : %s", strings.Join(attributeMutabilityValues, ",")),
 									},
 									"returned": schema.StringAttribute{
 										Computed: true,
 										//description must be enhanced
-										MarkdownDescription: fmt.Sprintf("Valid values include : %s", strings.Join(attributeReturnValues,",")),
+										MarkdownDescription: fmt.Sprintf("Valid values include : %s", strings.Join(attributeReturnValues, ",")),
 									},
 									"uniqueness": schema.StringAttribute{
 										Computed: true,
 										// description must be enhanced
-										MarkdownDescription: fmt.Sprintf("Define the context in which the attribute must be unique. Valid values include : %s", strings.Join(attributeReturnValues,",")),
+										MarkdownDescription: fmt.Sprintf("Define the context in which the attribute must be unique. Valid values include : %s", strings.Join(attributeReturnValues, ",")),
 									},
 									"canonical_values": schema.ListAttribute{
-										ElementType: types.StringType,
-										Computed: true,
+										ElementType:         types.StringType,
+										Computed:            true,
 										MarkdownDescription: "A collection of suggested canonical values that may be used",
 									},
-									"multivalued" : schema.BoolAttribute{
+									"multivalued": schema.BoolAttribute{
 										Computed: true,
 										// MarkDownDescription
 									},
-									"description" : schema.StringAttribute{
-										Computed: true,
+									"description": schema.StringAttribute{
+										Computed:            true,
 										MarkdownDescription: "A brief description for the attribute",
 									},
 									"required": schema.BoolAttribute{
@@ -139,24 +139,23 @@ func (d *schemasDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 								},
 							},
 						},
-						"schemas" : schema.SetAttribute{
+						"schemas": schema.SetAttribute{
 							ElementType: types.StringType,
-							Computed: true,
+							Computed:    true,
 							//MarkdownDescription
 						},
-						"description" : schema.StringAttribute{
-							Computed: true,
+						"description": schema.StringAttribute{
+							Computed:            true,
 							MarkdownDescription: "A description for the schema",
 						},
-						"external_id" : schema.StringAttribute{
-							Computed: true,
+						"external_id": schema.StringAttribute{
+							Computed:            true,
 							MarkdownDescription: "Unique and global identifier for the given schema",
 						},
 					},
 				},
 				Computed: true,
 			},
-
 		},
 	}
 }
@@ -179,7 +178,7 @@ func (d *schemasDataSource) Read(ctx context.Context, req datasource.ReadRequest
 
 	config.Values, diags = types.ListValueFrom(ctx, schemaObjType, resSchemas)
 	resp.Diagnostics.Append(diags...)
-	
+
 	diags = resp.State.Set(ctx, &config)
 	resp.Diagnostics.Append(diags...)
 }

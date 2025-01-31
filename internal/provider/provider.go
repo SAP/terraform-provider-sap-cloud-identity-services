@@ -21,14 +21,14 @@ func New() provider.Provider {
 	return NewWithClient(http.DefaultClient)
 }
 
-func NewWithClient (httpClient *http.Client) *IasProvider{
+func NewWithClient(httpClient *http.Client) *IasProvider {
 	return &IasProvider{
 		httpClient: httpClient,
 	}
 }
 
 type IasProvider struct {
-	httpClient 		*http.Client
+	httpClient *http.Client
 }
 
 type IasProviderData struct {
@@ -49,11 +49,11 @@ func (p *IasProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *
 				Required:            true,
 			},
 			"username": schema.StringAttribute{
-				Optional:			 true,
+				Optional: true,
 			},
 			"password": schema.StringAttribute{
-				Optional:			 true,
-				Sensitive: 			 true,	
+				Optional:  true,
+				Sensitive: true,
 			},
 		},
 	}

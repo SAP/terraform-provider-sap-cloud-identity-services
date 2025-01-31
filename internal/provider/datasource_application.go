@@ -35,29 +35,29 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Id of the application",
-				Required: true,
+				Required:            true,
 				Validators: []validator.String{
 					ValidUUID(),
 				},
 			},
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Free text description of the Application",
-				Computed: true,
+				Computed:            true,
 			},
 			"description": schema.StringAttribute{
 				MarkdownDescription: "Description for the application",
-				Computed: true,
+				Computed:            true,
 			},
 			"parent_application_id": schema.StringAttribute{
 				MarkdownDescription: "ID of the parent, from which the application will inherit its configurations",
-				Computed: true,
+				Computed:            true,
 				Validators: []validator.String{
 					ValidUUID(),
 				},
 			},
 			"multi_tenant_app": schema.BoolAttribute{
 				MarkdownDescription: "Only for Internal Use",
-				Computed: true,
+				Computed:            true,
 			},
 			"global_account": schema.StringAttribute{
 				// MarkdownDescription: "",
@@ -65,97 +65,97 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 			},
 			"authentication_schema": schema.SingleNestedAttribute{
 				Computed: true,
-				Attributes: map[string]schema.Attribute{	
+				Attributes: map[string]schema.Attribute{
 					"sso_type": schema.StringAttribute{
 						MarkdownDescription: "The preferred protocol for the application",
-						Computed: true,
+						Computed:            true,
 					},
-					"subject_name_identifier" : schema.SingleNestedAttribute{
+					"subject_name_identifier": schema.SingleNestedAttribute{
 						MarkdownDescription: "The attribute by which the application uses to identify the users. Identity Authentication sends the attribute to the application as subject in OpenID Connect tokens.",
-						Computed: true,
+						Computed:            true,
 						Attributes: map[string]schema.Attribute{
 							"source": schema.StringAttribute{
 								MarkdownDescription: "Acceptable values: \"Identity Directory\", \"Corporate Idenity Provider\", \"Expression\"",
-								Computed: true,
+								Computed:            true,
 							},
 							"value": schema.StringAttribute{
 								MarkdownDescription: "If the source is Identity Directory, the only acceptable values are \" none, uid, mail, loginName, displayName, personnelNumber, userUuid\"",
-								Computed: true,
+								Computed:            true,
 							},
 						},
 					},
 					"assertion_attributes": schema.ListNestedAttribute{
 						MarkdownDescription: "User attributes to be sent to the application. The Source of these attributes is always the Identity Directory, thus only valid attribute values will be accepted.",
-						Computed: true,
+						Computed:            true,
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
 								"attribute_name": schema.StringAttribute{
 									MarkdownDescription: "Name of the attribute",
-									Computed: true,
+									Computed:            true,
 								},
 								"attribute_value": schema.StringAttribute{
 									MarkdownDescription: "Value of the attribute.",
-									Computed: true,
+									Computed:            true,
 								},
 								"inherited": schema.BoolAttribute{
 									MarkdownDescription: "Indicates whether the attribute has been inherited from a parent application.",
-									Computed: true,
+									Computed:            true,
 								},
 							},
 						},
 					},
-					"advanced_assertion_attributes" : schema.ListNestedAttribute{
+					"advanced_assertion_attributes": schema.ListNestedAttribute{
 						MarkdownDescription: "Identical to the assertion attributes, except that the assertion attributes can come from other Sources.",
-						Computed: true,
+						Computed:            true,
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
 								"source": schema.StringAttribute{
 									MarkdownDescription: "Acceptable values: \"Corporate Idenity Provider\", \"Expression\"",
-									Computed: true,
+									Computed:            true,
 								},
 								"attribute_name": schema.StringAttribute{
 									MarkdownDescription: "Name of the attribute",
-									Computed: true,
+									Computed:            true,
 								},
 								"attribute_value": schema.StringAttribute{
 									MarkdownDescription: "Value of the attribute",
-									Computed: true,
+									Computed:            true,
 								},
 								"inherited": schema.BoolAttribute{
 									MarkdownDescription: "Indicates whether the attribute has been inherited from a parent application.",
-									Computed: true,
+									Computed:            true,
 								},
 							},
 						},
 					},
-					"default_authenticating_idp" : schema.StringAttribute{
+					"default_authenticating_idp": schema.StringAttribute{
 						MarkdownDescription: "A default identity provider can be used for users with any user domain, group and type. This identity provider is used when none of the defined authentication rules meets the criteria.",
-						Computed: true,
+						Computed:            true,
 					},
 					"authentication_rules": schema.ListNestedAttribute{
 						MarkdownDescription: "Rules to manage authentication. Each rule is evaluated by priority until the criteria of a rule are fulfilled.",
-						Computed: true,
+						Computed:            true,
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
 								"identity_provider_id": schema.StringAttribute{
 									MarkdownDescription: "The identity provider to delegate authentication to when all the defined conditions are met.",
-									Computed: true,
+									Computed:            true,
 								},
 								"user_type": schema.StringAttribute{
 									MarkdownDescription: "The type of user to be authenticated.",
-									Computed: true,
+									Computed:            true,
 								},
 								"user_group": schema.StringAttribute{
 									MarkdownDescription: "The user group to be authenticated.",
-									Computed: true,
+									Computed:            true,
 								},
 								"user_email_domain": schema.StringAttribute{
 									MarkdownDescription: "Valid email domain to be authenticated.",
-									Computed: true,
+									Computed:            true,
 								},
 								"ip_network_range": schema.StringAttribute{
 									MarkdownDescription: "Valid IP range to be authenticated.",
-									Computed: true,
+									Computed:            true,
 								},
 							},
 						},

@@ -8,17 +8,17 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
-func TestDataSourceApplication(t *testing.T){
+func TestDataSourceApplication(t *testing.T) {
 
 	t.Parallel()
 
-	t.Run("happy path", func (t *testing.T){
+	t.Run("happy path", func(t *testing.T) {
 
 		rec, user := setupVCR(t, "fixtures/datasource_application")
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{
-			IsUnitTest: true,
+			IsUnitTest:               true,
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
@@ -39,38 +39,38 @@ func TestDataSourceApplication(t *testing.T){
 		})
 	})
 
-	t.Run("error path - invalid app id", func(t *testing.T){
-		
+	t.Run("error path - invalid app id", func(t *testing.T) {
+
 		resource.Test(t, resource.TestCase{
-			IsUnitTest: true,
+			IsUnitTest:               true,
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config: DataSourceApplicationById("testApp", "invalid-uuid"),
+					Config:      DataSourceApplicationById("testApp", "invalid-uuid"),
 					ExpectError: regexp.MustCompile(`Attribute id value must be a valid UUID, got: invalid-uuid`),
 				},
 			},
 		})
 	})
 
-	t.Run("error path - app id is mandatory", func(t *testing.T){
-		
+	t.Run("error path - app id is mandatory", func(t *testing.T) {
+
 		resource.Test(t, resource.TestCase{
-			IsUnitTest: true,
+			IsUnitTest:               true,
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config: DataSourceApplicationNoId("testApp"),
+					Config:      DataSourceApplicationNoId("testApp"),
 					ExpectError: regexp.MustCompile(`The argument "id" is required, but no definition was found.`),
 				},
 			},
 		})
-	
+
 	})
 
 }
 
-func DataSourceApplication (datasourceName string, appName string) string {
+func DataSourceApplication(datasourceName string, appName string) string {
 	return fmt.Sprintf(`
 	data "ias_applications" "allApps" {}
 	data "ias_application" "%s" {
@@ -79,7 +79,7 @@ func DataSourceApplication (datasourceName string, appName string) string {
 	`, datasourceName, appName)
 }
 
-func DataSourceApplicationById (datasourceName string, appId string) string {
+func DataSourceApplicationById(datasourceName string, appId string) string {
 	return fmt.Sprintf(`
 	data "ias_application" "%s" {
 		id = "%s"
@@ -87,7 +87,7 @@ func DataSourceApplicationById (datasourceName string, appId string) string {
 	`, datasourceName, appId)
 }
 
-func DataSourceApplicationNoId (datasourceName string) string {
+func DataSourceApplicationNoId(datasourceName string) string {
 	return fmt.Sprintf(`
 	data "ias_application" "%s" {
 	}

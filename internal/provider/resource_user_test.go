@@ -18,12 +18,12 @@ func TestResourceUser(t *testing.T) {
 
 	name := users.Name{
 		FamilyName: "Doe",
-		GivenName: "Joe",
+		GivenName:  "Joe",
 	}
 
 	emails := []users.Email{
 		{
-      Type: "work",
+			Type:  "work",
 			Value: "joe.doe@test.com",
 		},
 	}
@@ -63,9 +63,9 @@ func TestResourceUser(t *testing.T) {
 
 		updatedName := users.Name{
 			FamilyName: "Doe S",
-			GivenName: "Joe",
+			GivenName:  "Joe",
 		}
-    
+
 		resource.Test(t, resource.TestCase{
 			IsUnitTest:               true,
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
@@ -166,7 +166,7 @@ func TestResourceUser(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceUserWithUserType("testUser", "Joe Doe", schemas, name, emails, "this-is-not-a-valid-user-type"),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute user_type value must be one of: \\[\"public\" \"partner\" \"customer\"\n\"external\" \"onboardee\" \"employee\"\\], got: \"%s\"","this-is-not-a-valid-user-type")),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute user_type value must be one of: \\[\"public\" \"partner\" \"customer\"\n\"external\" \"onboardee\" \"employee\"\\], got: \"%s\"", "this-is-not-a-valid-user-type")),
 				},
 			},
 		})
@@ -179,7 +179,7 @@ func TestResourceUser(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceUserWithStatus("testUser", "Joe Doe", schemas, name, emails, "this-is-not-a-valid-status"),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute sap_extension_user.status value must be one of: \\[\"active\"\n\"inactive\" \"new\"\\], got: \"%s\"","this-is-not-a-valid-status")),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute sap_extension_user.status value must be one of: \\[\"active\"\n\"inactive\" \"new\"\\], got: \"%s\"", "this-is-not-a-valid-status")),
 				},
 			},
 		})
@@ -334,5 +334,3 @@ func ResourceUserWithStatus(resourceName string, userName string, schemas []stri
 	}
 	`, resourceName, schemas[0], schemas[1], userName, name.FamilyName, name.GivenName, emails[0].Type, emails[0].Value, status)
 }
-
-

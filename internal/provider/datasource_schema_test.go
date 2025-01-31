@@ -3,6 +3,7 @@ package provider
 import (
 	"fmt"
 	"regexp"
+
 	// "regexp"
 	"testing"
 
@@ -19,7 +20,7 @@ func TestDataSourceSchema(t *testing.T) {
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{
-			IsUnitTest: true,
+			IsUnitTest:               true,
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
@@ -45,24 +46,24 @@ func TestDataSourceSchema(t *testing.T) {
 
 	// if regex is added for schema id, add a test
 
-	t.Run("error path - schema id is mandatory", func(t *testing.T){
-		
+	t.Run("error path - schema id is mandatory", func(t *testing.T) {
+
 		resource.Test(t, resource.TestCase{
-			IsUnitTest: true,
+			IsUnitTest:               true,
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config: DataSourceSchemaNoId("testSchema"),
+					Config:      DataSourceSchemaNoId("testSchema"),
 					ExpectError: regexp.MustCompile(`The argument "id" is required, but no definition was found.`),
 				},
 			},
 		})
-	
+
 	})
 
 }
 
-func DataSourceSchema (datasourceName string, schemaName string) string {
+func DataSourceSchema(datasourceName string, schemaName string) string {
 	return fmt.Sprintf(`
 	data "ias_schemas" "allSchemas" {}
 	data "ias_schema" "%s" {
@@ -79,7 +80,7 @@ func DataSourceSchema (datasourceName string, schemaName string) string {
 // 	`, datasourceName, schemaId)
 // }
 
-func DataSourceSchemaNoId (datasourceName string) string {
+func DataSourceSchemaNoId(datasourceName string) string {
 	return fmt.Sprintf(`
 	data "ias_schema" "%s" {
 	}

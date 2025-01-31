@@ -12,43 +12,43 @@ func TestDataSourceUser(t *testing.T) {
 
 	t.Parallel()
 
-	t.Run("happy path", func (t *testing.T){
+	t.Run("happy path", func(t *testing.T) {
 
 		rec, user := setupVCR(t, "fixtures/datasource_user")
 		defer stopQuietly(rec)
-		
+
 		resource.Test(t, resource.TestCase{
-			IsUnitTest: true,
+			IsUnitTest:               true,
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
 					Config: providerConfig("", user) + DataSourceUser("testUser", "Test User"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestMatchResourceAttr("data.ias_user.testUser","id",regexpUUID),
+						resource.TestMatchResourceAttr("data.ias_user.testUser", "id", regexpUUID),
 
-						resource.TestCheckResourceAttr("data.ias_user.testUser","name.given_name","Test"),
-						resource.TestCheckResourceAttr("data.ias_user.testUser","name.family_name","User"),
-						resource.TestCheckResourceAttr("data.ias_user.testUser","user_name","Test"),
-						resource.TestCheckResourceAttr("data.ias_user.testUser","emails.0.value","test.user2@gmail.com"),
-						resource.TestCheckResourceAttr("data.ias_user.testUser","emails.0.primary","true"),
-						resource.TestCheckResourceAttr("data.ias_user.testUser","emails.1.value","test.user1@sap.com"),
-						resource.TestCheckResourceAttr("data.ias_user.testUser","emails.1.type","work"),
-						resource.TestCheckResourceAttr("data.ias_user.testUser","sap_extension_user.status","inactive"),
-						resource.TestCheckResourceAttr("data.ias_user.testUser","user_type","public"),
+						resource.TestCheckResourceAttr("data.ias_user.testUser", "name.given_name", "Test"),
+						resource.TestCheckResourceAttr("data.ias_user.testUser", "name.family_name", "User"),
+						resource.TestCheckResourceAttr("data.ias_user.testUser", "user_name", "Test"),
+						resource.TestCheckResourceAttr("data.ias_user.testUser", "emails.0.value", "test.user2@gmail.com"),
+						resource.TestCheckResourceAttr("data.ias_user.testUser", "emails.0.primary", "true"),
+						resource.TestCheckResourceAttr("data.ias_user.testUser", "emails.1.value", "test.user1@sap.com"),
+						resource.TestCheckResourceAttr("data.ias_user.testUser", "emails.1.type", "work"),
+						resource.TestCheckResourceAttr("data.ias_user.testUser", "sap_extension_user.status", "inactive"),
+						resource.TestCheckResourceAttr("data.ias_user.testUser", "user_type", "public"),
 					),
 				},
 			},
 		})
 	})
 
-	t.Run("error path - invalid user id", func (t *testing.T){
+	t.Run("error path - invalid user id", func(t *testing.T) {
 
 		resource.Test(t, resource.TestCase{
-			IsUnitTest: true,
+			IsUnitTest:               true,
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config: DataSourceUserById("testUser","invalid-user-id"),
+					Config:      DataSourceUserById("testUser", "invalid-user-id"),
 					ExpectError: regexp.MustCompile(`Attribute id value must be a valid UUID, got: invalid-user-id`),
 				},
 			},
@@ -56,14 +56,14 @@ func TestDataSourceUser(t *testing.T) {
 
 	})
 
-	t.Run("error path - user id is mandatory", func (t *testing.T){
+	t.Run("error path - user id is mandatory", func(t *testing.T) {
 
 		resource.Test(t, resource.TestCase{
-			IsUnitTest: true,
+			IsUnitTest:               true,
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config: DataSourceUserNoId("testUser"),
+					Config:      DataSourceUserNoId("testUser"),
 					ExpectError: regexp.MustCompile(`The argument "id" is required, but no definition was found.`),
 				},
 			},
