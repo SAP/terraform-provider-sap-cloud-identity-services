@@ -29,10 +29,10 @@ func (s *SchemasCli) Get(ctx context.Context) (schemas.SchemasResponse, error) {
 		return schemas, err
 	}
 
-	if err = json.Unmarshal(res, &schemas); err != nil{
+	if err = json.Unmarshal(res, &schemas); err != nil {
 		return schemas, err
 	}
-	
+
 	return schemas, nil
 }
 
@@ -45,10 +45,10 @@ func (s *SchemasCli) GetBySchemaId(ctx context.Context, schemaId string) (schema
 		return schema, err
 	}
 
-	if err = json.Unmarshal(res, &schema); err != nil{
+	if err = json.Unmarshal(res, &schema); err != nil {
 		return schema, err
 	}
-	
+
 	return schema, nil
 }
 
@@ -60,16 +60,16 @@ func (s *SchemasCli) Create(ctx context.Context, args *schemas.Schema) (schemas.
 		return schema, err
 	}
 
-	if err = json.Unmarshal(res, &schema); err != nil{
+	if err = json.Unmarshal(res, &schema); err != nil {
 		return schema, err
 	}
-	
+
 	return schema, nil
 }
 
-func (s *SchemasCli) Delete(ctx context.Context, schemaId string) (error) {
-	
+func (s *SchemasCli) Delete(ctx context.Context, schemaId string) error {
+
 	_, err, _ := s.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", s.getUrl(), schemaId), nil, DirectoryHeader, nil)
-	
+
 	return err
 }

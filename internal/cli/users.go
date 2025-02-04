@@ -28,10 +28,10 @@ func (u *UsersCli) Get(ctx context.Context) (users.UsersResponse, error) {
 		return users, err
 	}
 
-	if err = json.Unmarshal(res, &users); err != nil{
+	if err = json.Unmarshal(res, &users); err != nil {
 		return users, err
 	}
-	
+
 	return users, nil
 }
 
@@ -44,10 +44,10 @@ func (u *UsersCli) GetByUserId(ctx context.Context, userId string) (users.User, 
 		return user, err
 	}
 
-	if err = json.Unmarshal(res, &user); err != nil{
+	if err = json.Unmarshal(res, &user); err != nil {
 		return user, err
 	}
-	
+
 	return user, nil
 }
 
@@ -59,10 +59,10 @@ func (u *UsersCli) Create(ctx context.Context, args *users.User) (users.User, er
 		return user, err
 	}
 
-	if err = json.Unmarshal(res, &user); err != nil{
+	if err = json.Unmarshal(res, &user); err != nil {
 		return user, err
 	}
-	
+
 	return user, nil
 }
 
@@ -74,16 +74,16 @@ func (u *UsersCli) Update(ctx context.Context, args *users.User) (users.User, er
 		return user, err
 	}
 
-	if err = json.Unmarshal(res, &user); err != nil{
+	if err = json.Unmarshal(res, &user); err != nil {
 		return user, err
 	}
-	
+
 	return user, nil
 }
 
-func (u *UsersCli) Delete(ctx context.Context, userId string) (error) {
-	
+func (u *UsersCli) Delete(ctx context.Context, userId string) error {
+
 	_, err, _ := u.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", u.getUrl(), userId), nil, DirectoryHeader, nil)
-	
+
 	return err
 }

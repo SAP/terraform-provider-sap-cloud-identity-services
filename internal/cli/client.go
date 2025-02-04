@@ -25,9 +25,9 @@ func NewClient(h *http.Client, u *url.URL) *Client {
 }
 
 type Client struct {
-	HttpClient 				*http.Client
-	ServerURL 				*url.URL
-	AuthorizationToken		string
+	HttpClient         *http.Client
+	ServerURL          *url.URL
+	AuthorizationToken string
 }
 
 func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, body any, reqHeader string) (*http.Response, error) {
@@ -52,7 +52,7 @@ func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, 
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Authorization", "Basic " + c.AuthorizationToken)
+	req.Header.Set("Authorization", "Basic "+c.AuthorizationToken)
 	req.Header.Set("Accept", "*/*")
 	req.Header.Set("DataServiceVersion", "2.0")
 	req.Header.Set("Content-Type", reqHeader)
@@ -81,29 +81,28 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 
 	if res.StatusCode >= 400 {
 
-		if strings.Contains(reqHeader,"scim") {
+		if strings.Contains(reqHeader, "scim") {
 
 			type ScimError struct {
-				Detail 		string 		`json:"detail"`
-				Schemas     []string 	`json:"schemas"`
-				Status 		string 		`json:"status"`
+				Detail  string   `json:"detail"`
+				Schemas []string `json:"schemas"`
+				Status  string   `json:"status"`
 			}
 
 			var responseError ScimError
 
 			if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
-				err = fmt.Errorf("%s",responseError.Detail)
-			}  else {
+				err = fmt.Errorf("%s", responseError.Detail)
+			} else {
 				err = fmt.Errorf("responded with unknown error : %s", responseError.Status)
 			}
-
 
 		} else {
 
 			type ErrorDetail struct {
 				Message string `json:"message"`
 			}
-	
+
 			type ApplicationError struct {
 				Code    int           `json:"code"`
 				Message string        `json:"message"`
@@ -111,16 +110,16 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 			}
 
 			var responseError struct {
-				Error 		ApplicationError	`json:"error"`	
+				Error ApplicationError `json:"error"`
 			}
-			
+
 			if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
-				err = fmt.Errorf("%s",responseError.Error.Message)
-	
-				for i:=0; i<len(responseError.Error.Details); i++ {
-					err = fmt.Errorf("%v \n%s",err,responseError.Error.Details[0].Message)
+				err = fmt.Errorf("%s", responseError.Error.Message)
+
+				for i := 0; i < len(responseError.Error.Details); i++ {
+					err = fmt.Errorf("%v \n%s", err, responseError.Error.Details[0].Message)
 				}
-			}  else {
+			} else {
 				err = fmt.Errorf("responded with unknown error : %d", responseError.Error.Code)
 			}
 

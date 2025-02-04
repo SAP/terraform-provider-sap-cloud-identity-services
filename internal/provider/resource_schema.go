@@ -47,12 +47,12 @@ func (r *schemaResource) Metadata(_ context.Context, req resource.MetadataReques
 
 func (r *schemaResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-
+		MarkdownDescription: `Creates a schema in the SAP Cloud Identity Services.`,
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "A unique id by which the schema can be referenced in other entities",
 				Required:            true,
-				//add a regex check
+				//TODO add a regex check
 			},
 			"name": schema.StringAttribute{
 				MarkdownDescription: "A unique name for the schema",

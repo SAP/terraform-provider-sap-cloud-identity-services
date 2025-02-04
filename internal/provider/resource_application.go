@@ -46,6 +46,7 @@ func (r *applicationResource) Metadata(_ context.Context, req resource.MetadataR
 
 func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		MarkdownDescription: `Creates an application in the SAP Cloud Identity Services.`,
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Id of the application",

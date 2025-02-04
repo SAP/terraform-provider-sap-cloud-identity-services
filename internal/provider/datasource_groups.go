@@ -64,7 +64,7 @@ func (d *groupsDataSource) Metadata(_ context.Context, req datasource.MetadataRe
 
 func (d *groupsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-
+		MarkdownDescription: `Gets an list of groups from the SAP Cloud Identity services.`,
 		Attributes: map[string]schema.Attribute{
 			"values": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{

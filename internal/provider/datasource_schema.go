@@ -33,7 +33,7 @@ func (d *schemaDataSource) Metadata(_ context.Context, req datasource.MetadataRe
 
 func (d *schemaDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-
+		MarkdownDescription: `Gets a schema from the SAP Cloud Identity services.`,
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "A unique id by which the schema can be referenced in other entities",

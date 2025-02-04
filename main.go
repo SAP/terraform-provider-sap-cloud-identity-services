@@ -1,3 +1,6 @@
+//go:generate go install github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@latest
+//go:generate tfplugindocs generate --provider-name "ias" --rendered-provider-name "SAP Cloud Identity Services"
+
 package main
 
 import (

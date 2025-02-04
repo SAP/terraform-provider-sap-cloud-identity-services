@@ -86,7 +86,7 @@ func (d *usersDataSource) Metadata(_ context.Context, req datasource.MetadataReq
 
 func (d *usersDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-
+		MarkdownDescription: `Gets a list of users from the SAP Cloud Identity services.`,
 		Attributes: map[string]schema.Attribute{
 
 			"values": schema.ListNestedAttribute{
