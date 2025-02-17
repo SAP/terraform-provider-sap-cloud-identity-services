@@ -2,8 +2,8 @@ package cli
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
+	"strings"
 
 	"terraform-provider-ias/internal/cli/apiObjects/applications"
 )
@@ -20,59 +20,53 @@ func (a *ApplicationsCli) getUrl() string {
 	return "Applications/v1/"
 }
 
-func (a *ApplicationsCli) Get(ctx context.Context) (applications.ApplicationsResponse, error) {
-	var app applications.ApplicationsResponse
+func (a *ApplicationsCli) Get(ctx context.Context) (applications.ApplicationsResponse, string, error) {
 
-	res, err, _ := a.cliClient.Execute(ctx, "GET", a.getUrl(), nil, ApplicationHeader, nil)
+	res, err, _ := a.cliClient.Execute(ctx, "GET", a.getUrl(), nil, "", ApplicationHeader, nil)
 
-	if err != nil {
-		return app, err
+	if res == nil || err != nil {
+		return applications.ApplicationsResponse{}, "", err
 	}
 
-	if err = json.Unmarshal(res, &app); err != nil {
-		return app, err
-	}
-	return app, nil
+	return unMarshalResponse[applications.ApplicationsResponse](res, false)
 }
 
-func (a *ApplicationsCli) GetByAppId(ctx context.Context, appId string) (applications.Application, error) {
-	var app applications.Application
+func (a *ApplicationsCli) GetByAppId(ctx context.Context, appId string) (applications.Application, string, error) {
 
-	res, err, _ := a.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", a.getUrl(), appId), nil, ApplicationHeader, nil)
+	res, err, _ := a.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", a.getUrl(), appId), nil, "", ApplicationHeader, nil)
 
 	if err != nil {
-		return app, err
+		return applications.Application{}, "", err
 	}
 
-	if err = json.Unmarshal(res, &app); err != nil {
-		return app, err
-	}
-	return app, nil
+	return unMarshalResponse[applications.Application](res, false)
 }
 
-func (a *ApplicationsCli) Create(ctx context.Context, args *applications.Application) (string, error) {
+func (a *ApplicationsCli) Create(ctx context.Context, args *applications.Application) (applications.Application, string, error) {
 
-	var appId string
-
-	_, err, res := a.cliClient.Execute(ctx, "POST", a.getUrl(), args, ApplicationHeader, []string{
+	_, err, res := a.cliClient.Execute(ctx, "POST", a.getUrl(), args, "", ApplicationHeader, []string{
 		"location",
 	})
 
 	if err != nil {
-		return appId, err
+		return applications.Application{}, "", err
 	}
 
-	appId = res["location"]
-
-	return appId, nil
+	return a.GetByAppId(ctx, strings.Split(res["location"], "/")[3])
 }
 
-func (a *ApplicationsCli) Update(ctx context.Context, args *applications.Application) error {
-	_, err, _ := a.cliClient.Execute(ctx, "PUT", fmt.Sprintf("%s%s", a.getUrl(), args.Id), args, ApplicationHeader, nil)
-	return err
+func (a *ApplicationsCli) Update(ctx context.Context, args *applications.Application) (applications.Application, string, error) {
+	
+	_, err, _ := a.cliClient.Execute(ctx, "PUT", fmt.Sprintf("%s%s", a.getUrl(), args.Id), args, "", ApplicationHeader, nil)
+
+	if err != nil {
+		return applications.Application{}, "", err
+	}
+
+	return a.GetByAppId(ctx, args.Id)
 }
 
-func (a *ApplicationsCli) Delete(ctx context.Context, id string) error {
-	_, err, _ := a.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", a.getUrl(), id), nil, ApplicationHeader, nil)
+func (a *ApplicationsCli) Delete(ctx context.Context, appId string) error {
+	_, err, _ := a.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", a.getUrl(), appId), nil, "", ApplicationHeader, nil)
 	return err
 }

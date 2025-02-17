@@ -250,7 +250,7 @@ func (d *applicationsDataSource) Read(ctx context.Context, req datasource.ReadRe
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
 
-	res, err := d.cli.Application.Get(ctx)
+	res, _, err := d.cli.Application.Get(ctx)
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving application", fmt.Sprintf("%s", err))
