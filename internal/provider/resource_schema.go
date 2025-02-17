@@ -20,10 +20,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-var attributeDataTypes = []string{"string", "boolean", "decimal", "integer", "dateTime", "binary", "reference", "complex"}
-var attributeMutabilityValues = []string{"readOnly", "readWrite", "writeOnly", "immutable"}
-var attributeReturnValues = []string{"always", "never", "default", "request"}
-var attributeUniquenessValues = []string{"none", "server", "global"}
+var attributeDataTypes 			= []string{"string", "boolean", "decimal", "integer", "dateTime", "binary", "reference", "complex"}
+var attributeMutabilityValues 	= []string{"readOnly", "readWrite", "writeOnly", "immutable"}
+var attributeReturnValues 		= []string{"always", "never", "default", "request"}
+var attributeUniquenessValues 	= []string{"none", "server", "global"}
 
 func newSchemaResource() resource.Resource {
 	return &schemaResource{}
@@ -168,7 +168,7 @@ func (r *schemaResource) Read(ctx context.Context, req resource.ReadRequest, res
 	diags := req.State.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
 
-	res, err := r.cli.Schema.GetBySchemaId(ctx, config.Id.ValueString())
+	res, _, err := r.cli.Schema.GetBySchemaId(ctx, config.Id.ValueString())
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving schema", fmt.Sprintf("%s", err))
@@ -191,7 +191,7 @@ func (r *schemaResource) Create(ctx context.Context, req resource.CreateRequest,
 	args, diags := getSchemaRequest(ctx, plan)
 	resp.Diagnostics.Append(diags...)
 
-	res, err := r.cli.Schema.Create(ctx, args)
+	res, _ ,err := r.cli.Schema.Create(ctx, args)
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error creating schema", fmt.Sprintf("%s", err))

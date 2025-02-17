@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"terraform-provider-ias/internal/cli/apiObjects/schemas"
@@ -20,56 +19,41 @@ func (s *SchemasCli) getUrl() string {
 	return "scim/Schemas/"
 }
 
-func (s *SchemasCli) Get(ctx context.Context) (schemas.SchemasResponse, error) {
-	var schemas schemas.SchemasResponse
+func (s *SchemasCli) Get(ctx context.Context) (schemas.SchemasResponse, string, error) {
 
-	res, err, _ := s.cliClient.Execute(ctx, "GET", s.getUrl(), nil, DirectoryHeader, nil)
+	res, err, _ := s.cliClient.Execute(ctx, "GET", s.getUrl(), nil, "", DirectoryHeader, nil)
 
 	if err != nil {
-		return schemas, err
+		return schemas.SchemasResponse{}, "", err
 	}
 
-	if err = json.Unmarshal(res, &schemas); err != nil {
-		return schemas, err
-	}
-
-	return schemas, nil
+	return unMarshalResponse[schemas.SchemasResponse](res, false)	
 }
 
-func (s *SchemasCli) GetBySchemaId(ctx context.Context, schemaId string) (schemas.Schema, error) {
-	var schema schemas.Schema
+func (s *SchemasCli) GetBySchemaId(ctx context.Context, schemaId string) (schemas.Schema, string, error) {
 
-	res, err, _ := s.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", s.getUrl(), schemaId), nil, DirectoryHeader, nil)
+	res, err, _ := s.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", s.getUrl(), schemaId), nil, "", DirectoryHeader, nil)
 
 	if err != nil {
-		return schema, err
+		return schemas.Schema{}, "", err
 	}
 
-	if err = json.Unmarshal(res, &schema); err != nil {
-		return schema, err
-	}
-
-	return schema, nil
+	return unMarshalResponse[schemas.Schema](res, false)
 }
 
-func (s *SchemasCli) Create(ctx context.Context, args *schemas.Schema) (schemas.Schema, error) {
-	var schema schemas.Schema
+func (s *SchemasCli) Create(ctx context.Context, args *schemas.Schema) (schemas.Schema, string, error) {
 
-	res, err, _ := s.cliClient.Execute(ctx, "POST", s.getUrl(), args, DirectoryHeader, nil)
+	res, err, _ := s.cliClient.Execute(ctx, "POST", s.getUrl(), args, "", DirectoryHeader, nil)
 	if err != nil {
-		return schema, err
+		return schemas.Schema{}, "", err
 	}
 
-	if err = json.Unmarshal(res, &schema); err != nil {
-		return schema, err
-	}
-
-	return schema, nil
+	return unMarshalResponse[schemas.Schema](res, false)
 }
 
 func (s *SchemasCli) Delete(ctx context.Context, schemaId string) error {
 
-	_, err, _ := s.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", s.getUrl(), schemaId), nil, DirectoryHeader, nil)
+	_, err, _ := s.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", s.getUrl(), schemaId), nil, "", DirectoryHeader, nil)
 
 	return err
 }

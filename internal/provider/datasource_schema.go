@@ -119,7 +119,7 @@ func (d *schemaDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
 
-	res, err := d.cli.Schema.GetBySchemaId(ctx, config.Id.ValueString())
+	res, _, err := d.cli.Schema.GetBySchemaId(ctx, config.Id.ValueString())
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving schema", fmt.Sprintf("%s", err))

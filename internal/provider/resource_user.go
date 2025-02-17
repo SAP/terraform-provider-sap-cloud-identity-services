@@ -21,8 +21,8 @@ import (
 )
 
 var emailTypeValues = []string{"work", "home", "other"}
-var userTypeValues = []string{"public", "partner", "customer", "external", "onboardee", "employee"}
-var activeValues = []string{"active", "inactive", "new"}
+var userTypeValues 	= []string{"public", "partner", "customer", "external", "onboardee", "employee"}
+var activeValues 	= []string{"active", "inactive", "new"}
 
 func newUserResource() resource.Resource {
 	return &userResource{}
