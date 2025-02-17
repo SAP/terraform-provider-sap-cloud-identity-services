@@ -34,7 +34,7 @@ func (u *UsersCli) Get(ctx context.Context) (users.UsersResponse, map[int]string
 
 		// each user is unmarshalled individually and the respective custom schemas are retrieved and added to the map
 		var user users.User
-		user, customSchemas[i], err = unMarshalResponse[users.User](resMap[i], "")
+		user, customSchemas[i], err = unMarshalResponse[users.User](resMap[i], true)
 
 		if err != nil {
 			return users.UsersResponse{}, map[int]string{}, err
@@ -54,7 +54,7 @@ func (u *UsersCli) GetByUserId(ctx context.Context, userId string) (users.User, 
 		return users.User{}, "", err
 	}
 
-	return unMarshalResponse[users.User](res, "")
+	return unMarshalResponse[users.User](res, true)
 }
 
 func (u *UsersCli) Create(ctx context.Context, customSchemas string, args *users.User) (users.User, string, error) {
@@ -64,7 +64,13 @@ func (u *UsersCli) Create(ctx context.Context, customSchemas string, args *users
 		return users.User{}, "", err
 	}
 
-	return unMarshalResponse[users.User](res, customSchemas)
+	if len(customSchemas)>0 {
+		if result, err := validateCustomSchemasResponse(res, customSchemas); !result {
+			return users.User{}, "", err
+		}
+	}
+
+	return unMarshalResponse[users.User](res, false)
 }
 
 func (u *UsersCli) Update(ctx context.Context, customSchemas string, args *users.User) (users.User, string, error) {
@@ -75,7 +81,13 @@ func (u *UsersCli) Update(ctx context.Context, customSchemas string, args *users
 		return users.User{}, "", err
 	}
 
-	return unMarshalResponse[users.User](res, customSchemas)
+	if len(customSchemas)>0 {
+		if result, err := validateCustomSchemasResponse(res, customSchemas); !result {
+			return users.User{}, "", err
+		}
+	}
+
+	return unMarshalResponse[users.User](res, false)
 }
 
 func (u *UsersCli) Delete(ctx context.Context, userId string) error {

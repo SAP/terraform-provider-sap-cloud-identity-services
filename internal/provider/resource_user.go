@@ -218,7 +218,7 @@ func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, r
 		return
 	}
 
-	res, customSchemasRes, err := r.cli.User.Create(ctx, customSchemas, args)
+	res, _, err := r.cli.User.Create(ctx, customSchemas, args)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -228,11 +228,10 @@ func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, r
 		return
 	}
 
-	state, diags := userValueFrom(ctx, res, customSchemasRes)
+	state, diags := userValueFrom(ctx, res, customSchemas)
 	resp.Diagnostics.Append(diags...)
 
 	state.Password = plan.Password
-	state.Schemas = plan.Schemas
 
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -279,13 +278,13 @@ func (r *userResource) Update(ctx context.Context, req resource.UpdateRequest, r
 
 	args.Id = state.Id.ValueString()
 
-	res, customSchemasRes, err := r.cli.User.Update(ctx, customSchemas, args)
+	res, _, err := r.cli.User.Update(ctx, customSchemas, args)
 	if err != nil {
 		resp.Diagnostics.AddError("Error updating application", fmt.Sprintf("%s", err))
 		return
 	}
 
-	updatedState, diags := userValueFrom(ctx, res, customSchemasRes)
+	updatedState, diags := userValueFrom(ctx, res, customSchemas)
 	resp.Diagnostics.Append(diags...)
 
 	updatedState.Password = plan.Password
