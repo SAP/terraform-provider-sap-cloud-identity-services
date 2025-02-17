@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"terraform-provider-ias/internal/cli/apiObjects/users"
@@ -10,11 +11,6 @@ import (
 )
 
 func TestResourceUser(t *testing.T) {
-
-	schemas := []string{
-		"urn:ietf:params:scim:schemas:extension:sap:2.0:User",
-		"urn:ietf:params:scim:schemas:core:2.0:User",
-	}
 
 	name := users.Name{
 		FamilyName: "Doe",
@@ -39,7 +35,7 @@ func TestResourceUser(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + ResourceUser("testUser", "Joe Doe", schemas, name, emails),
+					Config: providerConfig("", user) + ResourceUser("testUser", "Joe Doe", name, emails),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("ias_user.testUser", "id", regexpUUID),
 						resource.TestCheckResourceAttr("ias_user.testUser", "user_name", "Joe Doe"),
@@ -71,7 +67,7 @@ func TestResourceUser(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + ResourceUser("testUser", "Joe Doe", schemas, name, emails),
+					Config: providerConfig("", user) + ResourceUser("testUser", "Joe Doe", name, emails),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("ias_user.testUser", "id", regexpUUID),
 						resource.TestCheckResourceAttr("ias_user.testUser", "user_name", "Joe Doe"),
@@ -85,7 +81,7 @@ func TestResourceUser(t *testing.T) {
 					),
 				},
 				{
-					Config: providerConfig("", user) + ResourceUser("testUser", "Joe Doe S", schemas, updatedName, emails),
+					Config: providerConfig("", user) + ResourceUser("testUser", "Joe Doe S", updatedName, emails),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("ias_user.testUser", "id", regexpUUID),
 						resource.TestCheckResourceAttr("ias_user.testUser", "user_name", "Joe Doe S"),
@@ -103,6 +99,124 @@ func TestResourceUser(t *testing.T) {
 
 	})
 
+	t.Run("happy path - custom schemas", func(t *testing.T) {
+		rec, user := setupVCR(t, "fixtures/resource_user_with_custom_schemas")
+		defer stopQuietly(rec)
+
+		schemas := []string{
+			"urn:ietf:params:scim:schemas:extension:sap:2.0:User",
+			"urn:ietf:params:scim:schemas:core:2.0:User",
+			"urn:test:terraform:1.0:User",
+		}	
+
+		customSchemas, _ := json.Marshal(
+			map[string]interface{} {
+				"urn:test:terraform:1.0:User" : map[string]interface{} {
+					"test1" : "testValue",
+					"test2" : false,
+					"test3" : map[string]interface{} {
+						"test3a" : 12.33,
+						"test3b" : 12,
+					},
+				},
+			},
+		)
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+			Steps: []resource.TestStep{
+				{
+					Config: providerConfig("", user) + ResourceUserWithCustomSchemas("testUser", "Joe Doe", schemas, name, emails, string(customSchemas)),
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestMatchResourceAttr("ias_user.testUser", "id", regexpUUID),
+						resource.TestCheckResourceAttr("ias_user.testUser", "user_name", "Joe Doe"),
+						resource.TestCheckResourceAttr("ias_user.testUser", "name.family_name", name.FamilyName),
+						resource.TestCheckResourceAttr("ias_user.testUser", "name.given_name", name.GivenName),
+						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.type", emails[0].Type),
+						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.value", emails[0].Value),
+						resource.TestCheckResourceAttr("ias_user.testUser", "active", "false"),
+						resource.TestCheckResourceAttr("ias_user.testUser", "sap_extension_user.status", "inactive"),
+						resource.TestCheckResourceAttr("ias_user.testUser", "user_type", "public"),
+						resource.TestCheckResourceAttr("ias_user.testUser", "custom_schemas", string(customSchemas)),
+					),
+				},
+			},
+		})
+
+	})
+
+	t.Run("happy path - update custom schemas", func(t *testing.T) {
+		rec, user := setupVCR(t, "fixtures/resource_user_with_updated_custom_schemas")
+		defer stopQuietly(rec)
+
+		schemas := []string{
+			"urn:ietf:params:scim:schemas:extension:sap:2.0:User",
+			"urn:ietf:params:scim:schemas:core:2.0:User",
+			"urn:test:terraform:1.0:User",
+		}	
+
+		customSchemas, _ := json.Marshal(
+			map[string]interface{} {
+				"urn:test:terraform:1.0:User" : map[string]interface{} {
+					"test1" : "testValue",
+					"test2" : false,
+					"test3" : map[string]interface{} {
+						"test3a" : 12.33,
+						"test3b" : 12,
+					},
+				},
+			},
+		)
+
+		newCustomSchemas, _ := json.Marshal(
+			map[string]interface{} {
+				"urn:test:terraform:1.0:User" : map[string]interface{} {
+					"test1" : "newTestValue",
+					"test2" : true,
+				},
+			},
+		)
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+			Steps: []resource.TestStep{
+				{
+					Config: providerConfig("", user) + ResourceUserWithCustomSchemas("testUser", "Joe Doe", schemas, name, emails, string(customSchemas)),
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestMatchResourceAttr("ias_user.testUser", "id", regexpUUID),
+						resource.TestCheckResourceAttr("ias_user.testUser", "user_name", "Joe Doe"),
+						resource.TestCheckResourceAttr("ias_user.testUser", "name.family_name", name.FamilyName),
+						resource.TestCheckResourceAttr("ias_user.testUser", "name.given_name", name.GivenName),
+						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.type", emails[0].Type),
+						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.value", emails[0].Value),
+						resource.TestCheckResourceAttr("ias_user.testUser", "active", "false"),
+						resource.TestCheckResourceAttr("ias_user.testUser", "sap_extension_user.status", "inactive"),
+						resource.TestCheckResourceAttr("ias_user.testUser", "user_type", "public"),
+						resource.TestCheckResourceAttr("ias_user.testUser", "custom_schemas", string(customSchemas)),
+					),
+				},
+				{
+					Config: providerConfig("", user) + ResourceUserWithCustomSchemas("testUser", "Joe Doe", schemas, name, emails, string(newCustomSchemas)),
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestMatchResourceAttr("ias_user.testUser", "id", regexpUUID),
+						resource.TestCheckResourceAttr("ias_user.testUser", "user_name", "Joe Doe"),
+						resource.TestCheckResourceAttr("ias_user.testUser", "name.family_name", name.FamilyName),
+						resource.TestCheckResourceAttr("ias_user.testUser", "name.given_name", name.GivenName),
+						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.type", emails[0].Type),
+						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.value", emails[0].Value),
+						resource.TestCheckResourceAttr("ias_user.testUser", "active", "false"),
+						resource.TestCheckResourceAttr("ias_user.testUser", "sap_extension_user.status", "inactive"),
+						resource.TestCheckResourceAttr("ias_user.testUser", "user_type", "public"),
+						resource.TestCheckResourceAttr("ias_user.testUser", "custom_schemas", string(newCustomSchemas)),
+					),
+				},
+			},
+		})
+
+	})
+
 	t.Run("error path - schemas cannot be empty", func(t *testing.T) {
 		rec, user := setupVCR(t, "fixtures/resource_user_empty_schemas")
 		defer stopQuietly(rec)
@@ -113,7 +227,7 @@ func TestResourceUser(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      providerConfig("", user) + ResourceUserWithoutSchemas("testUser", "Joe Doe", name, emails),
-					ExpectError: regexp.MustCompile("Provide a valid value for \"schemas\""),
+					ExpectError: regexp.MustCompile("Attribute schemas set must contain at least 1 elements, got: 0"),
 				},
 			},
 		})
@@ -126,7 +240,7 @@ func TestResourceUser(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      ResourceUserWithoutUserName("testUser", schemas, name, emails),
+					Config:      ResourceUserWithoutUserName("testUser", name, emails),
 					ExpectError: regexp.MustCompile("The argument \"user_name\" is required, but no definition was found."),
 				},
 			},
@@ -139,7 +253,7 @@ func TestResourceUser(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      ResourceUserWithoutName("testUser", "Joe Doe", schemas, emails),
+					Config:      ResourceUserWithoutName("testUser", "Joe Doe", emails),
 					ExpectError: regexp.MustCompile("Inappropriate value for attribute \"name\": attributes \"family_name\" and\n\"given_name\" are required."),
 				},
 			},
@@ -152,7 +266,7 @@ func TestResourceUser(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      ResourceUserWithoutEmails("testUser", "Joe Doe", schemas, name),
+					Config:      ResourceUserWithoutEmails("testUser", "Joe Doe", name),
 					ExpectError: regexp.MustCompile("Inappropriate value for attribute \"emails\": element 0: attributes \"type\" and\n\"value\" are required."),
 				},
 			},
@@ -165,7 +279,7 @@ func TestResourceUser(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      ResourceUserWithUserType("testUser", "Joe Doe", schemas, name, emails, "this-is-not-a-valid-user-type"),
+					Config:      ResourceUserWithUserType("testUser", "Joe Doe", name, emails, "this-is-not-a-valid-user-type"),
 					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute user_type value must be one of: \\[\"public\" \"partner\" \"customer\"\n\"external\" \"onboardee\" \"employee\"\\], got: \"%s\"", "this-is-not-a-valid-user-type")),
 				},
 			},
@@ -178,8 +292,28 @@ func TestResourceUser(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      ResourceUserWithStatus("testUser", "Joe Doe", schemas, name, emails, "this-is-not-a-valid-status"),
+					Config:      ResourceUserWithStatus("testUser", "Joe Doe", name, emails, "this-is-not-a-valid-status"),
 					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute sap_extension_user.status value must be one of: \\[\"active\"\n\"inactive\" \"new\"\\], got: \"%s\"", "this-is-not-a-valid-status")),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - custom schemas must be a valid json string", func(t *testing.T) {
+		
+		schemas := []string{
+			"urn:ietf:params:scim:schemas:extension:sap:2.0:User",
+			"urn:ietf:params:scim:schemas:core:2.0:User",
+			"urn:test:terraform:1.0:User",
+		}	
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceUserWithCustomSchemas("testUser", "Joe Doe", schemas, name, emails, "this-is-not-a-valid-json-string"),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute custom_schemas value must be valid json, got:\n\"%s\"", "this-is-not-a-valid-json-string")),
 				},
 			},
 		})
@@ -187,13 +321,9 @@ func TestResourceUser(t *testing.T) {
 
 }
 
-func ResourceUser(resourceName string, userName string, schemas []string, name users.Name, emails []users.Email) string {
+func ResourceUser(resourceName string, userName string, name users.Name, emails []users.Email) string {
 	return fmt.Sprintf(`
 	resource "ias_user" "%s"{
-		schemas = [
-			"%s",
-			"%s"
-		]
 		user_name = "%s"
 		name = {
 			family_name = "%s"
@@ -206,7 +336,7 @@ func ResourceUser(resourceName string, userName string, schemas []string, name u
 			}
 		]
 	}
-	`, resourceName, schemas[0], schemas[1], userName, name.FamilyName, name.GivenName, emails[0].Type, emails[0].Value)
+	`, resourceName, userName, name.FamilyName, name.GivenName, emails[0].Type, emails[0].Value)
 }
 
 func ResourceUserWithoutSchemas(resourceName string, userName string, name users.Name, emails []users.Email) string {
@@ -228,13 +358,9 @@ func ResourceUserWithoutSchemas(resourceName string, userName string, name users
 	`, resourceName, userName, name.FamilyName, name.GivenName, emails[0].Type, emails[0].Value)
 }
 
-func ResourceUserWithoutUserName(resourceName string, schemas []string, name users.Name, emails []users.Email) string {
+func ResourceUserWithoutUserName(resourceName string, name users.Name, emails []users.Email) string {
 	return fmt.Sprintf(`
 	resource "ias_user" "%s"{
-		schemas = [
-			"%s",
-			"%s"
-		]
 		name = {
 			family_name = "%s"
 			given_name = "%s"
@@ -246,16 +372,12 @@ func ResourceUserWithoutUserName(resourceName string, schemas []string, name use
 			}
 		]
 	}
-	`, resourceName, schemas[0], schemas[1], name.FamilyName, name.GivenName, emails[0].Type, emails[0].Value)
+	`, resourceName, name.FamilyName, name.GivenName, emails[0].Type, emails[0].Value)
 }
 
-func ResourceUserWithoutName(resourceName string, userName string, schemas []string, emails []users.Email) string {
+func ResourceUserWithoutName(resourceName string, userName string, emails []users.Email) string {
 	return fmt.Sprintf(`
 	resource "ias_user" "%s"{
-		schemas = [
-			"%s",
-			"%s"
-		]
 		user_name = "%s"
 		name = {}
 		emails = [
@@ -265,16 +387,12 @@ func ResourceUserWithoutName(resourceName string, userName string, schemas []str
 			}
 		]
 	}
-	`, resourceName, schemas[0], schemas[1], userName, emails[0].Type, emails[0].Value)
+	`, resourceName, userName, emails[0].Type, emails[0].Value)
 }
 
-func ResourceUserWithoutEmails(resourceName string, userName string, schemas []string, name users.Name) string {
+func ResourceUserWithoutEmails(resourceName string, userName string, name users.Name) string {
 	return fmt.Sprintf(`
 	resource "ias_user" "%s"{
-		schemas = [
-			"%s",
-			"%s"
-		]
 		user_name = "%s"
 		name = {
 			family_name = "%s"
@@ -284,16 +402,12 @@ func ResourceUserWithoutEmails(resourceName string, userName string, schemas []s
 			{}
 		]
 	}
-	`, resourceName, schemas[0], schemas[1], userName, name.FamilyName, name.GivenName)
+	`, resourceName, userName, name.FamilyName, name.GivenName)
 }
 
-func ResourceUserWithUserType(resourceName string, userName string, schemas []string, name users.Name, emails []users.Email, userType string) string {
+func ResourceUserWithUserType(resourceName string, userName string, name users.Name, emails []users.Email, userType string) string {
 	return fmt.Sprintf(`
 	resource "ias_user" "%s"{
-		schemas = [
-			"%s",
-			"%s"
-		]
 		user_name = "%s"
 		name = {
 			family_name = "%s"
@@ -307,16 +421,12 @@ func ResourceUserWithUserType(resourceName string, userName string, schemas []st
 		]
 		user_type = "%s"
 	}
-	`, resourceName, schemas[0], schemas[1], userName, name.FamilyName, name.GivenName, emails[0].Type, emails[0].Value, userType)
+	`, resourceName, userName, name.FamilyName, name.GivenName, emails[0].Type, emails[0].Value, userType)
 }
 
-func ResourceUserWithStatus(resourceName string, userName string, schemas []string, name users.Name, emails []users.Email, status string) string {
+func ResourceUserWithStatus(resourceName string, userName string, name users.Name, emails []users.Email, status string) string {
 	return fmt.Sprintf(`
 	resource "ias_user" "%s"{
-		schemas = [
-			"%s",
-			"%s"
-		]
 		user_name = "%s"
 		name = {
 			family_name = "%s"
@@ -332,5 +442,29 @@ func ResourceUserWithStatus(resourceName string, userName string, schemas []stri
 			status = "%s"
 		}
 	}
-	`, resourceName, schemas[0], schemas[1], userName, name.FamilyName, name.GivenName, emails[0].Type, emails[0].Value, status)
+	`, resourceName, userName, name.FamilyName, name.GivenName, emails[0].Type, emails[0].Value, status)
+}
+
+func ResourceUserWithCustomSchemas(resourceName string, userName string, schemas []string, name users.Name, emails []users.Email, customSchemas string) string{
+	return fmt.Sprintf(`
+	resource "ias_user" "%s"{
+		schemas = [
+			"%s",
+			"%s",
+			"%s"
+		]
+		user_name = "%s"
+		name = {
+			family_name = "%s"
+			given_name = "%s"
+		}
+		emails = [
+			{
+				type = "%s"
+				value = "%s"
+			}
+		]
+		custom_schemas = %q
+	}
+	`, resourceName, schemas[0], schemas[1], schemas[2], userName, name.FamilyName, name.GivenName, emails[0].Type, emails[0].Value, customSchemas)
 }

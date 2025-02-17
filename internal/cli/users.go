@@ -2,7 +2,7 @@ package cli
 
 import (
 	"context"
-	"encoding/json"
+
 	"fmt"
 	"terraform-provider-ias/internal/cli/apiObjects/users"
 )
@@ -19,71 +19,68 @@ func (u *UsersCli) getUrl() string {
 	return "scim/Users/"
 }
 
-func (u *UsersCli) Get(ctx context.Context) (users.UsersResponse, error) {
-	var users users.UsersResponse
+func (u *UsersCli) Get(ctx context.Context) (users.UsersResponse, map[int]string, error) {
 
-	res, err, _ := u.cliClient.Execute(ctx, "GET", u.getUrl(), nil, DirectoryHeader, nil)
+	res, err, _ := u.cliClient.Execute(ctx, "GET", u.getUrl(), nil, "", DirectoryHeader, nil)
 
 	if err != nil {
-		return users, err
+		return users.UsersResponse{}, map[int]string{}, err
 	}
 
-	if err = json.Unmarshal(res, &users); err != nil {
-		return users, err
+	usersList := users.UsersResponse{}
+	resMap := res.(map[string]interface{})["Resources"].([]interface{})
+	customSchemas := map[int]string{}
+
+	for i:=0; i<len(resMap); i++ {
+
+		var user users.User
+		user, customSchemas[i], err = unMarshalResponse[users.User](resMap[i], "")
+
+		if err != nil {
+			return users.UsersResponse{}, map[int]string{}, err
+		}
+		usersList.Resources = append(usersList.Resources, user)
+
 	}
 
-	return users, nil
+	return usersList, customSchemas, err
 }
 
-func (u *UsersCli) GetByUserId(ctx context.Context, userId string) (users.User, error) {
-	var user users.User
+func (u *UsersCli) GetByUserId(ctx context.Context, userId string) (users.User, string, error) {
 
-	res, err, _ := u.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", u.getUrl(), userId), nil, DirectoryHeader, nil)
+	res, err, _ := u.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", u.getUrl(), userId), nil, "", DirectoryHeader, nil)
 
 	if err != nil {
-		return user, err
+		return users.User{}, "", err
 	}
 
-	if err = json.Unmarshal(res, &user); err != nil {
-		return user, err
-	}
+	return unMarshalResponse[users.User](res, "")
 
-	return user, nil
 }
 
-func (u *UsersCli) Create(ctx context.Context, args *users.User) (users.User, error) {
-	var user users.User
+func (u *UsersCli) Create(ctx context.Context, customSchemas string, args *users.User) (users.User, string, error) {
 
-	res, err, _ := u.cliClient.Execute(ctx, "POST", u.getUrl(), args, DirectoryHeader, nil)
+	res, err, _ := u.cliClient.Execute(ctx, "POST", u.getUrl(), args, customSchemas, DirectoryHeader, nil)
 	if err != nil {
-		return user, err
+		return users.User{}, "", err
 	}
 
-	if err = json.Unmarshal(res, &user); err != nil {
-		return user, err
-	}
-
-	return user, nil
+	return unMarshalResponse[users.User](res, customSchemas)
 }
 
-func (u *UsersCli) Update(ctx context.Context, args *users.User) (users.User, error) {
-	var user users.User
+func (u *UsersCli) Update(ctx context.Context, customSchemas string, args *users.User) (users.User, string, error) {
 
-	res, err, _ := u.cliClient.Execute(ctx, "PUT", fmt.Sprintf("%s%s", u.getUrl(), args.Id), args, DirectoryHeader, nil)
+	res, err, _ := u.cliClient.Execute(ctx, "PUT", fmt.Sprintf("%s%s", u.getUrl(), args.Id), args, customSchemas, DirectoryHeader, nil)
 	if err != nil {
-		return user, err
+		return users.User{}, "", err
 	}
 
-	if err = json.Unmarshal(res, &user); err != nil {
-		return user, err
-	}
-
-	return user, nil
+	return unMarshalResponse[users.User](res, customSchemas)
 }
 
 func (u *UsersCli) Delete(ctx context.Context, userId string) error {
 
-	_, err, _ := u.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", u.getUrl(), userId), nil, DirectoryHeader, nil)
+	_, err, _ := u.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", u.getUrl(), userId), nil, "", DirectoryHeader, nil)
 
 	return err
 }

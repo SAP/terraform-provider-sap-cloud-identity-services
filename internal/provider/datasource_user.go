@@ -138,6 +138,10 @@ func (d *userDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 					},
 				},
 			},
+			"custom_schemas": schema.StringAttribute{
+				Computed: true,
+				MarkdownDescription: "Furthur enhance the user created with custom schemas.",
+			},
 		},
 	}
 }
@@ -153,14 +157,14 @@ func (d *userDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 		return
 	}
 
-	res, err := d.cli.User.GetByUserId(ctx, config.Id.ValueString())
+	res, customSchemasRes, err := d.cli.User.GetByUserId(ctx, config.Id.ValueString())
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving user", fmt.Sprintf("%s", err))
 		return
 	}
 
-	state, diags := userValueFrom(ctx, res)
+	state, diags := userValueFrom(ctx, res, customSchemasRes)
 	resp.Diagnostics.Append(diags...)
 
 	diags = resp.State.Set(ctx, &state)
