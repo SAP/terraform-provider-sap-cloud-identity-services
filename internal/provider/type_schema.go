@@ -86,8 +86,8 @@ func schemasValueFrom(ctx context.Context, s schemas.SchemasResponse) ([]schemaD
 
 	schemas := []schemaData{}
 
-	for i := 0; i < len(s.Resources); i++ {
-		schema, diags := schemaValueFrom(ctx, s.Resources[i])
+	for _, schemaRes := range s.Resources {
+		schema, diags := schemaValueFrom(ctx, schemaRes)
 
 		schemas = append(schemas, schema)
 		diagnostics.Append(diags...)

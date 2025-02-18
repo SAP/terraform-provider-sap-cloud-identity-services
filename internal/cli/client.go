@@ -129,8 +129,8 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 			if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
 				err = fmt.Errorf("%s", responseError.Error.Message)
 
-				for i := 0; i < len(responseError.Error.Details); i++ {
-					err = fmt.Errorf("%v \n%s", err, responseError.Error.Details[0].Message)
+				for _, errMessage := range responseError.Error.Details{
+					err = fmt.Errorf("%v \n%s", err, errMessage.Message)
 				}
 			} else {
 				err = fmt.Errorf("responded with unknown error : %d", responseError.Error.Code)
