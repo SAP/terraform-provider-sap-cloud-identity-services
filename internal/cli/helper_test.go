@@ -8,11 +8,16 @@ import (
 )
 
 type testResponseStruct struct {
-	param1 	string	`json:"param1"`
-	param2 	bool	`json:"param2"`
+	Param1 	string	`json:"param1"`
+	Param2 	bool	`json:"param2"`
 }
 
 func Test_UnmarshalResponse(t *testing.T){
+
+	req := testResponseStruct{
+		Param1: "test",
+		Param2: true,
+	}
 
 	tests := []struct {
 		description 				string
@@ -23,8 +28,8 @@ func Test_UnmarshalResponse(t *testing.T){
 		{
 			description : "happy path - no custom schema retrieval",
 			res	: map[string]interface{}{
-				"param1" : "test",
-				"param2" : true,
+				"param1" : req.Param1,
+				"param2" : req.Param2,
 			},
 			retrieveCustomSchemas : false,
 			expectError: false,
@@ -32,8 +37,8 @@ func Test_UnmarshalResponse(t *testing.T){
 		{
 			description : "happy path - custom schema retrieval",
 			res	: map[string]interface{}{
-				"param1" : "test",
-				"param2" : true,
+				"param1" : req.Param1,
+				"param2" : req.Param2,
 				"customSchemas" : "valid-custom-schema-structure",
 			},
 			retrieveCustomSchemas : true,
@@ -57,6 +62,9 @@ func Test_UnmarshalResponse(t *testing.T){
 			} else {
 				assert.NoError(t, err)
 				assert.IsType(t, testResponseStruct{}, res)
+
+				assert.Equal(t, req.Param1, res.Param1)
+				assert.Equal(t, req.Param2, res.Param2)
 				
 				if test.retrieveCustomSchemas{
 					assert.NotZero(t, cS)
