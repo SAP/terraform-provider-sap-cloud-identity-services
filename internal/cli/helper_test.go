@@ -50,6 +50,18 @@ func Test_UnmarshalResponse(t *testing.T) {
 			retrieveCustomSchemas: false,
 			expectError:           true,
 		},
+		{
+			description:           "error path - marshalling",
+			res:                   make(chan int),
+			retrieveCustomSchemas: false,
+			expectError:           true,
+		},
+		{
+			description:           "error path - unmarshalling",
+			res:                   "invalid-object",
+			retrieveCustomSchemas: false,
+			expectError:           true,
+		},
 	}
 
 	for _, test := range tests {

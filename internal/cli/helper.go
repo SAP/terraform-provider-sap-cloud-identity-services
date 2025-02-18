@@ -8,24 +8,25 @@ import (
 )
 
 func unMarshalResponse[I interface{}](res interface{}, retrieveCustomSchemas bool) (I, string, error) {
-
 	var obj I
-	var customSchemaResponse string
-	var err error
-	var marshaledRes []byte
-
 	if res == nil {
-		return obj, customSchemaResponse, fmt.Errorf("response is nil")
+		return obj, "", fmt.Errorf("response is nil")
 	}
 
-	if marshaledRes, err = json.Marshal(res); err == nil {
-		err = json.Unmarshal(marshaledRes, &obj)
+	marshaledRes, err := json.Marshal(res)
+	if err != nil {
+		return obj, "", err
 	}
 
-	if err == nil && retrieveCustomSchemas {
-		customSchemaResponse, err = getCustomSchemas[I](res)
+	if err := json.Unmarshal(marshaledRes, &obj); err != nil {
+		return obj, "", err
 	}
 
+	if !retrieveCustomSchemas {
+		return obj, "", nil
+	}
+
+	customSchemaResponse, err := getCustomSchemas[I](res)
 	return obj, customSchemaResponse, err
 }
 
