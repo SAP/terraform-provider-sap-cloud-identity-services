@@ -1,6 +1,6 @@
 module terraform-provider-ias
 
-go 1.23.0
+go 1.24
 
 require (
 	github.com/hashicorp/terraform-plugin-framework v1.13.0
