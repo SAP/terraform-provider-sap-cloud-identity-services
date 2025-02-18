@@ -107,16 +107,16 @@ func TestResourceUser(t *testing.T) {
 			"urn:ietf:params:scim:schemas:extension:sap:2.0:User",
 			"urn:ietf:params:scim:schemas:core:2.0:User",
 			"urn:test:terraform:1.0:User",
-		}	
+		}
 
 		customSchemas, _ := json.Marshal(
-			map[string]interface{} {
-				"urn:test:terraform:1.0:User" : map[string]interface{} {
-					"test1" : "testValue",
-					"test2" : false,
-					"test3" : map[string]interface{} {
-						"test3a" : 12.33,
-						"test3b" : 12,
+			map[string]interface{}{
+				"urn:test:terraform:1.0:User": map[string]interface{}{
+					"test1": "testValue",
+					"test2": false,
+					"test3": map[string]interface{}{
+						"test3a": 12.33,
+						"test3b": 12,
 					},
 				},
 			},
@@ -154,26 +154,26 @@ func TestResourceUser(t *testing.T) {
 			"urn:ietf:params:scim:schemas:extension:sap:2.0:User",
 			"urn:ietf:params:scim:schemas:core:2.0:User",
 			"urn:test:terraform:1.0:User",
-		}	
+		}
 
 		customSchemas, _ := json.Marshal(
-			map[string]interface{} {
-				"urn:test:terraform:1.0:User" : map[string]interface{} {
-					"test1" : "testValue",
-					"test2" : false,
-					"test3" : map[string]interface{} {
-						"test3a" : 12.33,
-						"test3b" : 12,
+			map[string]interface{}{
+				"urn:test:terraform:1.0:User": map[string]interface{}{
+					"test1": "testValue",
+					"test2": false,
+					"test3": map[string]interface{}{
+						"test3a": 12.33,
+						"test3b": 12,
 					},
 				},
 			},
 		)
 
 		newCustomSchemas, _ := json.Marshal(
-			map[string]interface{} {
-				"urn:test:terraform:1.0:User" : map[string]interface{} {
-					"test1" : "newTestValue",
-					"test2" : true,
+			map[string]interface{}{
+				"urn:test:terraform:1.0:User": map[string]interface{}{
+					"test1": "newTestValue",
+					"test2": true,
 				},
 			},
 		)
@@ -300,12 +300,12 @@ func TestResourceUser(t *testing.T) {
 	})
 
 	t.Run("error path - custom schemas must be a valid json string", func(t *testing.T) {
-		
+
 		schemas := []string{
 			"urn:ietf:params:scim:schemas:extension:sap:2.0:User",
 			"urn:ietf:params:scim:schemas:core:2.0:User",
 			"urn:test:terraform:1.0:User",
-		}	
+		}
 
 		resource.Test(t, resource.TestCase{
 			IsUnitTest:               true,
@@ -445,7 +445,7 @@ func ResourceUserWithStatus(resourceName string, userName string, name users.Nam
 	`, resourceName, userName, name.FamilyName, name.GivenName, emails[0].Type, emails[0].Value, status)
 }
 
-func ResourceUserWithCustomSchemas(resourceName string, userName string, schemas []string, name users.Name, emails []users.Email, customSchemas string) string{
+func ResourceUserWithCustomSchemas(resourceName string, userName string, schemas []string, name users.Name, emails []users.Email, customSchemas string) string {
 	return fmt.Sprintf(`
 	resource "ias_user" "%s"{
 		schemas = [

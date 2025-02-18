@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
-var checkCustomSchemas resource.CheckResourceAttrWithFunc = func (value string) error {
+var checkCustomSchemas resource.CheckResourceAttrWithFunc = func(value string) error {
 	var err error
 	if len(value) == 0 {
 		err = fmt.Errorf("%s has length 0", value)

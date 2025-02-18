@@ -52,7 +52,7 @@ func (g *GroupsCli) Create(ctx context.Context, args *groups.Group) (groups.Grou
 }
 
 func (g *GroupsCli) Update(ctx context.Context, args *groups.Group) (groups.Group, string, error) {
-	
+
 	res, err, _ := g.cliClient.Execute(ctx, "PUT", fmt.Sprintf("%s%s", g.getUrl(), args.Id), args, "", DirectoryHeader, nil)
 
 	if err != nil {

@@ -27,7 +27,7 @@ func (s *SchemasCli) Get(ctx context.Context) (schemas.SchemasResponse, string, 
 		return schemas.SchemasResponse{}, "", err
 	}
 
-	return unMarshalResponse[schemas.SchemasResponse](res, false)	
+	return unMarshalResponse[schemas.SchemasResponse](res, false)
 }
 
 func (s *SchemasCli) GetBySchemaId(ctx context.Context, schemaId string) (schemas.Schema, string, error) {

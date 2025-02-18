@@ -56,7 +56,7 @@ func (a *ApplicationsCli) Create(ctx context.Context, args *applications.Applica
 }
 
 func (a *ApplicationsCli) Update(ctx context.Context, args *applications.Application) (applications.Application, string, error) {
-	
+
 	_, err, _ := a.cliClient.Execute(ctx, "PUT", fmt.Sprintf("%s%s", a.getUrl(), args.Id), args, "", ApplicationHeader, nil)
 
 	if err != nil {

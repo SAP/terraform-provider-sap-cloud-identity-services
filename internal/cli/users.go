@@ -30,7 +30,7 @@ func (u *UsersCli) Get(ctx context.Context) (users.UsersResponse, map[int]string
 	resMap := res.(map[string]interface{})["Resources"].([]interface{})
 	customSchemas := map[int]string{}
 
-	for i:=0; i<len(resMap); i++ {
+	for i := 0; i < len(resMap); i++ {
 
 		// each user is unmarshalled individually and the respective custom schemas are retrieved and added to the map
 		var user users.User
@@ -64,7 +64,7 @@ func (u *UsersCli) Create(ctx context.Context, customSchemas string, args *users
 		return users.User{}, "", err
 	}
 
-	if len(customSchemas)>0 {
+	if len(customSchemas) > 0 {
 		if result, err := validateCustomSchemasResponse(res, customSchemas); !result {
 			return users.User{}, "", err
 		}
@@ -76,12 +76,12 @@ func (u *UsersCli) Create(ctx context.Context, customSchemas string, args *users
 func (u *UsersCli) Update(ctx context.Context, customSchemas string, args *users.User) (users.User, string, error) {
 
 	res, err, _ := u.cliClient.Execute(ctx, "PUT", fmt.Sprintf("%s%s", u.getUrl(), args.Id), args, customSchemas, DirectoryHeader, nil)
-	
+
 	if err != nil {
 		return users.User{}, "", err
 	}
 
-	if len(customSchemas)>0 {
+	if len(customSchemas) > 0 {
 		if result, err := validateCustomSchemasResponse(res, customSchemas); !result {
 			return users.User{}, "", err
 		}

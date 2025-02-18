@@ -19,9 +19,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 )
 
-var sourceValues 		= 	[]string{"Identity Directory", "Corporate Identity Provider", "Expression"}
-var ssoValues 			= 	[]string{"openIdConnect", "saml2"}
-var usersTypeValues 	= 	[]string{"public", "employee", "customer", "partner", "external", "onboardee"}
+var sourceValues = []string{"Identity Directory", "Corporate Identity Provider", "Expression"}
+var ssoValues = []string{"openIdConnect", "saml2"}
+var usersTypeValues = []string{"public", "employee", "customer", "partner", "external", "onboardee"}
 
 func newApplicationResource() resource.Resource {
 	return &applicationResource{}
@@ -284,7 +284,7 @@ func (r *applicationResource) Create(ctx context.Context, req resource.CreateReq
 	args, diags := getApplicationRequest(ctx, config)
 	resp.Diagnostics.Append(diags...)
 
- 	res, _, err := r.cli.Application.Create(ctx, args)
+	res, _, err := r.cli.Application.Create(ctx, args)
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error creating application", fmt.Sprintf("%s", err))

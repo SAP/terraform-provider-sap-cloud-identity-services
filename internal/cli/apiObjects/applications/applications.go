@@ -151,14 +151,14 @@ type AuthenticationSchema struct {
 }
 
 type Application struct {
-	Id                  	string              	`json:"id"`
-	Name                	string              	`json:"name"`
-	Description         	string              	`json:"description,omitempty"`
-	ParentApplicationId 	string              	`json:"parentApplicationId,omitempty"`
-	MultiTenantApp      	bool                	`json:"multiTenantApp,omitempty"` //only for SAP internal use
-	GlobalAccount       	string              	`json:"globalAccount,omitempty"`
-	Schemas             	[]string            	`json:"schemas,omitempty"`
-	AuthenticationSchema	AuthenticationSchema	`json:"urn:sap:identity:application:schemas:extension:sci:1.0:Authentication"`
+	Id                   string               `json:"id"`
+	Name                 string               `json:"name"`
+	Description          string               `json:"description,omitempty"`
+	ParentApplicationId  string               `json:"parentApplicationId,omitempty"`
+	MultiTenantApp       bool                 `json:"multiTenantApp,omitempty"` //only for SAP internal use
+	GlobalAccount        string               `json:"globalAccount,omitempty"`
+	Schemas              []string             `json:"schemas,omitempty"`
+	AuthenticationSchema AuthenticationSchema `json:"urn:sap:identity:application:schemas:extension:sci:1.0:Authentication"`
 	// Meta 					Meta 					`json:"meta,omitempty"`
 	// PrivacyPolicy 			string 					`json:"privacyPolicy,omitempty"`
 	// TermsOfUse 				string 					`json:"termsOfUse,omitempty"`

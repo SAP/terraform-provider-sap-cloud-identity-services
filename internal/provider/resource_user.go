@@ -21,8 +21,8 @@ import (
 )
 
 var emailTypeValues = []string{"work", "home", "other"}
-var userTypeValues 	= []string{"public", "partner", "customer", "external", "onboardee", "employee"}
-var activeValues 	= []string{"active", "inactive", "new"}
+var userTypeValues = []string{"public", "partner", "customer", "external", "onboardee", "employee"}
+var activeValues = []string{"active", "inactive", "new"}
 
 func newUserResource() resource.Resource {
 	return &userResource{}
@@ -195,7 +195,7 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 				},
 			},
 			"custom_schemas": schema.StringAttribute{
-				Optional: true,
+				Optional:            true,
 				MarkdownDescription: "Furthur enhance your application with custom schemas.",
 				Validators: []validator.String{
 					ValidJSON(),
@@ -380,7 +380,6 @@ func getUserRequest(ctx context.Context, plan userData) (*users.User, string, di
 	if !plan.CustomSchemas.IsNull() {
 		customSchemas = plan.CustomSchemas.ValueString()
 	}
-
 
 	return args, customSchemas, diagnostics
 }

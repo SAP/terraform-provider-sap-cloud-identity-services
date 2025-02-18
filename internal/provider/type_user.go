@@ -32,9 +32,7 @@ type nameData struct {
 }
 
 type userData struct {
-	//INPUT
-	Id 				 types.String `tfsdk:"id"`
-	//OUTPUT
+	Id               types.String `tfsdk:"id"`
 	Schemas          types.Set    `tfsdk:"schemas"`
 	UserName         types.String `tfsdk:"user_name"`
 	Name             types.Object `tfsdk:"name"`
@@ -45,7 +43,7 @@ type userData struct {
 	UserType         types.String `tfsdk:"user_type"`
 	Active           types.Bool   `tfsdk:"active"`
 	SapExtensionUser types.Object `tfsdk:"sap_extension_user"`
-	CustomSchemas	 types.String `tfsdk:"custom_schemas"`
+	CustomSchemas    types.String `tfsdk:"custom_schemas"`
 }
 
 func userValueFrom(ctx context.Context, u users.User, cS string) (userData, diag.Diagnostics) {
@@ -108,7 +106,7 @@ func userValueFrom(ctx context.Context, u users.User, cS string) (userData, diag
 func usersValueFrom(ctx context.Context, u users.UsersResponse, customSchemas map[int]string) []userData {
 	users := []userData{}
 
-	for i:=0; i<len(u.Resources); i++ {
+	for i := 0; i < len(u.Resources); i++ {
 
 		user, _ := userValueFrom(ctx, u.Resources[i], customSchemas[i])
 		users = append(users, user)

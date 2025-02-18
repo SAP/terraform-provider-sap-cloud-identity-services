@@ -45,7 +45,7 @@ func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, 
 		if len(customSchemas) > 0 {
 
 			// remove the ending characters '}\n' from the encoded buffer
-			body := encodedBody.String()[:len(encodedBody.String()) - 2]
+			body := encodedBody.String()[:len(encodedBody.String())-2]
 			// remove the beginning character '{' from the custom schemas string
 			customSchemas = customSchemas[1:]
 
@@ -147,7 +147,7 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 
 	if err = json.NewDecoder(res.Body).Decode(&O); err == nil || err == io.EOF {
 		return O, nil, out
-	}else {
+	} else {
 		return nil, err, out
 	}
 }

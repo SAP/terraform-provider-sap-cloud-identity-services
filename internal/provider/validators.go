@@ -35,7 +35,6 @@ func ValidEmailDomain() validator.String {
 	return stringvalidator.RegexMatches(EmailDomainRegexp, "value must be a valid Email Domain")
 }
 
-
 // JSON validator, checks that the attribute is a valid JSON string
 type jsonValidator struct {
 }
@@ -69,4 +68,3 @@ func (v jsonValidator) ValidateString(ctx context.Context, request validator.Str
 func ValidJSON() validator.String {
 	return jsonValidator{}
 }
-

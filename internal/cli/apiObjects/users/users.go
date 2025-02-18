@@ -110,30 +110,30 @@ type Address struct {
 }
 
 type User struct {
-	Id					string			`json:"id,omitempty"`
-	ExternalId			string         	`json:"externalId,omitempty"`
-	Meta             	Meta           	`json:"meta,omitempty"`
-	Schemas           	[]string       	`json:"schemas"`
-	UserName          	string         	`json:"userName"`
-	Password         	string         	`json:"password,omitempty"`
-	Name              	Name           	`json:"name,omitempty"`
-	DisplayName       	string         	`json:"displayName,omitempty"`
-	NickName          	string         	`json:"nickName,omitempty"`
-	ProfileUrl        	string         	`json:"profileUrl,omitempty"`
-	Title             	string         	`json:"title,omitempty"`
-	UserType          	string         	`json:"userType,omitempty"`
-	PreferredLanguage 	string        	`json:"preferredLanguage,omitempty"`
-	Locale            	string         	`json:"locale,omitempty"`
-	TimeZone          	string         	`json:"timeZone,omitempty"`
-	Active            	bool           	`json:"active,omitempty"`
-	Emails            	[]Email        	`json:"emails"`
-	PhoneNumbers      	[]PhoneNumber  	`json:"phoneNumbers,omitempty"`
-	Photo             	[]Photo        	`json:"photos,omitempty"`
-	Addresses         	[]Address      	`json:"addresses,omitempty"`
-	Entitlements      	[]Enititlement 	`json:"entitlements,omitempty"`
-	Roles             	[]Role         	`json:"roles,omitempty"`
+	Id                string         `json:"id,omitempty"`
+	ExternalId        string         `json:"externalId,omitempty"`
+	Meta              Meta           `json:"meta,omitempty"`
+	Schemas           []string       `json:"schemas"`
+	UserName          string         `json:"userName"`
+	Password          string         `json:"password,omitempty"`
+	Name              Name           `json:"name,omitempty"`
+	DisplayName       string         `json:"displayName,omitempty"`
+	NickName          string         `json:"nickName,omitempty"`
+	ProfileUrl        string         `json:"profileUrl,omitempty"`
+	Title             string         `json:"title,omitempty"`
+	UserType          string         `json:"userType,omitempty"`
+	PreferredLanguage string         `json:"preferredLanguage,omitempty"`
+	Locale            string         `json:"locale,omitempty"`
+	TimeZone          string         `json:"timeZone,omitempty"`
+	Active            bool           `json:"active,omitempty"`
+	Emails            []Email        `json:"emails"`
+	PhoneNumbers      []PhoneNumber  `json:"phoneNumbers,omitempty"`
+	Photo             []Photo        `json:"photos,omitempty"`
+	Addresses         []Address      `json:"addresses,omitempty"`
+	Entitlements      []Enititlement `json:"entitlements,omitempty"`
+	Roles             []Role         `json:"roles,omitempty"`
 	// EnterpriseUser    	EnterpriseUser 	`json:"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User,omitempty"`
-	SAPExtension 	  	SAPExtension 	`json:"urn:ietf:params:scim:schemas:extension:sap:2.0:User"`
+	SAPExtension SAPExtension `json:"urn:ietf:params:scim:schemas:extension:sap:2.0:User"`
 }
 
 type UsersResponse struct {

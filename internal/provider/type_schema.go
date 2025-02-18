@@ -22,12 +22,12 @@ type attributesData struct {
 }
 
 type schemaData struct {
-	Id          	types.String	`tfsdk:"id"`
-	Name        	types.String	`tfsdk:"name"`
-	Description 	types.String	`tfsdk:"description"`
-	Schemas     	types.Set   	`tfsdk:"schemas"`
-	ExternalId  	types.String	`tfsdk:"external_id"`
-	Attributes  	types.List  	`tfsdk:"attributes"`	
+	Id          types.String `tfsdk:"id"`
+	Name        types.String `tfsdk:"name"`
+	Description types.String `tfsdk:"description"`
+	Schemas     types.Set    `tfsdk:"schemas"`
+	ExternalId  types.String `tfsdk:"external_id"`
+	Attributes  types.List   `tfsdk:"attributes"`
 }
 
 func schemaValueFrom(ctx context.Context, s schemas.Schema) (schemaData, diag.Diagnostics) {
@@ -86,7 +86,7 @@ func schemasValueFrom(ctx context.Context, s schemas.SchemasResponse) ([]schemaD
 
 	schemas := []schemaData{}
 
-	for i:=0; i<len(s.Resources); i++ {
+	for i := 0; i < len(s.Resources); i++ {
 		schema, diags := schemaValueFrom(ctx, s.Resources[i])
 
 		schemas = append(schemas, schema)

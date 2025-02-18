@@ -47,14 +47,14 @@ type authenticationRulesData struct {
 
 type applicationData struct {
 	//INPUT
-	Id 						types.String	`tfsdk:"id"`
+	Id types.String `tfsdk:"id"`
 	//OUTPUT
-	Name                	types.String	`tfsdk:"name"`
-	Description         	types.String	`tfsdk:"description"`
-	ParentApplicationId 	types.String	`tfsdk:"parent_application_id"`
-	MultiTenantApp      	types.Bool  	`tfsdk:"multi_tenant_app"`
-	GlobalAccount       	types.String	`tfsdk:"global_account"`
-	AuthenticationSchema	types.Object	`tfsdk:"authentication_schema"`
+	Name                 types.String `tfsdk:"name"`
+	Description          types.String `tfsdk:"description"`
+	ParentApplicationId  types.String `tfsdk:"parent_application_id"`
+	MultiTenantApp       types.Bool   `tfsdk:"multi_tenant_app"`
+	GlobalAccount        types.String `tfsdk:"global_account"`
+	AuthenticationSchema types.Object `tfsdk:"authentication_schema"`
 }
 
 func applicationValueFrom(ctx context.Context, a applications.Application) (applicationData, diag.Diagnostics) {
