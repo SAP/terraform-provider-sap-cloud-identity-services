@@ -44,7 +44,8 @@ func (a *ApplicationsCli) GetByAppId(ctx context.Context, appId string) (applica
 
 func (a *ApplicationsCli) Create(ctx context.Context, args *applications.Application) (applications.Application, string, error) {
 
-	_, err, res := a.cliClient.Execute(ctx, "POST", a.getUrl(), args, "", ApplicationHeader, []string{
+	// The API returns the unique ID of the created application in the header key "location"
+	_, err, headers := a.cliClient.Execute(ctx, "POST", a.getUrl(), args, "", ApplicationHeader, []string{
 		"location",
 	})
 
@@ -52,7 +53,9 @@ func (a *ApplicationsCli) Create(ctx context.Context, args *applications.Applica
 		return applications.Application{}, "", err
 	}
 
-	return a.GetByAppId(ctx, strings.Split(res["location"], "/")[3])
+	// The retrieved header is returned as a string in the form "/Applications/v1/ID"
+	// Hence it is split to retrieve the unique ID which is passed to the GET call
+	return a.GetByAppId(ctx, strings.Split(headers["location"], "/")[3])
 }
 
 func (a *ApplicationsCli) Update(ctx context.Context, args *applications.Application) (applications.Application, string, error) {
