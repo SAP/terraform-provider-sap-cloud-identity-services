@@ -24,7 +24,7 @@ func (a *ApplicationsCli) Get(ctx context.Context) (applications.ApplicationsRes
 
 	res, err, _ := a.cliClient.Execute(ctx, "GET", a.getUrl(), nil, "", ApplicationHeader, nil)
 
-	if res == nil || err != nil {
+	if err != nil {
 		return applications.ApplicationsResponse{}, "", err
 	}
 
