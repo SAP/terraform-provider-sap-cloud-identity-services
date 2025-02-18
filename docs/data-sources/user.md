@@ -28,6 +28,7 @@ data "ias_user" "by_id" {
 ### Read-Only
 
 - `active` (Boolean) Determines whether the user is active or not.The default value for the attribute is false.
+- `custom_schemas` (String) Furthur enhance the user created with custom schemas.
 - `display_name` (String) The name to be displayed for the user.
 - `emails` (Attributes Set) Email of the user. (see [below for nested schema](#nestedatt--emails))
 - `name` (Attributes) Name of the user (see [below for nested schema](#nestedatt--name))
