@@ -106,9 +106,9 @@ func userValueFrom(ctx context.Context, u users.User, cS string) (userData, diag
 func usersValueFrom(ctx context.Context, u users.UsersResponse, customSchemas map[int]string) []userData {
 	users := []userData{}
 
-	for i := 0; i < len(u.Resources); i++ {
+	for i, userRes := range u.Resources {
 
-		user, _ := userValueFrom(ctx, u.Resources[i], customSchemas[i])
+		user, _ := userValueFrom(ctx, userRes, customSchemas[i])
 		users = append(users, user)
 
 	}

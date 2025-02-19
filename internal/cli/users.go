@@ -30,11 +30,11 @@ func (u *UsersCli) Get(ctx context.Context) (users.UsersResponse, map[int]string
 	resMap := res.(map[string]interface{})["Resources"].([]interface{})
 	customSchemas := map[int]string{}
 
-	for i := 0; i < len(resMap); i++ {
+	for i, r := range resMap {
 
 		// each user is unmarshalled individually and the respective custom schemas are retrieved and added to the map
 		var user users.User
-		user, customSchemas[i], err = unMarshalResponse[users.User](resMap[i], true)
+		user, customSchemas[i], err = unMarshalResponse[users.User](r, true)
 
 		if err != nil {
 			return users.UsersResponse{}, map[int]string{}, err

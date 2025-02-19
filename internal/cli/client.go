@@ -141,8 +141,8 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 		return nil, err, out
 	}
 
-	for i := 0; i < len(headers); i++ {
-		out[headers[i]] = res.Header.Get(headers[i])
+	for _, header := range headers {
+		out[header] = res.Header.Get(header)
 	}
 
 	if err = json.NewDecoder(res.Body).Decode(&O); err == nil || err == io.EOF {
