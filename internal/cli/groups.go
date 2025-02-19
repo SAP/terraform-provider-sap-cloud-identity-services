@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"terraform-provider-ias/internal/cli/apiObjects/groups"
 )
@@ -19,73 +18,53 @@ func (g *GroupsCli) getUrl() string {
 	return "scim/Groups/"
 }
 
-func (g *GroupsCli) Get(ctx context.Context) (groups.GroupsResponse, error) {
-	var groups groups.GroupsResponse
+func (g *GroupsCli) Get(ctx context.Context) (groups.GroupsResponse, string, error) {
 
-	res, err, _ := g.cliClient.Execute(ctx, "GET", g.getUrl(), nil, DirectoryHeader, nil)
+	res, err, _ := g.cliClient.Execute(ctx, "GET", g.getUrl(), nil, "", DirectoryHeader, nil)
 
 	if err != nil {
-		return groups, err
+		return groups.GroupsResponse{}, "", err
 	}
 
-	if err = json.Unmarshal(res, &groups); err != nil {
-		return groups, err
-	}
-
-	return groups, nil
+	return unMarshalResponse[groups.GroupsResponse](res, false)
 }
 
-func (g *GroupsCli) GetByGroupId(ctx context.Context, groupId string) (groups.Group, error) {
-	var group groups.Group
+func (g *GroupsCli) GetByGroupId(ctx context.Context, groupId string) (groups.Group, string, error) {
 
-	res, err, _ := g.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", g.getUrl(), groupId), nil, DirectoryHeader, nil)
+	res, err, _ := g.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", g.getUrl(), groupId), nil, "", DirectoryHeader, nil)
 
 	if err != nil {
-		return group, err
+		return groups.Group{}, "", err
 	}
 
-	if err = json.Unmarshal(res, &group); err != nil {
-		return group, err
-	}
-
-	return group, nil
+	return unMarshalResponse[groups.Group](res, false)
 }
 
-func (g *GroupsCli) Create(ctx context.Context, args *groups.Group) (groups.Group, error) {
-	var group groups.Group
+func (g *GroupsCli) Create(ctx context.Context, args *groups.Group) (groups.Group, string, error) {
 
-	res, err, _ := g.cliClient.Execute(ctx, "POST", g.getUrl(), args, DirectoryHeader, nil)
+	res, err, _ := g.cliClient.Execute(ctx, "POST", g.getUrl(), args, "", DirectoryHeader, nil)
 
 	if err != nil {
-		return group, err
+		return groups.Group{}, "", err
 	}
 
-	if err = json.Unmarshal(res, &group); err != nil {
-		return group, err
-	}
-
-	return group, nil
+	return unMarshalResponse[groups.Group](res, false)
 }
 
-func (g *GroupsCli) Update(ctx context.Context, args *groups.Group) (groups.Group, error) {
-	var group groups.Group
+func (g *GroupsCli) Update(ctx context.Context, args *groups.Group) (groups.Group, string, error) {
 
-	res, err, _ := g.cliClient.Execute(ctx, "PUT", fmt.Sprintf("%s%s", g.getUrl(), args.Id), args, DirectoryHeader, nil)
+	res, err, _ := g.cliClient.Execute(ctx, "PUT", fmt.Sprintf("%s%s", g.getUrl(), args.Id), args, "", DirectoryHeader, nil)
 
 	if err != nil {
-		return group, err
+		return groups.Group{}, "", err
 	}
 
-	if err = json.Unmarshal(res, &group); err != nil {
-		return group, err
-	}
-
-	return group, nil
+	return unMarshalResponse[groups.Group](res, false)
 }
 
 func (g *GroupsCli) Delete(ctx context.Context, groupId string) error {
 
-	_, err, _ := g.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", g.getUrl(), groupId), nil, DirectoryHeader, nil)
+	_, err, _ := g.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", g.getUrl(), groupId), nil, "", DirectoryHeader, nil)
 
 	return err
 }

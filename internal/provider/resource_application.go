@@ -3,7 +3,6 @@ package provider
 import (
 	"context"
 	"fmt"
-	"strings"
 	"terraform-provider-ias/internal/cli"
 	"terraform-provider-ias/internal/cli/apiObjects/applications"
 
@@ -285,19 +284,10 @@ func (r *applicationResource) Create(ctx context.Context, req resource.CreateReq
 	args, diags := getApplicationRequest(ctx, config)
 	resp.Diagnostics.Append(diags...)
 
-	id, err := r.cli.Application.Create(ctx, args)
+	res, _, err := r.cli.Application.Create(ctx, args)
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error creating application", fmt.Sprintf("%s", err))
-		return
-	}
-
-	id = strings.Split(id, "/")[3]
-
-	res, err := r.cli.Application.GetByAppId(ctx, id)
-
-	if err != nil {
-		resp.Diagnostics.AddError("Error retrieving application", fmt.Sprintf("%s", err))
 		return
 	}
 
@@ -315,7 +305,7 @@ func (r *applicationResource) Read(ctx context.Context, req resource.ReadRequest
 	diags := req.State.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
 
-	res, err := r.cli.Application.GetByAppId(ctx, config.Id.ValueString())
+	res, _, err := r.cli.Application.GetByAppId(ctx, config.Id.ValueString())
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving application", fmt.Sprintf("%s", err))
@@ -351,19 +341,11 @@ func (r *applicationResource) Update(ctx context.Context, req resource.UpdateReq
 
 	args.Id = state.Id.ValueString()
 
-	err := r.cli.Application.Update(ctx, args)
+	res, _, err := r.cli.Application.Update(ctx, args)
 	if err != nil {
 		resp.Diagnostics.AddError("Error updating application", fmt.Sprintf("%s", err))
 		return
 	}
-
-	// Refresh the state with the latest data
-	res, err := r.cli.Application.GetByAppId(ctx, state.Id.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError("Error retrieving updated application", fmt.Sprintf("%s", err))
-		return
-	}
-
 	updatedState, diags := applicationValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
 

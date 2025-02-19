@@ -32,9 +32,7 @@ type nameData struct {
 }
 
 type userData struct {
-	//INPUT
-	Id types.String `tfsdk:"id"`
-	//OUTPUT
+	Id               types.String `tfsdk:"id"`
 	Schemas          types.Set    `tfsdk:"schemas"`
 	UserName         types.String `tfsdk:"user_name"`
 	Name             types.Object `tfsdk:"name"`
@@ -45,9 +43,10 @@ type userData struct {
 	UserType         types.String `tfsdk:"user_type"`
 	Active           types.Bool   `tfsdk:"active"`
 	SapExtensionUser types.Object `tfsdk:"sap_extension_user"`
+	CustomSchemas    types.String `tfsdk:"custom_schemas"`
 }
 
-func userValueFrom(ctx context.Context, u users.User) (userData, diag.Diagnostics) {
+func userValueFrom(ctx context.Context, u users.User, cS string) (userData, diag.Diagnostics) {
 	var diagnostics, diags diag.Diagnostics
 
 	user := userData{
@@ -97,15 +96,19 @@ func userValueFrom(ctx context.Context, u users.User) (userData, diag.Diagnostic
 	user.SapExtensionUser, diags = types.ObjectValueFrom(ctx, sapExtensionUserObjType, sapExtensionUser)
 	diagnostics.Append(diags...)
 
+	if len(cS) > 0 {
+		user.CustomSchemas = types.StringValue(cS)
+	}
+
 	return user, diagnostics
 }
 
-func usersValueFrom(ctx context.Context, u users.UsersResponse) []userData {
+func usersValueFrom(ctx context.Context, u users.UsersResponse, customSchemas map[int]string) []userData {
 	users := []userData{}
 
-	for _, userRes := range u.Resources {
+	for i, userRes := range u.Resources {
 
-		user, _ := userValueFrom(ctx, userRes)
+		user, _ := userValueFrom(ctx, userRes, customSchemas[i])
 		users = append(users, user)
 
 	}

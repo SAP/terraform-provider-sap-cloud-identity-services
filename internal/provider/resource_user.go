@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"terraform-provider-ias/internal/cli"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -53,9 +56,22 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 				},
 			},
 			"schemas": schema.SetAttribute{
-				// MarkdownDescription: "",
 				ElementType: types.StringType,
-				Required:    true,
+				Optional:    true,
+				Computed:    true,
+				// MarkdownDescription
+				Default: setdefault.StaticValue(
+					types.SetValueMust(
+						types.StringType,
+						[]attr.Value{
+							types.StringValue("urn:ietf:params:scim:schemas:core:2.0:User"),
+							types.StringValue("urn:ietf:params:scim:schemas:extension:sap:2.0:User"),
+						},
+					),
+				),
+				Validators: []validator.Set{
+					setvalidator.SizeAtLeast(1),
+				},
 			},
 			"user_name": schema.StringAttribute{
 				MarkdownDescription: "Unique user name of the user.",
@@ -178,6 +194,13 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 					},
 				},
 			},
+			"custom_schemas": schema.StringAttribute{
+				Optional:            true,
+				MarkdownDescription: "Furthur enhance your application with custom schemas.",
+				Validators: []validator.String{
+					ValidJSON(),
+				},
+			},
 		},
 	}
 }
@@ -189,13 +212,13 @@ func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, r
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 
-	args, diags := getUserRequest(ctx, plan)
+	args, customSchemas, diags := getUserRequest(ctx, plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	res, err := r.cli.User.Create(ctx, args)
+	res, _, err := r.cli.User.Create(ctx, customSchemas, args)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -205,11 +228,10 @@ func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, r
 		return
 	}
 
-	state, diags := userValueFrom(ctx, res)
+	state, diags := userValueFrom(ctx, res, customSchemas)
 	resp.Diagnostics.Append(diags...)
 
 	state.Password = plan.Password
-	state.Schemas = plan.Schemas
 
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -220,14 +242,14 @@ func (r *userResource) Read(ctx context.Context, req resource.ReadRequest, resp 
 	diags := req.State.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
 
-	res, err := r.cli.User.GetByUserId(ctx, config.Id.ValueString())
+	res, customSchemasRes, err := r.cli.User.GetByUserId(ctx, config.Id.ValueString())
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving user", fmt.Sprintf("%s", err))
 		return
 	}
 
-	state, diags := userValueFrom(ctx, res)
+	state, diags := userValueFrom(ctx, res, customSchemasRes)
 	resp.Diagnostics.Append(diags...)
 
 	state.Password = config.Password
@@ -251,18 +273,18 @@ func (r *userResource) Update(ctx context.Context, req resource.UpdateRequest, r
 		return
 	}
 
-	args, diags := getUserRequest(ctx, plan)
+	args, customSchemas, diags := getUserRequest(ctx, plan)
 	resp.Diagnostics.Append(diags...)
 
 	args.Id = state.Id.ValueString()
 
-	res, err := r.cli.User.Update(ctx, args)
+	res, _, err := r.cli.User.Update(ctx, customSchemas, args)
 	if err != nil {
 		resp.Diagnostics.AddError("Error updating application", fmt.Sprintf("%s", err))
 		return
 	}
 
-	updatedState, diags := userValueFrom(ctx, res)
+	updatedState, diags := userValueFrom(ctx, res, customSchemas)
 	resp.Diagnostics.Append(diags...)
 
 	updatedState.Password = plan.Password
@@ -294,7 +316,7 @@ func (r *userResource) ImportState(ctx context.Context, req resource.ImportState
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
 
-func getUserRequest(ctx context.Context, plan userData) (*users.User, diag.Diagnostics) {
+func getUserRequest(ctx context.Context, plan userData) (*users.User, string, diag.Diagnostics) {
 
 	var diagnostics diag.Diagnostics
 
@@ -304,7 +326,7 @@ func getUserRequest(ctx context.Context, plan userData) (*users.User, diag.Diagn
 
 	if len(schemas) == 0 {
 		diagnostics.AddError("The Schemas attribute cannot be Null or Empty", "Provide a valid value for \"schemas\"")
-		return nil, diagnostics
+		return nil, "", diagnostics
 	}
 
 	var name nameData
@@ -354,5 +376,10 @@ func getUserRequest(ctx context.Context, plan userData) (*users.User, diag.Diagn
 		args.Emails = append([]users.Email{userEmail}, args.Emails...)
 	}
 
-	return args, diagnostics
+	var customSchemas string
+	if !plan.CustomSchemas.IsNull() {
+		customSchemas = plan.CustomSchemas.ValueString()
+	}
+
+	return args, customSchemas, diagnostics
 }

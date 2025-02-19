@@ -101,7 +101,7 @@ func (d *groupDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 		return
 	}
 
-	res, err := d.cli.Group.GetByGroupId(ctx, config.Id.ValueString())
+	res, _, err := d.cli.Group.GetByGroupId(ctx, config.Id.ValueString())
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving group", fmt.Sprintf("%s", err))

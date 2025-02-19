@@ -69,6 +69,7 @@ var userObjType = types.ObjectType{
 		"sap_extension_user": types.ObjectType{
 			AttrTypes: sapExtensionUserObjType,
 		},
+		"custom_schemas": types.StringType,
 	},
 }
 
@@ -192,6 +193,10 @@ func (d *usersDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, 
 								},
 							},
 						},
+						"custom_schemas": schema.StringAttribute{
+							Computed:            true,
+							MarkdownDescription: "Furthur enhance the user created with custom schemas.",
+						},
 					},
 				},
 				Computed: true,
@@ -206,14 +211,14 @@ func (d *usersDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
 
-	res, err := d.cli.User.Get(ctx)
+	res, customSchemasRes, err := d.cli.User.Get(ctx)
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving users", fmt.Sprintf("%s", err))
 		return
 	}
 
-	resUsers := usersValueFrom(ctx, res)
+	resUsers := usersValueFrom(ctx, res, customSchemasRes)
 
 	config.Values, diags = types.ListValueFrom(ctx, userObjType, resUsers)
 	resp.Diagnostics.Append(diags...)

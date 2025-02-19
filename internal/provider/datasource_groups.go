@@ -133,7 +133,7 @@ func (d *groupsDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
 
-	res, err := d.cli.Group.Get(ctx)
+	res, _, err := d.cli.Group.Get(ctx)
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving groups", fmt.Sprintf("%s", err))

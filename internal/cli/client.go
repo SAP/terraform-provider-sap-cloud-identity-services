@@ -30,7 +30,7 @@ type Client struct {
 	AuthorizationToken string
 }
 
-func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, body any, reqHeader string) (*http.Response, error) {
+func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, body any, customSchemas string, reqHeader string) (*http.Response, error) {
 	parsedUrl, err := url.Parse(endpoint)
 
 	if err != nil {
@@ -41,6 +41,19 @@ func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, 
 	if body != nil {
 		encoder := json.NewEncoder(&encodedBody)
 		err := encoder.Encode(body)
+
+		if len(customSchemas) > 0 {
+
+			// remove the ending characters '}\n' from the encoded buffer
+			body := encodedBody.String()[:len(encodedBody.String())-2]
+			// remove the beginning character '{' from the custom schemas string
+			customSchemas = customSchemas[1:]
+
+			// reset the encoded buffer and concatenate the custom schemas with the rest of the request body
+			encodedBody.Reset()
+			encodedBody.WriteString(body + "," + customSchemas)
+		}
+
 		if err != nil {
 			return nil, err
 		}
@@ -66,12 +79,12 @@ func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, 
 	return res, nil
 }
 
-func (c *Client) Execute(ctx context.Context, method string, endpoint string, body any, reqHeader string, headers []string) ([]byte, error, map[string]string) {
+func (c *Client) Execute(ctx context.Context, method string, endpoint string, body any, customSchemas string, reqHeader string, headers []string) (interface{}, error, map[string]string) {
 
 	var O interface{}
 	out := make(map[string]string, len(headers))
 
-	res, err := c.DoRequest(ctx, method, endpoint, body, reqHeader)
+	res, err := c.DoRequest(ctx, method, endpoint, body, customSchemas, reqHeader)
 
 	if err != nil {
 		return nil, err, out
@@ -116,8 +129,8 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 			if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
 				err = fmt.Errorf("%s", responseError.Error.Message)
 
-				for i := 0; i < len(responseError.Error.Details); i++ {
-					err = fmt.Errorf("%v \n%s", err, responseError.Error.Details[0].Message)
+				for _, errMessage := range responseError.Error.Details{
+					err = fmt.Errorf("%v \n%s", err, errMessage.Message)
 				}
 			} else {
 				err = fmt.Errorf("responded with unknown error : %d", responseError.Error.Code)
@@ -128,19 +141,12 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 		return nil, err, out
 	}
 
-	for i := 0; i < len(headers); i++ {
-		out[headers[i]] = res.Header.Get(headers[i])
+	for _, header := range headers {
+		out[header] = res.Header.Get(header)
 	}
 
 	if err = json.NewDecoder(res.Body).Decode(&O); err == nil || err == io.EOF {
-
-		encodedRes, err := json.Marshal(O)
-
-		if err != nil {
-			return nil, err, out
-		}
-
-		return encodedRes, nil, out
+		return O, nil, out
 	} else {
 		return nil, err, out
 	}

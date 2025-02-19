@@ -1,0 +1,212 @@
+---
+version: 2
+interactions:
+    - id: 0
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 662
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: '{"meta":{},"schemas":["urn:ietf:params:scim:schemas:core:2.0:User","urn:ietf:params:scim:schemas:extension:sap:2.0:User","urn:test:terraform:1.0:User"],"userName":"Joe Doe","name":{"familyName":"Doe","givenName":"Joe"},"emails":[{"value":"joe.doe@test.com","type":"work"}],"urn:ietf:params:scim:schemas:extension:sap:2.0:User":{"sourceSystem":0,"sourceSystemId":"","applicationId":"","emailTemplateSetId":"","sendMail":false,"targetUrl":"","mailVerified":false,"userId":"","totpEnabled":false,"webAuthEnabled":false,"mfaEnabled":false,"corporateGroups":null},"urn:test:terraform:1.0:User":{"test1":"testValue","test2":false,"test3":{"test3a":12.33,"test3b":12}}}'
+        form: {}
+        headers:
+            Accept:
+                - '*/*'
+            Authorization:
+                - redacted
+            Content-Type:
+                - application/scim+json
+            Dataserviceversion:
+                - "2.0"
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 993
+        uncompressed: false
+        body: '{"id":"70b6480e-e252-4c82-b2c4-e016402aa462","meta":{"created":"2025-02-16T19:05:17Z","lastModified":"2025-02-16T19:05:17Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/70b6480e-e252-4c82-b2c4-e016402aa462","version":"e5b36989-bff3-4080-86e2-bc43502217af","resourceType":"User"},"schemas":["urn:test:terraform:1.0:User","urn:ietf:params:scim:schemas:core:2.0:User","urn:ietf:params:scim:schemas:extension:sap:2.0:User"],"userName":"Joe Doe","name":{"familyName":"Doe","givenName":"Joe"},"userType":"public","active":false,"emails":[{"value":"joe.doe@test.com","primary":true,"type":"work"}],"urn:test:terraform:1.0:User":{"test2":false,"test3":{"test3a":12.33,"test3b":12},"test1":"testValue"},"urn:ietf:params:scim:schemas:extension:sap:2.0:User":{"emails":[{"verified":false,"type":"work","value":"joe.doe@test.com","primary":true}],"sourceSystem":0,"userUuid":"70b6480e-e252-4c82-b2c4-e016402aa462","mailVerified":false,"userId":"P000185","status":"inactive"}}'
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+            Content-Length:
+                - "993"
+            Content-Type:
+                - application/scim+json
+            Date:
+                - Sun, 16 Feb 2025 19:05:17 GMT
+            Etag:
+                - '"e5b36989-bff3-4080-86e2-bc43502217af"'
+            Location:
+                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/70b6480e-e252-4c82-b2c4-e016402aa462
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains; preload
+            Vary:
+                - X-CSP-STRIP
+            X-Content-Type-Options:
+                - nosniff
+            X-Ids-Id:
+                - 9FDBECB1-E151-4CD2-9DDD-0E34A24106A5
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-l9tct
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Robots-Tag:
+                - none
+        status: '201 '
+        code: 201
+        duration: 1.05438952s
+    - id: 1
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            Accept:
+                - '*/*'
+            Authorization:
+                - redacted
+            Content-Type:
+                - application/scim+json
+            Dataserviceversion:
+                - "2.0"
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/70b6480e-e252-4c82-b2c4-e016402aa462
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: -1
+        uncompressed: true
+        body: '{"id":"70b6480e-e252-4c82-b2c4-e016402aa462","meta":{"created":"2025-02-16T19:05:17Z","lastModified":"2025-02-16T19:05:17Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/70b6480e-e252-4c82-b2c4-e016402aa462","version":"e5b36989-bff3-4080-86e2-bc43502217af","resourceType":"User"},"schemas":["urn:test:terraform:1.0:User","urn:ietf:params:scim:schemas:core:2.0:User","urn:ietf:params:scim:schemas:extension:sap:2.0:User"],"userName":"Joe Doe","name":{"familyName":"Doe","givenName":"Joe"},"userType":"public","active":false,"emails":[{"value":"joe.doe@test.com","primary":true,"type":"work"}],"urn:test:terraform:1.0:User":{"test2":false,"test3":{"test3a":12.33,"test3b":12},"test1":"testValue"},"urn:ietf:params:scim:schemas:extension:sap:2.0:User":{"emails":[{"verified":false,"type":"work","value":"joe.doe@test.com","primary":true}],"sourceSystem":0,"userUuid":"70b6480e-e252-4c82-b2c4-e016402aa462","mailVerified":false,"userId":"P000185","status":"inactive"}}'
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+            Content-Type:
+                - application/scim+json
+            Date:
+                - Sun, 16 Feb 2025 19:05:17 GMT
+            Etag:
+                - '"e5b36989-bff3-4080-86e2-bc43502217af-gzip"'
+            Location:
+                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/70b6480e-e252-4c82-b2c4-e016402aa462
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains; preload
+            Vary:
+                - Accept-Encoding,X-CSP-STRIP
+            X-Content-Type-Options:
+                - nosniff
+            X-Ids-Id:
+                - 373DF234-F409-4C2C-892B-E06D42E48168
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-l9tct
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Robots-Tag:
+                - none
+        status: '200 '
+        code: 200
+        duration: 268.964858ms
+    - id: 2
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            Accept:
+                - '*/*'
+            Authorization:
+                - redacted
+            Content-Type:
+                - application/scim+json
+            Dataserviceversion:
+                - "2.0"
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/70b6480e-e252-4c82-b2c4-e016402aa462
+        method: DELETE
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 0
+        uncompressed: false
+        body: ""
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+            Date:
+                - Sun, 16 Feb 2025 19:05:17 GMT
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains; preload
+            Vary:
+                - X-CSP-STRIP
+            X-Content-Type-Options:
+                - nosniff
+            X-Ids-Id:
+                - 0147E8D1-9196-4CBA-9C49-8A6E96A5DF83
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-l9tct
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Robots-Tag:
+                - none
+        status: '204 '
+        code: 204
+        duration: 270.813963ms

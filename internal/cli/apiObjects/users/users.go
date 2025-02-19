@@ -132,7 +132,7 @@ type User struct {
 	Addresses         []Address      `json:"addresses,omitempty"`
 	Entitlements      []Enititlement `json:"entitlements,omitempty"`
 	Roles             []Role         `json:"roles,omitempty"`
-	// EnterpriseUser      EnterpriseUser  `json:"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"`
+	// EnterpriseUser    	EnterpriseUser 	`json:"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User,omitempty"`
 	SAPExtension SAPExtension `json:"urn:ietf:params:scim:schemas:extension:sap:2.0:User"`
 }
 

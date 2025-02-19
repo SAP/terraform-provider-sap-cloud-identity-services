@@ -8,6 +8,14 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
+var checkCustomSchemas resource.CheckResourceAttrWithFunc = func(value string) error {
+	var err error
+	if len(value) == 0 {
+		err = fmt.Errorf("%s has length 0", value)
+	}
+	return err
+}
+
 func TestDataSourceUser(t *testing.T) {
 
 	t.Parallel()
@@ -35,6 +43,33 @@ func TestDataSourceUser(t *testing.T) {
 						resource.TestCheckResourceAttr("data.ias_user.testUser", "emails.1.type", "work"),
 						resource.TestCheckResourceAttr("data.ias_user.testUser", "sap_extension_user.status", "inactive"),
 						resource.TestCheckResourceAttr("data.ias_user.testUser", "user_type", "public"),
+					),
+				},
+			},
+		})
+	})
+
+	t.Run("happy path - user with custom schemas", func(t *testing.T) {
+
+		rec, user := setupVCR(t, "fixtures/datasource_user_with_custom_schemas")
+		defer stopQuietly(rec)
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+			Steps: []resource.TestStep{
+				{
+					Config: providerConfig("", user) + DataSourceUser("testUser", "Custom Schemas User"),
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestMatchResourceAttr("data.ias_user.testUser", "id", regexpUUID),
+
+						resource.TestCheckResourceAttr("data.ias_user.testUser", "name.given_name", "Custom Schemas"),
+						resource.TestCheckResourceAttr("data.ias_user.testUser", "name.family_name", "User"),
+						resource.TestCheckResourceAttr("data.ias_user.testUser", "emails.0.value", "custom.user@test.com"),
+						resource.TestCheckResourceAttr("data.ias_user.testUser", "emails.0.primary", "true"),
+						resource.TestCheckResourceAttr("data.ias_user.testUser", "sap_extension_user.status", "active"),
+						resource.TestCheckResourceAttr("data.ias_user.testUser", "user_type", "employee"),
+						resource.TestCheckResourceAttrWith("data.ias_user.testUser", "custom_schemas", checkCustomSchemas),
 					),
 				},
 			},
