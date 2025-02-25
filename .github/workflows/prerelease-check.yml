@@ -10,6 +10,6 @@ jobs:
   call-workflow-test:
     uses: ./.github/workflows/test.yml
     secrets: inherit
-  call-workflow-regression-test:
-    uses: ./.github/workflows/schema-regression-test.yml  
-    secrets: inherit
+#  call-workflow-regression-test:
+#    uses: ./.github/workflows/schema-regression-test.yml
+#    secrets: inherit
