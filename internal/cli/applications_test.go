@@ -63,7 +63,8 @@ func TestApplications_Create(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Add("location", "/Applications/v1/valid-app-id")
-			w.Write(applicationsResponse)
+			_, err := w.Write(applicationsResponse)
+			assert.NoError(t, err, "Failed to write response")
 
 			if r.Method != "GET" {
 				assertCall[applications.Application](t, r, applicationsPath, "POST", applicationsBody)
@@ -96,7 +97,9 @@ func TestApplications_Create(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(resErr)
+			_, err := w.Write(resErr)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[applications.Application](t, r, applicationsPath, "POST", applicationsBody)
 		}))
 
@@ -124,7 +127,9 @@ func TestApplications_Get(t *testing.T) {
 		})
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write(res)
+			_, err := w.Write(res)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[applications.Application](t, r, applicationsPath, "GET", nil)
 		}))
 
@@ -153,7 +158,9 @@ func TestApplications_Get(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(resErr)
+			_, err := w.Write(resErr)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[applications.Application](t, r, applicationsPath, "GET", nil)
 		}))
 
@@ -174,7 +181,9 @@ func TestApplications_GetByAppId(t *testing.T) {
 	t.Run("validate the API request", func(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write(applicationsResponse)
+			_, err := w.Write(applicationsResponse)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[applications.Application](t, r, fmt.Sprintf("%s%s", applicationsPath, "valid-app-id"), "GET", nil)
 		}))
 
@@ -202,7 +211,9 @@ func TestApplications_GetByAppId(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(resErr)
+			_, err := w.Write(resErr)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[applications.Application](t, r, fmt.Sprintf("%s%s", applicationsPath, "valid-app-id"), "GET", nil)
 		}))
 
@@ -224,7 +235,8 @@ func TestApplications_Update(t *testing.T) {
 	t.Run("validate the API request", func(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write(applicationsResponse)
+			_, err := w.Write(applicationsResponse)
+			assert.NoError(t, err, "Failed to write response")
 
 			if r.Method != "GET" {
 				assertCall[applications.Application](t, r, fmt.Sprintf("%s%s", applicationsPath, "valid-app-id"), "PUT", applicationsBody)
@@ -256,7 +268,9 @@ func TestApplications_Update(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(resErr)
+			_, err := w.Write(resErr)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[applications.Application](t, r, fmt.Sprintf("%s%s", applicationsPath, "valid-app-id"), "PUT", applicationsBody)
 		}))
 
@@ -303,7 +317,9 @@ func TestApplications_Delete(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(resErr)
+			_, err := w.Write(resErr)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[applications.Application](t, r, fmt.Sprintf("%s%s", applicationsPath, "valid-app-id"), "DELETE", applicationsBody)
 		}))
 

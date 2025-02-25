@@ -35,7 +35,9 @@ func TestGroups_Create(t *testing.T) {
 	t.Run("validate the API request", func(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write(groupsResponse)
+			_, err := w.Write(groupsResponse)
+			assert.NoError(t, err, "Failed to write response")
+			
 			assertCall[groups.Group](t, r, groupsPath, "POST", groupsBody)
 		}))
 
@@ -55,7 +57,9 @@ func TestGroups_Create(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(resErr)
+			_, err := w.Write(resErr)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[groups.Group](t, r, groupsPath, "POST", groupsBody)
 		}))
 
@@ -83,7 +87,9 @@ func TestGroups_Get(t *testing.T) {
 		})
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write(res)
+			_, err := w.Write(res)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[groups.Group](t, r, groupsPath, "GET", nil)
 		}))
 
@@ -103,7 +109,9 @@ func TestGroups_Get(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(resErr)
+			_, err := w.Write(resErr)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[groups.Group](t, r, groupsPath, "GET", nil)
 		}))
 
@@ -124,7 +132,9 @@ func TestGroups_GetByGroupId(t *testing.T) {
 	t.Run("validate the API request", func(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write(groupsResponse)
+			_, err := w.Write(groupsResponse)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[groups.Group](t, r, fmt.Sprintf("%s%s", groupsPath, "valid-group-id"), "GET", nil)
 		}))
 
@@ -144,7 +154,9 @@ func TestGroups_GetByGroupId(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(resErr)
+			_, err := w.Write(resErr)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[groups.Group](t, r, fmt.Sprintf("%s%s", groupsPath, "valid-group-id"), "GET", nil)
 		}))
 
@@ -166,7 +178,9 @@ func TestGroups_Update(t *testing.T) {
 	t.Run("validate the API request", func(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write(groupsResponse)
+			_, err := w.Write(groupsResponse)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[groups.Group](t, r, fmt.Sprintf("%s%s", groupsPath, "valid-group-id"), "PUT", groupsBody)
 		}))
 
@@ -186,7 +200,9 @@ func TestGroups_Update(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(resErr)
+			_, err := w.Write(resErr)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[groups.Group](t, r, fmt.Sprintf("%s%s", groupsPath, "valid-group-id"), "PUT", groupsBody)
 		}))
 
@@ -224,7 +240,9 @@ func TestGroups_Delete(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(resErr)
+			_, err := w.Write(resErr)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[groups.Group](t, r, fmt.Sprintf("%s%s", groupsPath, "valid-group-id"), "DELETE", groups.Group{})
 		}))
 

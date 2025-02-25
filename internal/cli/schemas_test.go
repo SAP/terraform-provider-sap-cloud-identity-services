@@ -42,7 +42,9 @@ func TestSchemas_Create(t *testing.T) {
 	t.Run("validate the API request", func(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write(schemasResponse)
+			_, err := w.Write(schemasResponse)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[schemas.Schema](t, r, schemasPath, "POST", schemasBody)
 		}))
 
@@ -62,7 +64,9 @@ func TestSchemas_Create(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(resErr)
+			_, err := w.Write(resErr)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[schemas.Schema](t, r, schemasPath, "POST", schemasBody)
 		}))
 
@@ -90,7 +94,9 @@ func TestSchemas_Get(t *testing.T) {
 		})
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write(res)
+			_, err := w.Write(res)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[schemas.Schema](t, r, schemasPath, "GET", nil)
 		}))
 
@@ -110,7 +116,9 @@ func TestSchemas_Get(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(resErr)
+			_, err := w.Write(resErr)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[schemas.Schema](t, r, schemasPath, "GET", nil)
 		}))
 
@@ -131,7 +139,9 @@ func TestSchemas_GetBySchemaId(t *testing.T) {
 	t.Run("validate the API request", func(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write(schemasResponse)
+			_, err := w.Write(schemasResponse)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[schemas.Schema](t, r, fmt.Sprintf("%s%s", schemasPath, "valid-schema-id"), "GET", nil)
 		}))
 
@@ -151,7 +161,9 @@ func TestSchemas_GetBySchemaId(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(resErr)
+			_, err := w.Write(resErr)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[schemas.Schema](t, r, fmt.Sprintf("%s%s", schemasPath, "valid-schema-id"), "GET", nil)
 		}))
 
@@ -189,7 +201,9 @@ func TestSchemas_Delete(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(resErr)
+			_, err := w.Write(resErr)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[schemas.Schema](t, r, fmt.Sprintf("%s%s", schemasPath, "valid-schema-id"), "DELETE", nil)
 		}))
 

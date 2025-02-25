@@ -50,7 +50,9 @@ func TestUsers_Create(t *testing.T) {
 	t.Run("validate the API request", func(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write(usersResponse)
+			_, err := w.Write(usersResponse)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[users.User](t, r, usersPath, "POST", usersBody)
 		}))
 
@@ -64,7 +66,9 @@ func TestUsers_Create(t *testing.T) {
 	t.Run("validate the API request with custom schemas", func(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write(responseWithCustomSchemas(usersResponse, customSchemas))
+			_, err := w.Write(responseWithCustomSchemas(usersResponse, customSchemas))
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[users.User](t, r, usersPath, "POST", usersBody)
 		}))
 
@@ -84,7 +88,9 @@ func TestUsers_Create(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(resErr)
+			_, err := w.Write(resErr)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[users.User](t, r, usersPath, "POST", users.User{})
 		}))
 
@@ -100,7 +106,9 @@ func TestUsers_Create(t *testing.T) {
 	t.Run("validate the API request with custom schemas - error", func(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write(responseWithCustomSchemas(usersResponse, incorrectCustomSchemas))
+			_, err := w.Write(responseWithCustomSchemas(usersResponse, incorrectCustomSchemas))
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[users.User](t, r, usersPath, "POST", users.User{})
 		}))
 
@@ -128,7 +136,9 @@ func TestUsers_Get(t *testing.T) {
 		})
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write(res)
+			_, err := w.Write(res)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[users.User](t, r, usersPath, "GET", nil)
 		}))
 
@@ -148,7 +158,9 @@ func TestUsers_Get(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(resErr)
+			_, err := w.Write(resErr)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[users.User](t, r, usersPath, "GET", nil)
 		}))
 
@@ -169,7 +181,9 @@ func TestUsers_GetByUserId(t *testing.T) {
 	t.Run("validate the API request", func(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write(usersResponse)
+			_, err := w.Write(usersResponse)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[users.User](t, r, fmt.Sprintf("%s%s", usersPath, "valid-user-id"), "GET", nil)
 		}))
 
@@ -189,7 +203,9 @@ func TestUsers_GetByUserId(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(resErr)
+			_, err := w.Write(resErr)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[users.User](t, r, fmt.Sprintf("%s%s", usersPath, "valid-user-id"), "GET", nil)
 		}))
 
@@ -225,7 +241,9 @@ func TestUsers_Update(t *testing.T) {
 	t.Run("validate the API request", func(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write(usersResponse)
+			_, err := w.Write(usersResponse)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[users.User](t, r, fmt.Sprintf("%s%s", usersPath, "valid-user-id"), "PUT", usersBody)
 		}))
 
@@ -239,7 +257,9 @@ func TestUsers_Update(t *testing.T) {
 	t.Run("validate the API request with custom schemas", func(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write(responseWithCustomSchemas(usersResponse, customSchemas))
+			_, err := w.Write(responseWithCustomSchemas(usersResponse, customSchemas))
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[users.User](t, r, fmt.Sprintf("%s%s", usersPath, "valid-user-id"), "PUT", usersBody)
 		}))
 
@@ -259,7 +279,9 @@ func TestUsers_Update(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(resErr)
+			_, err := w.Write(resErr)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[users.User](t, r, fmt.Sprintf("%s%s", usersPath, "valid-user-id"), "PUT", usersBody)
 		}))
 
@@ -275,7 +297,9 @@ func TestUsers_Update(t *testing.T) {
 	t.Run("validate the API request with custom schemas - error", func(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write(responseWithCustomSchemas(usersResponse, incorrectCustomSchemas))
+			_, err := w.Write(responseWithCustomSchemas(usersResponse, incorrectCustomSchemas))
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[users.User](t, r, fmt.Sprintf("%s%s", usersPath, "valid-user-id"), "PUT", usersBody)
 		}))
 
@@ -313,7 +337,9 @@ func TestUsers_Delete(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(resErr)
+			_, err := w.Write(resErr)
+			assert.NoError(t, err, "Failed to write response")
+
 			assertCall[users.User](t, r, fmt.Sprintf("%s%s", usersPath, "valid-user-id"), "DELETE", users.User{})
 		}))
 
