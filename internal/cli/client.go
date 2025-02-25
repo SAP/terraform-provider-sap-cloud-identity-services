@@ -127,7 +127,7 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 			if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
 				err = fmt.Errorf("%s", responseError.Error.Message)
 
-				for _, errMessage := range responseError.Error.Details{
+				for _, errMessage := range responseError.Error.Details {
 					err = fmt.Errorf("%v : %s", err, errMessage.Message)
 				}
 			} else {

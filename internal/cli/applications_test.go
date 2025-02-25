@@ -80,11 +80,11 @@ func TestApplications_Create(t *testing.T) {
 
 	t.Run("validate the API request - error", func(t *testing.T) {
 
-        resErr, _ := json.Marshal(struct{
+		resErr, _ := json.Marshal(struct {
 			Error ApplicationError `json:"error"`
 		}{
 			Error: ApplicationError{
-				Code: 400,
+				Code:    400,
 				Message: "create failed",
 				Details: []ErrorDetail{
 					{
@@ -93,10 +93,10 @@ func TestApplications_Create(t *testing.T) {
 				},
 			},
 		})
-    
+
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-            w.Write(resErr)
+			w.Write(resErr)
 			assertCall[applications.Application](t, r, applicationsPath, "POST", applicationsBody)
 		}))
 
@@ -104,9 +104,9 @@ func TestApplications_Create(t *testing.T) {
 
 		res, _, err := client.Application.Create(context.TODO(), &applicationsBody)
 
-        assert.Zero(t, res)
+		assert.Zero(t, res)
 		assert.Error(t, err)
-        assert.Equal(t, "create failed : server error", err.Error())
+		assert.Equal(t, "create failed : server error", err.Error())
 	})
 }
 
@@ -137,11 +137,11 @@ func TestApplications_Get(t *testing.T) {
 
 	t.Run("validate the API request - error", func(t *testing.T) {
 
-        resErr, _ := json.Marshal(struct{
+		resErr, _ := json.Marshal(struct {
 			Error ApplicationError `json:"error"`
 		}{
 			Error: ApplicationError{
-				Code: 400,
+				Code:    400,
 				Message: "get failed",
 				Details: []ErrorDetail{
 					{
@@ -150,10 +150,10 @@ func TestApplications_Get(t *testing.T) {
 				},
 			},
 		})
-    
+
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-            w.Write(resErr)
+			w.Write(resErr)
 			assertCall[applications.Application](t, r, applicationsPath, "GET", nil)
 		}))
 
@@ -161,9 +161,9 @@ func TestApplications_Get(t *testing.T) {
 
 		res, _, err := client.Application.Get(context.TODO())
 
-        assert.Zero(t, res)
+		assert.Zero(t, res)
 		assert.Error(t, err)
-        assert.Equal(t, "get failed : server error", err.Error())
+		assert.Equal(t, "get failed : server error", err.Error())
 	})
 }
 
@@ -186,11 +186,11 @@ func TestApplications_GetByAppId(t *testing.T) {
 
 	t.Run("validate the API request - error", func(t *testing.T) {
 
-        resErr, _ := json.Marshal(struct{
+		resErr, _ := json.Marshal(struct {
 			Error ApplicationError `json:"error"`
 		}{
 			Error: ApplicationError{
-				Code: 400,
+				Code:    400,
 				Message: "get failed",
 				Details: []ErrorDetail{
 					{
@@ -199,10 +199,10 @@ func TestApplications_GetByAppId(t *testing.T) {
 				},
 			},
 		})
-    
+
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-            w.Write(resErr)
+			w.Write(resErr)
 			assertCall[applications.Application](t, r, fmt.Sprintf("%s%s", applicationsPath, "valid-app-id"), "GET", nil)
 		}))
 
@@ -210,9 +210,9 @@ func TestApplications_GetByAppId(t *testing.T) {
 
 		res, _, err := client.Application.GetByAppId(context.TODO(), "valid-app-id")
 
-        assert.Zero(t, res)
+		assert.Zero(t, res)
 		assert.Error(t, err)
-        assert.Equal(t, "get failed : server error", err.Error())
+		assert.Equal(t, "get failed : server error", err.Error())
 	})
 }
 
@@ -240,11 +240,11 @@ func TestApplications_Update(t *testing.T) {
 
 	t.Run("validate the API request - error", func(t *testing.T) {
 
-        resErr, _ := json.Marshal(struct{
+		resErr, _ := json.Marshal(struct {
 			Error ApplicationError `json:"error"`
 		}{
 			Error: ApplicationError{
-				Code: 400,
+				Code:    400,
 				Message: "update failed",
 				Details: []ErrorDetail{
 					{
@@ -253,10 +253,10 @@ func TestApplications_Update(t *testing.T) {
 				},
 			},
 		})
-    
+
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-            w.Write(resErr)
+			w.Write(resErr)
 			assertCall[applications.Application](t, r, fmt.Sprintf("%s%s", applicationsPath, "valid-app-id"), "PUT", applicationsBody)
 		}))
 
@@ -264,9 +264,9 @@ func TestApplications_Update(t *testing.T) {
 
 		res, _, err := client.Application.Update(context.TODO(), &applicationsBody)
 
-        assert.Zero(t, res)
+		assert.Zero(t, res)
 		assert.Error(t, err)
-        assert.Equal(t, "update failed : server error", err.Error())
+		assert.Equal(t, "update failed : server error", err.Error())
 	})
 }
 
@@ -287,11 +287,11 @@ func TestApplications_Delete(t *testing.T) {
 
 	t.Run("validate the API request - error", func(t *testing.T) {
 
-        resErr, _ := json.Marshal(struct{
+		resErr, _ := json.Marshal(struct {
 			Error ApplicationError `json:"error"`
 		}{
 			Error: ApplicationError{
-				Code: 400,
+				Code:    400,
 				Message: "delete failed",
 				Details: []ErrorDetail{
 					{
@@ -300,10 +300,10 @@ func TestApplications_Delete(t *testing.T) {
 				},
 			},
 		})
-    
+
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-            w.Write(resErr)
+			w.Write(resErr)
 			assertCall[applications.Application](t, r, fmt.Sprintf("%s%s", applicationsPath, "valid-app-id"), "DELETE", applicationsBody)
 		}))
 
@@ -312,6 +312,6 @@ func TestApplications_Delete(t *testing.T) {
 		err := client.Application.Delete(context.TODO(), "valid-app-id")
 
 		assert.Error(t, err)
-        assert.Equal(t, "delete failed : server error", err.Error())
+		assert.Equal(t, "delete failed : server error", err.Error())
 	})
 }

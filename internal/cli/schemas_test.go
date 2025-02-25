@@ -53,17 +53,16 @@ func TestSchemas_Create(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-    t.Run("validate the API request - error", func(t *testing.T) {
+	t.Run("validate the API request - error", func(t *testing.T) {
 
-        resErr, _ := json.Marshal(ScimError{
-            Detail: "create failed",
-            Status: "400",
-        })
+		resErr, _ := json.Marshal(ScimError{
+			Detail: "create failed",
+			Status: "400",
+		})
 
-    
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-            w.Write(resErr)
+			w.Write(resErr)
 			assertCall[schemas.Schema](t, r, schemasPath, "POST", schemasBody)
 		}))
 
@@ -71,9 +70,9 @@ func TestSchemas_Create(t *testing.T) {
 
 		res, _, err := client.Schema.Create(context.TODO(), &schemasBody)
 
-        assert.Zero(t, res)
+		assert.Zero(t, res)
 		assert.Error(t, err)
-        assert.Equal(t, "create failed", err.Error())
+		assert.Equal(t, "create failed", err.Error())
 	})
 }
 
@@ -102,16 +101,16 @@ func TestSchemas_Get(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-    t.Run("validate the API request - error", func(t *testing.T) {
+	t.Run("validate the API request - error", func(t *testing.T) {
 
-        resErr, _ := json.Marshal(ScimError{
-            Detail: "get failed",
-            Status: "400",
-        })
-    
+		resErr, _ := json.Marshal(ScimError{
+			Detail: "get failed",
+			Status: "400",
+		})
+
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-            w.Write(resErr)
+			w.Write(resErr)
 			assertCall[schemas.Schema](t, r, schemasPath, "GET", nil)
 		}))
 
@@ -119,9 +118,9 @@ func TestSchemas_Get(t *testing.T) {
 
 		res, _, err := client.Schema.Get(context.TODO())
 
-        assert.Zero(t, res)
+		assert.Zero(t, res)
 		assert.Error(t, err)
-        assert.Equal(t, "get failed", err.Error())
+		assert.Equal(t, "get failed", err.Error())
 	})
 }
 
@@ -143,16 +142,16 @@ func TestSchemas_GetBySchemaId(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-    t.Run("validate the API request - error", func(t *testing.T) {
+	t.Run("validate the API request - error", func(t *testing.T) {
 
-        resErr, _ := json.Marshal(ScimError{
-            Detail: "get failed",
-            Status: "400",
-        })
-    
+		resErr, _ := json.Marshal(ScimError{
+			Detail: "get failed",
+			Status: "400",
+		})
+
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-            w.Write(resErr)
+			w.Write(resErr)
 			assertCall[schemas.Schema](t, r, fmt.Sprintf("%s%s", schemasPath, "valid-schema-id"), "GET", nil)
 		}))
 
@@ -160,9 +159,9 @@ func TestSchemas_GetBySchemaId(t *testing.T) {
 
 		res, _, err := client.Schema.GetBySchemaId(context.TODO(), "valid-schema-id")
 
-        assert.Zero(t, res)
+		assert.Zero(t, res)
 		assert.Error(t, err)
-        assert.Equal(t, "get failed", err.Error())
+		assert.Equal(t, "get failed", err.Error())
 	})
 }
 
@@ -181,16 +180,16 @@ func TestSchemas_Delete(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-    t.Run("validate the API request - error", func(t *testing.T) {
+	t.Run("validate the API request - error", func(t *testing.T) {
 
-        resErr, _ := json.Marshal(ScimError{
-            Detail: "delete failed",
-            Status: "400",
-        })
-    
+		resErr, _ := json.Marshal(ScimError{
+			Detail: "delete failed",
+			Status: "400",
+		})
+
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-            w.Write(resErr)
+			w.Write(resErr)
 			assertCall[schemas.Schema](t, r, fmt.Sprintf("%s%s", schemasPath, "valid-schema-id"), "DELETE", nil)
 		}))
 
@@ -199,7 +198,7 @@ func TestSchemas_Delete(t *testing.T) {
 		err := client.Schema.Delete(context.TODO(), "valid-schema-id")
 
 		assert.Error(t, err)
-        assert.Equal(t, "delete failed", err.Error())
+		assert.Equal(t, "delete failed", err.Error())
 	})
-    
+
 }
