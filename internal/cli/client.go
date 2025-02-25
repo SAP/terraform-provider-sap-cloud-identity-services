@@ -14,6 +14,22 @@ import (
 	"net/url"
 )
 
+type ScimError struct {
+	Detail  string   `json:"detail"`
+	Schemas []string `json:"schemas"`
+	Status  string   `json:"status"`
+}
+
+type ErrorDetail struct {
+	Message string `json:"message"`
+}
+
+type ApplicationError struct {
+	Code    int           `json:"code"`
+	Message string        `json:"message"`
+	Details []ErrorDetail `json:"details"`
+}
+
 const ApplicationHeader = "application/json"
 const DirectoryHeader = "application/scim+json"
 
@@ -96,12 +112,6 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 
 		if strings.Contains(reqHeader, "scim") {
 
-			type ScimError struct {
-				Detail  string   `json:"detail"`
-				Schemas []string `json:"schemas"`
-				Status  string   `json:"status"`
-			}
-
 			var responseError ScimError
 
 			if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
@@ -111,26 +121,14 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 			}
 
 		} else {
-
-			type ErrorDetail struct {
-				Message string `json:"message"`
-			}
-
-			type ApplicationError struct {
-				Code    int           `json:"code"`
-				Message string        `json:"message"`
-				Details []ErrorDetail `json:"details"`
-			}
-
 			var responseError struct {
 				Error ApplicationError `json:"error"`
 			}
-
 			if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
 				err = fmt.Errorf("%s", responseError.Error.Message)
 
-				for _, errMessage := range responseError.Error.Details{
-					err = fmt.Errorf("%v \n%s", err, errMessage.Message)
+				for _, errMessage := range responseError.Error.Details {
+					err = fmt.Errorf("%v : %s", err, errMessage.Message)
 				}
 			} else {
 				err = fmt.Errorf("responded with unknown error : %d", responseError.Error.Code)
