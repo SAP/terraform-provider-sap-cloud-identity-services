@@ -33,6 +33,20 @@ func TestUsers_Create(t *testing.T) {
 
 	usersResponse, _ = json.Marshal(usersBody)
 
+    customSchemas, _ := json.Marshal(map[string]interface{}{
+        "schema_id": map[string]interface{}{
+            "var1": "test",
+            "var2": 1,
+        },
+    })
+
+    incorrectCustomSchemas, _ := json.Marshal(map[string]interface{}{
+        "new_schema_id": map[string]interface{}{
+            "var1": "test",
+            "var2": 1,
+        },
+    })
+
 	t.Run("validate the API request", func(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -49,13 +63,6 @@ func TestUsers_Create(t *testing.T) {
 
 	t.Run("validate the API request with custom schemas", func(t *testing.T) {
 
-		customSchemas, _ := json.Marshal(map[string]interface{}{
-			"schema_id": map[string]interface{}{
-				"var1": "test",
-				"var2": 1,
-			},
-		})
-
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.Write(responseWithCustomSchemas(usersResponse, customSchemas))
 			assertCall[users.User](t, r, usersPath, "POST", usersBody)
@@ -66,6 +73,44 @@ func TestUsers_Create(t *testing.T) {
 		_, _, err := client.User.Create(context.TODO(), string(customSchemas), &usersBody)
 
 		assert.NoError(t, err)
+	})
+
+    t.Run("validate the API request - error", func(t *testing.T) {
+
+        resErr, _ := json.Marshal(ScimError{
+            Detail: "create failed",
+            Status: "400",
+        })
+
+		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusBadRequest)
+            w.Write(resErr)
+            assertCall[users.User](t, r, usersPath, "POST", users.User{})
+		}))
+
+		defer srv.Close()
+
+		res, _, err := client.User.Create(context.TODO(), "", &users.User{})
+
+		assert.Zero(t, res)
+        assert.Error(t, err)
+        assert.Equal(t, "create failed", err.Error())
+	})
+
+    t.Run("validate the API request with custom schemas - error", func(t *testing.T) {
+
+		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+            w.Write(responseWithCustomSchemas(usersResponse, incorrectCustomSchemas))
+            assertCall[users.User](t, r, usersPath, "POST", users.User{})
+		}))
+
+		defer srv.Close()
+
+		res, _, err := client.User.Create(context.TODO(), string(customSchemas), &users.User{})
+
+		assert.Zero(t, res)
+        assert.Error(t, err)
+        assert.Equal(t, "schema_id not found in the returned response", err.Error())
 	})
 }
 
@@ -93,6 +138,28 @@ func TestUsers_Get(t *testing.T) {
 
 		assert.NoError(t, err)
 	})
+
+    t.Run("validate the API request with error", func(t *testing.T) {
+
+        resErr, _ := json.Marshal(ScimError{
+            Detail: "get failed",
+            Status: "400",
+        })
+
+		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusBadRequest)
+            w.Write(resErr)
+            assertCall[users.User](t, r, usersPath, "GET", nil)
+		}))
+
+		defer srv.Close()
+
+		res, _, err := client.User.Get(context.TODO())
+
+        assert.Zero(t, res)
+        assert.Error(t, err)
+        assert.Equal(t, "get failed", err.Error())
+	})
 }
 
 func TestUsers_GetByUserId(t *testing.T) {
@@ -112,12 +179,49 @@ func TestUsers_GetByUserId(t *testing.T) {
 
 		assert.NoError(t, err)
 	})
+
+    t.Run("validate the API request with error", func(t *testing.T) {
+
+        resErr, _ := json.Marshal(ScimError{
+            Detail: "get failed",
+            Status: "400",
+        })
+
+		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusBadRequest)
+            w.Write(resErr)
+            assertCall[users.User](t, r, fmt.Sprintf("%s%s", usersPath, "valid-user-id"), "GET", nil)
+		}))
+
+		defer srv.Close()
+
+		res, _, err := client.User.GetByUserId(context.TODO(), "valid-user-id")
+
+        assert.Zero(t, res)
+        assert.Error(t, err)
+        assert.Equal(t, "get failed", err.Error())
+	})
 }
 
 func TestUsers_Update(t *testing.T) {
 
 	usersBody.Id = "valid-user-id"
 	usersResponse, _ := json.Marshal(usersBody)
+
+    customSchemas, _ := json.Marshal(map[string]interface{}{
+        "schema_id": map[string]interface{}{
+            "var1": "test",
+            "var2": 1,
+        },
+    })
+
+    incorrectCustomSchemas, _ := json.Marshal(map[string]interface{}{
+        "new_schema_id": map[string]interface{}{
+            "var1": "test",
+            "var2": 1,
+        },
+    })
+
 
 	t.Run("validate the API request", func(t *testing.T) {
 
@@ -135,13 +239,6 @@ func TestUsers_Update(t *testing.T) {
 
 	t.Run("validate the API request with custom schemas", func(t *testing.T) {
 
-		customSchemas, _ := json.Marshal(map[string]interface{}{
-			"schema_id": map[string]interface{}{
-				"var1": "test",
-				"var2": 1,
-			},
-		})
-
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.Write(responseWithCustomSchemas(usersResponse, customSchemas))
 			assertCall[users.User](t, r, fmt.Sprintf("%s%s", usersPath, "valid-user-id"), "PUT", usersBody)
@@ -152,6 +249,44 @@ func TestUsers_Update(t *testing.T) {
 		_, _, err := client.User.Update(context.TODO(), string(customSchemas), &usersBody)
 
 		assert.NoError(t, err)
+	})
+
+    t.Run("validate the API request with error", func(t *testing.T) {
+
+        resErr, _ := json.Marshal(ScimError{
+            Detail: "update failed",
+            Status: "400",
+        })
+
+		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusBadRequest)
+            w.Write(resErr)
+            assertCall[users.User](t, r, fmt.Sprintf("%s%s", usersPath, "valid-user-id"), "PUT", usersBody)
+		}))
+
+		defer srv.Close()
+
+		res, _, err := client.User.Update(context.TODO(), "", &usersBody)
+
+		assert.Zero(t, res)
+        assert.Error(t, err)
+        assert.Equal(t, "update failed", err.Error())
+	})
+
+    t.Run("validate the API request with custom schemas - error", func(t *testing.T) {
+
+		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+            w.Write(responseWithCustomSchemas(usersResponse, incorrectCustomSchemas))
+            assertCall[users.User](t, r, fmt.Sprintf("%s%s", usersPath, "valid-user-id"), "PUT", usersBody)
+		}))
+
+		defer srv.Close()
+
+		res, _, err := client.User.Update(context.TODO(), string(customSchemas), &usersBody)
+
+		assert.Zero(t, res)
+        assert.Error(t, err)
+        assert.Equal(t, "schema_id not found in the returned response", err.Error())
 	})
 }
 
@@ -168,6 +303,27 @@ func TestUsers_Delete(t *testing.T) {
 		err := client.User.Delete(context.TODO(), "valid-user-id")
 
 		assert.NoError(t, err)
+	})
+
+    t.Run("validate the API request with error", func(t *testing.T) {
+
+        resErr, _ := json.Marshal(ScimError{
+            Detail: "delete failed",
+            Status: "400",
+        })
+
+		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusBadRequest)
+            w.Write(resErr)
+            assertCall[users.User](t, r, fmt.Sprintf("%s%s", usersPath, "valid-user-id"), "DELETE", users.User{})
+		}))
+
+		defer srv.Close()
+
+		err := client.User.Delete(context.TODO(), "valid-user-id")
+
+        assert.Error(t, err)
+        assert.Equal(t, "delete failed", err.Error())
 	})
 }
 

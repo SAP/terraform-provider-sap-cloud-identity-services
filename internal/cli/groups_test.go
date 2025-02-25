@@ -45,6 +45,29 @@ func TestGroups_Create(t *testing.T) {
 
 		assert.NoError(t, err)
 	})
+
+	t.Run("validate the API request - error", func(t *testing.T) {
+
+        resErr, _ := json.Marshal(ScimError{
+            Detail: "create failed",
+            Status: "400",
+        })
+
+    
+		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusBadRequest)
+            w.Write(resErr)
+			assertCall[groups.Group](t, r, groupsPath, "POST", groupsBody)
+		}))
+
+		defer srv.Close()
+
+		res, _, err := client.Group.Create(context.TODO(), &groupsBody)
+
+        assert.Zero(t, res)
+		assert.Error(t, err)
+        assert.Equal(t, "create failed", err.Error())
+	})
 }
 
 func TestGroups_Get(t *testing.T) {
@@ -71,6 +94,28 @@ func TestGroups_Get(t *testing.T) {
 
 		assert.NoError(t, err)
 	})
+
+	t.Run("validate the API request with error", func(t *testing.T) {
+
+        resErr, _ := json.Marshal(ScimError{
+            Detail: "get failed",
+            Status: "400",
+        })
+
+		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusBadRequest)
+            w.Write(resErr)
+            assertCall[groups.Group](t, r, groupsPath, "GET", nil)
+		}))
+
+		defer srv.Close()
+
+		res, _, err := client.Group.Get(context.TODO())
+
+        assert.Zero(t, res)
+        assert.Error(t, err)
+        assert.Equal(t, "get failed", err.Error())
+	})
 }
 
 func TestGroups_GetByGroupId(t *testing.T) {
@@ -89,6 +134,28 @@ func TestGroups_GetByGroupId(t *testing.T) {
 		_, _, err := client.Group.GetByGroupId(context.TODO(), "valid-group-id")
 
 		assert.NoError(t, err)
+	})
+
+	t.Run("validate the API request with error", func(t *testing.T) {
+
+        resErr, _ := json.Marshal(ScimError{
+            Detail: "get failed",
+            Status: "400",
+        })
+
+		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusBadRequest)
+            w.Write(resErr)
+            assertCall[groups.Group](t, r, fmt.Sprintf("%s%s", groupsPath, "valid-group-id"), "GET", nil)
+		}))
+
+		defer srv.Close()
+
+		res, _, err := client.Group.GetByGroupId(context.TODO(), "valid-group-id")
+
+        assert.Zero(t, res)
+        assert.Error(t, err)
+        assert.Equal(t, "get failed", err.Error())
 	})
 }
 
@@ -110,6 +177,28 @@ func TestGroups_Update(t *testing.T) {
 
 		assert.NoError(t, err)
 	})
+
+	t.Run("validate the API request with error", func(t *testing.T) {
+
+        resErr, _ := json.Marshal(ScimError{
+            Detail: "update failed",
+            Status: "400",
+        })
+
+		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusBadRequest)
+            w.Write(resErr)
+            assertCall[groups.Group](t, r, fmt.Sprintf("%s%s", groupsPath, "valid-group-id"), "PUT", groupsBody)
+		}))
+
+		defer srv.Close()
+
+		res, _, err := client.Group.Update(context.TODO(), &groupsBody)
+
+		assert.Zero(t, res)
+        assert.Error(t, err)
+        assert.Equal(t, "update failed", err.Error())
+	})
 }
 
 func TestGroups_Delete(t *testing.T) {
@@ -127,4 +216,24 @@ func TestGroups_Delete(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
+	t.Run("validate the API request with error", func(t *testing.T) {
+
+        resErr, _ := json.Marshal(ScimError{
+            Detail: "delete failed",
+            Status: "400",
+        })
+
+		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusBadRequest)
+            w.Write(resErr)
+            assertCall[groups.Group](t, r, fmt.Sprintf("%s%s", groupsPath, "valid-group-id"), "DELETE", groups.Group{})
+		}))
+
+		defer srv.Close()
+
+		err := client.Group.Delete(context.TODO(), "valid-group-id")
+
+        assert.Error(t, err)
+        assert.Equal(t, "delete failed", err.Error())
+	})
 }
