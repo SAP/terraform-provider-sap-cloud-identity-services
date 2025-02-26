@@ -1,6 +1,6 @@
 # Terraform Provider for for SAP Cloud Identity Services
 
-![Golang](https://img.shields.io/badge/Go-1.23-informational)
+![Golang](https://img.shields.io/badge/Go-1.24-informational)
 
 ## About This Project
 
