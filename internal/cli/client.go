@@ -95,7 +95,7 @@ func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, 
 	return res, nil
 }
 
-func (c *Client) Execute(ctx context.Context, method string, endpoint string, body any, customSchemas string, reqHeader string, headers []string) (interface{}, error, map[string]string) {
+func (c *Client) Execute(ctx context.Context, method string, endpoint string, body any, customSchemas string, reqHeader string, headers []string) (interface{}, map[string]string, error) {
 
 	var O interface{}
 	out := make(map[string]string, len(headers))
@@ -103,10 +103,14 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 	res, err := c.DoRequest(ctx, method, endpoint, body, customSchemas, reqHeader)
 
 	if err != nil {
-		return nil, err, out
+		return nil, out, err
 	}
 
-	defer res.Body.Close()
+	defer func() {
+		if tempErr := res.Body.Close(); tempErr != nil {
+			err = tempErr
+		}
+	}()
 
 	if res.StatusCode >= 400 {
 
@@ -136,7 +140,7 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 
 		}
 
-		return nil, err, out
+		return nil, out, err
 	}
 
 	for _, header := range headers {
@@ -144,8 +148,8 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 	}
 
 	if err = json.NewDecoder(res.Body).Decode(&O); err == nil || err == io.EOF {
-		return O, nil, out
+		return O, out, nil
 	} else {
-		return nil, err, out
+		return nil, out, err
 	}
 }
