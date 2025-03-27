@@ -21,7 +21,7 @@ func (u *UsersCli) getUrl() string {
 
 func (u *UsersCli) Get(ctx context.Context) (users.UsersResponse, map[int]string, error) {
 
-	res, err, _ := u.cliClient.Execute(ctx, "GET", u.getUrl(), nil, "", DirectoryHeader, nil)
+	res, _, err := u.cliClient.Execute(ctx, "GET", u.getUrl(), nil, "", DirectoryHeader, nil)
 	if err != nil {
 		return users.UsersResponse{}, map[int]string{}, err
 	}
@@ -48,7 +48,7 @@ func (u *UsersCli) Get(ctx context.Context) (users.UsersResponse, map[int]string
 
 func (u *UsersCli) GetByUserId(ctx context.Context, userId string) (users.User, string, error) {
 
-	res, err, _ := u.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", u.getUrl(), userId), nil, "", DirectoryHeader, nil)
+	res, _, err := u.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", u.getUrl(), userId), nil, "", DirectoryHeader, nil)
 
 	if err != nil {
 		return users.User{}, "", err
@@ -59,7 +59,7 @@ func (u *UsersCli) GetByUserId(ctx context.Context, userId string) (users.User, 
 
 func (u *UsersCli) Create(ctx context.Context, customSchemas string, args *users.User) (users.User, string, error) {
 
-	res, err, _ := u.cliClient.Execute(ctx, "POST", u.getUrl(), args, customSchemas, DirectoryHeader, nil)
+	res, _, err := u.cliClient.Execute(ctx, "POST", u.getUrl(), args, customSchemas, DirectoryHeader, nil)
 	if err != nil {
 		return users.User{}, "", err
 	}
@@ -75,7 +75,7 @@ func (u *UsersCli) Create(ctx context.Context, customSchemas string, args *users
 
 func (u *UsersCli) Update(ctx context.Context, customSchemas string, args *users.User) (users.User, string, error) {
 
-	res, err, _ := u.cliClient.Execute(ctx, "PUT", fmt.Sprintf("%s%s", u.getUrl(), args.Id), args, customSchemas, DirectoryHeader, nil)
+	res, _, err := u.cliClient.Execute(ctx, "PUT", fmt.Sprintf("%s%s", u.getUrl(), args.Id), args, customSchemas, DirectoryHeader, nil)
 
 	if err != nil {
 		return users.User{}, "", err
@@ -92,7 +92,7 @@ func (u *UsersCli) Update(ctx context.Context, customSchemas string, args *users
 
 func (u *UsersCli) Delete(ctx context.Context, userId string) error {
 
-	_, err, _ := u.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", u.getUrl(), userId), nil, "", DirectoryHeader, nil)
+	_, _, err := u.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", u.getUrl(), userId), nil, "", DirectoryHeader, nil)
 
 	return err
 }
