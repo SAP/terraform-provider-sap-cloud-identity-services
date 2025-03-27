@@ -37,7 +37,7 @@ func TestGroups_Create(t *testing.T) {
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			_, err := w.Write(groupsResponse)
 			assert.NoError(t, err, "Failed to write response")
-			
+
 			assertCall[groups.Group](t, r, groupsPath, "POST", groupsBody)
 		}))
 
