@@ -127,6 +127,30 @@ func TestResourceGroup(t *testing.T) {
 		})
 	})
 
+	t.Run("error path - group_members.value must be a valid member", func(t *testing.T) {
+
+		rec, user := setupVCR(t, "fixtures/resource_group_invalid_group_member")
+		defer stopQuietly(rec)
+
+		members := []groups.GroupMember{
+			{
+				Value: "5b4e7391-67d2-419f-8f0e-46f46f1f67ec",
+				Type:  "User",
+			},
+		}
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+			Steps: []resource.TestStep{
+				{
+					Config:      providerConfig("", user) + ResourceGroup("testGroup", "Terraform Group", schemas, "For testing purposes", members),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("member %s is not found", members[0].Value)),
+				},
+			},
+		})
+	})
+
 	t.Run("error path - group_members.type must be a valid value", func(t *testing.T) {
 
 		members := []groups.GroupMember{
