@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"terraform-provider-ias/internal/cli"
+	"terraform-provider-ias/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -73,7 +74,7 @@ func (d *groupsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 							Computed:            true,
 							MarkdownDescription: "Unique ID of the group.",
 							Validators: []validator.String{
-								ValidUUID(),
+								utils.ValidUUID(),
 							},
 						},
 						"schemas": schema.SetAttribute{

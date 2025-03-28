@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"terraform-provider-ias/internal/cli"
+	"terraform-provider-ias/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -38,7 +39,7 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 				MarkdownDescription: "Id of the application",
 				Required:            true,
 				Validators: []validator.String{
-					ValidUUID(),
+					utils.ValidUUID(),
 				},
 			},
 			"name": schema.StringAttribute{
@@ -53,7 +54,7 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 				MarkdownDescription: "ID of the parent, from which the application will inherit its configurations",
 				Computed:            true,
 				Validators: []validator.String{
-					ValidUUID(),
+					utils.ValidUUID(),
 				},
 			},
 			"multi_tenant_app": schema.BoolAttribute{

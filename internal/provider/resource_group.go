@@ -6,6 +6,7 @@ import (
 	"strings"
 	"terraform-provider-ias/internal/cli"
 	"terraform-provider-ias/internal/cli/apiObjects/groups"
+	"terraform-provider-ias/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -14,13 +15,16 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
-
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
+
+var defaultGroupSchemas = []attr.Value{
+	types.StringValue("urn:ietf:params:scim:schemas:core:2.0:Group"),
+	types.StringValue("urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"),
+}
 
 var memberTypeValues = []string{"User", "Group"}
 
@@ -52,7 +56,7 @@ func (r *groupResource) Schema(_ context.Context, _ resource.SchemaRequest, resp
 				Computed:            true,
 				MarkdownDescription: "Unique ID of the group.",
 				Validators: []validator.String{
-					ValidUUID(),
+					utils.ValidUUID(),
 				},
 			},
 			"schemas": schema.SetAttribute{
@@ -63,17 +67,12 @@ func (r *groupResource) Schema(_ context.Context, _ resource.SchemaRequest, resp
 				Default: setdefault.StaticValue(
 					types.SetValueMust(
 						types.StringType,
-						[]attr.Value{
-							types.StringValue("urn:ietf:params:scim:schemas:core:2.0:Group"),
-							types.StringValue("urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"),
-						},
+						defaultGroupSchemas,
 					),
 				),
 				Validators: []validator.Set{
 					setvalidator.SizeAtLeast(1),
-				},
-				PlanModifiers: []planmodifier.Set{
-					SchemaModifier(),
+					utils.SchemaValidator(defaultGroupSchemas),
 				},
 			},
 			"display_name": schema.StringAttribute{
@@ -90,7 +89,7 @@ func (r *groupResource) Schema(_ context.Context, _ resource.SchemaRequest, resp
 							Required:            true,
 							MarkdownDescription: "SCIM ID of the user or the group",
 							Validators: []validator.String{
-								ValidUUID(),
+								utils.ValidUUID(),
 							},
 						},
 						"type": schema.StringAttribute{

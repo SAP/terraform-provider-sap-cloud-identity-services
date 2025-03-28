@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"terraform-provider-ias/internal/cli"
+	"terraform-provider-ias/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -39,7 +40,7 @@ func (d *userDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 				MarkdownDescription: "Unique ID of the resource.",
 				Required:            true,
 				Validators: []validator.String{
-					ValidUUID(),
+					utils.ValidUUID(),
 				},
 			},
 			"schemas": schema.SetAttribute{

@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
+	"terraform-provider-ias/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
-var regexpUUID = UuidRegexp
+var regexpUUID = utils.UuidRegexp
 
 func TestResourceApplication(t *testing.T) {
 

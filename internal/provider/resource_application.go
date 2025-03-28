@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"terraform-provider-ias/internal/cli"
 	"terraform-provider-ias/internal/cli/apiObjects/applications"
+	"terraform-provider-ias/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/objectvalidator"
@@ -52,7 +53,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 				Optional:            true,
 				Computed:            true,
 				Validators: []validator.String{
-					ValidUUID(),
+					utils.ValidUUID(),
 				},
 			},
 			"name": schema.StringAttribute{
@@ -74,7 +75,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 				Optional:            true,
 				Computed:            true,
 				Validators: []validator.String{
-					ValidUUID(),
+					utils.ValidUUID(),
 				},
 			},
 			"multi_tenant_app": schema.BoolAttribute{
@@ -255,14 +256,14 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 									MarkdownDescription: "Valid email domain to be authenticated.",
 									Optional:            true,
 									Validators: []validator.String{
-										ValidEmailDomain(),
+										utils.ValidEmailDomain(),
 									},
 								},
 								"ip_network_range": schema.StringAttribute{
 									MarkdownDescription: "Valid IP range to be authenticated.",
 									Optional:            true,
 									Validators: []validator.String{
-										ValidIPAddress(),
+										utils.ValidIPAddress(),
 									},
 								},
 							},
