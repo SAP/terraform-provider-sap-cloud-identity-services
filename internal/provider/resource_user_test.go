@@ -223,7 +223,7 @@ func TestResourceUser(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:       ResourceUserWithoutSchemas("testUser", "Joe Doe", name, emails),
+					Config:      ResourceUserWithoutSchemas("testUser", "Joe Doe", name, emails),
 					ExpectError: regexp.MustCompile("Attribute schemas set must contain at least 1 elements, got: 0"),
 				},
 			},

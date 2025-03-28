@@ -3,8 +3,8 @@ package provider
 import (
 	"fmt"
 	"regexp"
-	"testing"
 	"terraform-provider-ias/internal/utils"
+	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
