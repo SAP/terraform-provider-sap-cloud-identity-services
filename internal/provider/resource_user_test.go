@@ -218,15 +218,12 @@ func TestResourceUser(t *testing.T) {
 	})
 
 	t.Run("error path - schemas cannot be empty", func(t *testing.T) {
-		rec, user := setupVCR(t, "fixtures/resource_user_empty_schemas")
-		defer stopQuietly(rec)
-
 		resource.Test(t, resource.TestCase{
 			IsUnitTest:               true,
-			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      providerConfig("", user) + ResourceUserWithoutSchemas("testUser", "Joe Doe", name, emails),
+					Config:      ResourceUserWithoutSchemas("testUser", "Joe Doe", name, emails),
 					ExpectError: regexp.MustCompile("Attribute schemas set must contain at least 1 elements, got: 0"),
 				},
 			},

@@ -5,32 +5,32 @@ type CorporateGroup struct {
 }
 
 type SAPExtension struct {
-	// LoginTime				string 		`json:"loginTime"`
-	SourceSystem       int    `json:"sourceSystem"`
-	SourceSystemId     string `json:"sourceSystemId"`
-	ApplicationId      string `json:"applicationId"`
-	EmailTemplateSetId string `json:"emailTemplateSetId"`
-	SendMail           bool   `json:"sendMail"`
-	TargetUrl          string `json:"targetUrl"`
-	MailVerified       bool   `json:"mailVerified"`
-	// UserUuid				string 		`json:"userUuid"`
-	// UserUuidHistory			string 		`json:"userUuidHistory"` 		//read only
-	UserId string `json:"userId"`
-	// SapUserName				string 		`json:"sapUserName"`
-	Status         string `json:"status,omitempty"`
-	TotpEnabled    bool   `json:"totpEnabled"`
-	WebAuthEnabled bool   `json:"webAuthEnabled"`
-	// Industry				string 		`json:"industry"`
-	// CompanyRelationship		string 		`json:"companyRelationship"`
-	MfaEnabled bool `json:"mfaEnabled"`
+	SendMail     bool   `json:"sendMail,omitempty"`
+	TargetUrl    string `json:"targetUrl,omitempty"`
+	MailVerified bool   `json:"mailVerified,omitempty"`
+	Status       string `json:"status,omitempty"`
+	// TotpEnabled         bool             `json:"totpEnabled"`
+	// WebAuthEnabled      bool             `json:"webAuthEnabled"`
+	// MfaEnabled          bool             `json:"mfaEnabled"`
+	// CorporateGroups     []CorporateGroup `json:"corporateGroups"`
+	// SourceSystem        int              `json:"sourceSystem"`
+	// SourceSystemId      string           `json:"sourceSystemId"`
+	// ApplicationId       string           `json:"applicationId"`
+	// UserId              string           `json:"userId"`
+	// EmailTemplateSetId  string           `json:"emailTemplateSetId"`
+	// LoginTime           string           `json:"loginTime"`
+	// UserUuid            string           `json:"userUuid"`
+	// UserUuidHistory     string           `json:"userUuidHistory"` //read only
+	// SapUserName         string           `json:"sapUserName"`
+	// Industry            string           `json:"industry"`
+	// CompanyRelationship string           `json:"companyRelationship"`
 	// contactPreferences
 	// socialIdentities
 	// passwordDetails
 	// emails
 	// addresses
-	CorporateGroups []CorporateGroup `json:"corporateGroups"`
-	// ValidFrom				string 		`json:"validFrom"`
-	// ValidTo					string 		`json:"validTo"`
+	// ValidFrom string `json:"validFrom"`
+	// ValidTo   string `json:"validTo"`
 }
 
 type Manager struct {
@@ -132,8 +132,8 @@ type User struct {
 	Addresses         []Address      `json:"addresses,omitempty"`
 	Entitlements      []Enititlement `json:"entitlements,omitempty"`
 	Roles             []Role         `json:"roles,omitempty"`
+	SAPExtension      SAPExtension   `json:"urn:ietf:params:scim:schemas:extension:sap:2.0:User,omitempty"`
 	// EnterpriseUser    	EnterpriseUser 	`json:"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User,omitempty"`
-	SAPExtension SAPExtension `json:"urn:ietf:params:scim:schemas:extension:sap:2.0:User"`
 }
 
 type UsersResponse struct {

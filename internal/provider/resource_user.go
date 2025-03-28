@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"terraform-provider-ias/internal/cli"
+	"terraform-provider-ias/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -19,6 +20,11 @@ import (
 
 	"terraform-provider-ias/internal/cli/apiObjects/users"
 )
+
+var defaultUserSchemas = []attr.Value{
+	types.StringValue("urn:ietf:params:scim:schemas:core:2.0:User"),
+	types.StringValue("urn:ietf:params:scim:schemas:extension:sap:2.0:User"),
+}
 
 var emailTypeValues = []string{"work", "home", "other"}
 var userTypeValues = []string{"public", "partner", "customer", "external", "onboardee", "employee"}
@@ -52,7 +58,7 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 				MarkdownDescription: "Unique ID of the resource.",
 				Computed:            true,
 				Validators: []validator.String{
-					ValidUUID(),
+					utils.ValidUUID(),
 				},
 			},
 			"schemas": schema.SetAttribute{
@@ -63,14 +69,12 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 				Default: setdefault.StaticValue(
 					types.SetValueMust(
 						types.StringType,
-						[]attr.Value{
-							types.StringValue("urn:ietf:params:scim:schemas:core:2.0:User"),
-							types.StringValue("urn:ietf:params:scim:schemas:extension:sap:2.0:User"),
-						},
+						defaultUserSchemas,
 					),
 				),
 				Validators: []validator.Set{
 					setvalidator.SizeAtLeast(1),
+					utils.SchemaValidator(defaultUserSchemas),
 				},
 			},
 			"user_name": schema.StringAttribute{
@@ -198,7 +202,7 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 				Optional:            true,
 				MarkdownDescription: "Furthur enhance your application with custom schemas.",
 				Validators: []validator.String{
-					ValidJSON(),
+					utils.ValidJSON(),
 				},
 			},
 		},

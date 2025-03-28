@@ -6,6 +6,7 @@ import (
 	"strings"
 	"terraform-provider-ias/internal/cli"
 	"terraform-provider-ias/internal/cli/apiObjects/schemas"
+	"terraform-provider-ias/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
@@ -19,6 +20,10 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
+
+var defaultSchemaSchemas = []attr.Value{
+	types.StringValue("urn:ietf:params:scim:schemas:core:2.0:Schema"),
+}
 
 var attributeDataTypes = []string{"string", "boolean", "decimal", "integer", "dateTime", "binary", "reference", "complex"}
 var attributeMutabilityValues = []string{"readOnly", "readWrite", "writeOnly", "immutable"}
@@ -71,7 +76,7 @@ func (r *schemaResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 							MarkdownDescription: "The attribute name. Only alphanumeric characters and underscores are allowed.",
 							Validators: []validator.String{
 								stringvalidator.LengthBetween(2, 20),
-								ValidAttributeName(),
+								utils.ValidAttributeName(),
 							},
 						},
 						"type": schema.StringAttribute{
@@ -141,13 +146,12 @@ func (r *schemaResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 				Default: setdefault.StaticValue(
 					types.SetValueMust(
 						types.StringType,
-						[]attr.Value{
-							types.StringValue("urn:ietf:params:scim:schemas:core:2.0:Schema"),
-						},
+						defaultSchemaSchemas,
 					),
 				),
 				Validators: []validator.Set{
 					setvalidator.SizeAtLeast(1),
+					utils.SchemaValidator(defaultSchemaSchemas),
 				},
 			},
 			"description": schema.StringAttribute{
