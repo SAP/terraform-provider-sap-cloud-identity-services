@@ -23,7 +23,7 @@ interactions:
                 - application/scim+json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/80f858a3-28ce-437e-ba31-d3358a5bdbfa
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/0b35d8cf-722c-4151-951e-176b623c0b78
         method: GET
       response:
         proto: HTTP/1.1
@@ -33,18 +33,18 @@ interactions:
         trailer: {}
         content_length: -1
         uncompressed: true
-        body: '{"id":"80f858a3-28ce-437e-ba31-d3358a5bdbfa","meta":{"created":"2025-01-06T08:10:15Z","lastModified":"2025-01-06T08:15:48Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/80f858a3-28ce-437e-ba31-d3358a5bdbfa","version":"78f404e3-5082-414d-8837-27e394b46e01","resourceType":"User"},"schemas":["urn:ietf:params:scim:schemas:core:2.0:User","urn:ietf:params:scim:schemas:extension:sap:2.0:User"],"userName":"Test","name":{"familyName":"User","givenName":"Test"},"userType":"public","active":false,"emails":[{"value":"test.user1@sap.com","display":"Test.User.1","primary":false,"type":"work"},{"value":"test.user2@gmail.com","primary":true,"type":"home"}],"groups":[{"value":"59aeb87b-777a-4034-8f3e-709d39fb1a18","display":"testGroup","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/59aeb87b-777a-4034-8f3e-709d39fb1a18"},{"value":"9de5145a-aa26-4c95-8d88-29f14f369bde","display":"new_group","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/9de5145a-aa26-4c95-8d88-29f14f369bde"}],"urn:ietf:params:scim:schemas:extension:sap:2.0:User":{"emails":[{"display":"Test.User.1","type":"work","value":"test.user1@sap.com","primary":false},{"type":"home","value":"test.user2@gmail.com","primary":true}],"userUuid":"80f858a3-28ce-437e-ba31-d3358a5bdbfa","mailVerified":false,"userId":"P000089","status":"inactive"}}'
+        body: '{"id":"0b35d8cf-722c-4151-951e-176b623c0b78","meta":{"created":"2025-02-16T19:39:42Z","lastModified":"2025-02-16T19:40:13Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/0b35d8cf-722c-4151-951e-176b623c0b78","version":"0f8f636b-1536-42b1-8ca4-02b07171b3e9","resourceType":"User"},"schemas":["urn:test:terraform:1.0:User","urn:ietf:params:scim:schemas:core:2.0:User","urn:ietf:params:scim:schemas:extension:sap:2.0:User"],"userName":"","name":{"familyName":"User","givenName":"Custom Schemas"},"displayName":"None","userType":"employee","active":true,"emails":[{"value":"custom.user@test.com","primary":true}],"urn:test:terraform:1.0:User":{"test1":"test value","test2":true},"urn:ietf:params:scim:schemas:extension:sap:2.0:User":{"emails":[{"verified":false,"value":"custom.user@test.com","primary":true}],"userUuid":"0b35d8cf-722c-4151-951e-176b623c0b78","mailVerified":false,"userId":"P000194","status":"active"}}'
         headers:
             Cache-Control:
                 - private,no-cache,no-store
             Content-Type:
                 - application/scim+json
             Date:
-                - Fri, 28 Mar 2025 15:12:28 GMT
+                - Fri, 04 Apr 2025 08:44:58 GMT
             Etag:
-                - '"78f404e3-5082-414d-8837-27e394b46e01-gzip"'
+                - '"0f8f636b-1536-42b1-8ca4-02b07171b3e9-gzip"'
             Location:
-                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/80f858a3-28ce-437e-ba31-d3358a5bdbfa
+                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/0b35d8cf-722c-4151-951e-176b623c0b78
             Referrer-Policy:
                 - origin
             Server:
@@ -56,13 +56,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - 98CEC263-6D90-470D-92D3-F24BBA0060CE
+                - 5514200A-58B6-46CE-A7A1-498130ACD9D3
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-rml2v
+                - http-t24qk
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -71,7 +71,7 @@ interactions:
                 - none
         status: '200 '
         code: 200
-        duration: 1.355299633s
+        duration: 1.002248708s
     - id: 1
       request:
         proto: HTTP/1.1
@@ -94,7 +94,7 @@ interactions:
                 - application/scim+json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/80f858a3-28ce-437e-ba31-d3358a5bdbfa
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/0b35d8cf-722c-4151-951e-176b623c0b78
         method: GET
       response:
         proto: HTTP/1.1
@@ -104,7 +104,7 @@ interactions:
         trailer: {}
         content_length: 138
         uncompressed: false
-        body: '{"schemas":["urn:ietf:params:scim:api:messages:2.0:Error"],"status":"404","detail":"Group 80f858a3-28ce-437e-ba31-d3358a5bdbfa not found"}'
+        body: '{"schemas":["urn:ietf:params:scim:api:messages:2.0:Error"],"status":"404","detail":"Group 0b35d8cf-722c-4151-951e-176b623c0b78 not found"}'
         headers:
             Cache-Control:
                 - private,no-cache,no-store
@@ -113,7 +113,7 @@ interactions:
             Content-Type:
                 - application/scim+json
             Date:
-                - Fri, 28 Mar 2025 15:12:28 GMT
+                - Fri, 04 Apr 2025 08:44:58 GMT
             Referrer-Policy:
                 - origin
             Server:
@@ -125,13 +125,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - D46FB7D7-8855-4678-AE17-B4337FC19540
+                - F55A9D66-9EE0-4BB9-8331-63FBA3D70850
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-rml2v
+                - http-t24qk
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -140,7 +140,7 @@ interactions:
                 - none
         status: '404 '
         code: 404
-        duration: 291.780057ms
+        duration: 267.777055ms
     - id: 2
       request:
         proto: HTTP/1.1
@@ -153,7 +153,7 @@ interactions:
         remote_addr: ""
         request_uri: ""
         body: |
-            {"meta":{},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Terraform Group","members":[{"value":"80f858a3-28ce-437e-ba31-d3358a5bdbfa","type":"User"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"description":"For testing purposes"}}
+            {"meta":{},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Terraform Group","members":[{"value":"0b35d8cf-722c-4151-951e-176b623c0b78","type":"User"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"description":"For testing purposes"}}
         form: {}
         headers:
             Accept:
@@ -174,7 +174,7 @@ interactions:
         trailer: {}
         content_length: 824
         uncompressed: false
-        body: '{"id":"dca24c60-7149-42b2-b14d-6dc9282ba775","meta":{"created":"2025-03-28T15:12:29Z","lastModified":"2025-03-28T15:12:29Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/dca24c60-7149-42b2-b14d-6dc9282ba775","version":"757f79b6-83dd-4fbb-88c1-880e93add084","resourceType":"Group"},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Terraform Group","members":[{"value":"80f858a3-28ce-437e-ba31-d3358a5bdbfa","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/80f858a3-28ce-437e-ba31-d3358a5bdbfa","type":"User"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"name":"dca24c60-7149-42b2-b14d-6dc9282ba775","additionalId":"67e6bc5d015c7161a8fc8bde","description":"For testing purposes"}}'
+        body: '{"id":"852e4f94-7b10-4061-a39c-fc0abe910eee","meta":{"created":"2025-04-04T08:44:59Z","lastModified":"2025-04-04T08:44:59Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/852e4f94-7b10-4061-a39c-fc0abe910eee","version":"1af09a48-c191-4b7e-852b-ca3220d87af2","resourceType":"Group"},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Terraform Group","members":[{"value":"0b35d8cf-722c-4151-951e-176b623c0b78","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/0b35d8cf-722c-4151-951e-176b623c0b78","type":"User"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"name":"852e4f94-7b10-4061-a39c-fc0abe910eee","additionalId":"67ef9c0be79931351dff7de1","description":"For testing purposes"}}'
         headers:
             Cache-Control:
                 - private,no-cache,no-store
@@ -183,11 +183,11 @@ interactions:
             Content-Type:
                 - application/scim+json
             Date:
-                - Fri, 28 Mar 2025 15:12:29 GMT
+                - Fri, 04 Apr 2025 08:44:59 GMT
             Etag:
-                - '"757f79b6-83dd-4fbb-88c1-880e93add084"'
+                - '"1af09a48-c191-4b7e-852b-ca3220d87af2"'
             Location:
-                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/dca24c60-7149-42b2-b14d-6dc9282ba775
+                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/852e4f94-7b10-4061-a39c-fc0abe910eee
             Referrer-Policy:
                 - origin
             Server:
@@ -199,13 +199,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - AC1C8053-BE7E-4835-99C8-4E51689D9344
+                - 79E37335-0C94-4FB2-B4F5-CEC00EA10938
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-rml2v
+                - http-t24qk
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -214,7 +214,7 @@ interactions:
                 - none
         status: '201 '
         code: 201
-        duration: 261.928836ms
+        duration: 240.657503ms
     - id: 3
       request:
         proto: HTTP/1.1
@@ -237,7 +237,7 @@ interactions:
                 - application/scim+json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/dca24c60-7149-42b2-b14d-6dc9282ba775
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/852e4f94-7b10-4061-a39c-fc0abe910eee
         method: GET
       response:
         proto: HTTP/1.1
@@ -247,18 +247,18 @@ interactions:
         trailer: {}
         content_length: -1
         uncompressed: true
-        body: '{"id":"dca24c60-7149-42b2-b14d-6dc9282ba775","meta":{"created":"2025-03-28T15:12:29Z","lastModified":"2025-03-28T15:12:29Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/dca24c60-7149-42b2-b14d-6dc9282ba775","version":"757f79b6-83dd-4fbb-88c1-880e93add084","resourceType":"Group"},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Terraform Group","members":[{"value":"80f858a3-28ce-437e-ba31-d3358a5bdbfa","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/80f858a3-28ce-437e-ba31-d3358a5bdbfa","type":"User"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"name":"dca24c60-7149-42b2-b14d-6dc9282ba775","additionalId":"67e6bc5d015c7161a8fc8bde","description":"For testing purposes"}}'
+        body: '{"id":"852e4f94-7b10-4061-a39c-fc0abe910eee","meta":{"created":"2025-04-04T08:44:59Z","lastModified":"2025-04-04T08:44:59Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/852e4f94-7b10-4061-a39c-fc0abe910eee","version":"1af09a48-c191-4b7e-852b-ca3220d87af2","resourceType":"Group"},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Terraform Group","members":[{"value":"0b35d8cf-722c-4151-951e-176b623c0b78","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/0b35d8cf-722c-4151-951e-176b623c0b78","type":"User"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"name":"852e4f94-7b10-4061-a39c-fc0abe910eee","additionalId":"67ef9c0be79931351dff7de1","description":"For testing purposes"}}'
         headers:
             Cache-Control:
                 - private,no-cache,no-store
             Content-Type:
                 - application/scim+json
             Date:
-                - Fri, 28 Mar 2025 15:12:29 GMT
+                - Fri, 04 Apr 2025 08:44:59 GMT
             Etag:
-                - '"757f79b6-83dd-4fbb-88c1-880e93add084-gzip"'
+                - '"1af09a48-c191-4b7e-852b-ca3220d87af2-gzip"'
             Location:
-                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/dca24c60-7149-42b2-b14d-6dc9282ba775
+                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/852e4f94-7b10-4061-a39c-fc0abe910eee
             Referrer-Policy:
                 - origin
             Server:
@@ -270,13 +270,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - 33900CB5-FC78-4104-9B8F-06523BA09AB5
+                - C6D55C15-EEB2-46C1-8B9B-4084E9B4D492
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-rml2v
+                - http-t24qk
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -285,7 +285,7 @@ interactions:
                 - none
         status: '200 '
         code: 200
-        duration: 304.348539ms
+        duration: 272.507614ms
     - id: 4
       request:
         proto: HTTP/1.1
@@ -308,7 +308,7 @@ interactions:
                 - application/scim+json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/dca24c60-7149-42b2-b14d-6dc9282ba775
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/852e4f94-7b10-4061-a39c-fc0abe910eee
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -323,7 +323,7 @@ interactions:
             Cache-Control:
                 - private,no-cache,no-store
             Date:
-                - Fri, 28 Mar 2025 15:12:30 GMT
+                - Fri, 04 Apr 2025 08:44:59 GMT
             Referrer-Policy:
                 - origin
             Server:
@@ -335,13 +335,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - 593C3E3C-056C-4309-9601-D07010F87BE3
+                - 580AA034-408C-4C28-B45C-3DFFB1927805
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-rml2v
+                - http-t24qk
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -350,4 +350,4 @@ interactions:
                 - none
         status: '204 '
         code: 204
-        duration: 268.756364ms
+        duration: 247.754889ms
