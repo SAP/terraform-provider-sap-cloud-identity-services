@@ -135,13 +135,14 @@ func (r *groupResource) Create(ctx context.Context, req resource.CreateRequest, 
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 
-	args, diags := getGroupRequest(ctx, plan)
+	args, diags := r.GetGroupRequest(ctx, plan)
 	resp.Diagnostics.Append(diags...)
 
-	res, _, err := r.cli.Group.Create(ctx, args)
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	res, _, err := r.cli.Group.Create(ctx, args)
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error creating user", fmt.Sprintf("%s", err))
@@ -190,8 +191,12 @@ func (r *groupResource) Update(ctx context.Context, req resource.UpdateRequest, 
 		return
 	}
 
-	args, diags := getGroupRequest(ctx, plan)
+	args, diags := r.GetGroupRequest(ctx, plan)
 	resp.Diagnostics.Append(diags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	args.Id = state.Id.ValueString()
 
@@ -232,7 +237,7 @@ func (r *groupResource) ImportState(ctx context.Context, req resource.ImportStat
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
 
-func getGroupRequest(ctx context.Context, plan groupData) (*groups.Group, diag.Diagnostics) {
+func (r *groupResource) GetGroupRequest(ctx context.Context, plan groupData) (*groups.Group, diag.Diagnostics) {
 
 	var diagnostics diag.Diagnostics
 
@@ -245,12 +250,24 @@ func getGroupRequest(ctx context.Context, plan groupData) (*groups.Group, diag.D
 		DisplayName: plan.DisplayName.ValueString(),
 	}
 
-	var members []memberData
-	diags = plan.GroupMembers.ElementsAs(ctx, &members, true)
-	diagnostics.Append(diags...)
-
 	if !plan.GroupMembers.IsNull() {
+
+		var members []memberData
+		diags = plan.GroupMembers.ElementsAs(ctx, &members, true)
+		diagnostics.Append(diags...)
+
 		for _, member := range members {
+
+			// validate the member as a valid user or group as the API does not handle this
+			err := validateMembers(ctx, r.cli, member.Value.ValueString())
+			if err != nil {
+				diagnostics.AddError(
+					fmt.Sprintf("%s", err),
+					"please provide a valid member UUID",
+				)
+				return nil, diagnostics
+			}
+
 			groupMember := groups.GroupMember{
 				Value: member.Value.ValueString(),
 			}
@@ -274,4 +291,17 @@ func getGroupRequest(ctx context.Context, plan groupData) (*groups.Group, diag.D
 	}
 
 	return args, diagnostics
+}
+
+func validateMembers(ctx context.Context, client *cli.IasClient, member string) error {
+
+	// do a GET call for both the users and groups to check if the member exists
+	_, _, userErr := client.User.GetByUserId(ctx, member)
+	_, _, groupErr := client.Group.GetByGroupId(ctx, member)
+
+	if userErr != nil && groupErr != nil {
+		return fmt.Errorf("member %s is not found", member)
+	}
+
+	return nil
 }

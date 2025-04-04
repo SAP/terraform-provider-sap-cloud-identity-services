@@ -19,7 +19,7 @@ func TestResourceGroup(t *testing.T) {
 
 	members := []groups.GroupMember{
 		{
-			Value: "80f858a3-28ce-437e-ba31-d3358a5bdbfa",
+			Value: "0b35d8cf-722c-4151-951e-176b623c0b78",
 			Type:  "User",
 		},
 	}
@@ -122,6 +122,30 @@ func TestResourceGroup(t *testing.T) {
 				{
 					Config:      ResourceGroup("testGroup", "Terraform Group", schemas, "For testing purposes", members),
 					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute group_members\\[0].value value must be a valid UUID, got:\n%s", "this-is-not-a-valid-UUID")),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - group_members.value must be a valid member", func(t *testing.T) {
+
+		rec, user := setupVCR(t, "fixtures/resource_group_invalid_group_member")
+		defer stopQuietly(rec)
+
+		members := []groups.GroupMember{
+			{
+				Value: "5b4e7391-67d2-419f-8f0e-46f46f1f67ec",
+				Type:  "User",
+			},
+		}
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+			Steps: []resource.TestStep{
+				{
+					Config:      providerConfig("", user) + ResourceGroup("testGroup", "Terraform Group", schemas, "For testing purposes", members),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("member %s is not found", members[0].Value)),
 				},
 			},
 		})
