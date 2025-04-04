@@ -138,10 +138,11 @@ func (r *groupResource) Create(ctx context.Context, req resource.CreateRequest, 
 	args, diags := r.GetGroupRequest(ctx, plan)
 	resp.Diagnostics.Append(diags...)
 
-	res, _, err := r.cli.Group.Create(ctx, args)
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	res, _, err := r.cli.Group.Create(ctx, args)
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error creating user", fmt.Sprintf("%s", err))
@@ -192,6 +193,10 @@ func (r *groupResource) Update(ctx context.Context, req resource.UpdateRequest, 
 
 	args, diags := r.GetGroupRequest(ctx, plan)
 	resp.Diagnostics.Append(diags...)
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	args.Id = state.Id.ValueString()
 
