@@ -19,7 +19,7 @@ func TestResourceGroup(t *testing.T) {
 
 	members := []groups.GroupMember{
 		{
-			Value: "80f858a3-28ce-437e-ba31-d3358a5bdbfa",
+			Value: "0b35d8cf-722c-4151-951e-176b623c0b78",
 			Type:  "User",
 		},
 	}
