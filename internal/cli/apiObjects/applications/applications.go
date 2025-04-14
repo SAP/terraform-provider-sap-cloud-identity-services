@@ -113,15 +113,15 @@ type ConsumedApi struct {
 }
 
 type AuthenticationSchema struct {
-	SsoType                     string                       `json:"ssoType,omitempty"`
-	SubjectNameIdentifier       string                       `json:"subjectNameIdentifier,omitempty"`
-	AssertionAttributes         []AssertionAttribute         `json:"assertionAttributes,omitempty"`
-	AdvancedAssertionAttributes []AdvancedAssertionAttribute `json:"advancedAssertionAttributes,omitempty"`
-	DefaultAuthenticatingIdpId  string                       `json:"defaultAuthenticatingIdpId,omitempty"`
-	ConditionalAuthentication   []AuthenicationRule          `json:"conditionalAuthentication,omitempty"`
+	SsoType                       string                       `json:"ssoType,omitempty"`
+	SubjectNameIdentifier         string                       `json:"subjectNameIdentifier,omitempty"`
+	SubjectNameIdentifierFunction string                       `json:"subjectNameIdentifierFunction,omitempty"`
+	AssertionAttributes           []AssertionAttribute         `json:"assertionAttributes,omitempty"`
+	AdvancedAssertionAttributes   []AdvancedAssertionAttribute `json:"advancedAssertionAttributes,omitempty"`
+	DefaultAuthenticatingIdpId    string                       `json:"defaultAuthenticatingIdpId,omitempty"`
+	ConditionalAuthentication     []AuthenicationRule          `json:"conditionalAuthentication,omitempty"`
 	// HomeUrl								string 							`json:"homeUrl"`
 	// FallbackSubjectNameIdentifier		string 							`json:"fallbackSubjectNameIdentifier,omitempty"`
-	// SubjectNameIdentifierFunction		string 							`json:"subjectNameIdentifierFunction,omitempty"`
 	// RememberMeExpirationTimeInMonths	string 							`json:"rememberMeExpirationTimeInMonths,omitempty"`
 	// PasswordPolicy						string 							`json:"passwordPolicy"`
 	// UserAccess							UserAccess 						`json:"userAccess,omitempty"`

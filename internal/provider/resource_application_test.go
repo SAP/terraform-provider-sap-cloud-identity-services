@@ -169,6 +169,19 @@ func TestResourceApplication(t *testing.T) {
 		})
 	})
 
+	t.Run("error path - subject_name_identifier_function needs to be a valid value", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceApplicationWithSubjectNameIdentifierFunction("testApp", "test-app", "application for testing purposes", "invalid-function-name"),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_schema.subject_name_identifier_function value must\nbe one of: \\[\"none\" \"upperCase\" \"lowerCase\"], got: \"%s\"", "invalid-function-name")),
+				},
+			},
+		})
+	})
+
 	t.Run("error path - assertion_attributes requires sub-attributes: attribute_name, attribute_value", func(t *testing.T) {
 		resource.Test(t, resource.TestCase{
 			IsUnitTest:               true,
@@ -321,6 +334,18 @@ func ResourceApplicationWithSubjectNameIdentifier(resourceName string, appName s
 		}
 	}
 	`, resourceName, appName, description, subAttribute)
+}
+
+func ResourceApplicationWithSubjectNameIdentifierFunction(resourceName string, appName string, description string, functionName string) string {
+	return fmt.Sprintf(`
+	resource "ias_application" "%s" {
+		name = "%s"
+		description = "%s"
+		authentication_schema = {
+			subject_name_identifier_function = "%s"
+		}
+	}
+	`, resourceName, appName, description, functionName)
 }
 
 func ResourceApplicationWithAssertionAttributes(resourceName string, appName string, description string, subAttribute string) string {

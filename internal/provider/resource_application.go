@@ -23,6 +23,7 @@ import (
 var sourceValues = []string{"Identity Directory", "Corporate Identity Provider", "Expression"}
 var ssoValues = []string{"openIdConnect", "saml2"}
 var usersTypeValues = []string{"public", "employee", "customer", "partner", "external", "onboardee"}
+var subjectNameIdentifierFunctionValues = []string{"none", "upperCase", "lowerCase"}
 
 func newApplicationResource() resource.Resource {
 	return &applicationResource{}
@@ -130,6 +131,13 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 									stringvalidator.LengthBetween(1, 255),
 								},
 							},
+						},
+					},
+					"subject_name_identifier_function": schema.StringAttribute{
+						MarkdownDescription: "Convert the subject name identifier to uppercase or lowercase. The only acceptable values are \"none\", \"upperCase\", \"lowerCase\"",
+						Optional:            true,
+						Validators: []validator.String{
+							stringvalidator.OneOf(subjectNameIdentifierFunctionValues...),
 						},
 					},
 					"assertion_attributes": schema.ListNestedAttribute{
@@ -406,6 +414,10 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 			} else {
 				args.AuthenticationSchema.SubjectNameIdentifier = "${corporateIdP." + authenticationSchema.SubjectNameIdentifier.Value.ValueString() + "}"
 			}
+		}
+
+		if !authenticationSchema.SubjectNameIdentifierFunction.IsNull() {
+			args.AuthenticationSchema.SubjectNameIdentifierFunction = authenticationSchema.SubjectNameIdentifierFunction.ValueString()
 		}
 
 		if !authenticationSchema.AssertionAttributes.IsNull() {
