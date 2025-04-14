@@ -407,6 +407,10 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 		diags = plan.AuthenticationSchema.As(ctx, &authenticationSchema, basetypes.ObjectAsOptions{})
 		diagnostics.Append(diags...)
 
+		if !authenticationSchema.SsoType.IsNull() {
+			args.AuthenticationSchema.SsoType = authenticationSchema.SsoType.ValueString()
+		}
+
 		if authenticationSchema.SubjectNameIdentifier != nil && !authenticationSchema.SubjectNameIdentifier.Source.IsNull() {
 
 			if authenticationSchema.SubjectNameIdentifier.Source.ValueString() == "Identity Directory" || authenticationSchema.SubjectNameIdentifier.Source.ValueString() == "Expression" {
