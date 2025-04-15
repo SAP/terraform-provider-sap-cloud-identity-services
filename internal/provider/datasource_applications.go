@@ -31,6 +31,7 @@ var authenticationSchemaObjType = map[string]attr.Type{
 	"subject_name_identifier": types.ObjectType{
 		AttrTypes: subjectNameIdentitfierObjType,
 	},
+	"subject_name_identifier_function": types.StringType,
 	"assertion_attributes": types.ListType{
 		ElemType: assertionAttributesObjType,
 	},
@@ -158,6 +159,10 @@ func (d *applicationsDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 											Computed:            true,
 										},
 									},
+								},
+								"subject_name_identifier_function": schema.StringAttribute{
+									MarkdownDescription: "Convert the subject name identifier to uppercase or lowercase. The only acceptable values are \"none\", \"upperCase\", \"lowerCase\"",
+									Computed:            true,
 								},
 								"assertion_attributes": schema.ListNestedAttribute{
 									MarkdownDescription: "User attributes to be sent to the application. The Source of these attributes is always the Identity Directory, thus only valid attribute values will be accepted.",

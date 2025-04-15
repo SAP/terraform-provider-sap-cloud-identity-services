@@ -11,12 +11,13 @@ import (
 )
 
 type authenticationSchemaData struct {
-	SsoType                     types.String               `tfsdk:"sso_type"`
-	SubjectNameIdentifier       *subjectNameIdentifierData `tfsdk:"subject_name_identifier"`
-	AssertionAttributes         types.List                 `tfsdk:"assertion_attributes"`
-	AdvancedAssertionAttributes types.List                 `tfsdk:"advanced_assertion_attributes"`
-	DefaultAuthenticatingIdpId  types.String               `tfsdk:"default_authenticating_idp"`
-	AuthenticationRules         types.List                 `tfsdk:"authentication_rules"`
+	SsoType                       types.String               `tfsdk:"sso_type"`
+	SubjectNameIdentifier         *subjectNameIdentifierData `tfsdk:"subject_name_identifier"`
+	SubjectNameIdentifierFunction types.String               `tfsdk:"subject_name_identifier_function"`
+	AssertionAttributes           types.List                 `tfsdk:"assertion_attributes"`
+	AdvancedAssertionAttributes   types.List                 `tfsdk:"advanced_assertion_attributes"`
+	DefaultAuthenticatingIdpId    types.String               `tfsdk:"default_authenticating_idp"`
+	AuthenticationRules           types.List                 `tfsdk:"authentication_rules"`
 }
 
 type advancedAssertionAttributesData struct {
@@ -91,6 +92,10 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 	} else {
 		authenticationSchema.SubjectNameIdentifier.Value = types.StringValue(a.AuthenticationSchema.SubjectNameIdentifier)
 		authenticationSchema.SubjectNameIdentifier.Source = types.StringValue(sourceValues[0])
+	}
+
+	if len(a.AuthenticationSchema.SubjectNameIdentifierFunction) > 0 {
+		authenticationSchema.SubjectNameIdentifierFunction = types.StringValue((a.AuthenticationSchema.SubjectNameIdentifierFunction))
 	}
 
 	attributes := []assertionAttributesData{}

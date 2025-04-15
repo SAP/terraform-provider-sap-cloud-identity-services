@@ -47,6 +47,7 @@ Optional:
 - `default_authenticating_idp` (String) A default identity provider can be used for users with any user domain, group and type. This identity provider is used when none of the defined authentication rules meets the criteria.
 - `sso_type` (String) The preferred protocol for the application. Acceptable values: "openIdConnect", "saml2"
 - `subject_name_identifier` (Attributes) The attribute by which the application uses to identify the users. Identity Authentication sends the attribute to the application as subject in OpenID Connect tokens. (see [below for nested schema](#nestedatt--authentication_schema--subject_name_identifier))
+- `subject_name_identifier_function` (String) Convert the subject name identifier to uppercase or lowercase. The only acceptable values are "none", "upperCase", "lowerCase"
 
 <a id="nestedatt--authentication_schema--advanced_assertion_attributes"></a>
 ### Nested Schema for `authentication_schema.advanced_assertion_attributes`
