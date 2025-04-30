@@ -17,7 +17,8 @@ type authenticationSchemaData struct {
 	AssertionAttributes           types.List                 `tfsdk:"assertion_attributes"`
 	AdvancedAssertionAttributes   types.List                 `tfsdk:"advanced_assertion_attributes"`
 	DefaultAuthenticatingIdpId    types.String               `tfsdk:"default_authenticating_idp"`
-	AuthenticationRules           types.List                 `tfsdk:"authentication_rules"`
+	AuthenticationRules           types.List                 `tfsdk:"conditional_authentication"`
+	RBAConfiguration              *rbaConfigurationData      `tfsdk:"risk_based_authentication"`
 }
 
 type advancedAssertionAttributesData struct {
@@ -46,16 +47,37 @@ type authenticationRulesData struct {
 	IpNetworkRange     types.String `tfsdk:"ip_network_range"`
 }
 
+type rbaConfigurationData struct {
+	DefaultAction types.List `tfsdk:"default_action"`
+	Rules         types.List `tfsdk:"rules"`
+}
+
+type corporateIdpAttributeData struct {
+	Name  types.String `tfsdk:"name"`
+	Value types.String `tfsdk:"value"`
+}
+
+type rbaRulesData struct {
+	IpNetworkRange        types.String               `tfsdk:"ip_network_range"`
+	IpForwardRange        types.String               `tfsdk:"ip_forward_range"`
+	Actions               types.List                 `tfsdk:"actions"`
+	Group                 types.String               `tfsdk:"group"`
+	GroupType             types.String               `tfsdk:"group_type"`
+	AuthMethod            types.String               `tfsdk:"auth_method"`
+	UserType              types.String               `tfsdk:"user_type"`
+	CorporateIdpAttribute *corporateIdpAttributeData `tfsdk:"corporate_idp_attribute"`
+}
+
 type applicationData struct {
 	//INPUT
 	Id types.String `tfsdk:"id"`
 	//OUTPUT
-	Name                 types.String `tfsdk:"name"`
-	Description          types.String `tfsdk:"description"`
-	ParentApplicationId  types.String `tfsdk:"parent_application_id"`
-	MultiTenantApp       types.Bool   `tfsdk:"multi_tenant_app"`
-	GlobalAccount        types.String `tfsdk:"global_account"`
-	AuthenticationSchema types.Object `tfsdk:"authentication_schema"`
+	Name                 types.String              `tfsdk:"name"`
+	Description          types.String              `tfsdk:"description"`
+	ParentApplicationId  types.String              `tfsdk:"parent_application_id"`
+	MultiTenantApp       types.Bool                `tfsdk:"multi_tenant_app"`
+	GlobalAccount        types.String              `tfsdk:"global_account"`
+	AuthenticationSchema *authenticationSchemaData `tfsdk:"authentication_schema"`
 }
 
 func applicationValueFrom(ctx context.Context, a applications.Application) (applicationData, diag.Diagnostics) {
@@ -98,19 +120,23 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 		authenticationSchema.SubjectNameIdentifierFunction = types.StringValue((a.AuthenticationSchema.SubjectNameIdentifierFunction))
 	}
 
-	attributes := []assertionAttributesData{}
-	for _, attributeRes := range a.AuthenticationSchema.AssertionAttributes {
+	if a.AuthenticationSchema.AssertionAttributes != nil { 
+		attributes := []assertionAttributesData{}
+		for _, attributeRes := range *(a.AuthenticationSchema.AssertionAttributes) {
 
-		attribute := assertionAttributesData{
-			AttributeName:  types.StringValue(attributeRes.AssertionAttributeName),
-			AttributeValue: types.StringValue(attributeRes.UserAttributeName),
-			Inherited:      types.BoolValue(attributeRes.Inherited),
+			attribute := assertionAttributesData{
+				AttributeName:  types.StringValue(attributeRes.AssertionAttributeName),
+				AttributeValue: types.StringValue(attributeRes.UserAttributeName),
+				Inherited:      types.BoolValue(attributeRes.Inherited),
+			}
+
+			attributes = append(attributes, attribute)
 		}
-
-		attributes = append(attributes, attribute)
+		authenticationSchema.AssertionAttributes, diags = types.ListValueFrom(ctx, assertionAttributesObjType, attributes)
+		diagnostics.Append(diags...)
+	} else {
+		authenticationSchema.AssertionAttributes, _ = types.ListValue(assertionAttributesObjType, nil)
 	}
-	authenticationSchema.AssertionAttributes, diags = types.ListValueFrom(ctx, assertionAttributesObjType, attributes)
-	diagnostics.Append(diags...)
 
 	advancedAttributes := []advancedAssertionAttributesData{}
 	for _, attributeRes := range a.AuthenticationSchema.AdvancedAssertionAttributes {
@@ -173,8 +199,64 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 
 	diagnostics.Append(diags...)
 
-	application.AuthenticationSchema, diags = types.ObjectValueFrom(ctx, authenticationSchemaObjType, authenticationSchema)
-	diagnostics.Append(diags...)
+	rbaConfiguration := rbaConfigurationData{}
+
+	if a.AuthenticationSchema.RiskBasedAuthentication != nil {
+		rbaConfiguration.DefaultAction, diags = types.ListValueFrom(ctx, types.StringType, a.AuthenticationSchema.RiskBasedAuthentication.DefaultAction)
+		diagnostics.Append(diags...)
+
+		rbaRules := []rbaRulesData{}
+		for _, rule := range a.AuthenticationSchema.RiskBasedAuthentication.Rules {
+
+			ruleData := rbaRulesData{}
+
+			actions := rule.Actions
+			ruleData.Actions, diags = types.ListValueFrom(ctx, types.StringType, actions)
+
+			diagnostics.Append(diags...)
+
+			ruleData.IpNetworkRange = types.StringValue(rule.IpNetworkRange)
+
+			// if len(rule.IpForwardRange) > 0 {
+			ruleData.IpForwardRange = types.StringValue(rule.IpForwardRange)
+			// }
+			if len(rule.Group) > 0 {
+				ruleData.Group = types.StringValue(rule.Group)
+			}
+			if len(rule.GroupType) > 0 {
+				ruleData.GroupType = types.StringValue(rule.GroupType)
+			}
+			if len(rule.AuthMethod) > 0 {
+				ruleData.AuthMethod = types.StringValue(rule.AuthMethod)
+			}
+			if len(rule.UserType) > 0 {
+				ruleData.UserType = types.StringValue(rule.UserType)
+			}
+			if rule.CorporateIdpAttribute != nil {
+				attr := corporateIdpAttributeData{}
+
+				attr.Name = types.StringValue(rule.CorporateIdpAttribute.Name)
+				attr.Value = types.StringValue(rule.CorporateIdpAttribute.Value)
+
+				ruleData.CorporateIdpAttribute = &attr
+			} else {
+				ruleData.CorporateIdpAttribute = nil
+			}
+
+			rbaRules = append(rbaRules, ruleData)
+		}
+
+		if len(rbaRules) > 0 {
+			rbaConfiguration.Rules, diags = types.ListValueFrom(ctx, rbaRuleObjType, rbaRules)
+			diagnostics.Append(diags...)
+		} else {
+			rbaConfiguration.Rules = types.ListNull(rbaRuleObjType)
+		}
+
+		authenticationSchema.RBAConfiguration = &rbaConfiguration
+	}
+
+	application.AuthenticationSchema = &authenticationSchema
 
 	return application, diagnostics
 }

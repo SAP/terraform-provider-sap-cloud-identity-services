@@ -19,7 +19,7 @@ var applicationsBody = applications.Application{
 	AuthenticationSchema: applications.AuthenticationSchema{
 		SsoType:               "saml",
 		SubjectNameIdentifier: "mail",
-		AssertionAttributes: []applications.AssertionAttribute{
+		AssertionAttributes: &[]applications.AssertionAttribute{
 			{
 				AssertionAttributeName: "attr_name_1",
 				UserAttributeName:      "user_name_1",

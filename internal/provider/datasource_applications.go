@@ -39,7 +39,7 @@ var authenticationSchemaObjType = map[string]attr.Type{
 		ElemType: advancedAssertionAttributesObjType,
 	},
 	"default_authenticating_idp": types.StringType,
-	"authentication_rules": types.ListType{
+	"conditional_authentication": types.ListType{
 		ElemType: authenticationRulesObjType,
 	},
 }
@@ -73,6 +73,35 @@ var authenticationRulesObjType = types.ObjectType{
 		"user_email_domain":    types.StringType,
 		"identity_provider_id": types.StringType,
 		"ip_network_range":     types.StringType,
+	},
+}
+
+var rbaConfigurationObjType = map[string]attr.Type{
+	"deafult_action": types.ListType{
+		ElemType: types.StringType,
+	},
+	"rules": types.ListType{
+		ElemType: rbaRuleObjType,
+	},
+}
+
+var rbaRuleObjType = types.ObjectType{
+	AttrTypes: map[string]attr.Type{
+		"ip_network_range": types.StringType,
+		"ip_forward_range": types.StringType,
+		"actions": types.ListType{
+			ElemType: types.StringType,
+		},
+		"group":       types.StringType,
+		"group_type":  types.StringType,
+		"auth_method": types.StringType,
+		"user_type":   types.StringType,
+		"corporate_idp_attribute": types.ObjectType{
+			AttrTypes: map[string]attr.Type{
+				"name":  types.StringType,
+				"value": types.StringType,
+			},
+		},
 	},
 }
 
@@ -212,7 +241,7 @@ func (d *applicationsDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 									MarkdownDescription: "A default identity provider can be used for users with any user domain, group and type. This identity provider is used when none of the defined authentication rules meets the criteria.",
 									Computed:            true,
 								},
-								"authentication_rules": schema.ListNestedAttribute{
+								"conditional_authentication": schema.ListNestedAttribute{
 									MarkdownDescription: "Rules to manage authentication. Each rule is evaluated by priority until the criteria of a rule are fulfilled.",
 									Computed:            true,
 									NestedObject: schema.NestedAttributeObject{
@@ -236,6 +265,68 @@ func (d *applicationsDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 											"ip_network_range": schema.StringAttribute{
 												MarkdownDescription: "Valid IP range to be authenticated.",
 												Computed:            true,
+											},
+										},
+									},
+								},
+								"risk_based_authentication": schema.SingleNestedAttribute{
+									MarkdownDescription: "Define rules for authentication according to IP range, group membership, authentication method, and type of the authenticating user.",
+									Computed:            true,
+									Attributes: map[string]schema.Attribute{
+										"default_action": schema.ListAttribute{
+											MarkdownDescription: "Set a default action for any IP range, group and authentication method. This rule is used when none of the defined authentication rules meets the criteria. If there are no rules configured, the risk-based authentication configuration on tenant level will be applied.",
+											Computed:            true,
+											ElementType:         types.StringType,
+										},
+										"rules": schema.ListNestedAttribute{
+											MarkdownDescription: "Configure rules to manage authentication. Each rule is evaluated by priority until the criteria of a rule are fulfilled.",
+											Computed:            true,
+											NestedObject: schema.NestedAttributeObject{
+												Attributes: map[string]schema.Attribute{
+													"actions": schema.ListAttribute{
+														MarkdownDescription: "Action for the authentication of the user when all conditions specified are met",
+														Computed:            true,
+														ElementType:         types.StringType,
+													},
+													"ip_network_range": schema.StringAttribute{
+														MarkdownDescription: "Valid IP range to be authenticated",
+														Computed:            true,
+													},
+													"ip_forward_range": schema.StringAttribute{
+														MarkdownDescription: "Valid IP range to be authenticated",
+														Computed:            true,
+													},
+													"group": schema.StringAttribute{
+														MarkdownDescription: "User group to be authenticated",
+														Computed:            true,
+													},
+													"group_type": schema.StringAttribute{
+														MarkdownDescription: "Type of the group to be authenticated",
+														Computed:            true,
+													},
+													"auth_method": schema.StringAttribute{
+														MarkdownDescription: "Authentication method to be authenticated",
+														Computed:            true,
+													},
+													"user_type": schema.StringAttribute{
+														MarkdownDescription: "Type of the user to be authenticated",
+														Computed:            true,
+													},
+													"corporate_idp_attribute": schema.SingleNestedAttribute{
+														// MarkdownDescription: ,
+														Computed: true,
+														Attributes: map[string]schema.Attribute{
+															"name": schema.StringAttribute{
+																MarkdownDescription: "Name of the attribute",
+																Computed:            true,
+															},
+															"value": schema.StringAttribute{
+																MarkdownDescription: "Value of the attribute",
+																Computed:            true,
+															},
+														},
+													},
+												},
 											},
 										},
 									},

@@ -138,7 +138,7 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 						MarkdownDescription: "A default identity provider can be used for users with any user domain, group and type. This identity provider is used when none of the defined authentication rules meets the criteria.",
 						Computed:            true,
 					},
-					"authentication_rules": schema.ListNestedAttribute{
+					"conditional_authentication": schema.ListNestedAttribute{
 						MarkdownDescription: "Rules to manage authentication. Each rule is evaluated by priority until the criteria of a rule are fulfilled.",
 						Computed:            true,
 						NestedObject: schema.NestedAttributeObject{

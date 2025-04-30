@@ -24,7 +24,7 @@ func ValidAttributeName() validator.String {
 
 // Checks that the String held in the attribute is a valid IP Address
 func ValidIPAddress() validator.String {
-	return stringvalidator.RegexMatches(IPRegexp, "value must be a valid IP Address")
+	return stringvalidator.RegexMatches(IPRegexp, "value must be a valid IP Address with a valid CIDR notation")
 }
 
 // Checks that the String held in the attribute is a valid Email Domain

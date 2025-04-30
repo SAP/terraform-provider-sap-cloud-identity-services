@@ -1,3 +1,6 @@
+// tfsdk tags have been added to fields of certain structs to help
+// with the conversion of the terraform config to the API request [refer function getApplicationRequest]
+
 package applications
 
 type Meta struct {
@@ -68,15 +71,15 @@ type JwtClientAuthCredential struct {
 }
 
 type AssertionAttribute struct {
-	AssertionAttributeName string `json:"assertionAttributeName"`
-	UserAttributeName      string `json:"userAttributeName"`
-	Inherited              bool   `json:"inherited"`
+	AssertionAttributeName string `json:"assertionAttributeName" tfsdk:"attribute_name"`
+	UserAttributeName      string `json:"userAttributeName" tfsdk:"attribute_value"`
+	Inherited              bool   `json:"inherited" tfsdk:"inherited"`
 }
 
 type AdvancedAssertionAttribute struct {
-	AttributeName  string `json:"attributeName,omitempty"`
-	AttributeValue string `json:"attributeValue,omitempty"`
-	Inherited      bool   `json:"inherited"`
+	AttributeName  string `json:"attributeName,omitempty" tfsdk:"attribute_name"`
+	AttributeValue string `json:"attributeValue,omitempty" tfsdk:"attribute_value"`
+	Inherited      bool   `json:"inherited" tfsdk:"inherited"`
 }
 
 type DisabledInheritedProperties struct {
@@ -85,11 +88,32 @@ type DisabledInheritedProperties struct {
 }
 
 type AuthenicationRule struct {
-	UserType           string `json:"userType,omitempty"`
-	UserGroup          string `json:"userGroup,omitempty"`
-	UserEmailDomain    string `json:"userEmailDomain,omitempty"`
-	IdentityProviderId string `json:"identityProviderId,omitempty"`
-	IpNetworkRange     string `json:"ipNetworkRange,omitempty"`
+	UserType           string `json:"userType,omitempty" tfsdk:"user_type"`
+	UserGroup          string `json:"userGroup,omitempty" tfsdk:"user_group"`
+	UserEmailDomain    string `json:"userEmailDomain,omitempty" tfsdk:"user_email_domain"`
+	IdentityProviderId string `json:"identityProviderId,omitempty" tfsdk:"identity_provider_id"`
+	IpNetworkRange     string `json:"ipNetworkRange,omitempty" tfsdk:"ip_network_range"`
+}
+
+type CorporateIdpAttribute struct {
+	Name  string `json:"name" tfsdk:"name"`
+	Value string `json:"value" tfsdk:"value"`
+}
+
+type RBARule struct {
+	IpNetworkRange        string                 `json:"ipNetworkRange" tfsdk:"ip_network_range"`
+	IpForwardRange        string                 `json:"ipForwardRange,omitempty" tfsdk:"ip_forward_range"`
+	Actions               []string               `json:"actions" tfsdk:"actions"`
+	Group                 string                 `json:"group,omitempty" tfsdk:"group"`
+	GroupType             string                 `json:"groupType,omitempty" tfsdk:"group_type"`
+	AuthMethod            string                 `json:"authMethod,omitempty" tfsdk:"auth_method"`
+	UserType              string                 `json:"userType,omitempty" tfsdk:"user_type"`
+	CorporateIdpAttribute *CorporateIdpAttribute `json:"corporateIdpAttribute" tfsdk:"corporate_idp_attribute"`
+}
+
+type RBAConfiguration struct {
+	DefaultAction []string  `json:"defaultAction,omitempty" tfsdk:"default_action"`
+	Rules         []RBARule `json:"rules,omitempty" tfsdk:"rules"`
 }
 
 type ConsumedService struct {
@@ -116,10 +140,11 @@ type AuthenticationSchema struct {
 	SsoType                       string                       `json:"ssoType,omitempty"`
 	SubjectNameIdentifier         string                       `json:"subjectNameIdentifier,omitempty"`
 	SubjectNameIdentifierFunction string                       `json:"subjectNameIdentifierFunction,omitempty"`
-	AssertionAttributes           []AssertionAttribute         `json:"assertionAttributes,omitempty"`
+	AssertionAttributes           *[]AssertionAttribute         `json:"assertionAttributes,omitempty"`
 	AdvancedAssertionAttributes   []AdvancedAssertionAttribute `json:"advancedAssertionAttributes,omitempty"`
 	DefaultAuthenticatingIdpId    string                       `json:"defaultAuthenticatingIdpId,omitempty"`
 	ConditionalAuthentication     []AuthenicationRule          `json:"conditionalAuthentication,omitempty"`
+	RiskBasedAuthentication       *RBAConfiguration            `json:"riskBasedAuthentication"`
 	// HomeUrl								string 							`json:"homeUrl"`
 	// FallbackSubjectNameIdentifier		string 							`json:"fallbackSubjectNameIdentifier,omitempty"`
 	// RememberMeExpirationTimeInMonths	string 							`json:"rememberMeExpirationTimeInMonths,omitempty"`
@@ -140,7 +165,6 @@ type AuthenticationSchema struct {
 	// ConsumedServices					[]ConsumedService				`json:"consumedServices,omitempty"`
 	// ProvidedApis						[]ProvidedApi 					`json:"providedApis,omitempty"`
 	// ConsumedApis						[]ConsumedApi 					`json:"consumedApis,omitempty"`
-	// riskBasedAuthentication
 	// smsVerificationConfig
 	// captchaConfig
 	// saml2Configuration

@@ -41,7 +41,7 @@ Read-Only:
 
 - `advanced_assertion_attributes` (Attributes List) Identical to the assertion attributes, except that the assertion attributes can come from other Sources. (see [below for nested schema](#nestedatt--authentication_schema--advanced_assertion_attributes))
 - `assertion_attributes` (Attributes List) User attributes to be sent to the application. The Source of these attributes is always the Identity Directory, thus only valid attribute values will be accepted. (see [below for nested schema](#nestedatt--authentication_schema--assertion_attributes))
-- `authentication_rules` (Attributes List) Rules to manage authentication. Each rule is evaluated by priority until the criteria of a rule are fulfilled. (see [below for nested schema](#nestedatt--authentication_schema--authentication_rules))
+- `conditional_authentication` (Attributes List) Rules to manage authentication. Each rule is evaluated by priority until the criteria of a rule are fulfilled. (see [below for nested schema](#nestedatt--authentication_schema--conditional_authentication))
 - `default_authenticating_idp` (String) A default identity provider can be used for users with any user domain, group and type. This identity provider is used when none of the defined authentication rules meets the criteria.
 - `sso_type` (String) The preferred protocol for the application
 - `subject_name_identifier` (Attributes) The attribute by which the application uses to identify the users. Identity Authentication sends the attribute to the application as subject in OpenID Connect tokens. (see [below for nested schema](#nestedatt--authentication_schema--subject_name_identifier))
@@ -68,8 +68,8 @@ Read-Only:
 - `inherited` (Boolean) Indicates whether the attribute has been inherited from a parent application.
 
 
-<a id="nestedatt--authentication_schema--authentication_rules"></a>
-### Nested Schema for `authentication_schema.authentication_rules`
+<a id="nestedatt--authentication_schema--conditional_authentication"></a>
+### Nested Schema for `authentication_schema.conditional_authentication`
 
 Read-Only:
 
