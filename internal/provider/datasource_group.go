@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"terraform-provider-ias/internal/cli"
-	"terraform-provider-ias/internal/utils"
+	"terraform-provider-sci/internal/cli"
+	"terraform-provider-sci/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -18,7 +18,7 @@ func newGroupDataSource() datasource.DataSource {
 }
 
 type groupDataSource struct {
-	cli *cli.IasClient
+	cli *cli.SciClient
 }
 
 func (d *groupDataSource) Configure(_ context.Context, req datasource.ConfigureRequest, _ *datasource.ConfigureResponse) {
@@ -26,7 +26,7 @@ func (d *groupDataSource) Configure(_ context.Context, req datasource.ConfigureR
 		return
 	}
 
-	d.cli = req.ProviderData.(*cli.IasClient)
+	d.cli = req.ProviderData.(*cli.SciClient)
 }
 
 func (d *groupDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {

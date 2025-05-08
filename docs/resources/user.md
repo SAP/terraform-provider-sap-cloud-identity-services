@@ -1,11 +1,11 @@
 ---
-page_title: "ias_user Resource - ias"
+page_title: "sci_user Resource - sci"
 subcategory: ""
 description: |-
   Creates a user in the SAP Cloud Identity Services.
 ---
 
-# ias_user (Resource)
+# sci_user (Resource)
 
 Creates a user in the SAP Cloud Identity Services.
 
@@ -13,21 +13,37 @@ Creates a user in the SAP Cloud Identity Services.
 
 ```terraform
 # Create a user in SAP Cloud Identity Services
-resource "ias_user" "new_user" {
-  user_name   = "TO BE DONE"
-  name        = "TO BE DONE"
+resource "sci_user" "new_user" {
+  user_name   = "jdoe"
+  name = {
+    family_name = "John"
+    given_name  = "Doe"
+  }
+  emails = [
+    {
+      value = "john.doe@sap.com",
+      type  = "work"
+    }
+  ]
 }
 
 
 # Create a user in SAP Cloud Identity Services with customSchemas
-resource "ias_user" "new_user" {
+resource "sci_user" "new_user" {
   user_name   = "TO BE DONE"
-  name        = "TO BE DONE"
-  custom_schemas = jsonencoded({
-    "schema_id" : {
-      "attr1" : value
+  name = {
+    family_name = "John"
+    given_name  = "Doe"
+  }
+  emails = [
+    {
+      value = "john.doe@sap.com",
+      type  = "work"
     }
-  })
+  ]
+  custom_schemas = jsonencode({
+    "schema_id" : ["attr1"]}
+    )
 }
 ```
 
@@ -99,7 +115,7 @@ Optional:
 Import is supported using the following syntax:
 
 ```terraform
-# terraform import ias_user.<resource_name> <user_id>
+# terraform import sci_user.<resource_name> <user_id>
 
-terraform import ias_user.my_user dd005d8b-1fee-4e6b-b6ff-cb9a197b7fe0
+terraform import sci_user.my_user dd005d8b-1fee-4e6b-b6ff-cb9a197b7fe0
 ```

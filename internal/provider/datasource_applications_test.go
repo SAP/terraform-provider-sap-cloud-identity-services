@@ -23,7 +23,7 @@ func TestDataSourceApplications(t *testing.T) {
 					Config: providerConfig("", user) + DataSourceApplications("allApps"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						//fixture needs to re-recorded after cleanup, no. of apps needs to be modified accordingly
-						resource.TestCheckResourceAttr("data.ias_applications.allApps", "values.#", "21"),
+						resource.TestCheckResourceAttr("data.sci_applications.allApps", "values.#", "21"),
 					),
 				},
 			},
@@ -35,7 +35,7 @@ func TestDataSourceApplications(t *testing.T) {
 
 func DataSourceApplications(datasourceName string) string {
 	return fmt.Sprintf(`
-	data "ias_applications" "%s"{
+	data "sci_applications" "%s"{
 
 	}
 	`, datasourceName)

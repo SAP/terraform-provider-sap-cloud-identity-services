@@ -32,17 +32,17 @@ func TestDataSourceUser(t *testing.T) {
 				{
 					Config: providerConfig("", user) + DataSourceUser("testUser", "Test User"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestMatchResourceAttr("data.ias_user.testUser", "id", regexpUUID),
+						resource.TestMatchResourceAttr("data.sci_user.testUser", "id", regexpUUID),
 
-						resource.TestCheckResourceAttr("data.ias_user.testUser", "name.given_name", "Test"),
-						resource.TestCheckResourceAttr("data.ias_user.testUser", "name.family_name", "User"),
-						resource.TestCheckResourceAttr("data.ias_user.testUser", "user_name", "Test"),
-						resource.TestCheckResourceAttr("data.ias_user.testUser", "emails.0.value", "test.user2@gmail.com"),
-						resource.TestCheckResourceAttr("data.ias_user.testUser", "emails.0.primary", "true"),
-						resource.TestCheckResourceAttr("data.ias_user.testUser", "emails.1.value", "test.user1@sap.com"),
-						resource.TestCheckResourceAttr("data.ias_user.testUser", "emails.1.type", "work"),
-						resource.TestCheckResourceAttr("data.ias_user.testUser", "sap_extension_user.status", "inactive"),
-						resource.TestCheckResourceAttr("data.ias_user.testUser", "user_type", "public"),
+						resource.TestCheckResourceAttr("data.sci_user.testUser", "name.given_name", "Test"),
+						resource.TestCheckResourceAttr("data.sci_user.testUser", "name.family_name", "User"),
+						resource.TestCheckResourceAttr("data.sci_user.testUser", "user_name", "Test"),
+						resource.TestCheckResourceAttr("data.sci_user.testUser", "emails.0.value", "test.user2@gmail.com"),
+						resource.TestCheckResourceAttr("data.sci_user.testUser", "emails.0.primary", "true"),
+						resource.TestCheckResourceAttr("data.sci_user.testUser", "emails.1.value", "test.user1@sap.com"),
+						resource.TestCheckResourceAttr("data.sci_user.testUser", "emails.1.type", "work"),
+						resource.TestCheckResourceAttr("data.sci_user.testUser", "sap_extension_user.status", "inactive"),
+						resource.TestCheckResourceAttr("data.sci_user.testUser", "user_type", "public"),
 					),
 				},
 			},
@@ -61,15 +61,15 @@ func TestDataSourceUser(t *testing.T) {
 				{
 					Config: providerConfig("", user) + DataSourceUser("testUser", "Custom Schemas User"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestMatchResourceAttr("data.ias_user.testUser", "id", regexpUUID),
+						resource.TestMatchResourceAttr("data.sci_user.testUser", "id", regexpUUID),
 
-						resource.TestCheckResourceAttr("data.ias_user.testUser", "name.given_name", "Custom Schemas"),
-						resource.TestCheckResourceAttr("data.ias_user.testUser", "name.family_name", "User"),
-						resource.TestCheckResourceAttr("data.ias_user.testUser", "emails.0.value", "custom.user@test.com"),
-						resource.TestCheckResourceAttr("data.ias_user.testUser", "emails.0.primary", "true"),
-						resource.TestCheckResourceAttr("data.ias_user.testUser", "sap_extension_user.status", "active"),
-						resource.TestCheckResourceAttr("data.ias_user.testUser", "user_type", "employee"),
-						resource.TestCheckResourceAttrWith("data.ias_user.testUser", "custom_schemas", checkCustomSchemas),
+						resource.TestCheckResourceAttr("data.sci_user.testUser", "name.given_name", "Custom Schemas"),
+						resource.TestCheckResourceAttr("data.sci_user.testUser", "name.family_name", "User"),
+						resource.TestCheckResourceAttr("data.sci_user.testUser", "emails.0.value", "custom.user@test.com"),
+						resource.TestCheckResourceAttr("data.sci_user.testUser", "emails.0.primary", "true"),
+						resource.TestCheckResourceAttr("data.sci_user.testUser", "sap_extension_user.status", "active"),
+						resource.TestCheckResourceAttr("data.sci_user.testUser", "user_type", "employee"),
+						resource.TestCheckResourceAttrWith("data.sci_user.testUser", "custom_schemas", checkCustomSchemas),
 					),
 				},
 			},
@@ -109,16 +109,16 @@ func TestDataSourceUser(t *testing.T) {
 
 func DataSourceUser(resourceName string, userName string) string {
 	return fmt.Sprintf(`
-	data "ias_users" "allUsers" {}
-	data "ias_user" "%s" {
-		id = [for user in data.ias_users.allUsers.values : user.id if join(" ",[user.name.given_name,user.name.family_name]) == "%s"][0]
+	data "sci_users" "allUsers" {}
+	data "sci_user" "%s" {
+		id = [for user in data.sci_users.allUsers.values : user.id if join(" ",[user.name.given_name,user.name.family_name]) == "%s"][0]
 	}
 	`, resourceName, userName)
 }
 
 func DataSourceUserById(resourceName string, userId string) string {
 	return fmt.Sprintf(`
-	data "ias_user" "%s"{
+	data "sci_user" "%s"{
 		id = "%s"
 	}
 	`, resourceName, userId)
@@ -126,7 +126,7 @@ func DataSourceUserById(resourceName string, userId string) string {
 
 func DataSourceUserNoId(resourceName string) string {
 	return fmt.Sprintf(`
-	data "ias_user" "%s"{
+	data "sci_user" "%s"{
 	}
 	`, resourceName)
 }

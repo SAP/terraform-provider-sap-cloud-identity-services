@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"fmt"
-	"terraform-provider-ias/internal/cli/apiObjects/users"
+	"terraform-provider-sci/internal/cli/apiObjects/users"
 )
 
 type UsersCli struct {

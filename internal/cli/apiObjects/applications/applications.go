@@ -136,7 +136,7 @@ type AuthenticationSchema struct {
 	// ForceAuthentication					bool 							`json:"forceAuthentication,omitempty"`
 	// ConcurrentAccess					[]string						`json:"concurrentAccess,omitempty"`
 	// TrustAllCorporateIdentityProviders	bool 							`json:"trustAllCorporateIdentityProviders,omitempty"`
-	// AllowIasUsers						bool 							`json:"allowIasUsers,omitempty"`
+	// AllowSciUsers						bool 							`json:"allowIaUsers,omitempty"`
 	// ConsumedServices					[]ConsumedService				`json:"consumedServices,omitempty"`
 	// ProvidedApis						[]ProvidedApi 					`json:"providedApis,omitempty"`
 	// ConsumedApis						[]ConsumedApi 					`json:"consumedApis,omitempty"`

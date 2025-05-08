@@ -24,10 +24,10 @@ func TestDataSourceGroup(t *testing.T) {
 				{
 					Config: providerConfig("", user) + DataSourceGroup("testGroup", "testGroup"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestMatchResourceAttr("data.ias_group.testGroup", "id", regexpUUID),
-						resource.TestCheckResourceAttr("data.ias_group.testGroup", "display_name", "testGroup"),
-						resource.TestMatchResourceAttr("data.ias_group.testGroup", "group_members.0.value", regexpUUID),
-						resource.TestCheckResourceAttr("data.ias_group.testGroup", "group_members.0.type", "User"),
+						resource.TestMatchResourceAttr("data.sci_group.testGroup", "id", regexpUUID),
+						resource.TestCheckResourceAttr("data.sci_group.testGroup", "display_name", "testGroup"),
+						resource.TestMatchResourceAttr("data.sci_group.testGroup", "group_members.0.value", regexpUUID),
+						resource.TestCheckResourceAttr("data.sci_group.testGroup", "group_members.0.type", "User"),
 					),
 				},
 			},
@@ -68,16 +68,16 @@ func TestDataSourceGroup(t *testing.T) {
 
 func DataSourceGroup(datasourceName string, groupName string) string {
 	return fmt.Sprintf(`
-	data "ias_groups" "allGroups" {}
-	data "ias_group" "%s" {
-		id = [for group in data.ias_groups.allGroups.values : group.id if group.display_name == "%s"][0]
+	data "sci_groups" "allGroups" {}
+	data "sci_group" "%s" {
+		id = [for group in data.sci_groups.allGroups.values : group.id if group.display_name == "%s"][0]
 	}
 	`, datasourceName, groupName)
 }
 
 func DataSourceGroupById(datasourceName string, groupId string) string {
 	return fmt.Sprintf(`
-	data "ias_group" "%s" {
+	data "sci_group" "%s" {
 		id = "%s"
 	}
 	`, datasourceName, groupId)
@@ -85,6 +85,6 @@ func DataSourceGroupById(datasourceName string, groupId string) string {
 
 func DataSourceGroupNoId(datasourceName string) string {
 	return fmt.Sprintf(`
-	data "ias_group" "%s" {}
+	data "sci_group" "%s" {}
 	`, datasourceName)
 }

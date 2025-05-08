@@ -24,15 +24,15 @@ func TestDataSourceApplication(t *testing.T) {
 				{
 					Config: providerConfig("", user) + DataSourceApplication("testApp", "oac.accounts.sap.com"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestMatchResourceAttr("data.ias_application.testApp", "id", regexpUUID),
-						resource.TestCheckResourceAttr("data.ias_application.testApp", "global_account", "b37ef791-a3d6-4aef-b700-fb7e0c353c43"),
-						resource.TestCheckResourceAttr("data.ias_application.testApp", "multi_tenant_app", "false"),
-						resource.TestCheckResourceAttr("data.ias_application.testApp", "name", "oac.accounts.sap.com"),
-						resource.TestCheckResourceAttr("data.ias_application.testApp", "parent_application_id", ""),
-						resource.TestCheckResourceAttr("data.ias_application.testApp", "authentication_schema.assertion_attributes.0.attribute_value", "firstName"),
-						resource.TestCheckResourceAttr("data.ias_application.testApp", "authentication_schema.default_authenticating_idp", "664c660e25cff252c5c202dc"),
-						resource.TestCheckResourceAttr("data.ias_application.testApp", "authentication_schema.sso_type", "saml2"),
-						resource.TestCheckResourceAttr("data.ias_application.testApp", "authentication_schema.subject_name_identifier.value", "uid"),
+						resource.TestMatchResourceAttr("data.sci_application.testApp", "id", regexpUUID),
+						resource.TestCheckResourceAttr("data.sci_application.testApp", "global_account", "b37ef791-a3d6-4aef-b700-fb7e0c353c43"),
+						resource.TestCheckResourceAttr("data.sci_application.testApp", "multi_tenant_app", "false"),
+						resource.TestCheckResourceAttr("data.sci_application.testApp", "name", "oac.accounts.sap.com"),
+						resource.TestCheckResourceAttr("data.sci_application.testApp", "parent_application_id", ""),
+						resource.TestCheckResourceAttr("data.sci_application.testApp", "authentication_schema.assertion_attributes.0.attribute_value", "firstName"),
+						resource.TestCheckResourceAttr("data.sci_application.testApp", "authentication_schema.default_authenticating_idp", "664c660e25cff252c5c202dc"),
+						resource.TestCheckResourceAttr("data.sci_application.testApp", "authentication_schema.sso_type", "saml2"),
+						resource.TestCheckResourceAttr("data.sci_application.testApp", "authentication_schema.subject_name_identifier.value", "uid"),
 					),
 				},
 			},
@@ -72,16 +72,16 @@ func TestDataSourceApplication(t *testing.T) {
 
 func DataSourceApplication(datasourceName string, appName string) string {
 	return fmt.Sprintf(`
-	data "ias_applications" "allApps" {}
-	data "ias_application" "%s" {
-		id = [for app in data.ias_applications.allApps.values : app.id if app.name == "%s"][0]
+	data "sci_applications" "allApps" {}
+	data "sci_application" "%s" {
+		id = [for app in data.sci_applications.allApps.values : app.id if app.name == "%s"][0]
 	}
 	`, datasourceName, appName)
 }
 
 func DataSourceApplicationById(datasourceName string, appId string) string {
 	return fmt.Sprintf(`
-	data "ias_application" "%s" {
+	data "sci_application" "%s" {
 		id = "%s"
 	}
 	`, datasourceName, appId)
@@ -89,7 +89,7 @@ func DataSourceApplicationById(datasourceName string, appId string) string {
 
 func DataSourceApplicationNoId(datasourceName string) string {
 	return fmt.Sprintf(`
-	data "ias_application" "%s" {
+	data "sci_application" "%s" {
 	}
 	`, datasourceName)
 }

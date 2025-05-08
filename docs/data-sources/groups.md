@@ -1,11 +1,11 @@
 ---
-page_title: "ias_groups Data Source - ias"
+page_title: "sci_groups Data Source - sci"
 subcategory: ""
 description: |-
   Gets an list of groups from the SAP Cloud Identity services.
 ---
 
-# ias_groups (Data Source)
+# sci_groups (Data Source)
 
 Gets an list of groups from the SAP Cloud Identity services.
 
@@ -13,7 +13,7 @@ Gets an list of groups from the SAP Cloud Identity services.
 
 ```terraform
 # List all groups
-data "ias_groups" "all" {
+data "sci_groups" "all" {
 }
 ```
 

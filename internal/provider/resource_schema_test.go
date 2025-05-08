@@ -3,7 +3,7 @@ package provider
 import (
 	"fmt"
 	"regexp"
-	"terraform-provider-ias/internal/cli/apiObjects/schemas"
+	"terraform-provider-sci/internal/cli/apiObjects/schemas"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -34,14 +34,14 @@ func TestResourceSchema(t *testing.T) {
 					Config: providerConfig("", user) + ResourceSchema("testSchema", "urn:ietf:scim:schemas:Terraform", "Terraform", schemaAttributes),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						//add if regex is added
-						// resource.TestMatchResourceAttr("ias_user.testSchema", "id", regexpUUID),
-						resource.TestCheckResourceAttr("ias_schema.testSchema", "id", "urn:ietf:scim:schemas:Terraform"),
-						resource.TestCheckResourceAttr("ias_schema.testSchema", "name", "Terraform"),
-						resource.TestCheckResourceAttr("ias_schema.testSchema", "attributes.0.name", schemaAttributes.Name),
-						resource.TestCheckResourceAttr("ias_schema.testSchema", "attributes.0.type", schemaAttributes.Type),
-						resource.TestCheckResourceAttr("ias_schema.testSchema", "attributes.0.mutability", schemaAttributes.Mutability),
-						resource.TestCheckResourceAttr("ias_schema.testSchema", "attributes.0.returned", schemaAttributes.Returned),
-						resource.TestCheckResourceAttr("ias_schema.testSchema", "attributes.0.uniqueness", schemaAttributes.Uniqueness),
+						// resource.TestMatchResourceAttr("sci_user.testSchema", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_schema.testSchema", "id", "urn:ietf:scim:schemas:Terraform"),
+						resource.TestCheckResourceAttr("sci_schema.testSchema", "name", "Terraform"),
+						resource.TestCheckResourceAttr("sci_schema.testSchema", "attributes.0.name", schemaAttributes.Name),
+						resource.TestCheckResourceAttr("sci_schema.testSchema", "attributes.0.type", schemaAttributes.Type),
+						resource.TestCheckResourceAttr("sci_schema.testSchema", "attributes.0.mutability", schemaAttributes.Mutability),
+						resource.TestCheckResourceAttr("sci_schema.testSchema", "attributes.0.returned", schemaAttributes.Returned),
+						resource.TestCheckResourceAttr("sci_schema.testSchema", "attributes.0.uniqueness", schemaAttributes.Uniqueness),
 					),
 				},
 			},
@@ -247,7 +247,7 @@ func TestResourceSchema(t *testing.T) {
 
 func ResourceSchema(resourceName string, schemaId string, schemaName string, schemaAttributes schemas.Attribute) string {
 	return fmt.Sprintf(`
-	resource "ias_schema" "%s"{
+	resource "sci_schema" "%s"{
 		id = "%s"
 		name = "%s"
 		attributes = [
@@ -265,7 +265,7 @@ func ResourceSchema(resourceName string, schemaId string, schemaName string, sch
 
 func ResourceSchemaWithoutSchemas(resourceName string, schemaId string, schemaName string) string {
 	return fmt.Sprintf(`
-	resource "ias_schema" "%s"{
+	resource "sci_schema" "%s"{
 		id = "%s"
 		name = "%s"
 		attributes = []
@@ -276,7 +276,7 @@ func ResourceSchemaWithoutSchemas(resourceName string, schemaId string, schemaNa
 
 func ResourceSchemaWithoutSchemaId(resourceName string, schemaName string) string {
 	return fmt.Sprintf(`
-	resource "ias_schema" "%s"{
+	resource "sci_schema" "%s"{
 		name = "%s"
 		attributes = []
 	}
@@ -285,7 +285,7 @@ func ResourceSchemaWithoutSchemaId(resourceName string, schemaName string) strin
 
 func ResourceSchemaWithoutSchemaName(resourceName string, schemaId string) string {
 	return fmt.Sprintf(`
-	resource "ias_schema" "%s"{
+	resource "sci_schema" "%s"{
 		id = "%s"
 		attributes = []
 	}
@@ -294,7 +294,7 @@ func ResourceSchemaWithoutSchemaName(resourceName string, schemaId string) strin
 
 func ResourceSchemaWithoutAttributes(resourceName string, schemaId string, schemaName string) string {
 	return fmt.Sprintf(`
-	resource "ias_schema" "%s"{
+	resource "sci_schema" "%s"{
 		id = "%s"
 		name = "%s"
 		attributes = [

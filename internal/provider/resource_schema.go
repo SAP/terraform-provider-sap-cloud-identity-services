@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"terraform-provider-ias/internal/cli"
-	"terraform-provider-ias/internal/cli/apiObjects/schemas"
-	"terraform-provider-ias/internal/utils"
+	"terraform-provider-sci/internal/cli"
+	"terraform-provider-sci/internal/cli/apiObjects/schemas"
+	"terraform-provider-sci/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
@@ -35,7 +35,7 @@ func newSchemaResource() resource.Resource {
 }
 
 type schemaResource struct {
-	cli *cli.IasClient
+	cli *cli.SciClient
 }
 
 func (r *schemaResource) Configure(_ context.Context, req resource.ConfigureRequest, _ *resource.ConfigureResponse) {
@@ -43,7 +43,7 @@ func (r *schemaResource) Configure(_ context.Context, req resource.ConfigureRequ
 		return
 	}
 
-	r.cli = req.ProviderData.(*cli.IasClient)
+	r.cli = req.ProviderData.(*cli.SciClient)
 }
 
 func (r *schemaResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {

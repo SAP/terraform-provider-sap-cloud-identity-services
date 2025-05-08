@@ -2,7 +2,7 @@ package provider
 
 import (
 	"context"
-	"terraform-provider-ias/internal/cli/apiObjects/schemas"
+	"terraform-provider-sci/internal/cli/apiObjects/schemas"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"terraform-provider-ias/internal/cli/apiObjects/groups"
+	"terraform-provider-sci/internal/cli/apiObjects/groups"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

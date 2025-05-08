@@ -1,11 +1,11 @@
 ---
-page_title: "ias_user Data Source - ias"
+page_title: "sci_user Data Source - sci"
 subcategory: ""
 description: |-
   Gets a user from the SAP Cloud Identity services.
 ---
 
-# ias_user (Data Source)
+# sci_user (Data Source)
 
 Gets a user from the SAP Cloud Identity services.
 
@@ -13,7 +13,7 @@ Gets a user from the SAP Cloud Identity services.
 
 ```terraform
 # Read a user by ID
-data "ias_user" "by_id" {
+data "sci_user" "by_id" {
   id = "user_1234567890"
 }
 ```

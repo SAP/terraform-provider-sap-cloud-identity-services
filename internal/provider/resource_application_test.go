@@ -3,8 +3,8 @@ package provider
 import (
 	"fmt"
 	"regexp"
-	"terraform-provider-ias/internal/cli/apiObjects/applications"
-	"terraform-provider-ias/internal/utils"
+	"terraform-provider-sci/internal/cli/apiObjects/applications"
+	"terraform-provider-sci/internal/utils"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -66,30 +66,30 @@ func TestResourceApplication(t *testing.T) {
 				{
 					Config: providerConfig("", user) + ResourceApplication("testApp", application),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestMatchResourceAttr("ias_application.testApp", "id", regexpUUID),
-						resource.TestCheckResourceAttr("ias_application.testApp", "name", application.Name),
-						resource.TestCheckResourceAttr("ias_application.testApp", "description", application.Description),
-						resource.TestCheckResourceAttr("ias_application.testApp", "multi_tenant_app", "false"),
-						resource.TestCheckResourceAttr("ias_application.testApp", "global_account", "unknown"),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.sso_type", application.AuthenticationSchema.SsoType),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.subject_name_identifier.value", application.AuthenticationSchema.SubjectNameIdentifier),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.subject_name_identifier_function", application.AuthenticationSchema.SubjectNameIdentifierFunction),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.assertion_attributes.0.attribute_name", application.AuthenticationSchema.AssertionAttributes[0].AssertionAttributeName),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.assertion_attributes.0.attribute_value", application.AuthenticationSchema.AssertionAttributes[0].UserAttributeName),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.assertion_attributes.1.attribute_name", application.AuthenticationSchema.AssertionAttributes[1].AssertionAttributeName),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.assertion_attributes.1.attribute_value", application.AuthenticationSchema.AssertionAttributes[1].UserAttributeName),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.advanced_assertion_attributes.0.attribute_name", application.AuthenticationSchema.AdvancedAssertionAttributes[0].AttributeName),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.advanced_assertion_attributes.0.attribute_value", application.AuthenticationSchema.AdvancedAssertionAttributes[0].AttributeValue),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.advanced_assertion_attributes.1.attribute_name", application.AuthenticationSchema.AdvancedAssertionAttributes[1].AttributeName),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.advanced_assertion_attributes.1.attribute_value", application.AuthenticationSchema.AdvancedAssertionAttributes[1].AttributeValue),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.default_authenticating_idp", application.AuthenticationSchema.DefaultAuthenticatingIdpId),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.authentication_rules.0.user_type", application.AuthenticationSchema.ConditionalAuthentication[0].UserType),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.authentication_rules.0.user_email_domain", application.AuthenticationSchema.ConditionalAuthentication[0].UserEmailDomain),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.authentication_rules.0.ip_network_range", application.AuthenticationSchema.ConditionalAuthentication[0].IpNetworkRange),
+						resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_application.testApp", "name", application.Name),
+						resource.TestCheckResourceAttr("sci_application.testApp", "description", application.Description),
+						resource.TestCheckResourceAttr("sci_application.testApp", "multi_tenant_app", "false"),
+						resource.TestCheckResourceAttr("sci_application.testApp", "global_account", "unknown"),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sso_type", application.AuthenticationSchema.SsoType),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.subject_name_identifier.value", application.AuthenticationSchema.SubjectNameIdentifier),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.subject_name_identifier_function", application.AuthenticationSchema.SubjectNameIdentifierFunction),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.assertion_attributes.0.attribute_name", application.AuthenticationSchema.AssertionAttributes[0].AssertionAttributeName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.assertion_attributes.0.attribute_value", application.AuthenticationSchema.AssertionAttributes[0].UserAttributeName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.assertion_attributes.1.attribute_name", application.AuthenticationSchema.AssertionAttributes[1].AssertionAttributeName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.assertion_attributes.1.attribute_value", application.AuthenticationSchema.AssertionAttributes[1].UserAttributeName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.advanced_assertion_attributes.0.attribute_name", application.AuthenticationSchema.AdvancedAssertionAttributes[0].AttributeName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.advanced_assertion_attributes.0.attribute_value", application.AuthenticationSchema.AdvancedAssertionAttributes[0].AttributeValue),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.advanced_assertion_attributes.1.attribute_name", application.AuthenticationSchema.AdvancedAssertionAttributes[1].AttributeName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.advanced_assertion_attributes.1.attribute_value", application.AuthenticationSchema.AdvancedAssertionAttributes[1].AttributeValue),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.default_authenticating_idp", application.AuthenticationSchema.DefaultAuthenticatingIdpId),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.authentication_rules.0.user_type", application.AuthenticationSchema.ConditionalAuthentication[0].UserType),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.authentication_rules.0.user_email_domain", application.AuthenticationSchema.ConditionalAuthentication[0].UserEmailDomain),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.authentication_rules.0.ip_network_range", application.AuthenticationSchema.ConditionalAuthentication[0].IpNetworkRange),
 					),
 				},
 				{
-					ResourceName:      "ias_application.testApp",
+					ResourceName:      "sci_application.testApp",
 					ImportState:       true,
 					ImportStateVerify: true,
 				},
@@ -147,51 +147,51 @@ func TestResourceApplication(t *testing.T) {
 				{
 					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/", user) + ResourceApplication("testApp", application),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestMatchResourceAttr("ias_application.testApp", "id", regexpUUID),
-						resource.TestCheckResourceAttr("ias_application.testApp", "name", application.Name),
-						resource.TestCheckResourceAttr("ias_application.testApp", "description", application.Description),
-						resource.TestCheckResourceAttr("ias_application.testApp", "multi_tenant_app", "false"),
-						resource.TestCheckResourceAttr("ias_application.testApp", "global_account", "unknown"),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.sso_type", application.AuthenticationSchema.SsoType),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.subject_name_identifier.value", application.AuthenticationSchema.SubjectNameIdentifier),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.subject_name_identifier_function", application.AuthenticationSchema.SubjectNameIdentifierFunction),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.assertion_attributes.0.attribute_name", application.AuthenticationSchema.AssertionAttributes[0].AssertionAttributeName),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.assertion_attributes.0.attribute_value", application.AuthenticationSchema.AssertionAttributes[0].UserAttributeName),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.assertion_attributes.1.attribute_name", application.AuthenticationSchema.AssertionAttributes[1].AssertionAttributeName),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.assertion_attributes.1.attribute_value", application.AuthenticationSchema.AssertionAttributes[1].UserAttributeName),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.advanced_assertion_attributes.0.attribute_name", application.AuthenticationSchema.AdvancedAssertionAttributes[0].AttributeName),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.advanced_assertion_attributes.0.attribute_value", application.AuthenticationSchema.AdvancedAssertionAttributes[0].AttributeValue),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.advanced_assertion_attributes.1.attribute_name", application.AuthenticationSchema.AdvancedAssertionAttributes[1].AttributeName),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.advanced_assertion_attributes.1.attribute_value", application.AuthenticationSchema.AdvancedAssertionAttributes[1].AttributeValue),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.default_authenticating_idp", application.AuthenticationSchema.DefaultAuthenticatingIdpId),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.authentication_rules.0.user_type", application.AuthenticationSchema.ConditionalAuthentication[0].UserType),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.authentication_rules.0.user_email_domain", application.AuthenticationSchema.ConditionalAuthentication[0].UserEmailDomain),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.authentication_rules.0.ip_network_range", application.AuthenticationSchema.ConditionalAuthentication[0].IpNetworkRange),
+						resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_application.testApp", "name", application.Name),
+						resource.TestCheckResourceAttr("sci_application.testApp", "description", application.Description),
+						resource.TestCheckResourceAttr("sci_application.testApp", "multi_tenant_app", "false"),
+						resource.TestCheckResourceAttr("sci_application.testApp", "global_account", "unknown"),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sso_type", application.AuthenticationSchema.SsoType),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.subject_name_identifier.value", application.AuthenticationSchema.SubjectNameIdentifier),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.subject_name_identifier_function", application.AuthenticationSchema.SubjectNameIdentifierFunction),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.assertion_attributes.0.attribute_name", application.AuthenticationSchema.AssertionAttributes[0].AssertionAttributeName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.assertion_attributes.0.attribute_value", application.AuthenticationSchema.AssertionAttributes[0].UserAttributeName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.assertion_attributes.1.attribute_name", application.AuthenticationSchema.AssertionAttributes[1].AssertionAttributeName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.assertion_attributes.1.attribute_value", application.AuthenticationSchema.AssertionAttributes[1].UserAttributeName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.advanced_assertion_attributes.0.attribute_name", application.AuthenticationSchema.AdvancedAssertionAttributes[0].AttributeName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.advanced_assertion_attributes.0.attribute_value", application.AuthenticationSchema.AdvancedAssertionAttributes[0].AttributeValue),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.advanced_assertion_attributes.1.attribute_name", application.AuthenticationSchema.AdvancedAssertionAttributes[1].AttributeName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.advanced_assertion_attributes.1.attribute_value", application.AuthenticationSchema.AdvancedAssertionAttributes[1].AttributeValue),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.default_authenticating_idp", application.AuthenticationSchema.DefaultAuthenticatingIdpId),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.authentication_rules.0.user_type", application.AuthenticationSchema.ConditionalAuthentication[0].UserType),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.authentication_rules.0.user_email_domain", application.AuthenticationSchema.ConditionalAuthentication[0].UserEmailDomain),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.authentication_rules.0.ip_network_range", application.AuthenticationSchema.ConditionalAuthentication[0].IpNetworkRange),
 					),
 				},
 				{
 					Config: providerConfig("https://iasprovidertestblr.accounts400.ondemand.com/", user) + ResourceApplication("testApp", updatedApplication),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestMatchResourceAttr("ias_application.testApp", "id", regexpUUID),
-						resource.TestCheckResourceAttr("ias_application.testApp", "name", updatedApplication.Name),
-						resource.TestCheckResourceAttr("ias_application.testApp", "description", updatedApplication.Description),
-						resource.TestCheckResourceAttr("ias_application.testApp", "multi_tenant_app", "false"),
-						resource.TestCheckResourceAttr("ias_application.testApp", "global_account", "unknown"),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.sso_type", updatedApplication.AuthenticationSchema.SsoType),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.subject_name_identifier.value", updatedApplication.AuthenticationSchema.SubjectNameIdentifier),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.subject_name_identifier_function", updatedApplication.AuthenticationSchema.SubjectNameIdentifierFunction),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.assertion_attributes.0.attribute_name", updatedApplication.AuthenticationSchema.AssertionAttributes[0].AssertionAttributeName),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.assertion_attributes.0.attribute_value", updatedApplication.AuthenticationSchema.AssertionAttributes[0].UserAttributeName),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.advanced_assertion_attributes.0.attribute_name", updatedApplication.AuthenticationSchema.AdvancedAssertionAttributes[0].AttributeName),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.advanced_assertion_attributes.0.attribute_value", updatedApplication.AuthenticationSchema.AdvancedAssertionAttributes[0].AttributeValue),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.advanced_assertion_attributes.1.attribute_name", updatedApplication.AuthenticationSchema.AdvancedAssertionAttributes[1].AttributeName),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.advanced_assertion_attributes.1.attribute_value", updatedApplication.AuthenticationSchema.AdvancedAssertionAttributes[1].AttributeValue),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.advanced_assertion_attributes.2.attribute_name", updatedApplication.AuthenticationSchema.AdvancedAssertionAttributes[2].AttributeName),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.advanced_assertion_attributes.2.attribute_value", updatedApplication.AuthenticationSchema.AdvancedAssertionAttributes[2].AttributeValue),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.default_authenticating_idp", updatedApplication.AuthenticationSchema.DefaultAuthenticatingIdpId),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.authentication_rules.0.user_type", updatedApplication.AuthenticationSchema.ConditionalAuthentication[0].UserType),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.authentication_rules.0.user_email_domain", updatedApplication.AuthenticationSchema.ConditionalAuthentication[0].UserEmailDomain),
-						resource.TestCheckResourceAttr("ias_application.testApp", "authentication_schema.authentication_rules.0.ip_network_range", updatedApplication.AuthenticationSchema.ConditionalAuthentication[0].IpNetworkRange),
+						resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_application.testApp", "name", updatedApplication.Name),
+						resource.TestCheckResourceAttr("sci_application.testApp", "description", updatedApplication.Description),
+						resource.TestCheckResourceAttr("sci_application.testApp", "multi_tenant_app", "false"),
+						resource.TestCheckResourceAttr("sci_application.testApp", "global_account", "unknown"),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sso_type", updatedApplication.AuthenticationSchema.SsoType),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.subject_name_identifier.value", updatedApplication.AuthenticationSchema.SubjectNameIdentifier),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.subject_name_identifier_function", updatedApplication.AuthenticationSchema.SubjectNameIdentifierFunction),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.assertion_attributes.0.attribute_name", updatedApplication.AuthenticationSchema.AssertionAttributes[0].AssertionAttributeName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.assertion_attributes.0.attribute_value", updatedApplication.AuthenticationSchema.AssertionAttributes[0].UserAttributeName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.advanced_assertion_attributes.0.attribute_name", updatedApplication.AuthenticationSchema.AdvancedAssertionAttributes[0].AttributeName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.advanced_assertion_attributes.0.attribute_value", updatedApplication.AuthenticationSchema.AdvancedAssertionAttributes[0].AttributeValue),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.advanced_assertion_attributes.1.attribute_name", updatedApplication.AuthenticationSchema.AdvancedAssertionAttributes[1].AttributeName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.advanced_assertion_attributes.1.attribute_value", updatedApplication.AuthenticationSchema.AdvancedAssertionAttributes[1].AttributeValue),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.advanced_assertion_attributes.2.attribute_name", updatedApplication.AuthenticationSchema.AdvancedAssertionAttributes[2].AttributeName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.advanced_assertion_attributes.2.attribute_value", updatedApplication.AuthenticationSchema.AdvancedAssertionAttributes[2].AttributeValue),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.default_authenticating_idp", updatedApplication.AuthenticationSchema.DefaultAuthenticatingIdpId),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.authentication_rules.0.user_type", updatedApplication.AuthenticationSchema.ConditionalAuthentication[0].UserType),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.authentication_rules.0.user_email_domain", updatedApplication.AuthenticationSchema.ConditionalAuthentication[0].UserEmailDomain),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.authentication_rules.0.ip_network_range", updatedApplication.AuthenticationSchema.ConditionalAuthentication[0].IpNetworkRange),
 					),
 				},
 			},
@@ -430,7 +430,7 @@ func ResourceApplication(resourceName string, app applications.Application) stri
 	}
 
 	return fmt.Sprintf(
-		`resource "ias_application" "%s" {
+		`resource "sci_application" "%s" {
 		name = "%s"
 		description = "%s"
 		authentication_schema = {
@@ -450,7 +450,7 @@ func ResourceApplication(resourceName string, app applications.Application) stri
 
 func ResourceApplicationWithParent(resourceName string, appName string, description string, parentAppId string) string {
 	return fmt.Sprintf(`
-	resource "ias_application" "%s" {
+	resource "sci_application" "%s" {
 		name = "%s"
 		description = "%s"
 		parent_application_id = "%s"
@@ -460,7 +460,7 @@ func ResourceApplicationWithParent(resourceName string, appName string, descript
 
 func ResourceApplicationWithAppId(resourceName string, appID string, appName string, description string) string {
 	return fmt.Sprintf(`
-	resource "ias_application" "%s" {
+	resource "sci_application" "%s" {
 		id = "%s"
 		name = "%s"
 		description = "%s"
@@ -470,14 +470,14 @@ func ResourceApplicationWithAppId(resourceName string, appID string, appName str
 
 func ResourceApplicationWithoutAppName(resourceName string) string {
 	return fmt.Sprintf(`
-	resource "ias_application" "%s" {
+	resource "sci_application" "%s" {
 	}
 	`, resourceName)
 }
 
 func ResourceApplicationWithSubjectNameIdentifier(resourceName string, appName string, description string, subAttribute string) string {
 	return fmt.Sprintf(`
-	resource "ias_application" "%s" {
+	resource "sci_application" "%s" {
 		name = "%s"
 		description = "%s"
 		authentication_schema = {
@@ -491,7 +491,7 @@ func ResourceApplicationWithSubjectNameIdentifier(resourceName string, appName s
 
 func ResourceApplicationWithSubjectNameIdentifierFunction(resourceName string, appName string, description string, functionName string) string {
 	return fmt.Sprintf(`
-	resource "ias_application" "%s" {
+	resource "sci_application" "%s" {
 		name = "%s"
 		description = "%s"
 		authentication_schema = {
@@ -503,7 +503,7 @@ func ResourceApplicationWithSubjectNameIdentifierFunction(resourceName string, a
 
 func ResourceApplicationWithAssertionAttributes(resourceName string, appName string, description string, subAttribute string) string {
 	return fmt.Sprintf(`
-	resource "ias_application" "%s" {
+	resource "sci_application" "%s" {
 		name = "%s"
 		description = "%s"
 		authentication_schema = {
@@ -517,7 +517,7 @@ func ResourceApplicationWithAssertionAttributes(resourceName string, appName str
 
 func ResourceApplicationWithAdvancedAssertionAttributes(resourceName string, appName string, description string, subAttribute string) string {
 	return fmt.Sprintf(`
-	resource "ias_application" "%s" {
+	resource "sci_application" "%s" {
 		name = "%s"
 		description = "%s"
 		authentication_schema = {
@@ -531,7 +531,7 @@ func ResourceApplicationWithAdvancedAssertionAttributes(resourceName string, app
 
 func ResourceApplicationWithSsoType(resourceName string, appName string, description string, ssoType string) string {
 	return fmt.Sprintf(`
-	resource "ias_application" "%s" {
+	resource "sci_application" "%s" {
 		name = "%s"
 		description = "%s"
 		authentication_schema = {
@@ -543,7 +543,7 @@ func ResourceApplicationWithSsoType(resourceName string, appName string, descrip
 
 func ResourceApplicationWithAuthenticationRules(resourceName string, appName string, description string, subAttribute string) string {
 	return fmt.Sprintf(`
-	resource "ias_application" "%s" {
+	resource "sci_application" "%s" {
 		name = "%s"
 		description = "%s"
 		authentication_schema = {

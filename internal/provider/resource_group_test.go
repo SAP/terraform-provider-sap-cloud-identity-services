@@ -3,7 +3,7 @@ package provider
 import (
 	"fmt"
 	"regexp"
-	"terraform-provider-ias/internal/cli/apiObjects/groups"
+	"terraform-provider-sci/internal/cli/apiObjects/groups"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -35,11 +35,11 @@ func TestResourceGroup(t *testing.T) {
 				{
 					Config: providerConfig("", user) + ResourceGroup("testGroup", "Terraform Group", schemas, "For testing purposes", members),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestMatchResourceAttr("ias_group.testGroup", "id", regexpUUID),
-						resource.TestCheckResourceAttr("ias_group.testGroup", "display_name", "Terraform Group"),
-						resource.TestCheckResourceAttr("ias_group.testGroup", "group_extension.description", "For testing purposes"),
-						resource.TestCheckResourceAttr("ias_group.testGroup", "group_members.0.value", members[0].Value),
-						resource.TestCheckResourceAttr("ias_group.testGroup", "group_members.0.type", members[0].Type),
+						resource.TestMatchResourceAttr("sci_group.testGroup", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "display_name", "Terraform Group"),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "group_extension.description", "For testing purposes"),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "group_members.0.value", members[0].Value),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "group_members.0.type", members[0].Type),
 					),
 				},
 			},
@@ -58,21 +58,21 @@ func TestResourceGroup(t *testing.T) {
 				{
 					Config: providerConfig("", user) + ResourceGroup("testGroup", "Terraform Group", schemas, "For testing purposes", members),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestMatchResourceAttr("ias_group.testGroup", "id", regexpUUID),
-						resource.TestCheckResourceAttr("ias_group.testGroup", "display_name", "Terraform Group"),
-						resource.TestCheckResourceAttr("ias_group.testGroup", "group_extension.description", "For testing purposes"),
-						resource.TestCheckResourceAttr("ias_group.testGroup", "group_members.0.value", members[0].Value),
-						resource.TestCheckResourceAttr("ias_group.testGroup", "group_members.0.type", members[0].Type),
+						resource.TestMatchResourceAttr("sci_group.testGroup", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "display_name", "Terraform Group"),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "group_extension.description", "For testing purposes"),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "group_members.0.value", members[0].Value),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "group_members.0.type", members[0].Type),
 					),
 				},
 				{
 					Config: providerConfig("", user) + ResourceGroup("testGroup", "Updated Terraform Group", schemas, "For testing purposes", members),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestMatchResourceAttr("ias_group.testGroup", "id", regexpUUID),
-						resource.TestCheckResourceAttr("ias_group.testGroup", "display_name", "Updated Terraform Group"),
-						resource.TestCheckResourceAttr("ias_group.testGroup", "group_extension.description", "For testing purposes"),
-						resource.TestCheckResourceAttr("ias_group.testGroup", "group_members.0.value", members[0].Value),
-						resource.TestCheckResourceAttr("ias_group.testGroup", "group_members.0.type", members[0].Type),
+						resource.TestMatchResourceAttr("sci_group.testGroup", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "display_name", "Updated Terraform Group"),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "group_extension.description", "For testing purposes"),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "group_members.0.value", members[0].Value),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "group_members.0.type", members[0].Type),
 					),
 				},
 			},
@@ -175,7 +175,7 @@ func TestResourceGroup(t *testing.T) {
 
 func ResourceGroup(resoureName string, displayName string, schemas []string, description string, members []groups.GroupMember) string {
 	return fmt.Sprintf(`
-	resource "ias_group" "%s"{
+	resource "sci_group" "%s"{
 		schemas = [
 			"%s",
 			"%s"
@@ -196,7 +196,7 @@ func ResourceGroup(resoureName string, displayName string, schemas []string, des
 
 func ResourceGroupWithoutSchemas(resoureName string, displayName string) string {
 	return fmt.Sprintf(`
-	resource "ias_group" "%s"{
+	resource "sci_group" "%s"{
 		schemas = []
 		display_name = "%s"
 	}
@@ -205,7 +205,7 @@ func ResourceGroupWithoutSchemas(resoureName string, displayName string) string 
 
 func ResourceGroupWithoutDisplayName(resoureName string) string {
 	return fmt.Sprintf(`
-	resource "ias_group" "%s"{
+	resource "sci_group" "%s"{
 	}
 	`, resoureName)
 }

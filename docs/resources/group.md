@@ -1,11 +1,11 @@
 ---
-page_title: "ias_group Resource - ias"
+page_title: "sci_group Resource - sci"
 subcategory: ""
 description: |-
   Creates a group in the SAP Cloud Identity Services.
 ---
 
-# ias_group (Resource)
+# sci_group (Resource)
 
 Creates a group in the SAP Cloud Identity Services.
 
@@ -13,7 +13,7 @@ Creates a group in the SAP Cloud Identity Services.
 
 ```terraform
 # Create a basic group in SAP Cloud Identity Services
-resource "ias_group" "basic_group" {
+resource "sci_group" "basic_group" {
   group = "my basic group"
 }
 ```
@@ -61,7 +61,7 @@ Optional:
 Import is supported using the following syntax:
 
 ```terraform
-# terraform import ias_group.<resource_name> <group_id>
+# terraform import sci_group.<resource_name> <group_id>
 
-terraform import ias_group.my_group dd005d8b-1fee-4e6b-b6ff-cb9a197b7fe0
+terraform import sci_group.my_group dd005d8b-1fee-4e6b-b6ff-cb9a197b7fe0
 ```

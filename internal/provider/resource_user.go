@@ -3,8 +3,8 @@ package provider
 import (
 	"context"
 	"fmt"
-	"terraform-provider-ias/internal/cli"
-	"terraform-provider-ias/internal/utils"
+	"terraform-provider-sci/internal/cli"
+	"terraform-provider-sci/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -18,7 +18,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
-	"terraform-provider-ias/internal/cli/apiObjects/users"
+	"terraform-provider-sci/internal/cli/apiObjects/users"
 )
 
 var defaultUserSchemas = []attr.Value{
@@ -35,7 +35,7 @@ func newUserResource() resource.Resource {
 }
 
 type userResource struct {
-	cli *cli.IasClient
+	cli *cli.SciClient
 }
 
 func (d *userResource) Configure(_ context.Context, req resource.ConfigureRequest, _ *resource.ConfigureResponse) {
@@ -43,7 +43,7 @@ func (d *userResource) Configure(_ context.Context, req resource.ConfigureReques
 		return
 	}
 
-	d.cli = req.ProviderData.(*cli.IasClient)
+	d.cli = req.ProviderData.(*cli.SciClient)
 }
 
 func (r *userResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {

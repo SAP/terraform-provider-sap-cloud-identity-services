@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"terraform-provider-ias/internal/cli/apiObjects/applications"
+	"terraform-provider-sci/internal/cli/apiObjects/applications"
 )
 
 type ApplicationsCli struct {
