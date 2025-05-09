@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func testClient(handleFn http.HandlerFunc) (*IasClient, *httptest.Server) {
+func testClient(handleFn http.HandlerFunc) (*SciClient, *httptest.Server) {
 	srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		handleFn.ServeHTTP(w, r)
@@ -19,7 +19,7 @@ func testClient(handleFn http.HandlerFunc) (*IasClient, *httptest.Server) {
 	srvUrl, _ := url.Parse(srv.URL)
 
 	client := NewClient(srv.Client(), srvUrl)
-	return NewIasClient(client), srv
+	return NewSciClient(client), srv
 }
 
 func assertCall[I interface{}](t *testing.T, r *http.Request, expectedPath string, expectedMethod string, expectedBody any) {

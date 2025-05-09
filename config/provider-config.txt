@@ -1,6 +1,6 @@
 provider_installation {
   dev_overrides {
-    "sap/ias" = "/go/bin"
+    "sap/sci" = "/go/bin"
   }
 
   direct {}

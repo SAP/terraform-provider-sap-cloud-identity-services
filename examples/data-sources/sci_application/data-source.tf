@@ -1,4 +1,4 @@
 # Read an application by ID
-data "ias_application" "by_id" {
+data "sci_application" "by_id" {
   id = "app_1234567890"
 }

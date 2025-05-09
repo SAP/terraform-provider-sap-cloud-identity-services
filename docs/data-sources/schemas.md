@@ -1,11 +1,11 @@
 ---
-page_title: "ias_schemas Data Source - ias"
+page_title: "sci_schemas Data Source - sci"
 subcategory: ""
 description: |-
   Gets a list of schemas from the SAP Cloud Identity services.
 ---
 
-# ias_schemas (Data Source)
+# sci_schemas (Data Source)
 
 Gets a list of schemas from the SAP Cloud Identity services.
 
@@ -13,7 +13,7 @@ Gets a list of schemas from the SAP Cloud Identity services.
 
 ```terraform
 # List all schemas
-data "ias_schemas" "all" {
+data "sci_schemas" "all" {
 }
 ```
 

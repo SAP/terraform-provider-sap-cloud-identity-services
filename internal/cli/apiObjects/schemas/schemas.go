@@ -1,7 +1,7 @@
 package schemas
 
 import (
-	"terraform-provider-ias/internal/cli/apiObjects/users"
+	"terraform-provider-sci/internal/cli/apiObjects/users"
 )
 
 type Attribute struct {

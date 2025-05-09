@@ -1,11 +1,11 @@
 ---
-page_title: "ias_application Data Source - ias"
+page_title: "sci_application Data Source - sci"
 subcategory: ""
 description: |-
   Gets an application from the SAP Cloud Identity services.
 ---
 
-# ias_application (Data Source)
+# sci_application (Data Source)
 
 Gets an application from the SAP Cloud Identity services.
 
@@ -13,7 +13,7 @@ Gets an application from the SAP Cloud Identity services.
 
 ```terraform
 # Read an application by ID
-data "ias_application" "by_id" {
+data "sci_application" "by_id" {
   id = "app_1234567890"
 }
 ```

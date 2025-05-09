@@ -1,6 +1,6 @@
 package groups
 
-import "terraform-provider-ias/internal/cli/apiObjects/users"
+import "terraform-provider-sci/internal/cli/apiObjects/users"
 
 type GroupExtension struct {
 	AdditionalId string `json:"additionalId,omitempty"`

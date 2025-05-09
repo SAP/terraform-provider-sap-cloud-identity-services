@@ -22,7 +22,7 @@ func TestDataSourceUsers(t *testing.T) {
 				{
 					Config: providerConfig("", user) + DataSourceUsers("allUsers"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestCheckResourceAttr("data.ias_users.allUsers", "values.#", "5"),
+						resource.TestCheckResourceAttr("data.sci_users.allUsers", "values.#", "5"),
 					),
 				},
 			},
@@ -34,7 +34,7 @@ func TestDataSourceUsers(t *testing.T) {
 
 func DataSourceUsers(datasourceName string) string {
 	return fmt.Sprintf(`
-	data "ias_users" "%s"{
+	data "sci_users" "%s"{
 
 	}
 	`, datasourceName)
