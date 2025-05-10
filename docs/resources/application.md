@@ -14,9 +14,42 @@ Creates an application in the SAP Cloud Identity Services.
 ```terraform
 # Create a basic application in SAP Cloud Identity Services
 resource "sci_application" "basic_application" {
-  id          = "app_1234567890"
+  id          = "app_1234567890"                        # Must be a valid and unique UUID
   name        = "My Basic Application"
   description = "A basic application in SAP Cloud Identity Services"
+  parent_application_id = "app_0987654321"              # Must be a valid UUID
+  multi_tenant_app = false
+  authentication_schema = {
+    sso_type = "saml2"                                  # Refer to the documentation for valid values
+    subject_name_identifier = {
+      source = "Identity Directory"                     # Refer to the documentation for valid values
+      value  = "uid"                      
+    }
+    subject_name_identifier_function = "upperCase"      # Refer to the documentation for valid values
+    assertion_attributes = [
+      {
+        attribute_name = "user_attribute"
+        attribute_value = "mail"
+      }
+    ]
+    advanced_assertion_attributes = [
+      {
+        source = "Corporate Identity Provider"          # Refer to the documentation for valid values
+        attribute_name = "user_attribute"
+        attribute_value = "test"
+      }
+    ]
+    default_authenticating_idp = "idp_1234567890"       # Must be a valid UUID
+    conditional_authentication = [
+      {
+        identity_provider_id = "idp_0987654321"          # Must be a valid UUID
+        user_email_domain = "example.com"                
+        user_type = "employee"                           # Refer to the documentation for valid values
+        user_group = "group_1234567890"                  # Must be a valid UUID
+        ip_network_range = "10.0.0.8/16"          
+      }
+    ]
+  }
 }
 ```
 
@@ -29,7 +62,7 @@ resource "sci_application" "basic_application" {
 
 ### Optional
 
-- `authentication_schema` (Attributes) (see [below for nested schema](#nestedatt--authentication_schema))
+- `authentication_schema` (Attributes) Configure attributes particular to the schema "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication" (see [below for nested schema](#nestedatt--authentication_schema))
 - `description` (String) Free text description of the Application
 - `global_account` (String)
 - `id` (String) Id of the application
@@ -42,6 +75,7 @@ resource "sci_application" "basic_application" {
 Optional:
 
 - `advanced_assertion_attributes` (Attributes List) Identical to the assertion attributes, except that the assertion attributes can come from other Sources. (see [below for nested schema](#nestedatt--authentication_schema--advanced_assertion_attributes))
+- `assertion_attributes` (Attributes List) User attributes to be sent to the application. The Source of these attributes is always the Identity Directory, thus only valid attribute values will be accepted. (see [below for nested schema](#nestedatt--authentication_schema--assertion_attributes))
 - `conditional_authentication` (Attributes List) Define rules for authenticating identity provider according to email domain, user type, user group, and IP range. Each rule is evaluated by priority until the criteria of a rule are fulfilled. (see [below for nested schema](#nestedatt--authentication_schema--conditional_authentication))
 - `default_authenticating_idp` (String) A default identity provider can be used for users with any user domain, group and type. This identity provider is used when none of the defined authentication rules meets the criteria.
 - `sso_type` (String) The preferred protocol for the application. Acceptable values are : `openIdConnect`, `saml2`,
@@ -59,6 +93,19 @@ Optional:
 - `attribute_name` (String) Name of the attribute
 - `attribute_value` (String) Value of the attribute
 - `source` (String) Acceptable values are : `Corporate Identity Provider`, `Expression`,
+
+Read-Only:
+
+- `inherited` (Boolean) Indicates whether the attribute has been inherited from a parent application.
+
+
+<a id="nestedatt--authentication_schema--assertion_attributes"></a>
+### Nested Schema for `authentication_schema.assertion_attributes`
+
+Optional:
+
+- `attribute_name` (String) Name of the attribute
+- `attribute_value` (String) Value of the attribute.
 
 Read-Only:
 

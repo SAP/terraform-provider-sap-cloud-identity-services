@@ -29,12 +29,12 @@ data "sci_applications" "all" {
 
 Read-Only:
 
-- `authentication_schema` (Attributes) (see [below for nested schema](#nestedatt--values--authentication_schema))
-- `description` (String) Description for the application
+- `authentication_schema` (Attributes) Configure attributes particular to the schema "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication" (see [below for nested schema](#nestedatt--values--authentication_schema))
+- `description` (String) Free text description of the Application
 - `global_account` (String)
 - `id` (String) Id of the application
 - `multi_tenant_app` (Boolean) Only for Internal Use
-- `name` (String) Free text description of the Application
+- `name` (String) Name of the application
 - `parent_application_id` (String) ID of the parent, from which the application will inherit its configurations
 
 <a id="nestedatt--values--authentication_schema"></a>
@@ -43,13 +43,15 @@ Read-Only:
 Read-Only:
 
 - `advanced_assertion_attributes` (Attributes List) Identical to the assertion attributes, except that the assertion attributes can come from other Sources. (see [below for nested schema](#nestedatt--values--authentication_schema--advanced_assertion_attributes))
-- `assertion_attributes` (Attributes List) User attributes to be sent to the application. The Source of these attributes is always the Identity Directory, thus only valid attribute values will be accepted. (see [below for nested schema](#nestedatt--values--authentication_schema--assertion_attributes))
-- `conditional_authentication` (Attributes List) Rules to manage authentication. Each rule is evaluated by priority until the criteria of a rule are fulfilled. (see [below for nested schema](#nestedatt--values--authentication_schema--conditional_authentication))
+- `assertion_attributes` (Attributes List) User attributes to be sent to the application. The Source of these attributes is always the Identity Directory (see [below for nested schema](#nestedatt--values--authentication_schema--assertion_attributes))
+- `conditional_authentication` (Attributes List) Define rules for authenticating identity provider according to email domain, user type, user group, and IP range. Each rule is evaluated by priority until the criteria of a rule are fulfilled. (see [below for nested schema](#nestedatt--values--authentication_schema--conditional_authentication))
 - `default_authenticating_idp` (String) A default identity provider can be used for users with any user domain, group and type. This identity provider is used when none of the defined authentication rules meets the criteria.
-- `risk_based_authentication` (Attributes) Define rules for authentication according to IP range, group membership, authentication method, and type of the authenticating user. (see [below for nested schema](#nestedatt--values--authentication_schema--risk_based_authentication))
 - `sso_type` (String) The preferred protocol for the application
-- `subject_name_identifier` (Attributes) The attribute by which the application uses to identify the users. Identity Authentication sends the attribute to the application as subject in OpenID Connect tokens. (see [below for nested schema](#nestedatt--values--authentication_schema--subject_name_identifier))
-- `subject_name_identifier_function` (String) Convert the subject name identifier to uppercase or lowercase. The only acceptable values are "none", "upperCase", "lowerCase"
+- `subject_name_identifier` (Attributes) The attribute by which the application uses to identify the users. Used by the application to uniquely identify the user during logon.
+Identity Authentication sends the attribute to the application as :
+	 - subject in OpenID Connect tokens
+	 - name ID in SAML 2.0 assertions (see [below for nested schema](#nestedatt--values--authentication_schema--subject_name_identifier))
+- `subject_name_identifier_function` (String) Convert the subject name identifier to uppercase or lowercase
 
 <a id="nestedatt--values--authentication_schema--advanced_assertion_attributes"></a>
 ### Nested Schema for `values.authentication_schema.advanced_assertion_attributes`
@@ -59,7 +61,7 @@ Read-Only:
 - `attribute_name` (String) Name of the attribute
 - `attribute_value` (String) Value of the attribute
 - `inherited` (Boolean) Indicates whether the attribute has been inherited from a parent application.
-- `source` (String) Acceptable values: "Corporate Idenity Provider", "Expression"
+- `source` (String) Acceptable values are : `Corporate Identity Provider`, `Expression`,
 
 
 <a id="nestedatt--values--authentication_schema--assertion_attributes"></a>
@@ -84,43 +86,10 @@ Read-Only:
 - `user_type` (String) The type of user to be authenticated.
 
 
-<a id="nestedatt--values--authentication_schema--risk_based_authentication"></a>
-### Nested Schema for `values.authentication_schema.risk_based_authentication`
-
-Read-Only:
-
-- `default_action` (List of String) Set a default action for any IP range, group and authentication method. This rule is used when none of the defined authentication rules meets the criteria. If there are no rules configured, the risk-based authentication configuration on tenant level will be applied.
-- `rules` (Attributes List) Configure rules to manage authentication. Each rule is evaluated by priority until the criteria of a rule are fulfilled. (see [below for nested schema](#nestedatt--values--authentication_schema--risk_based_authentication--rules))
-
-<a id="nestedatt--values--authentication_schema--risk_based_authentication--rules"></a>
-### Nested Schema for `values.authentication_schema.risk_based_authentication.rules`
-
-Read-Only:
-
-- `actions` (List of String) Action for the authentication of the user when all conditions specified are met
-- `auth_method` (String) Authentication method to be authenticated
-- `corporate_idp_attribute` (Attributes) (see [below for nested schema](#nestedatt--values--authentication_schema--risk_based_authentication--rules--corporate_idp_attribute))
-- `group` (String) User group to be authenticated
-- `group_type` (String) Type of the group to be authenticated
-- `ip_forward_range` (String) Valid IP range to be authenticated
-- `ip_network_range` (String) Valid IP range to be authenticated
-- `user_type` (String) Type of the user to be authenticated
-
-<a id="nestedatt--values--authentication_schema--risk_based_authentication--rules--corporate_idp_attribute"></a>
-### Nested Schema for `values.authentication_schema.risk_based_authentication.rules.corporate_idp_attribute`
-
-Read-Only:
-
-- `name` (String) Name of the attribute
-- `value` (String) Value of the attribute
-
-
-
-
 <a id="nestedatt--values--authentication_schema--subject_name_identifier"></a>
 ### Nested Schema for `values.authentication_schema.subject_name_identifier`
 
 Read-Only:
 
-- `source` (String) Acceptable values: "Identity Directory", "Corporate Idenity Provider", "Expression"
+- `source` (String) Acceptable values are : `Identity Directory`, `Corporate Identity Provider`, `Expression`,
 - `value` (String) If the source is Identity Directory, the only acceptable values are " none, uid, mail, loginName, displayName, personnelNumber, userUuid"
