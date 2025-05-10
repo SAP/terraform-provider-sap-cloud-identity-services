@@ -19,16 +19,16 @@ var applicationsBody = applications.Application{
 	AuthenticationSchema: applications.AuthenticationSchema{
 		SsoType:               "saml",
 		SubjectNameIdentifier: "mail",
-		AssertionAttributes: &[]applications.AssertionAttribute{
-			{
-				AssertionAttributeName: "attr_name_1",
-				UserAttributeName:      "user_name_1",
-			},
-			{
-				AssertionAttributeName: "attr_name_2",
-				UserAttributeName:      "user_name_2",
-			},
-		},
+		// AssertionAttributes: &[]applications.AssertionAttribute{
+		// 	{
+		// 		AssertionAttributeName: "attr_name_1",
+		// 		UserAttributeName:      "user_name_1",
+		// 	},
+		// 	{
+		// 		AssertionAttributeName: "attr_name_2",
+		// 		UserAttributeName:      "user_name_2",
+		// 	},
+		// },
 		AdvancedAssertionAttributes: []applications.AdvancedAssertionAttribute{
 			{
 				AttributeName:  "attr_name_1",

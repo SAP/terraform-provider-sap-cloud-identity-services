@@ -46,6 +46,7 @@ Read-Only:
 - `assertion_attributes` (Attributes List) User attributes to be sent to the application. The Source of these attributes is always the Identity Directory, thus only valid attribute values will be accepted. (see [below for nested schema](#nestedatt--values--authentication_schema--assertion_attributes))
 - `conditional_authentication` (Attributes List) Rules to manage authentication. Each rule is evaluated by priority until the criteria of a rule are fulfilled. (see [below for nested schema](#nestedatt--values--authentication_schema--conditional_authentication))
 - `default_authenticating_idp` (String) A default identity provider can be used for users with any user domain, group and type. This identity provider is used when none of the defined authentication rules meets the criteria.
+- `risk_based_authentication` (Attributes) Define rules for authentication according to IP range, group membership, authentication method, and type of the authenticating user. (see [below for nested schema](#nestedatt--values--authentication_schema--risk_based_authentication))
 - `sso_type` (String) The preferred protocol for the application
 - `subject_name_identifier` (Attributes) The attribute by which the application uses to identify the users. Identity Authentication sends the attribute to the application as subject in OpenID Connect tokens. (see [below for nested schema](#nestedatt--values--authentication_schema--subject_name_identifier))
 - `subject_name_identifier_function` (String) Convert the subject name identifier to uppercase or lowercase. The only acceptable values are "none", "upperCase", "lowerCase"
@@ -81,6 +82,39 @@ Read-Only:
 - `user_email_domain` (String) Valid email domain to be authenticated.
 - `user_group` (String) The user group to be authenticated.
 - `user_type` (String) The type of user to be authenticated.
+
+
+<a id="nestedatt--values--authentication_schema--risk_based_authentication"></a>
+### Nested Schema for `values.authentication_schema.risk_based_authentication`
+
+Read-Only:
+
+- `default_action` (List of String) Set a default action for any IP range, group and authentication method. This rule is used when none of the defined authentication rules meets the criteria. If there are no rules configured, the risk-based authentication configuration on tenant level will be applied.
+- `rules` (Attributes List) Configure rules to manage authentication. Each rule is evaluated by priority until the criteria of a rule are fulfilled. (see [below for nested schema](#nestedatt--values--authentication_schema--risk_based_authentication--rules))
+
+<a id="nestedatt--values--authentication_schema--risk_based_authentication--rules"></a>
+### Nested Schema for `values.authentication_schema.risk_based_authentication.rules`
+
+Read-Only:
+
+- `actions` (List of String) Action for the authentication of the user when all conditions specified are met
+- `auth_method` (String) Authentication method to be authenticated
+- `corporate_idp_attribute` (Attributes) (see [below for nested schema](#nestedatt--values--authentication_schema--risk_based_authentication--rules--corporate_idp_attribute))
+- `group` (String) User group to be authenticated
+- `group_type` (String) Type of the group to be authenticated
+- `ip_forward_range` (String) Valid IP range to be authenticated
+- `ip_network_range` (String) Valid IP range to be authenticated
+- `user_type` (String) Type of the user to be authenticated
+
+<a id="nestedatt--values--authentication_schema--risk_based_authentication--rules--corporate_idp_attribute"></a>
+### Nested Schema for `values.authentication_schema.risk_based_authentication.rules.corporate_idp_attribute`
+
+Read-Only:
+
+- `name` (String) Name of the attribute
+- `value` (String) Value of the attribute
+
+
 
 
 <a id="nestedatt--values--authentication_schema--subject_name_identifier"></a>

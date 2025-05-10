@@ -21,16 +21,16 @@ func TestResourceApplication(t *testing.T) {
 			SsoType:                       "openIdConnect",
 			SubjectNameIdentifier:         "mail",
 			SubjectNameIdentifierFunction: "lowerCase",
-			AssertionAttributes: &[]applications.AssertionAttribute{
-				{
-					AssertionAttributeName: "param1",
-					UserAttributeName:      "firstName",
-				},
-				{
-					AssertionAttributeName: "param2",
-					UserAttributeName:      "mail",
-				},
-			},
+			// AssertionAttributes: &[]applications.AssertionAttribute{
+			// 	{
+			// 		AssertionAttributeName: "param1",
+			// 		UserAttributeName:      "firstName",
+			// 	},
+			// 	{
+			// 		AssertionAttributeName: "param2",
+			// 		UserAttributeName:      "mail",
+			// 	},
+			// },
 			AdvancedAssertionAttributes: []applications.AdvancedAssertionAttribute{
 				{
 					AttributeName:  "adv_param1",
@@ -108,12 +108,12 @@ func TestResourceApplication(t *testing.T) {
 				SsoType:                       "saml2",
 				SubjectNameIdentifier:         "userUuid",
 				SubjectNameIdentifierFunction: "upperCase",
-				AssertionAttributes: &[]applications.AssertionAttribute{
-					{
-						AssertionAttributeName: "param1",
-						UserAttributeName:      "lastName",
-					},
-				},
+				// AssertionAttributes: &[]applications.AssertionAttribute{
+				// 	{
+				// 		AssertionAttributeName: "param1",
+				// 		UserAttributeName:      "lastName",
+				// 	},
+				// },
 				AdvancedAssertionAttributes: []applications.AdvancedAssertionAttribute{
 					{
 						AttributeName:  "adv_param1",
@@ -400,13 +400,13 @@ func TestResourceApplication(t *testing.T) {
 func ResourceApplication(resourceName string, app applications.Application) string {
 
 	var assertionAttributes string
-	for _, attribute := range *app.AuthenticationSchema.AssertionAttributes {
-		assertionAttributes += fmt.Sprintf(`
-				{
-					attribute_name = "%s"
-					attribute_value = "%s"
-				},`, attribute.AssertionAttributeName, attribute.UserAttributeName)
-	}
+	// for _, attribute := range *app.AuthenticationSchema.AssertionAttributes {
+	// 	assertionAttributes += fmt.Sprintf(`
+	// 			{
+	// 				attribute_name = "%s"
+	// 				attribute_value = "%s"
+	// 			},`, attribute.AssertionAttributeName, attribute.UserAttributeName)
+	// }
 
 	var advancedAssertionAttributes string
 	for _, attribute := range app.AuthenticationSchema.AdvancedAssertionAttributes {

@@ -95,27 +95,6 @@ type AuthenicationRule struct {
 	IpNetworkRange     string `json:"ipNetworkRange,omitempty" tfsdk:"ip_network_range"`
 }
 
-type CorporateIdpAttribute struct {
-	Name  string `json:"name" tfsdk:"name"`
-	Value string `json:"value" tfsdk:"value"`
-}
-
-type RBARule struct {
-	IpNetworkRange        string                 `json:"ipNetworkRange" tfsdk:"ip_network_range"`
-	IpForwardRange        string                 `json:"ipForwardRange,omitempty" tfsdk:"ip_forward_range"`
-	Actions               []string               `json:"actions" tfsdk:"actions"`
-	Group                 string                 `json:"group,omitempty" tfsdk:"group"`
-	GroupType             string                 `json:"groupType,omitempty" tfsdk:"group_type"`
-	AuthMethod            string                 `json:"authMethod,omitempty" tfsdk:"auth_method"`
-	UserType              string                 `json:"userType,omitempty" tfsdk:"user_type"`
-	CorporateIdpAttribute *CorporateIdpAttribute `json:"corporateIdpAttribute" tfsdk:"corporate_idp_attribute"`
-}
-
-type RBAConfiguration struct {
-	DefaultAction []string  `json:"defaultAction,omitempty" tfsdk:"default_action"`
-	Rules         []RBARule `json:"rules,omitempty" tfsdk:"rules"`
-}
-
 type ConsumedService struct {
 	ServiceInstanceId string `json:"serviceInstanceId,omitempty"`
 	AppId             string `json:"appId"`
@@ -140,11 +119,11 @@ type AuthenticationSchema struct {
 	SsoType                       string                       `json:"ssoType,omitempty"`
 	SubjectNameIdentifier         string                       `json:"subjectNameIdentifier,omitempty"`
 	SubjectNameIdentifierFunction string                       `json:"subjectNameIdentifierFunction,omitempty"`
-	AssertionAttributes           *[]AssertionAttribute         `json:"assertionAttributes,omitempty"`
+	// AssertionAttributes           *[]AssertionAttribute         `json:"assertionAttributes"`
 	AdvancedAssertionAttributes   []AdvancedAssertionAttribute `json:"advancedAssertionAttributes,omitempty"`
 	DefaultAuthenticatingIdpId    string                       `json:"defaultAuthenticatingIdpId,omitempty"`
 	ConditionalAuthentication     []AuthenicationRule          `json:"conditionalAuthentication,omitempty"`
-	RiskBasedAuthentication       *RBAConfiguration            `json:"riskBasedAuthentication"`
+	// RiskBasedAuthentication       *RBAConfiguration            `json:"riskBasedAuthentication"`
 	// HomeUrl								string 							`json:"homeUrl"`
 	// FallbackSubjectNameIdentifier		string 							`json:"fallbackSubjectNameIdentifier,omitempty"`
 	// RememberMeExpirationTimeInMonths	string 							`json:"rememberMeExpirationTimeInMonths,omitempty"`
