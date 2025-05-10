@@ -1,11 +1,11 @@
 ---
-page_title: "ias_applications Data Source - ias"
+page_title: "sci_applications Data Source - sci"
 subcategory: ""
 description: |-
   Gets a list of applications from the SAP Cloud Identity services.
 ---
 
-# ias_applications (Data Source)
+# sci_applications (Data Source)
 
 Gets a list of applications from the SAP Cloud Identity services.
 
@@ -13,7 +13,7 @@ Gets a list of applications from the SAP Cloud Identity services.
 
 ```terraform
 # List all applications
-data "ias_applications" "all" {
+data "sci_applications" "all" {
 }
 ```
 

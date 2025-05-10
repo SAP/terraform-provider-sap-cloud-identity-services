@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
-	"terraform-provider-ias/internal/cli/apiObjects/users"
+	"terraform-provider-sci/internal/cli/apiObjects/users"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -37,15 +37,15 @@ func TestResourceUser(t *testing.T) {
 				{
 					Config: providerConfig("", user) + ResourceUser("testUser", "Joe Doe", name, emails),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestMatchResourceAttr("ias_user.testUser", "id", regexpUUID),
-						resource.TestCheckResourceAttr("ias_user.testUser", "user_name", "Joe Doe"),
-						resource.TestCheckResourceAttr("ias_user.testUser", "name.family_name", name.FamilyName),
-						resource.TestCheckResourceAttr("ias_user.testUser", "name.given_name", name.GivenName),
-						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.type", emails[0].Type),
-						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.value", emails[0].Value),
-						resource.TestCheckResourceAttr("ias_user.testUser", "active", "false"),
-						resource.TestCheckResourceAttr("ias_user.testUser", "sap_extension_user.status", "inactive"),
-						resource.TestCheckResourceAttr("ias_user.testUser", "user_type", "public"),
+						resource.TestMatchResourceAttr("sci_user.testUser", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_user.testUser", "user_name", "Joe Doe"),
+						resource.TestCheckResourceAttr("sci_user.testUser", "name.family_name", name.FamilyName),
+						resource.TestCheckResourceAttr("sci_user.testUser", "name.given_name", name.GivenName),
+						resource.TestCheckResourceAttr("sci_user.testUser", "emails.0.type", emails[0].Type),
+						resource.TestCheckResourceAttr("sci_user.testUser", "emails.0.value", emails[0].Value),
+						resource.TestCheckResourceAttr("sci_user.testUser", "active", "false"),
+						resource.TestCheckResourceAttr("sci_user.testUser", "sap_extension_user.status", "inactive"),
+						resource.TestCheckResourceAttr("sci_user.testUser", "user_type", "public"),
 					),
 				},
 			},
@@ -69,29 +69,29 @@ func TestResourceUser(t *testing.T) {
 				{
 					Config: providerConfig("", user) + ResourceUser("testUser", "Joe Doe", name, emails),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestMatchResourceAttr("ias_user.testUser", "id", regexpUUID),
-						resource.TestCheckResourceAttr("ias_user.testUser", "user_name", "Joe Doe"),
-						resource.TestCheckResourceAttr("ias_user.testUser", "name.family_name", name.FamilyName),
-						resource.TestCheckResourceAttr("ias_user.testUser", "name.given_name", name.GivenName),
-						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.type", emails[0].Type),
-						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.value", emails[0].Value),
-						resource.TestCheckResourceAttr("ias_user.testUser", "active", "false"),
-						resource.TestCheckResourceAttr("ias_user.testUser", "sap_extension_user.status", "inactive"),
-						resource.TestCheckResourceAttr("ias_user.testUser", "user_type", "public"),
+						resource.TestMatchResourceAttr("sci_user.testUser", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_user.testUser", "user_name", "Joe Doe"),
+						resource.TestCheckResourceAttr("sci_user.testUser", "name.family_name", name.FamilyName),
+						resource.TestCheckResourceAttr("sci_user.testUser", "name.given_name", name.GivenName),
+						resource.TestCheckResourceAttr("sci_user.testUser", "emails.0.type", emails[0].Type),
+						resource.TestCheckResourceAttr("sci_user.testUser", "emails.0.value", emails[0].Value),
+						resource.TestCheckResourceAttr("sci_user.testUser", "active", "false"),
+						resource.TestCheckResourceAttr("sci_user.testUser", "sap_extension_user.status", "inactive"),
+						resource.TestCheckResourceAttr("sci_user.testUser", "user_type", "public"),
 					),
 				},
 				{
 					Config: providerConfig("", user) + ResourceUser("testUser", "Joe Doe S", updatedName, emails),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestMatchResourceAttr("ias_user.testUser", "id", regexpUUID),
-						resource.TestCheckResourceAttr("ias_user.testUser", "user_name", "Joe Doe S"),
-						resource.TestCheckResourceAttr("ias_user.testUser", "name.family_name", updatedName.FamilyName),
-						resource.TestCheckResourceAttr("ias_user.testUser", "name.given_name", updatedName.GivenName),
-						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.type", emails[0].Type),
-						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.value", emails[0].Value),
-						resource.TestCheckResourceAttr("ias_user.testUser", "active", "false"),
-						resource.TestCheckResourceAttr("ias_user.testUser", "sap_extension_user.status", "inactive"),
-						resource.TestCheckResourceAttr("ias_user.testUser", "user_type", "public"),
+						resource.TestMatchResourceAttr("sci_user.testUser", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_user.testUser", "user_name", "Joe Doe S"),
+						resource.TestCheckResourceAttr("sci_user.testUser", "name.family_name", updatedName.FamilyName),
+						resource.TestCheckResourceAttr("sci_user.testUser", "name.given_name", updatedName.GivenName),
+						resource.TestCheckResourceAttr("sci_user.testUser", "emails.0.type", emails[0].Type),
+						resource.TestCheckResourceAttr("sci_user.testUser", "emails.0.value", emails[0].Value),
+						resource.TestCheckResourceAttr("sci_user.testUser", "active", "false"),
+						resource.TestCheckResourceAttr("sci_user.testUser", "sap_extension_user.status", "inactive"),
+						resource.TestCheckResourceAttr("sci_user.testUser", "user_type", "public"),
 					),
 				},
 			},
@@ -129,16 +129,16 @@ func TestResourceUser(t *testing.T) {
 				{
 					Config: providerConfig("", user) + ResourceUserWithCustomSchemas("testUser", "Joe Doe", schemas, name, emails, string(customSchemas)),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestMatchResourceAttr("ias_user.testUser", "id", regexpUUID),
-						resource.TestCheckResourceAttr("ias_user.testUser", "user_name", "Joe Doe"),
-						resource.TestCheckResourceAttr("ias_user.testUser", "name.family_name", name.FamilyName),
-						resource.TestCheckResourceAttr("ias_user.testUser", "name.given_name", name.GivenName),
-						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.type", emails[0].Type),
-						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.value", emails[0].Value),
-						resource.TestCheckResourceAttr("ias_user.testUser", "active", "false"),
-						resource.TestCheckResourceAttr("ias_user.testUser", "sap_extension_user.status", "inactive"),
-						resource.TestCheckResourceAttr("ias_user.testUser", "user_type", "public"),
-						resource.TestCheckResourceAttr("ias_user.testUser", "custom_schemas", string(customSchemas)),
+						resource.TestMatchResourceAttr("sci_user.testUser", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_user.testUser", "user_name", "Joe Doe"),
+						resource.TestCheckResourceAttr("sci_user.testUser", "name.family_name", name.FamilyName),
+						resource.TestCheckResourceAttr("sci_user.testUser", "name.given_name", name.GivenName),
+						resource.TestCheckResourceAttr("sci_user.testUser", "emails.0.type", emails[0].Type),
+						resource.TestCheckResourceAttr("sci_user.testUser", "emails.0.value", emails[0].Value),
+						resource.TestCheckResourceAttr("sci_user.testUser", "active", "false"),
+						resource.TestCheckResourceAttr("sci_user.testUser", "sap_extension_user.status", "inactive"),
+						resource.TestCheckResourceAttr("sci_user.testUser", "user_type", "public"),
+						resource.TestCheckResourceAttr("sci_user.testUser", "custom_schemas", string(customSchemas)),
 					),
 				},
 			},
@@ -185,31 +185,31 @@ func TestResourceUser(t *testing.T) {
 				{
 					Config: providerConfig("", user) + ResourceUserWithCustomSchemas("testUser", "Joe Doe", schemas, name, emails, string(customSchemas)),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestMatchResourceAttr("ias_user.testUser", "id", regexpUUID),
-						resource.TestCheckResourceAttr("ias_user.testUser", "user_name", "Joe Doe"),
-						resource.TestCheckResourceAttr("ias_user.testUser", "name.family_name", name.FamilyName),
-						resource.TestCheckResourceAttr("ias_user.testUser", "name.given_name", name.GivenName),
-						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.type", emails[0].Type),
-						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.value", emails[0].Value),
-						resource.TestCheckResourceAttr("ias_user.testUser", "active", "false"),
-						resource.TestCheckResourceAttr("ias_user.testUser", "sap_extension_user.status", "inactive"),
-						resource.TestCheckResourceAttr("ias_user.testUser", "user_type", "public"),
-						resource.TestCheckResourceAttr("ias_user.testUser", "custom_schemas", string(customSchemas)),
+						resource.TestMatchResourceAttr("sci_user.testUser", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_user.testUser", "user_name", "Joe Doe"),
+						resource.TestCheckResourceAttr("sci_user.testUser", "name.family_name", name.FamilyName),
+						resource.TestCheckResourceAttr("sci_user.testUser", "name.given_name", name.GivenName),
+						resource.TestCheckResourceAttr("sci_user.testUser", "emails.0.type", emails[0].Type),
+						resource.TestCheckResourceAttr("sci_user.testUser", "emails.0.value", emails[0].Value),
+						resource.TestCheckResourceAttr("sci_user.testUser", "active", "false"),
+						resource.TestCheckResourceAttr("sci_user.testUser", "sap_extension_user.status", "inactive"),
+						resource.TestCheckResourceAttr("sci_user.testUser", "user_type", "public"),
+						resource.TestCheckResourceAttr("sci_user.testUser", "custom_schemas", string(customSchemas)),
 					),
 				},
 				{
 					Config: providerConfig("", user) + ResourceUserWithCustomSchemas("testUser", "Joe Doe", schemas, name, emails, string(newCustomSchemas)),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestMatchResourceAttr("ias_user.testUser", "id", regexpUUID),
-						resource.TestCheckResourceAttr("ias_user.testUser", "user_name", "Joe Doe"),
-						resource.TestCheckResourceAttr("ias_user.testUser", "name.family_name", name.FamilyName),
-						resource.TestCheckResourceAttr("ias_user.testUser", "name.given_name", name.GivenName),
-						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.type", emails[0].Type),
-						resource.TestCheckResourceAttr("ias_user.testUser", "emails.0.value", emails[0].Value),
-						resource.TestCheckResourceAttr("ias_user.testUser", "active", "false"),
-						resource.TestCheckResourceAttr("ias_user.testUser", "sap_extension_user.status", "inactive"),
-						resource.TestCheckResourceAttr("ias_user.testUser", "user_type", "public"),
-						resource.TestCheckResourceAttr("ias_user.testUser", "custom_schemas", string(newCustomSchemas)),
+						resource.TestMatchResourceAttr("sci_user.testUser", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_user.testUser", "user_name", "Joe Doe"),
+						resource.TestCheckResourceAttr("sci_user.testUser", "name.family_name", name.FamilyName),
+						resource.TestCheckResourceAttr("sci_user.testUser", "name.given_name", name.GivenName),
+						resource.TestCheckResourceAttr("sci_user.testUser", "emails.0.type", emails[0].Type),
+						resource.TestCheckResourceAttr("sci_user.testUser", "emails.0.value", emails[0].Value),
+						resource.TestCheckResourceAttr("sci_user.testUser", "active", "false"),
+						resource.TestCheckResourceAttr("sci_user.testUser", "sap_extension_user.status", "inactive"),
+						resource.TestCheckResourceAttr("sci_user.testUser", "user_type", "public"),
+						resource.TestCheckResourceAttr("sci_user.testUser", "custom_schemas", string(newCustomSchemas)),
 					),
 				},
 			},
@@ -320,7 +320,7 @@ func TestResourceUser(t *testing.T) {
 
 func ResourceUser(resourceName string, userName string, name users.Name, emails []users.Email) string {
 	return fmt.Sprintf(`
-	resource "ias_user" "%s"{
+	resource "sci_user" "%s"{
 		user_name = "%s"
 		name = {
 			family_name = "%s"
@@ -338,7 +338,7 @@ func ResourceUser(resourceName string, userName string, name users.Name, emails 
 
 func ResourceUserWithoutSchemas(resourceName string, userName string, name users.Name, emails []users.Email) string {
 	return fmt.Sprintf(`
-	resource "ias_user" "%s"{
+	resource "sci_user" "%s"{
 		schemas = []
 		user_name = "%s"
 		name = {
@@ -357,7 +357,7 @@ func ResourceUserWithoutSchemas(resourceName string, userName string, name users
 
 func ResourceUserWithoutUserName(resourceName string, name users.Name, emails []users.Email) string {
 	return fmt.Sprintf(`
-	resource "ias_user" "%s"{
+	resource "sci_user" "%s"{
 		name = {
 			family_name = "%s"
 			given_name = "%s"
@@ -374,7 +374,7 @@ func ResourceUserWithoutUserName(resourceName string, name users.Name, emails []
 
 func ResourceUserWithoutName(resourceName string, userName string, emails []users.Email) string {
 	return fmt.Sprintf(`
-	resource "ias_user" "%s"{
+	resource "sci_user" "%s"{
 		user_name = "%s"
 		name = {}
 		emails = [
@@ -389,7 +389,7 @@ func ResourceUserWithoutName(resourceName string, userName string, emails []user
 
 func ResourceUserWithoutEmails(resourceName string, userName string, name users.Name) string {
 	return fmt.Sprintf(`
-	resource "ias_user" "%s"{
+	resource "sci_user" "%s"{
 		user_name = "%s"
 		name = {
 			family_name = "%s"
@@ -404,7 +404,7 @@ func ResourceUserWithoutEmails(resourceName string, userName string, name users.
 
 func ResourceUserWithUserType(resourceName string, userName string, name users.Name, emails []users.Email, userType string) string {
 	return fmt.Sprintf(`
-	resource "ias_user" "%s"{
+	resource "sci_user" "%s"{
 		user_name = "%s"
 		name = {
 			family_name = "%s"
@@ -423,7 +423,7 @@ func ResourceUserWithUserType(resourceName string, userName string, name users.N
 
 func ResourceUserWithStatus(resourceName string, userName string, name users.Name, emails []users.Email, status string) string {
 	return fmt.Sprintf(`
-	resource "ias_user" "%s"{
+	resource "sci_user" "%s"{
 		user_name = "%s"
 		name = {
 			family_name = "%s"
@@ -444,7 +444,7 @@ func ResourceUserWithStatus(resourceName string, userName string, name users.Nam
 
 func ResourceUserWithCustomSchemas(resourceName string, userName string, schemas []string, name users.Name, emails []users.Email, customSchemas string) string {
 	return fmt.Sprintf(`
-	resource "ias_user" "%s"{
+	resource "sci_user" "%s"{
 		schemas = [
 			"%s",
 			"%s",

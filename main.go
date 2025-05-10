@@ -1,17 +1,17 @@
 //go:generate go install github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@latest
-//go:generate tfplugindocs generate --provider-name "ias" --rendered-provider-name "SAP Cloud Identity Services"
+//go:generate tfplugindocs generate --provider-name "sci" --rendered-provider-name "SAP Cloud Identity Services"
 
 package main
 
 import (
-	// "ias/internal/cli"
+	// "sci/internal/cli"
 	"context"
 	"flag"
 	"log"
-	"terraform-provider-ias/internal/provider"
+	"terraform-provider-sci/internal/provider"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
-	// "ias/cli/apiObjects/users"
+	// "sci/cli/apiObjects/users"
 	// "net/http"
 	// "net/url"
 	// "context"
@@ -32,7 +32,7 @@ func main() {
 		// provider address is used in these tutorials in conjunction with a
 		// specific Terraform CLI configuration for manual development testing
 		// of this provider.
-		Address:         "registry.terraform.io/sap/ias",
+		Address:         "registry.terraform.io/sap/sci",
 		Debug:           debug,
 		ProtocolVersion: 6,
 	}

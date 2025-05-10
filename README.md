@@ -1,6 +1,8 @@
 # Terraform Provider for for SAP Cloud Identity Services
 
 ![Golang](https://img.shields.io/badge/Go-1.24-informational)
+[![REUSE status](https://api.reuse.software/badge/github.com/SAP/terraform-provider-sap-cloud-identity-services)](https://api.reuse.software/info/github.com/SAP/terraform-provider-sap-cloud-identity-services)
+
 
 ## About This Project
 

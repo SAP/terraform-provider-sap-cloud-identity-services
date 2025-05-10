@@ -1,11 +1,11 @@
 ---
-page_title: "ias_users Data Source - ias"
+page_title: "sci_users Data Source - sci"
 subcategory: ""
 description: |-
   Gets a list of users from the SAP Cloud Identity services.
 ---
 
-# ias_users (Data Source)
+# sci_users (Data Source)
 
 Gets a list of users from the SAP Cloud Identity services.
 
@@ -13,7 +13,7 @@ Gets a list of users from the SAP Cloud Identity services.
 
 ```terraform
 # List all users
-data "ias_userss" "all" {
+data "sci_userss" "all" {
 }
 ```
 

@@ -28,7 +28,7 @@ type User struct {
 func providerConfig(_ string, testUser User) string {
 	tenantUrl := "https://iasprovidertestblr.accounts400.ondemand.com/"
 	return fmt.Sprintf(`
-	provider "ias" {
+	provider "sci" {
 		tenant_url = "%s"
 		username = "%s"
 		password = "%s"
@@ -37,10 +37,10 @@ func providerConfig(_ string, testUser User) string {
 }
 
 func getTestProviders(httpClient *http.Client) map[string]func() (tfprotov6.ProviderServer, error) {
-	iasProvider := NewWithClient(httpClient)
+	sciProvider := NewWithClient(httpClient)
 
 	return map[string]func() (tfprotov6.ProviderServer, error){
-		"ias": providerserver.NewProtocol6WithError(iasProvider),
+		"sci": providerserver.NewProtocol6WithError(sciProvider),
 	}
 }
 
@@ -62,10 +62,10 @@ func setupVCR(t *testing.T, cassetteName string) (*recorder.Recorder, User) {
 	var testUser User
 	if rec.IsRecording() {
 		t.Logf("ATTENTION: Recording '%s'", cassetteName)
-		testUser.Username = os.Getenv("ias_username")
-		testUser.Password = os.Getenv("ias_password")
+		testUser.Username = os.Getenv("SCI_USERNAME")
+		testUser.Password = os.Getenv("SCI_PASSWORD")
 		if len(testUser.Username) == 0 || len(testUser.Password) == 0 {
-			t.Fatal("Env vars ias_username and ias_password are required when recording test fixtures")
+			t.Fatal("Env vars SCI_USERNAME and SCI_PASSWORD are required when recording test fixtures")
 		}
 	} else {
 		t.Logf("Replaying '%s'", cassetteName)
@@ -123,13 +123,13 @@ func stopQuietly(rec *recorder.Recorder) {
 	}
 }
 
-func TestIasProvider_AllResources(t *testing.T) {
+func TestSciProvider_AllResources(t *testing.T) {
 
 	expectedResources := []string{
-		"ias_application",
-		"ias_user",
-		"ias_group",
-		"ias_schema",
+		"sci_application",
+		"sci_user",
+		"sci_group",
+		"sci_schema",
 	}
 
 	ctx := context.Background()
@@ -138,7 +138,7 @@ func TestIasProvider_AllResources(t *testing.T) {
 	for _, resourceFunc := range New().Resources(ctx) {
 		var resp resource.MetadataResponse
 
-		resourceFunc().Metadata(ctx, resource.MetadataRequest{ProviderTypeName: "ias"}, &resp)
+		resourceFunc().Metadata(ctx, resource.MetadataRequest{ProviderTypeName: "sci"}, &resp)
 
 		registeredResources = append(registeredResources, resp.TypeName)
 	}
@@ -146,17 +146,17 @@ func TestIasProvider_AllResources(t *testing.T) {
 	assert.ElementsMatch(t, expectedResources, registeredResources)
 }
 
-func TestIasProvider_AllDataSources(t *testing.T) {
+func TestSciProvider_AllDataSources(t *testing.T) {
 
 	expectedDataSources := []string{
-		"ias_application",
-		"ias_applications",
-		"ias_user",
-		"ias_users",
-		"ias_group",
-		"ias_groups",
-		"ias_schema",
-		"ias_schemas",
+		"sci_application",
+		"sci_applications",
+		"sci_user",
+		"sci_users",
+		"sci_group",
+		"sci_groups",
+		"sci_schema",
+		"sci_schemas",
 	}
 
 	ctx := context.Background()
@@ -165,7 +165,7 @@ func TestIasProvider_AllDataSources(t *testing.T) {
 	for _, datasourceFunc := range New().DataSources(ctx) {
 		var resp datasource.MetadataResponse
 
-		datasourceFunc().Metadata(ctx, datasource.MetadataRequest{ProviderTypeName: "ias"}, &resp)
+		datasourceFunc().Metadata(ctx, datasource.MetadataRequest{ProviderTypeName: "sci"}, &resp)
 
 		registeredDataSources = append(registeredDataSources, resp.TypeName)
 	}

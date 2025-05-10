@@ -1,13 +1,13 @@
 terraform {
   required_providers {
-    ias = {
-      source  = "SAP/ias"
+    sci = {
+      source  = "SAP/sci"
       version = "0.1.0-beta1"
     }
   }
 }
 
 # Configure the BTP Provider
-provider "ias" {
+provider "sci" {
   tenant_url = "https://<tenant>.authentication.eu10.hana.ondemand.com"
 }

@@ -3,7 +3,7 @@ package cli
 import (
 	"context"
 	"fmt"
-	"terraform-provider-ias/internal/cli/apiObjects/groups"
+	"terraform-provider-sci/internal/cli/apiObjects/groups"
 )
 
 type GroupsCli struct {

@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"terraform-provider-ias/internal/cli"
+	"terraform-provider-sci/internal/cli"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -21,32 +21,32 @@ func New() provider.Provider {
 	return NewWithClient(http.DefaultClient)
 }
 
-func NewWithClient(httpClient *http.Client) *IasProvider {
-	return &IasProvider{
+func NewWithClient(httpClient *http.Client) *SciProvider {
+	return &SciProvider{
 		httpClient: httpClient,
 	}
 }
 
-type IasProvider struct {
+type SciProvider struct {
 	httpClient *http.Client
 }
 
-type IasProviderData struct {
+type SciProviderData struct {
 	TenantUrl types.String `tfsdk:"tenant_url"`
 	Username  types.String `tfsdk:"username"`
 	Password  types.String `tfsdk:"password"`
 }
 
-func (p *IasProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
-	resp.TypeName = "ias"
+func (p *SciProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
+	resp.TypeName = "sci"
 }
 
-func (p *IasProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
+func (p *SciProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: `The Terraform provider for SAP Cloud Identity Services enables you to automate the provisioning, management, and configuration of resources in the [SAP Cloud Identity Services](https://help.sap.com/docs/cloud-identity-services). By leveraging this provider, you can simplify and streamline the configuration of applications, groups, schemas and users.`,
 		Attributes: map[string]schema.Attribute{
 			"tenant_url": schema.StringAttribute{
-				MarkdownDescription: "The URL of the IAS tenant",
+				MarkdownDescription: "The URL of the SCI tenant",
 				Required:            true,
 			},
 			"username": schema.StringAttribute{
@@ -60,9 +60,9 @@ func (p *IasProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *
 	}
 }
 
-func (p *IasProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
+func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
 
-	var config IasProviderData
+	var config SciProviderData
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
 
@@ -78,18 +78,18 @@ func (p *IasProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		return
 	}
 
-	client := cli.NewIasClient(cli.NewClient(p.httpClient, pasrsedUrl))
+	client := cli.NewSciClient(cli.NewClient(p.httpClient, pasrsedUrl))
 
 	var username string
 	if config.Username.IsNull() {
-		username = os.Getenv("ias_username")
+		username = os.Getenv("SCI_USERNAME")
 	} else {
 		username = config.Username.ValueString()
 	}
 
 	var password string
 	if config.Password.IsNull() {
-		password = os.Getenv("ias_password")
+		password = os.Getenv("SCI_PASSWORD")
 	} else {
 		password = config.Password.ValueString()
 	}
@@ -100,7 +100,7 @@ func (p *IasProvider) Configure(ctx context.Context, req provider.ConfigureReque
 	resp.ResourceData = client
 }
 
-func (p *IasProvider) DataSources(_ context.Context) []func() datasource.DataSource {
+func (p *SciProvider) DataSources(_ context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		newApplicationDataSource,
 		newApplicationsDataSource,
@@ -113,7 +113,7 @@ func (p *IasProvider) DataSources(_ context.Context) []func() datasource.DataSou
 	}
 }
 
-func (p *IasProvider) Resources(_ context.Context) []func() resource.Resource {
+func (p *SciProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		newApplicationResource,
 		newUserResource,

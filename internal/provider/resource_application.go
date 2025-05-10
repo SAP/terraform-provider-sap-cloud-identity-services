@@ -3,9 +3,9 @@ package provider
 import (
 	"context"
 	"fmt"
-	"terraform-provider-ias/internal/cli"
-	"terraform-provider-ias/internal/cli/apiObjects/applications"
-	"terraform-provider-ias/internal/utils"
+	"terraform-provider-sci/internal/cli"
+	"terraform-provider-sci/internal/cli/apiObjects/applications"
+	"terraform-provider-sci/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/objectvalidator"
@@ -40,7 +40,7 @@ func newApplicationResource() resource.Resource {
 }
 
 type applicationResource struct {
-	cli *cli.IasClient
+	cli *cli.SciClient
 }
 
 func (d *applicationResource) Configure(_ context.Context, req resource.ConfigureRequest, _ *resource.ConfigureResponse) {
@@ -48,7 +48,7 @@ func (d *applicationResource) Configure(_ context.Context, req resource.Configur
 		return
 	}
 
-	d.cli = req.ProviderData.(*cli.IasClient)
+	d.cli = req.ProviderData.(*cli.SciClient)
 }
 
 func (r *applicationResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {

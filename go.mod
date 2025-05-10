@@ -1,4 +1,4 @@
-module terraform-provider-ias
+module terraform-provider-sci
 
 go 1.24
 

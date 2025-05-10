@@ -1,11 +1,11 @@
 ---
-page_title: "ias_application Resource - ias"
+page_title: "sci_application Resource - sci"
 subcategory: ""
 description: |-
   Creates an application in the SAP Cloud Identity Services.
 ---
 
-# ias_application (Resource)
+# sci_application (Resource)
 
 Creates an application in the SAP Cloud Identity Services.
 
@@ -13,7 +13,7 @@ Creates an application in the SAP Cloud Identity Services.
 
 ```terraform
 # Create a basic application in SAP Cloud Identity Services
-resource "ias_application" "basic_application" {
+resource "sci_application" "basic_application" {
   id          = "app_1234567890"
   name        = "My Basic Application"
   description = "A basic application in SAP Cloud Identity Services"
@@ -90,7 +90,7 @@ Optional:
 Import is supported using the following syntax:
 
 ```terraform
-# terraform import ias_application.<resource_name> <app_id>
+# terraform import sci_application.<resource_name> <app_id>
 
-terraform import ias_application.my_app dd005d8b-1fee-4e6b-b6ff-cb9a197b7fe0
+terraform import sci_application.my_app dd005d8b-1fee-4e6b-b6ff-cb9a197b7fe0
 ```

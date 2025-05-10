@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"terraform-provider-ias/internal/cli/apiObjects/schemas"
+	"terraform-provider-sci/internal/cli/apiObjects/schemas"
 )
 
 type SchemasCli struct {

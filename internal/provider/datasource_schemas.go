@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"terraform-provider-ias/internal/cli"
+	"terraform-provider-sci/internal/cli"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -19,7 +19,7 @@ func newSchemasDataSource() datasource.DataSource {
 }
 
 type schemasDataSource struct {
-	cli *cli.IasClient
+	cli *cli.SciClient
 }
 
 type schemasData struct {
@@ -63,7 +63,7 @@ func (d *schemasDataSource) Configure(_ context.Context, req datasource.Configur
 		return
 	}
 
-	d.cli = req.ProviderData.(*cli.IasClient)
+	d.cli = req.ProviderData.(*cli.SciClient)
 }
 
 func (d *schemasDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {

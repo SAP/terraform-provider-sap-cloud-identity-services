@@ -6,7 +6,7 @@ import (
 
 	"fmt"
 	"net/http"
-	"terraform-provider-ias/internal/cli/apiObjects/applications"
+	"terraform-provider-sci/internal/cli/apiObjects/applications"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

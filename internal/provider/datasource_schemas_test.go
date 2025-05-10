@@ -22,7 +22,7 @@ func TestDataSourceSchemas(t *testing.T) {
 				{
 					Config: providerConfig("", user) + DataSourceSchemas("allSchemas"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestCheckResourceAttr("data.ias_schemas.allSchemas", "values.#", "13"),
+						resource.TestCheckResourceAttr("data.sci_schemas.allSchemas", "values.#", "13"),
 					),
 				},
 			},
@@ -34,7 +34,7 @@ func TestDataSourceSchemas(t *testing.T) {
 
 func DataSourceSchemas(datasourceName string) string {
 	return fmt.Sprintf(`
-	data "ias_schemas" "%s"{
+	data "sci_schemas" "%s"{
 
 	}
 	`, datasourceName)

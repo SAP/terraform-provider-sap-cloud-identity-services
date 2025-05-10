@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"terraform-provider-ias/internal/cli"
-	"terraform-provider-ias/internal/cli/apiObjects/groups"
-	"terraform-provider-ias/internal/utils"
+	"terraform-provider-sci/internal/cli"
+	"terraform-provider-sci/internal/cli/apiObjects/groups"
+	"terraform-provider-sci/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -33,7 +33,7 @@ func newGroupResource() resource.Resource {
 }
 
 type groupResource struct {
-	cli *cli.IasClient
+	cli *cli.SciClient
 }
 
 func (d *groupResource) Configure(_ context.Context, req resource.ConfigureRequest, _ *resource.ConfigureResponse) {
@@ -41,7 +41,7 @@ func (d *groupResource) Configure(_ context.Context, req resource.ConfigureReque
 		return
 	}
 
-	d.cli = req.ProviderData.(*cli.IasClient)
+	d.cli = req.ProviderData.(*cli.SciClient)
 }
 
 func (r *groupResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -293,7 +293,7 @@ func (r *groupResource) GetGroupRequest(ctx context.Context, plan groupData) (*g
 	return args, diagnostics
 }
 
-func validateMembers(ctx context.Context, client *cli.IasClient, member string) error {
+func validateMembers(ctx context.Context, client *cli.SciClient, member string) error {
 
 	// do a GET call for both the users and groups to check if the member exists
 	_, _, userErr := client.User.GetByUserId(ctx, member)

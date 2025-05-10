@@ -3,8 +3,8 @@ package provider
 import (
 	"context"
 	"fmt"
-	"terraform-provider-ias/internal/cli"
-	"terraform-provider-ias/internal/utils"
+	"terraform-provider-sci/internal/cli"
+	"terraform-provider-sci/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -18,7 +18,7 @@ func newApplicationsDataSource() datasource.DataSource {
 }
 
 type applicationsDataSource struct {
-	cli *cli.IasClient
+	cli *cli.SciClient
 }
 
 type applicationsData struct {
@@ -124,7 +124,7 @@ func (d *applicationsDataSource) Configure(_ context.Context, req datasource.Con
 		return
 	}
 
-	d.cli = req.ProviderData.(*cli.IasClient)
+	d.cli = req.ProviderData.(*cli.SciClient)
 }
 
 func (d *applicationsDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
