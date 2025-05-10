@@ -14,7 +14,7 @@ type authenticationSchemaData struct {
 	SsoType                       types.String               `tfsdk:"sso_type"`
 	SubjectNameIdentifier         *subjectNameIdentifierData `tfsdk:"subject_name_identifier"`
 	SubjectNameIdentifierFunction types.String               `tfsdk:"subject_name_identifier_function"`
-	// AssertionAttributes           types.List                 `tfsdk:"assertion_attributes"`
+	AssertionAttributes           types.List                 `tfsdk:"assertion_attributes"`
 	AdvancedAssertionAttributes   types.List                 `tfsdk:"advanced_assertion_attributes"`
 	DefaultAuthenticatingIdpId    types.String               `tfsdk:"default_authenticating_idp"`
 	AuthenticationRules           types.List                 `tfsdk:"conditional_authentication"`
@@ -27,11 +27,11 @@ type advancedAssertionAttributesData struct {
 	Inherited      types.Bool   `tfsdk:"inherited"`
 }
 
-// type assertionAttributesData struct {
-// 	AttributeName  types.String `tfsdk:"attribute_name"`
-// 	AttributeValue types.String `tfsdk:"attribute_value"`
-// 	Inherited      types.Bool   `tfsdk:"inherited"`
-// }
+type assertionAttributesData struct {
+	AttributeName  types.String `tfsdk:"attribute_name"`
+	AttributeValue types.String `tfsdk:"attribute_value"`
+	Inherited      types.Bool   `tfsdk:"inherited"`
+}
 
 type subjectNameIdentifierData struct {
 	Source types.String `tfsdk:"source"`
@@ -62,16 +62,18 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 
 	var diagnostics, diags diag.Diagnostics
 
-	// check for expressions?
+	// regex for attribute values whose sources are the corporate IDP
 	re := regexp.MustCompile(`\$\{corporateIdP\.([^\}]+)\}`)
 
+	// reading attributes : id, name, multi_tenant_app and global_account
 	application := applicationData{
-		Id:                  types.StringValue(a.Id),
-		Name:                types.StringValue(a.Name),
-		MultiTenantApp:      types.BoolValue(a.MultiTenantApp),
-		GlobalAccount:       types.StringValue(a.GlobalAccount),
+		Id:             types.StringValue(a.Id),
+		Name:           types.StringValue(a.Name),
+		MultiTenantApp: types.BoolValue(a.MultiTenantApp),
+		GlobalAccount:  types.StringValue(a.GlobalAccount),
 	}
 
+	// reading attributes : description and parent_application_id
 	if len(a.Description) > 0 {
 		application.Description = types.StringValue(a.Description)
 	}
@@ -82,12 +84,13 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 
 	authenticationSchema := authenticationSchemaData{}
 
+	// reading attributes of the Authentication Schema : sso_type, default_authenticating_idp
 	authenticationSchema.SsoType = types.StringValue(a.AuthenticationSchema.SsoType)
 	authenticationSchema.DefaultAuthenticatingIdpId = types.StringValue(a.AuthenticationSchema.DefaultAuthenticatingIdpId)
 
+	// reading attribute of the Authentication Schema : subject_name_identifier
 	authenticationSchema.SubjectNameIdentifier = &subjectNameIdentifierData{}
 
-	//regex for expressions needed
 	if re.MatchString(a.AuthenticationSchema.SubjectNameIdentifier) {
 		match := re.FindStringSubmatch(a.AuthenticationSchema.SubjectNameIdentifier)
 		authenticationSchema.SubjectNameIdentifier.Value = types.StringValue(match[1])
@@ -97,28 +100,29 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 		authenticationSchema.SubjectNameIdentifier.Source = types.StringValue(sourceValues[0])
 	}
 
+	// reading attributes of the Authentication Schema : subject_name_identifier_function
 	if len(a.AuthenticationSchema.SubjectNameIdentifierFunction) > 0 {
 		authenticationSchema.SubjectNameIdentifierFunction = types.StringValue((a.AuthenticationSchema.SubjectNameIdentifierFunction))
 	}
 
-	// if a.AuthenticationSchema.AssertionAttributes != nil { 
-	// 	attributes := []assertionAttributesData{}
-	// 	for _, attributeRes := range *(a.AuthenticationSchema.AssertionAttributes) {
+	// reading attributes of the Authentication Schema : assertion_attributes
+	attributes := []assertionAttributesData{}
+	for _, attributeRes := range a.AuthenticationSchema.AssertionAttributes {
 
-	// 		attribute := assertionAttributesData{
-	// 			AttributeName:  types.StringValue(attributeRes.AssertionAttributeName),
-	// 			AttributeValue: types.StringValue(attributeRes.UserAttributeName),
-	// 			Inherited:      types.BoolValue(attributeRes.Inherited),
-	// 		}
+		attribute := assertionAttributesData{
+			AttributeName:  types.StringValue(attributeRes.AssertionAttributeName),
+			AttributeValue: types.StringValue(attributeRes.UserAttributeName),
+			Inherited:      types.BoolValue(attributeRes.Inherited),
+		}
 
-	// 		attributes = append(attributes, attribute)
-	// 	}
-	// 	authenticationSchema.AssertionAttributes, diags = types.ListValueFrom(ctx, assertionAttributesObjType, attributes)
-	// 	diagnostics.Append(diags...)
-	// } else {
-	// 	authenticationSchema.AssertionAttributes, _ = types.ListValue(assertionAttributesObjType, nil)
-	// }
+		attributes = append(attributes, attribute)
+	}
 
+	authenticationSchema.AssertionAttributes, diags = types.ListValueFrom(ctx, assertionAttributesObjType, attributes)
+
+	diagnostics.Append(diags...)
+
+	// reading attributes of the Authentication Schema : advanced_assertion_attributes
 	advancedAttributes := []advancedAssertionAttributesData{}
 	for _, attributeRes := range a.AuthenticationSchema.AdvancedAssertionAttributes {
 
@@ -145,9 +149,9 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 	} else {
 		authenticationSchema.AdvancedAssertionAttributes = types.ListNull(advancedAssertionAttributesObjType)
 	}
-
 	diagnostics.Append(diags...)
 
+	// reading attributes of the Authentication Schema : conditional_authentication
 	authRules := []authenticationRulesData{}
 	for _, authRulesRes := range a.AuthenticationSchema.ConditionalAuthentication {
 
@@ -177,7 +181,6 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 	} else {
 		authenticationSchema.AuthenticationRules = types.ListNull(authenticationRulesObjType)
 	}
-
 	diagnostics.Append(diags...)
 
 	application.AuthenticationSchema = &authenticationSchema

@@ -71,8 +71,8 @@ type JwtClientAuthCredential struct {
 }
 
 type AssertionAttribute struct {
-	AssertionAttributeName string `json:"assertionAttributeName" tfsdk:"attribute_name"`
-	UserAttributeName      string `json:"userAttributeName" tfsdk:"attribute_value"`
+	AssertionAttributeName string `json:"assertionAttributeName,omitempty" tfsdk:"attribute_name"`
+	UserAttributeName      string `json:"userAttributeName,omitempty" tfsdk:"attribute_value"`
 	Inherited              bool   `json:"inherited" tfsdk:"inherited"`
 }
 
@@ -119,11 +119,11 @@ type AuthenticationSchema struct {
 	SsoType                       string                       `json:"ssoType,omitempty"`
 	SubjectNameIdentifier         string                       `json:"subjectNameIdentifier,omitempty"`
 	SubjectNameIdentifierFunction string                       `json:"subjectNameIdentifierFunction,omitempty"`
-	// AssertionAttributes           *[]AssertionAttribute         `json:"assertionAttributes"`
+	AssertionAttributes           []AssertionAttribute         `json:"assertionAttributes"`
 	AdvancedAssertionAttributes   []AdvancedAssertionAttribute `json:"advancedAssertionAttributes,omitempty"`
 	DefaultAuthenticatingIdpId    string                       `json:"defaultAuthenticatingIdpId,omitempty"`
 	ConditionalAuthentication     []AuthenicationRule          `json:"conditionalAuthentication,omitempty"`
-	// RiskBasedAuthentication       *RBAConfiguration            `json:"riskBasedAuthentication"`
+	// RiskBasedAuthentication       RBAConfiguration            `json:"riskBasedAuthentication"`
 	// HomeUrl								string 							`json:"homeUrl"`
 	// FallbackSubjectNameIdentifier		string 							`json:"fallbackSubjectNameIdentifier,omitempty"`
 	// RememberMeExpirationTimeInMonths	string 							`json:"rememberMeExpirationTimeInMonths,omitempty"`

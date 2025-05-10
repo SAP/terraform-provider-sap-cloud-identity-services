@@ -43,11 +43,11 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 				},
 			},
 			"name": schema.StringAttribute{
-				MarkdownDescription: "Free text description of the Application",
+				MarkdownDescription: "Name of the application",
 				Computed:            true,
 			},
 			"description": schema.StringAttribute{
-				MarkdownDescription: "Description for the application",
+				MarkdownDescription: "Free text description of the Application",
 				Computed:            true,
 			},
 			"parent_application_id": schema.StringAttribute{
@@ -62,22 +62,25 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 				Computed:            true,
 			},
 			"global_account": schema.StringAttribute{
-				// MarkdownDescription: "",
 				Computed: true,
 			},
 			"authentication_schema": schema.SingleNestedAttribute{
-				Computed: true,
+				MarkdownDescription: "Configure attributes particular to the schema \"urn:sap:identity:application:schemas:extension:sci:1.0:Authentication\"",
+				Computed:            true,
 				Attributes: map[string]schema.Attribute{
 					"sso_type": schema.StringAttribute{
 						MarkdownDescription: "The preferred protocol for the application",
 						Computed:            true,
 					},
 					"subject_name_identifier": schema.SingleNestedAttribute{
-						MarkdownDescription: "The attribute by which the application uses to identify the users. Identity Authentication sends the attribute to the application as subject in OpenID Connect tokens.",
-						Computed:            true,
+						MarkdownDescription: "The attribute by which the application uses to identify the users. Used by the application to uniquely identify the user during logon.\n" +
+							fmt.Sprintln("Identity Authentication sends the attribute to the application as :") +
+							fmt.Sprintln("\t - subject in OpenID Connect tokens") +
+							fmt.Sprintln("\t - name ID in SAML 2.0 assertions"),
+						Computed: true,
 						Attributes: map[string]schema.Attribute{
 							"source": schema.StringAttribute{
-								MarkdownDescription: "Acceptable values: \"Identity Directory\", \"Corporate Idenity Provider\", \"Expression\"",
+								MarkdownDescription: validValuesString(sourceValues),
 								Computed:            true,
 							},
 							"value": schema.StringAttribute{
@@ -87,11 +90,11 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 						},
 					},
 					"subject_name_identifier_function": schema.StringAttribute{
-						MarkdownDescription: "Convert the subject name identifier to uppercase or lowercase. The only acceptable values are \"none\", \"upperCase\", \"lowerCase\"",
+						MarkdownDescription: "Convert the subject name identifier to uppercase or lowercase",
 						Computed:            true,
 					},
 					"assertion_attributes": schema.ListNestedAttribute{
-						MarkdownDescription: "User attributes to be sent to the application. The Source of these attributes is always the Identity Directory, thus only valid attribute values will be accepted.",
+						MarkdownDescription: "User attributes to be sent to the application. The Source of these attributes is always the Identity Directory",
 						Computed:            true,
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
@@ -116,7 +119,7 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
 								"source": schema.StringAttribute{
-									MarkdownDescription: "Acceptable values: \"Corporate Idenity Provider\", \"Expression\"",
+									MarkdownDescription: validValuesString(sourceValues[1:]),
 									Computed:            true,
 								},
 								"attribute_name": schema.StringAttribute{
@@ -139,7 +142,7 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 						Computed:            true,
 					},
 					"conditional_authentication": schema.ListNestedAttribute{
-						MarkdownDescription: "Rules to manage authentication. Each rule is evaluated by priority until the criteria of a rule are fulfilled.",
+						MarkdownDescription: "Define rules for authenticating identity provider according to email domain, user type, user group, and IP range. Each rule is evaluated by priority until the criteria of a rule are fulfilled.",
 						Computed:            true,
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{

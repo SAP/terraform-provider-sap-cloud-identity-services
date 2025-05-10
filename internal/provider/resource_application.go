@@ -89,7 +89,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 				Optional:            true,
 				Validators: []validator.String{
 					utils.ValidUUID(),
-				},				
+				},
 			},
 			"multi_tenant_app": schema.BoolAttribute{
 				MarkdownDescription: "Only for Internal Use",
@@ -111,8 +111,8 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 			},
 			"authentication_schema": schema.SingleNestedAttribute{
 				MarkdownDescription: "Configure attributes particular to the schema \"urn:sap:identity:application:schemas:extension:sci:1.0:Authentication\"",
-				Optional: true,
-				Computed: true,
+				Optional:            true,
+				Computed:            true,
 				PlanModifiers: []planmodifier.Object{
 					objectplanmodifier.UseStateForUnknown(),
 				},
@@ -130,11 +130,11 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 					},
 					"subject_name_identifier": schema.SingleNestedAttribute{
 						MarkdownDescription: "The attribute by which the application uses to identify the users. Used by the application to uniquely identify the user during logon.\n" +
-						fmt.Sprintln("Identity Authentication sends the attribute to the application as :") +
-						fmt.Sprintln("\t - subject in OpenID Connect tokens") + 
-						fmt.Sprintln("\t - name ID in SAML 2.0 assertions"),
-						Optional:            true,
-						Computed:            true,
+							fmt.Sprintln("Identity Authentication sends the attribute to the application as :") +
+							fmt.Sprintln("\t - subject in OpenID Connect tokens") +
+							fmt.Sprintln("\t - name ID in SAML 2.0 assertions"),
+						Optional: true,
+						Computed: true,
 						Validators: []validator.Object{
 							objectvalidator.AlsoRequires(
 								path.MatchRoot("authentication_schema").AtName("subject_name_identifier").AtName("source"),
@@ -172,54 +172,50 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 							stringvalidator.OneOf(subjectNameIdentifierFunctionValues...),
 						},
 					},
-					// "assertion_attributes": schema.ListNestedAttribute{
-					// 	MarkdownDescription: "User attributes to be sent to the application. The Source of these attributes is always the Identity Directory, thus only valid attribute values will be accepted.",
-					// 	Optional:            true,
-					// 	Computed:            true,
-					// 	Validators: []validator.List{
-					// 		listvalidator.AlsoRequires(
-					// 			path.MatchRoot("authentication_schema").AtName("assertion_attributes").AtAnyListIndex().AtName("attribute_name"),
-					// 			path.MatchRoot("authentication_schema").AtName("assertion_attributes").AtAnyListIndex().AtName("attribute_value"),
-					// 		),
-					// 		// listvalidator.SizeAtLeast(1),
-					// 	},
-					// 	PlanModifiers: []planmodifier.List{
-					// 		utils.UpdateUnknown(),
-					// 	},
-					// 	NestedObject: schema.NestedAttributeObject{
-					// 		Attributes: map[string]schema.Attribute{
-					// 			"attribute_name": schema.StringAttribute{
-					// 				MarkdownDescription: "Name of the attribute",
-					// 				Optional:            true,
-					// 				Computed:            true,
-					// 				Validators: []validator.String{
-					// 					stringvalidator.LengthBetween(1, 255),
-					// 				},
-					// 				PlanModifiers: []planmodifier.String{
-					// 					stringplanmodifier.UseStateForUnknown(),
-					// 				},
-					// 			},
-					// 			"attribute_value": schema.StringAttribute{
-					// 				MarkdownDescription: "Value of the attribute.",
-					// 				Optional:            true,
-					// 				Computed:            true,
-					// 				Validators: []validator.String{
-					// 					stringvalidator.LengthBetween(1, 255),
-					// 				},
-					// 				PlanModifiers: []planmodifier.String{
-					// 					stringplanmodifier.UseStateForUnknown(),
-					// 				},
-					// 			},
-					// 			"inherited": schema.BoolAttribute{
-					// 				MarkdownDescription: "Indicates whether the attribute has been inherited from a parent application.",
-					// 				Computed:            true,
-					// 				PlanModifiers: []planmodifier.Bool{
-					// 					boolplanmodifier.UseStateForUnknown(),
-					// 				},
-					// 			},
-					// 		},
-					// 	},
-					// },
+					"assertion_attributes": schema.ListNestedAttribute{
+						MarkdownDescription: "User attributes to be sent to the application. The Source of these attributes is always the Identity Directory, thus only valid attribute values will be accepted.",
+						Optional:            true,
+						Computed:            true,
+						Validators: []validator.List{
+							listvalidator.AlsoRequires(
+								path.MatchRoot("authentication_schema").AtName("assertion_attributes").AtAnyListIndex().AtName("attribute_name"),
+								path.MatchRoot("authentication_schema").AtName("assertion_attributes").AtAnyListIndex().AtName("attribute_value"),
+							),
+						},
+						NestedObject: schema.NestedAttributeObject{
+							Attributes: map[string]schema.Attribute{
+								"attribute_name": schema.StringAttribute{
+									MarkdownDescription: "Name of the attribute",
+									Optional:            true,
+									Computed:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 255),
+									},
+									PlanModifiers: []planmodifier.String{
+										stringplanmodifier.UseStateForUnknown(),
+									},
+								},
+								"attribute_value": schema.StringAttribute{
+									MarkdownDescription: "Value of the attribute.",
+									Optional:            true,
+									Computed:            true,
+									Validators: []validator.String{
+										stringvalidator.LengthBetween(1, 255),
+									},
+									PlanModifiers: []planmodifier.String{
+										stringplanmodifier.UseStateForUnknown(),
+									},
+								},
+								"inherited": schema.BoolAttribute{
+									MarkdownDescription: "Indicates whether the attribute has been inherited from a parent application.",
+									Computed:            true,
+									PlanModifiers: []planmodifier.Bool{
+										boolplanmodifier.UseStateForUnknown(),
+									},
+								},
+							},
+						},
+					},
 					"advanced_assertion_attributes": schema.ListNestedAttribute{
 						MarkdownDescription: "Identical to the assertion attributes, except that the assertion attributes can come from other Sources.",
 						Optional:            true,
@@ -436,6 +432,7 @@ func (rs *applicationResource) ImportState(ctx context.Context, req resource.Imp
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
 
+// retrieve the API Request body from the plan data
 func getApplicationRequest(ctx context.Context, plan applicationData) (*applications.Application, diag.Diagnostics) {
 
 	var diagnostics, diags diag.Diagnostics
@@ -444,12 +441,15 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 		Name:           plan.Name.ValueString(),
 		Description:    plan.Description.ValueString(),
 		MultiTenantApp: plan.MultiTenantApp.ValueBool(),
-		GlobalAccount:  plan.GlobalAccount.ValueString(),
 	}
-
 	diagnostics.Append(diags...)
+
 	if !plan.ParentApplicationId.IsNull() {
 		args.ParentApplicationId = plan.ParentApplicationId.ValueString()
+	}
+
+	if !plan.GlobalAccount.IsNull() {
+		args.GlobalAccount = plan.GlobalAccount.ValueString()
 	}
 
 	if plan.AuthenticationSchema != nil {
@@ -462,7 +462,7 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 
 		if authenticationSchema.SubjectNameIdentifier != nil && !authenticationSchema.SubjectNameIdentifier.Source.IsNull() {
 
-			if authenticationSchema.SubjectNameIdentifier.Source.ValueString() == "Identity Directory" || authenticationSchema.SubjectNameIdentifier.Source.ValueString() == "Expression" {
+			if authenticationSchema.SubjectNameIdentifier.Source.ValueString() == sourceValues[0] || authenticationSchema.SubjectNameIdentifier.Source.ValueString() == sourceValues[2] {
 				args.AuthenticationSchema.SubjectNameIdentifier = authenticationSchema.SubjectNameIdentifier.Value.ValueString()
 			} else {
 				args.AuthenticationSchema.SubjectNameIdentifier = "${corporateIdP." + authenticationSchema.SubjectNameIdentifier.Value.ValueString() + "}"
@@ -472,15 +472,15 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 		if !authenticationSchema.SubjectNameIdentifierFunction.IsNull() {
 			args.AuthenticationSchema.SubjectNameIdentifierFunction = authenticationSchema.SubjectNameIdentifierFunction.ValueString()
 		}
-		
-		// if !authenticationSchema.AssertionAttributes.IsNull() {
 
-		// 	var attributes []applications.AssertionAttribute
-		// 	diags := authenticationSchema.AssertionAttributes.ElementsAs(ctx, &attributes, true)
-		// 	diagnostics.Append(diags...)
+		if !authenticationSchema.AssertionAttributes.IsNull() {
 
-		// 	args.AuthenticationSchema.AssertionAttributes = &attributes
-		// }
+			var attributes []applications.AssertionAttribute
+			diags := authenticationSchema.AssertionAttributes.ElementsAs(ctx, &attributes, true)
+			diagnostics.Append(diags...)
+
+			args.AuthenticationSchema.AssertionAttributes = attributes
+		}
 		if !authenticationSchema.AdvancedAssertionAttributes.IsNull() {
 
 			var advancedAssertionAttributes []advancedAssertionAttributesData
@@ -493,7 +493,7 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 					AttributeName: attribute.AttributeName.ValueString(),
 				}
 
-				if attribute.Source == types.StringValue("Corporate Identity Provider") {
+				if attribute.Source == types.StringValue(sourceValues[1]) {
 					assertionAttribute.AttributeValue = "${corporateIdP." + attribute.AttributeValue.ValueString() + "}"
 				} else {
 					assertionAttribute.AttributeValue = attribute.AttributeValue.ValueString()
@@ -516,7 +516,8 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 	return args, diagnostics
 }
 
-func validValuesString (values []string) string {
+// string together the array of valid values for the attribute
+func validValuesString(values []string) string {
 
 	valString := "Acceptable values are : "
 
