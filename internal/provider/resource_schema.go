@@ -113,6 +113,9 @@ func (r *schemaResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 							ElementType:         types.StringType,
 							Optional:            true,
 							MarkdownDescription: "A collection of suggested canonical values that may be used",
+							Validators: []validator.List{
+								listvalidator.SizeAtLeast(1),
+							},
 						},
 						"multivalued": schema.BoolAttribute{
 							Optional:            true,

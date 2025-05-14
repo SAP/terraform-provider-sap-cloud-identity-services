@@ -2,9 +2,9 @@ package provider
 
 import (
 	"fmt"
-	"regexp"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/applications"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"

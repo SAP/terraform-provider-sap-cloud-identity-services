@@ -4,22 +4,13 @@
 package main
 
 import (
-	// "sci/internal/cli"
 	"context"
 	"flag"
-	"log"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/provider"
+	"log"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
-	// "sci/cli/apiObjects/users"
-	// "net/http"
-	// "net/url"
-	// "context"
-	// "encoding/json"
-	// "fmt"
 )
-
-// const host = "https://iasprovidertestblr.accounts400.ondemand.com/"
 
 func main() {
 
