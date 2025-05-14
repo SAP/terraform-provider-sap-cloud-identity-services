@@ -18,67 +18,69 @@ type sapExtensionUserData struct {
 type emailData struct {
 	Value   types.String `tfsdk:"value"`
 	Type    types.String `tfsdk:"type"`
-	Display types.String `tfsdk:"display"`
 	Primary types.Bool   `tfsdk:"primary"`
 }
 
 type nameData struct {
-	FamilyName    types.String `tfsdk:"family_name"`
-	GivenName     types.String `tfsdk:"given_name"`
-	Formatted     types.String `tfsdk:"formatted"`
-	MiddleName    types.String `tfsdk:"middle_name"`
-	HonoricPrefix types.String `tfsdk:"honoric_prefix"`
-	HonoricSuffix types.String `tfsdk:"honoric_suffix"`
+	FamilyName      types.String `tfsdk:"family_name"`
+	GivenName       types.String `tfsdk:"given_name"`
+	HonorificPrefix types.String `tfsdk:"honorific_prefix"`
 }
 
 type userData struct {
-	Id               types.String `tfsdk:"id"`
-	Schemas          types.Set    `tfsdk:"schemas"`
-	UserName         types.String `tfsdk:"user_name"`
-	Name             types.Object `tfsdk:"name"`
-	DisplayName      types.String `tfsdk:"display_name"`
-	Emails           types.Set    `tfsdk:"emails"`
-	Password         types.String `tfsdk:"password"`
-	Title            types.String `tfsdk:"title"`
-	UserType         types.String `tfsdk:"user_type"`
-	Active           types.Bool   `tfsdk:"active"`
-	SapExtensionUser types.Object `tfsdk:"sap_extension_user"`
-	CustomSchemas    types.String `tfsdk:"custom_schemas"`
+	Id               types.String          `tfsdk:"id"`
+	Schemas          types.Set             `tfsdk:"schemas"`
+	UserName         types.String          `tfsdk:"user_name"`
+	Name             *nameData             `tfsdk:"name"`
+	DisplayName      types.String          `tfsdk:"display_name"`
+	Emails           types.Set             `tfsdk:"emails"`
+	InitialPassword  types.String          `tfsdk:"initial_password"`
+	UserType         types.String          `tfsdk:"user_type"`
+	Active           types.Bool            `tfsdk:"active"`
+	SapExtensionUser types.Object 		   `tfsdk:"sap_extension_user"`
+	CustomSchemas    types.String          `tfsdk:"custom_schemas"`
 }
 
 func userValueFrom(ctx context.Context, u users.User, cS string) (userData, diag.Diagnostics) {
 	var diagnostics, diags diag.Diagnostics
 
 	user := userData{
-		Id:          types.StringValue(u.Id),
-		UserName:    types.StringValue(u.UserName),
-		DisplayName: types.StringValue(u.DisplayName),
-		Title:       types.StringValue(u.Title),
-		UserType:    types.StringValue(u.UserType),
-		Active:      types.BoolValue(u.Active),
+		Id:       types.StringValue(u.Id),
+		UserName: types.StringValue(u.UserName),
+		UserType: types.StringValue(u.UserType),
+		Active:   types.BoolValue(u.Active),
+	}
+
+	if len(u.DisplayName) > 0 {
+		user.DisplayName = types.StringValue(u.DisplayName)
 	}
 
 	user.Schemas, diags = types.SetValueFrom(ctx, types.StringType, u.Schemas)
 	diagnostics.Append(diags...)
 
-	userName := nameData{
-		FamilyName:    types.StringValue(u.Name.FamilyName),
-		GivenName:     types.StringValue(u.Name.GivenName),
-		Formatted:     types.StringValue(u.Name.Formatted),
-		MiddleName:    types.StringValue(u.Name.MiddleName),
-		HonoricPrefix: types.StringValue(u.Name.HonoricPrefix),
-		HonoricSuffix: types.StringValue(u.Name.HonoricSuffix),
+	name := nameData{}
+
+	if len(u.Name.FamilyName) > 0 {
+		name.FamilyName = types.StringValue(u.Name.FamilyName)
+	}
+	if len(u.Name.GivenName) > 0 {
+		name.GivenName = types.StringValue(u.Name.GivenName)
+	}
+	if len(u.Name.HonorificPrefix) > 0 {
+		name.HonorificPrefix = types.StringValue(u.Name.HonorificPrefix)
 	}
 
-	user.Name, diags = types.ObjectValueFrom(ctx, nameObjType, userName)
-	diagnostics.Append(diags...)
+	if name == (nameData{}) {
+		user.Name = nil
+	} else {
+		user.Name = &name
+	}
 
 	userEmails := []emailData{}
 	for _, emailRes := range u.Emails {
 		userEmail := emailData{
 			Value:   types.StringValue(emailRes.Value),
 			Type:    types.StringValue(emailRes.Type),
-			Display: types.StringValue(emailRes.Display),
 			Primary: types.BoolValue(emailRes.Primary),
 		}
 		userEmails = append(userEmails, userEmail)
