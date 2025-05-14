@@ -2,8 +2,8 @@ package provider
 
 import (
 	"fmt"
-	"regexp"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/schemas"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -13,15 +13,30 @@ func TestResourceSchema(t *testing.T) {
 
 	t.Parallel()
 
-	t.Run("happy path", func(t *testing.T) {
+	schema := schemas.Schema{
+		Id:   "urn:ietf:scim:schemas:Terraform",
+		Name: "Terraform",
+		Attributes: []schemas.Attribute{
+			{
+				Name:       "test_attribute",
+				Type:       "string",
+				Mutability: "readWrite",
+				Returned:   "never",
+				Uniqueness: "none",
+				CanonicalValues: []string{
+					"test",
+					"attr",
+				},
+				Multivalued: true,
+				Description: "Test Attribute",
+				Required:    true,
+				CaseExact:   false,
+			},
+		},
+		Description: "Test Schema",
+	}
 
-		schemaAttributes := schemas.Attribute{
-			Name:       "test_attribute",
-			Type:       "string",
-			Mutability: "readWrite",
-			Returned:   "never",
-			Uniqueness: "none",
-		}
+	t.Run("happy path", func(t *testing.T) {
 
 		rec, user := setupVCR(t, "fixtures/resource_schema")
 		defer stopQuietly(rec)
@@ -31,17 +46,23 @@ func TestResourceSchema(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + ResourceSchema("testSchema", "urn:ietf:scim:schemas:Terraform", "Terraform", schemaAttributes),
+					Config: providerConfig("", user) + ResourceSchema("testSchema", schema),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						//add if regex is added
-						// resource.TestMatchResourceAttr("sci_user.testSchema", "id", regexpUUID),
-						resource.TestCheckResourceAttr("sci_schema.testSchema", "id", "urn:ietf:scim:schemas:Terraform"),
-						resource.TestCheckResourceAttr("sci_schema.testSchema", "name", "Terraform"),
-						resource.TestCheckResourceAttr("sci_schema.testSchema", "attributes.0.name", schemaAttributes.Name),
-						resource.TestCheckResourceAttr("sci_schema.testSchema", "attributes.0.type", schemaAttributes.Type),
-						resource.TestCheckResourceAttr("sci_schema.testSchema", "attributes.0.mutability", schemaAttributes.Mutability),
-						resource.TestCheckResourceAttr("sci_schema.testSchema", "attributes.0.returned", schemaAttributes.Returned),
-						resource.TestCheckResourceAttr("sci_schema.testSchema", "attributes.0.uniqueness", schemaAttributes.Uniqueness),
+						// TODO add test check if regex is added
+						resource.TestCheckResourceAttr("sci_schema.testSchema", "id", schema.Id),
+						resource.TestCheckResourceAttr("sci_schema.testSchema", "name", schema.Name),
+						resource.TestCheckResourceAttr("sci_schema.testSchema", "attributes.0.name", schema.Attributes[0].Name),
+						resource.TestCheckResourceAttr("sci_schema.testSchema", "attributes.0.type", schema.Attributes[0].Type),
+						resource.TestCheckResourceAttr("sci_schema.testSchema", "attributes.0.mutability", schema.Attributes[0].Mutability),
+						resource.TestCheckResourceAttr("sci_schema.testSchema", "attributes.0.returned", schema.Attributes[0].Returned),
+						resource.TestCheckResourceAttr("sci_schema.testSchema", "attributes.0.uniqueness", schema.Attributes[0].Uniqueness),
+						resource.TestCheckResourceAttr("sci_schema.testSchema", "attributes.0.canonical_values.0", schema.Attributes[0].CanonicalValues[0]),
+						resource.TestCheckResourceAttr("sci_schema.testSchema", "attributes.0.canonical_values.1", schema.Attributes[0].CanonicalValues[1]),
+						resource.TestCheckResourceAttr("sci_schema.testSchema", "attributes.0.multivalued", fmt.Sprintf("%t", schema.Attributes[0].Multivalued)),
+						resource.TestCheckResourceAttr("sci_schema.testSchema", "attributes.0.description", schema.Attributes[0].Description),
+						resource.TestCheckResourceAttr("sci_schema.testSchema", "attributes.0.required", fmt.Sprintf("%t", schema.Attributes[0].Required)),
+						resource.TestCheckResourceAttr("sci_schema.testSchema", "attributes.0.case_exact", fmt.Sprintf("%t", schema.Attributes[0].CaseExact)),
+						resource.TestCheckResourceAttr("sci_schema.testSchema", "description", schema.Description),
 					),
 				},
 			},
@@ -103,7 +124,7 @@ func TestResourceSchema(t *testing.T) {
 
 	t.Run("error path - schema attributes.name must be a valid value", func(t *testing.T) {
 
-		schemaAttributes := []schemas.Attribute{
+		schema.Attributes = []schemas.Attribute{
 			{
 				Name:       "an-invalid-name",
 				Type:       "string",
@@ -111,6 +132,20 @@ func TestResourceSchema(t *testing.T) {
 				Returned:   "never",
 				Uniqueness: "none",
 			},
+		}
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceSchema("testSchema", schema),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].name value must be a valid name. Must start with an\nalphabet and should contain only alphanumeric characters and underscores,\ngot: %s", schema.Attributes[0].Name)),
+				},
+			},
+		})
+
+		schema.Attributes = []schemas.Attribute{
 			{
 				Name:       "@n_invalid_name",
 				Type:       "string",
@@ -118,6 +153,20 @@ func TestResourceSchema(t *testing.T) {
 				Returned:   "never",
 				Uniqueness: "none",
 			},
+		}
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceSchema("testSchema", schema),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].name value must be a valid name. Must start with an\nalphabet and should contain only alphanumeric characters and underscores,\ngot: %s", schema.Attributes[0].Name)),
+				},
+			},
+		})
+
+		schema.Attributes = []schemas.Attribute{
 			{
 				Name:       "1_an_invalid_name",
 				Type:       "string",
@@ -132,16 +181,8 @@ func TestResourceSchema(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      ResourceSchema("testSchema", "urn:ietf:scim:schemas:Terraform", "Terraform", schemaAttributes[0]),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].name value must be a valid name. Must start with an\nalphabet and should contain only alphanumeric characters and underscores,\ngot: %s", schemaAttributes[0].Name)),
-				},
-				{
-					Config:      ResourceSchema("testSchema", "urn:ietf:scim:schemas:Terraform", "Terraform", schemaAttributes[1]),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].name value must be a valid name. Must start with an\nalphabet and should contain only alphanumeric characters and underscores,\ngot: %s", schemaAttributes[1].Name)),
-				},
-				{
-					Config:      ResourceSchema("testSchema", "urn:ietf:scim:schemas:Terraform", "Terraform", schemaAttributes[1]),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].name value must be a valid name. Must start with an\nalphabet and should contain only alphanumeric characters and underscores,\ngot: %s", schemaAttributes[1].Name)),
+					Config:      ResourceSchema("testSchema", schema),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].name value must be a valid name. Must start with an\nalphabet and should contain only alphanumeric characters and underscores,\ngot: %s", schema.Attributes[0].Name)),
 				},
 			},
 		})
@@ -149,7 +190,7 @@ func TestResourceSchema(t *testing.T) {
 
 	t.Run("error path - schema attributes.type must be a valid value", func(t *testing.T) {
 
-		schemaAttributes := []schemas.Attribute{
+		schema.Attributes = []schemas.Attribute{
 			{
 				Name:       "test_attribute",
 				Type:       "an_invalid_value",
@@ -164,8 +205,8 @@ func TestResourceSchema(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      ResourceSchema("testSchema", "urn:ietf:scim:schemas:Terraform", "Terraform", schemaAttributes[0]),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].type value must be one of: \\[\"string\" \"boolean\"\n\"decimal\" \"integer\" \"dateTime\" \"binary\" \"reference\" \"complex\"], got:\n\"%s\"", schemaAttributes[0].Type)),
+					Config:      ResourceSchema("testSchema", schema),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].type value must be one of: \\[\"string\" \"boolean\"\n\"decimal\" \"integer\" \"dateTime\" \"binary\" \"reference\" \"complex\"], got:\n\"%s\"", schema.Attributes[0].Type)),
 				},
 			},
 		})
@@ -173,7 +214,7 @@ func TestResourceSchema(t *testing.T) {
 
 	t.Run("error path - schema attributes.mutability must be a valid value", func(t *testing.T) {
 
-		schemaAttributes := []schemas.Attribute{
+		schema.Attributes = []schemas.Attribute{
 			{
 				Name:       "test_attribute",
 				Type:       "integer",
@@ -188,8 +229,8 @@ func TestResourceSchema(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      ResourceSchema("testSchema", "urn:ietf:scim:schemas:Terraform", "Terraform", schemaAttributes[0]),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].mutability value must be one of: \\[\"readOnly\"\n\"readWrite\" \"writeOnly\" \"immutable\"], got: \"%s\"", schemaAttributes[0].Mutability)),
+					Config:      ResourceSchema("testSchema", schema),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].mutability value must be one of: \\[\"readOnly\"\n\"readWrite\" \"writeOnly\" \"immutable\"], got: \"%s\"", schema.Attributes[0].Mutability)),
 				},
 			},
 		})
@@ -197,7 +238,7 @@ func TestResourceSchema(t *testing.T) {
 
 	t.Run("error path - schema attributes.returned must be a valid value", func(t *testing.T) {
 
-		schemaAttributes := []schemas.Attribute{
+		schema.Attributes = []schemas.Attribute{
 			{
 				Name:       "test_attribute",
 				Type:       "integer",
@@ -212,8 +253,8 @@ func TestResourceSchema(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      ResourceSchema("testSchema", "urn:ietf:scim:schemas:Terraform", "Terraform", schemaAttributes[0]),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].returned value must be one of: \\[\"always\" \"never\"\n\"default\" \"request\"], got: \"%s\"", schemaAttributes[0].Returned)),
+					Config:      ResourceSchema("testSchema", schema),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].returned value must be one of: \\[\"always\" \"never\"\n\"default\" \"request\"], got: \"%s\"", schema.Attributes[0].Returned)),
 				},
 			},
 		})
@@ -221,7 +262,7 @@ func TestResourceSchema(t *testing.T) {
 
 	t.Run("error path - schema attributes.uniqueness must be a valid value", func(t *testing.T) {
 
-		schemaAttributes := []schemas.Attribute{
+		schema.Attributes = []schemas.Attribute{
 			{
 				Name:       "test_attribute",
 				Type:       "integer",
@@ -236,8 +277,8 @@ func TestResourceSchema(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      ResourceSchema("testSchema", "urn:ietf:scim:schemas:Terraform", "Terraform", schemaAttributes[0]),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].uniqueness value must be one of: \\[\"none\" \"server\"\n\"global\"], got: \"%s\"", schemaAttributes[0].Uniqueness)),
+					Config:      ResourceSchema("testSchema", schema),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute attributes\\[0].uniqueness value must be one of: \\[\"none\" \"server\"\n\"global\"], got: \"%s\"", schema.Attributes[0].Uniqueness)),
 				},
 			},
 		})
@@ -245,22 +286,15 @@ func TestResourceSchema(t *testing.T) {
 
 }
 
-func ResourceSchema(resourceName string, schemaId string, schemaName string, schemaAttributes schemas.Attribute) string {
+func ResourceSchema(resourceName string, schema schemas.Schema) string {
 	return fmt.Sprintf(`
 	resource "sci_schema" "%s"{
 		id = "%s"
 		name = "%s"
-		attributes = [
-			{
-				name = "%s"
-				mutability = "%s"
-				returned = "%s"
-				type = "%s"
-				uniqueness = "%s"
-			}
-		]
+		attributes = [%s]
+		description = "%s"
 	}
-	`, resourceName, schemaId, schemaName, schemaAttributes.Name, schemaAttributes.Mutability, schemaAttributes.Returned, schemaAttributes.Type, schemaAttributes.Uniqueness)
+	`, resourceName, schema.Id, schema.Name, getSchemaAttributes(schema.Attributes), schema.Description)
 }
 
 func ResourceSchemaWithoutSchemas(resourceName string, schemaId string, schemaName string) string {
@@ -302,4 +336,32 @@ func ResourceSchemaWithoutAttributes(resourceName string, schemaId string, schem
 		]
 	}
 	`, resourceName, schemaId, schemaName)
+}
+
+func getSchemaAttributes(schemaAttributes []schemas.Attribute) string {
+	attributes := ""
+	for _, attr := range schemaAttributes {
+
+		canonicalValues := ""
+		for _, val := range attr.CanonicalValues {
+			canonicalValues += fmt.Sprintf(`
+				"%s",
+			`, val)
+		}
+
+		attributes += fmt.Sprintf(`{
+			name = "%s"
+			mutability = "%s"
+			returned = "%s"
+			type = "%s"
+			uniqueness = "%s"
+			canonical_values = [%s]
+			multivalued = %t
+			description = "%s"
+			required = %t
+			case_exact = %t
+		},`, attr.Name, attr.Mutability, attr.Returned, attr.Type, attr.Uniqueness,
+			canonicalValues, attr.Multivalued, attr.Description, attr.Required, attr.CaseExact)
+	}
+	return attributes
 }

@@ -22,15 +22,15 @@ type Schema struct {
 	Id          string      `json:"id"`
 	Name        string      `json:"name"`
 	Description string      `json:"description,omitempty"`
-	Meta        users.Meta  `json:"meta,omitempty"`
+	Meta        users.Meta  `json:"meta"`
 	Schemas     []string    `json:"schemas"`
-	ExternalId  string      `json:"externalId,omitempty"`
 	Attributes  []Attribute `json:"attributes"`
+	// ExternalId  string      `json:"externalId,omitempty"`
 }
 
 type SchemasResponse struct {
 	Resources    []Schema `json:"Resources,omitempty"`
 	Schemas      []string `json:"schemas,omitempty"`
 	TotalResults int      `json:"totalResults,omitempty"`
-	//rest of th response object
+	//rest of the response object
 }

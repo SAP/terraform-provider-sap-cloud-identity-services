@@ -26,7 +26,6 @@ type schemaData struct {
 	Name        types.String `tfsdk:"name"`
 	Description types.String `tfsdk:"description"`
 	Schemas     types.Set    `tfsdk:"schemas"`
-	ExternalId  types.String `tfsdk:"external_id"`
 	Attributes  types.List   `tfsdk:"attributes"`
 }
 
@@ -41,9 +40,6 @@ func schemaValueFrom(ctx context.Context, s schemas.Schema) (schemaData, diag.Di
 	if len(s.Description) > 0 {
 		schema.Description = types.StringValue(s.Description)
 	}
-	if len(s.ExternalId) > 0 {
-		schema.ExternalId = types.StringValue(s.ExternalId)
-	}
 
 	schema.Schemas, diags = types.SetValueFrom(ctx, types.StringType, s.Schemas)
 	diagnostics.Append(diags...)
@@ -55,7 +51,6 @@ func schemaValueFrom(ctx context.Context, s schemas.Schema) (schemaData, diag.Di
 			Name:        types.StringValue(attributeRes.Name),
 			Type:        types.StringValue(attributeRes.Type),
 			Multivalued: types.BoolValue(attributeRes.Multivalued),
-			Description: types.StringValue(attributeRes.Description),
 			Required:    types.BoolValue(attributeRes.Required),
 			CaseExact:   types.BoolValue(attributeRes.CaseExact),
 			Mutability:  types.StringValue(attributeRes.Mutability),
@@ -65,12 +60,14 @@ func schemaValueFrom(ctx context.Context, s schemas.Schema) (schemaData, diag.Di
 
 		if len(attributeRes.Description) > 0 {
 			attribute.Description = types.StringValue(attributeRes.Description)
-		} else {
-			attribute.Description = types.StringNull()
 		}
 
-		attribute.CanonicalValues, diags = types.ListValueFrom(ctx, types.StringType, attributeRes.CanonicalValues)
-		diagnostics.Append(diags...)
+		if len(attributeRes.CanonicalValues) > 0 {
+			attribute.CanonicalValues, diags = types.ListValueFrom(ctx, types.StringType, attributeRes.CanonicalValues)
+			diagnostics.Append(diags...)
+		} else {
+			attribute.CanonicalValues = types.ListNull(types.StringType)
+		}
 
 		attributes = append(attributes, attribute)
 	}

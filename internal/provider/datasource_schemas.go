@@ -3,14 +3,14 @@ package provider
 import (
 	"context"
 	"fmt"
-	"strings"
+
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 
-	// "github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -51,7 +51,6 @@ var schemaObjType = types.ObjectType{
 		"schemas": types.SetType{
 			ElemType: types.StringType,
 		},
-		"external_id": types.StringType,
 		"attributes": types.ListType{
 			ElemType: attributeObjType,
 		},
@@ -79,11 +78,11 @@ func (d *schemasDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"id": schema.StringAttribute{
-							MarkdownDescription: "A unique id by which the schema can be referenced in other entities",
-							Computed:            true,
+							MarkdownDescription: "Unique id by which the schema can be referenced in other entities",
+							Required:            true,
 						},
 						"name": schema.StringAttribute{
-							MarkdownDescription: "A unique name for the schema",
+							MarkdownDescription: "Unique name for the schema",
 							Computed:            true,
 						},
 						"attributes": schema.ListNestedAttribute{
@@ -97,21 +96,19 @@ func (d *schemasDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 									},
 									"type": schema.StringAttribute{
 										Computed:            true,
-										MarkdownDescription: fmt.Sprintf("The attribute data type. Valid values include : %s", strings.Join(attributeDataTypes, ",")),
+										MarkdownDescription: "The attribute data type",
 									},
 									"mutability": schema.StringAttribute{
 										Computed:            true,
-										MarkdownDescription: fmt.Sprintf("Control the Read or Write access of the attribute. Valid values include : %s", strings.Join(attributeMutabilityValues, ",")),
+										MarkdownDescription: "Control the Read or Write access of the attribute",
 									},
 									"returned": schema.StringAttribute{
-										Computed: true,
-										//description must be enhanced
-										MarkdownDescription: fmt.Sprintf("Valid values include : %s", strings.Join(attributeReturnValues, ",")),
+										Computed:            true,
+										MarkdownDescription: "Configure how the attribute's value must be returned",
 									},
 									"uniqueness": schema.StringAttribute{
-										Computed: true,
-										// description must be enhanced
-										MarkdownDescription: fmt.Sprintf("Define the context in which the attribute must be unique. Valid values include : %s", strings.Join(attributeReturnValues, ",")),
+										Computed:            true,
+										MarkdownDescription: "Define the context in which the attribute must be unique.",
 									},
 									"canonical_values": schema.ListAttribute{
 										ElementType:         types.StringType,
@@ -119,22 +116,20 @@ func (d *schemasDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 										MarkdownDescription: "A collection of suggested canonical values that may be used",
 									},
 									"multivalued": schema.BoolAttribute{
-										Computed: true,
-										// MarkDownDescription
+										Computed:            true,
+										MarkdownDescription: "Confgire if the attribute can have more than one value.",
 									},
 									"description": schema.StringAttribute{
 										Computed:            true,
 										MarkdownDescription: "A brief description for the attribute",
 									},
 									"required": schema.BoolAttribute{
-										Computed: true,
-										//enhance description
-										MarkdownDescription: "Set a restriction on whether the attribute may be mandatory or not",
+										Computed:            true,
+										MarkdownDescription: "Configure if the attribute must be mandatory or not.",
 									},
 									"case_exact": schema.BoolAttribute{
-										Computed: true,
-										//enhance description
-										MarkdownDescription: "Set a restriction on whether the attribute may be case-sensitive or not",
+										Computed:            true,
+										MarkdownDescription: "Configure if the attribute must be case-sensitive or not.",
 									},
 								},
 							},
@@ -142,15 +137,12 @@ func (d *schemasDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 						"schemas": schema.SetAttribute{
 							ElementType: types.StringType,
 							Computed:    true,
-							//MarkdownDescription
+							MarkdownDescription: "List of SCIM schemas to configure schemas. The attribute is configured with default values :\n" +
+								utils.PrintDefaultSchemas(defaultSchemaSchemas),
 						},
 						"description": schema.StringAttribute{
 							Computed:            true,
 							MarkdownDescription: "A description for the schema",
-						},
-						"external_id": schema.StringAttribute{
-							Computed:            true,
-							MarkdownDescription: "Unique and global identifier for the given schema",
 						},
 					},
 				},
@@ -165,9 +157,11 @@ func (d *schemasDataSource) Read(ctx context.Context, req datasource.ReadRequest
 	var config schemasData
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	res, _, err := d.cli.Schema.Get(ctx)
-
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving schemas", fmt.Sprintf("%s", err))
 		return
@@ -175,9 +169,15 @@ func (d *schemasDataSource) Read(ctx context.Context, req datasource.ReadRequest
 
 	resSchemas, diags := schemasValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	config.Values, diags = types.ListValueFrom(ctx, schemaObjType, resSchemas)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	diags = resp.State.Set(ctx, &config)
 	resp.Diagnostics.Append(diags...)

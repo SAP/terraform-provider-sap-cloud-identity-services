@@ -14,8 +14,26 @@ Creates a schema in the SAP Cloud Identity Services.
 ```terraform
 # Create a basic schema in SAP Cloud Identity Services
 resource "sci_schema" "basic_schema" {
-  name       = "My Basic Schema"
-  attributes = "TO BE DONE"
+  id       = "urn:sap:Terraform"               # Must follow the pattern : urn:<namespace-identifier>:<resource-type>
+  name     = "Terraform"
+  attributes = [
+    {
+      name = "test_attr"
+      type = "string"                          # Refer to the documentation for valid values
+      mutability = "writeOnly"                 # Refer to the documentation for valid values
+      returned = "default"                     # Refer to the documentation for valid values
+      uniqueness = "none"                      # Refer to the documentation for valid values
+      canonical_values = [
+        "val1",
+        "val2"
+      ]
+      multivalued = true
+      description = "Test Attribute"
+      required = true
+      case_exact = false
+    } 
+  ]
+  description = "Test Schema"
 }
 ```
 
@@ -25,32 +43,32 @@ resource "sci_schema" "basic_schema" {
 ### Required
 
 - `attributes` (Attributes List) The list of attribites that comprise the schema (see [below for nested schema](#nestedatt--attributes))
-- `id` (String) A unique id by which the schema can be referenced in other entities
+- `id` (String) A unique id by which the schema can be referenced in other entities. The ID must follow the `urn:<namespace-identifier>:<resource-type>` pattern.
 - `name` (String) A unique name for the schema
 
 ### Optional
 
 - `description` (String) A description for the schema
-- `external_id` (String) Unique and global identifier for the given schema
-- `schemas` (Set of String)
+- `schemas` (Set of String) List of SCIM schemas to configure schemas. The attribute is configured with default values :
+	- `urn:ietf:params:scim:schemas:core:2.0:Schema`
 
 <a id="nestedatt--attributes"></a>
 ### Nested Schema for `attributes`
 
 Required:
 
-- `mutability` (String) Control the Read or Write access of the attribute. Valid values include : readOnly,readWrite,writeOnly,immutable
+- `mutability` (String) Control the Read or Write access of the attribute. Acceptable values are : `readOnly`, `readWrite`, `writeOnly`, `immutable`.
 - `name` (String) The attribute name. Only alphanumeric characters and underscores are allowed.
-- `returned` (String) Valid values include : always,never,default,request
-- `type` (String) The attribute data type. Valid values include : string,boolean,decimal,integer,dateTime,binary,reference,complex
-- `uniqueness` (String) Define the context in which the attribute must be unique. Valid values include : none,server,global
+- `returned` (String) Configure how the attribute's value must be returned. Acceptable values are : `always`, `never`, `default`, `request`.
+- `type` (String) The attribute data type. Acceptable values are : `string`, `boolean`, `decimal`, `integer`, `dateTime`, `binary`, `reference`, `complex`.
+- `uniqueness` (String) Define the context in which the attribute must be unique. Acceptable values are : `none`, `server`, `global`.
 
 Optional:
 
 - `canonical_values` (List of String) A collection of suggested canonical values that may be used
-- `case_exact` (Boolean) Set a restriction on whether the attribute may be case-sensitive or not
+- `case_exact` (Boolean) Configure if the attribute must be case-sensitive or not.
 - `description` (String) A brief description for the attribute
-- `multivalued` (Boolean)
-- `required` (Boolean) Set a restriction on whether the attribute may be mandatory or not
+- `multivalued` (Boolean) Confgire if the attribute can have more than one value.
+- `required` (Boolean) Configure if the attribute must be mandatory or not.
 
 
