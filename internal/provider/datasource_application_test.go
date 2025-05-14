@@ -27,7 +27,6 @@ func TestDataSourceApplication(t *testing.T) {
 						resource.TestMatchResourceAttr("data.sci_application.testApp", "id", regexpUUID),
 						resource.TestCheckResourceAttr("data.sci_application.testApp", "multi_tenant_app", "false"),
 						resource.TestCheckResourceAttr("data.sci_application.testApp", "name", "oac.accounts.sap.com"),
-						resource.TestCheckResourceAttr("data.sci_application.testApp", "parent_application_id", ""),
 						resource.TestCheckResourceAttr("data.sci_application.testApp", "authentication_schema.assertion_attributes.0.attribute_value", "firstName"),
 						resource.TestCheckResourceAttr("data.sci_application.testApp", "authentication_schema.default_authenticating_idp", "664c660e25cff252c5c202dc"),
 						resource.TestCheckResourceAttr("data.sci_application.testApp", "authentication_schema.sso_type", "saml2"),

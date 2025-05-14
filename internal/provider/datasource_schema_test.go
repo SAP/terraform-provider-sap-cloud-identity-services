@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"regexp"
 
-	// "regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -71,14 +70,6 @@ func DataSourceSchema(datasourceName string, schemaName string) string {
 	}
 	`, datasourceName, schemaName)
 }
-
-// func DataSourceSchemaById (datasourceName string, schemaId string) string {
-// 	return fmt.Sprintf(`
-// 	data "sci_schema" "%s" {
-// 		id = "%s"
-// 	}
-// 	`, datasourceName, schemaId)
-// }
 
 func DataSourceSchemaNoId(datasourceName string) string {
 	return fmt.Sprintf(`

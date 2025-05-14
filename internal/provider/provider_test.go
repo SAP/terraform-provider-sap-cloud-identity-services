@@ -87,8 +87,6 @@ func requestMatcher(t *testing.T) cassette.MatcherFunc {
 			return false
 		}
 
-		//headers verification?
-
 		bytes, err := io.ReadAll(r.Body)
 		if err != nil {
 			t.Fatal("Unable to read body from request")
