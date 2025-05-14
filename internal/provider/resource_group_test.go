@@ -2,8 +2,8 @@ package provider
 
 import (
 	"fmt"
-	"regexp"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/groups"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -12,15 +12,17 @@ import (
 func TestResourceGroup(t *testing.T) {
 	t.Parallel()
 
-	schemas := []string{
-		"urn:ietf:params:scim:schemas:core:2.0:Group",
-		"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group",
-	}
-
-	members := []groups.GroupMember{
-		{
-			Value: "0b35d8cf-722c-4151-951e-176b623c0b78",
-			Type:  "User",
+	group :=  groups.Group {
+		DisplayName: "Test Group",
+		GroupMembers: []groups.GroupMember{
+			{
+				Value: "0b35d8cf-722c-4151-951e-176b623c0b78",
+				Type:  "User",
+			},
+		},
+		GroupExtension: groups.GroupExtension{
+			Name: "Test-Group",
+			Description: "For testing purposes",
 		},
 	}
 
@@ -33,13 +35,14 @@ func TestResourceGroup(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + ResourceGroup("testGroup", "Terraform Group", schemas, "For testing purposes", members),
+					Config: providerConfig("", user) + ResourceGroup("testGroup", group),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("sci_group.testGroup", "id", regexpUUID),
-						resource.TestCheckResourceAttr("sci_group.testGroup", "display_name", "Terraform Group"),
-						resource.TestCheckResourceAttr("sci_group.testGroup", "group_extension.description", "For testing purposes"),
-						resource.TestCheckResourceAttr("sci_group.testGroup", "group_members.0.value", members[0].Value),
-						resource.TestCheckResourceAttr("sci_group.testGroup", "group_members.0.type", members[0].Type),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "display_name", group.DisplayName),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "group_members.0.value", group.GroupMembers[0].Value),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "group_members.0.type", group.GroupMembers[0].Type),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "group_extension.name", group.GroupExtension.Name),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "group_extension.description", group.GroupExtension.Description),
 					),
 				},
 			},
@@ -48,6 +51,25 @@ func TestResourceGroup(t *testing.T) {
 	})
 
 	t.Run("happy path - group update", func(t *testing.T) {
+	
+		updatedGroup := groups.Group {
+			DisplayName: "Test Group - New",
+			GroupMembers: []groups.GroupMember{
+				{
+					Value: "0b35d8cf-722c-4151-951e-176b623c0b78",
+					Type:  "User",
+				},
+				{
+					Value: "59aeb87b-777a-4034-8f3e-709d39fb1a18",
+					Type: "Group",
+				},
+			},
+			GroupExtension: groups.GroupExtension{
+				Name: "Test-Group",
+				Description: "For testing purposes",
+			},
+		}
+
 		rec, user := setupVCR(t, "fixtures/resource_group_updated")
 		defer stopQuietly(rec)
 
@@ -56,23 +78,27 @@ func TestResourceGroup(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + ResourceGroup("testGroup", "Terraform Group", schemas, "For testing purposes", members),
+					Config: providerConfig("", user) + ResourceGroup("testGroup", group),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("sci_group.testGroup", "id", regexpUUID),
-						resource.TestCheckResourceAttr("sci_group.testGroup", "display_name", "Terraform Group"),
-						resource.TestCheckResourceAttr("sci_group.testGroup", "group_extension.description", "For testing purposes"),
-						resource.TestCheckResourceAttr("sci_group.testGroup", "group_members.0.value", members[0].Value),
-						resource.TestCheckResourceAttr("sci_group.testGroup", "group_members.0.type", members[0].Type),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "display_name", group.DisplayName),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "group_members.0.value", group.GroupMembers[0].Value),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "group_members.0.type", group.GroupMembers[0].Type),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "group_extension.name", group.GroupExtension.Name),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "group_extension.description", group.GroupExtension.Description),
 					),
 				},
 				{
-					Config: providerConfig("", user) + ResourceGroup("testGroup", "Updated Terraform Group", schemas, "For testing purposes", members),
+					Config: providerConfig("", user) + ResourceGroup("testGroup", updatedGroup),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("sci_group.testGroup", "id", regexpUUID),
-						resource.TestCheckResourceAttr("sci_group.testGroup", "display_name", "Updated Terraform Group"),
-						resource.TestCheckResourceAttr("sci_group.testGroup", "group_extension.description", "For testing purposes"),
-						resource.TestCheckResourceAttr("sci_group.testGroup", "group_members.0.value", members[0].Value),
-						resource.TestCheckResourceAttr("sci_group.testGroup", "group_members.0.type", members[0].Type),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "display_name", updatedGroup.DisplayName),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "group_members.0.value", updatedGroup.GroupMembers[1].Value),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "group_members.0.type", updatedGroup.GroupMembers[1].Type),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "group_members.1.value", updatedGroup.GroupMembers[0].Value),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "group_members.1.type", updatedGroup.GroupMembers[0].Type),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "group_extension.name", updatedGroup.GroupExtension.Name),
+						resource.TestCheckResourceAttr("sci_group.testGroup", "group_extension.description", updatedGroup.GroupExtension.Description),
 					),
 				},
 			},
@@ -108,7 +134,7 @@ func TestResourceGroup(t *testing.T) {
 
 	t.Run("error path - group_members.value must be a valid UUID", func(t *testing.T) {
 
-		members := []groups.GroupMember{
+		group.GroupMembers = []groups.GroupMember{
 			{
 				Value: "this-is-not-a-valid-UUID",
 				Type:  "User",
@@ -120,8 +146,8 @@ func TestResourceGroup(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      ResourceGroup("testGroup", "Terraform Group", schemas, "For testing purposes", members),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute group_members\\[0].value value must be a valid UUID, got:\n%s", "this-is-not-a-valid-UUID")),
+					Config:      ResourceGroup("testGroup", group),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("\nvalue must be a valid UUID, got: %s", group.GroupMembers[0].Value)),
 				},
 			},
 		})
@@ -132,7 +158,7 @@ func TestResourceGroup(t *testing.T) {
 		rec, user := setupVCR(t, "fixtures/resource_group_invalid_group_member")
 		defer stopQuietly(rec)
 
-		members := []groups.GroupMember{
+		group.GroupMembers = []groups.GroupMember{
 			{
 				Value: "5b4e7391-67d2-419f-8f0e-46f46f1f67ec",
 				Type:  "User",
@@ -144,8 +170,8 @@ func TestResourceGroup(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config:      providerConfig("", user) + ResourceGroup("testGroup", "Terraform Group", schemas, "For testing purposes", members),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("member %s is not found", members[0].Value)),
+					Config:      providerConfig("", user) + ResourceGroup("testGroup", group),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("member %s is not found", group.GroupMembers[0].Value)),
 				},
 			},
 		})
@@ -153,7 +179,7 @@ func TestResourceGroup(t *testing.T) {
 
 	t.Run("error path - group_members.type must be a valid value", func(t *testing.T) {
 
-		members := []groups.GroupMember{
+		group.GroupMembers = []groups.GroupMember{
 			{
 				Value: "user-id",
 				Type:  "this-is-not-a-valid-member-type",
@@ -165,33 +191,25 @@ func TestResourceGroup(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      ResourceGroup("testGroup", "Terraform Group", schemas, "For testing purposes", members),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute group_members\\[0].type value must be one of: \\[\"User\" \"Group\"], got:\n\"%s\"", "this-is-not-a-valid-member-type")),
+					Config:      ResourceGroup("testGroup", group),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("\nvalue must be one of: \\[\"User\" \"Group\"], got:\n\"%s\"", group.GroupMembers[0].Type)),
 				},
 			},
 		})
 	})
 }
 
-func ResourceGroup(resoureName string, displayName string, schemas []string, description string, members []groups.GroupMember) string {
+func ResourceGroup(resoureName string, group groups.Group) string {
 	return fmt.Sprintf(`
 	resource "sci_group" "%s"{
-		schemas = [
-			"%s",
-			"%s"
-		]
 		display_name = "%s"
-		group_members = [
-			{
-				value = "%s",
-				type = "%s"
-			}
-		]
+		group_members = [%s]
 		group_extension = {
+			name = "%s"
 			description = "%s"
 		}
 	}
-	`, resoureName, schemas[0], schemas[1], displayName, members[0].Value, members[0].Type, description)
+	`, resoureName, group.DisplayName, getGroupMembers(group.GroupMembers), group.GroupExtension.Name, group.GroupExtension.Description)
 }
 
 func ResourceGroupWithoutSchemas(resoureName string, displayName string) string {
@@ -208,4 +226,16 @@ func ResourceGroupWithoutDisplayName(resoureName string) string {
 	resource "sci_group" "%s"{
 	}
 	`, resoureName)
+}
+
+func getGroupMembers (groupMembers []groups.GroupMember) string {
+	
+	members := ""
+	for _, member := range groupMembers {
+		members += fmt.Sprintf(`{
+			value = "%s"
+			type = "%s"
+		},`, member.Value, member.Type)
+	}
+	return members
 }

@@ -22,12 +22,13 @@ func TestDataSourceGroup(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + DataSourceGroup("testGroup", "testGroup"),
+					Config: providerConfig("", user) + DataSourceGroup("testGroup", "Terraform Test Group"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("data.sci_group.testGroup", "id", regexpUUID),
-						resource.TestCheckResourceAttr("data.sci_group.testGroup", "display_name", "testGroup"),
+						resource.TestCheckResourceAttr("data.sci_group.testGroup", "display_name", "Terraform Test Group"),
 						resource.TestMatchResourceAttr("data.sci_group.testGroup", "group_members.0.value", regexpUUID),
 						resource.TestCheckResourceAttr("data.sci_group.testGroup", "group_members.0.type", "User"),
+						resource.TestCheckResourceAttr("data.sci_group.testGroup", "group_extension.name", "Test Group"),
 					),
 				},
 			},

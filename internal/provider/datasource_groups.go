@@ -3,7 +3,6 @@ package provider
 import (
 	"context"
 	"fmt"
-	"strings"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
 
@@ -37,10 +36,9 @@ var groupObjType = types.ObjectType{
 			ElemType: types.StringType,
 		},
 		"display_name": types.StringType,
-		"group_members": types.ListType{
+		"group_members": types.SetType{
 			ElemType: membersObjType,
 		},
-		"external_id": types.StringType,
 		"group_extension": types.ObjectType{
 			AttrTypes: groupExtensionObjType,
 		},
@@ -80,13 +78,14 @@ func (d *groupsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 						"schemas": schema.SetAttribute{
 							ElementType: types.StringType,
 							Computed:    true,
-							//MarkdownDescription:
+							MarkdownDescription: "List of SCIM schemas to configure groups. The attribute is configured with default values :\n" +
+								utils.PrintDefaultSchemas(defaultGroupSchemas),
 						},
 						"display_name": schema.StringAttribute{
 							Computed:            true,
 							MarkdownDescription: "Display Name of the group.",
 						},
-						"group_members": schema.ListNestedAttribute{
+						"group_members": schema.SetNestedAttribute{
 							Computed:            true,
 							MarkdownDescription: "Specify the members to be part of the group.",
 							NestedObject: schema.NestedAttributeObject{
@@ -97,18 +96,14 @@ func (d *groupsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 									},
 									"type": schema.StringAttribute{
 										Computed:            true,
-										MarkdownDescription: fmt.Sprintf("Type of the member added to the group. Valid Values can be one of the following : %s", strings.Join(memberTypeValues, ",")),
+										MarkdownDescription: "Type of the member added to the group.",
 									},
 								},
 							},
 						},
-						"external_id": schema.StringAttribute{
-							Computed:            true,
-							MarkdownDescription: "Unique and global identifier for the given group",
-						},
 						"group_extension": schema.SingleNestedAttribute{
-							// MarkdownDescription: ,
-							Computed: true,
+							MarkdownDescription: "Configure attributes particular to the schema `" + defaultGroupSchemas[1].String() + "`.",
+							Computed:            true,
 							Attributes: map[string]schema.Attribute{
 								"name": schema.StringAttribute{
 									MarkdownDescription: "Provide a unique name for the group.",
@@ -133,9 +128,11 @@ func (d *groupsDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	var config groupsData
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	res, _, err := d.cli.Group.Get(ctx)
-
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving groups", fmt.Sprintf("%s", err))
 		return
@@ -143,9 +140,15 @@ func (d *groupsDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 
 	resGroups, diags := groupsValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	config.Values, diags = types.ListValueFrom(ctx, groupObjType, resGroups)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	diags = resp.State.Set(ctx, &config)
 	resp.Diagnostics.Append(diags...)
