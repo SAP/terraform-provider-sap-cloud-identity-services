@@ -82,7 +82,6 @@ var appObjType = types.ObjectType{
 		"description":           types.StringType,
 		"parent_application_id": types.StringType,
 		"multi_tenant_app":      types.BoolType,
-		"global_account":        types.StringType,
 		"authentication_schema": types.ObjectType{
 			AttrTypes: authenticationSchemaObjType,
 		},
@@ -134,9 +133,6 @@ func (d *applicationsDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 							MarkdownDescription: "Only for Internal Use",
 							Computed:            true,
 						},
-						"global_account": schema.StringAttribute{
-							Computed: true,
-						},
 						"authentication_schema": schema.SingleNestedAttribute{
 							MarkdownDescription: "Configure attributes particular to the schema \"urn:sap:identity:application:schemas:extension:sci:1.0:Authentication\"",
 							Computed:            true,
@@ -153,7 +149,7 @@ func (d *applicationsDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 									Computed: true,
 									Attributes: map[string]schema.Attribute{
 										"source": schema.StringAttribute{
-											MarkdownDescription: validValuesString(sourceValues),
+											MarkdownDescription: utils.ValidValuesString(sourceValues),
 											Computed:            true,
 										},
 										"value": schema.StringAttribute{
@@ -192,7 +188,7 @@ func (d *applicationsDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 									NestedObject: schema.NestedAttributeObject{
 										Attributes: map[string]schema.Attribute{
 											"source": schema.StringAttribute{
-												MarkdownDescription: validValuesString(sourceValues[1:]),
+												MarkdownDescription: utils.ValidValuesString(sourceValues[1:]),
 												Computed:            true,
 											},
 											"attribute_name": schema.StringAttribute{

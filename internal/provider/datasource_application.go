@@ -61,9 +61,6 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 				MarkdownDescription: "Only for Internal Use",
 				Computed:            true,
 			},
-			"global_account": schema.StringAttribute{
-				Computed: true,
-			},
 			"authentication_schema": schema.SingleNestedAttribute{
 				MarkdownDescription: "Configure attributes particular to the schema \"urn:sap:identity:application:schemas:extension:sci:1.0:Authentication\"",
 				Computed:            true,
@@ -80,7 +77,7 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 						Computed: true,
 						Attributes: map[string]schema.Attribute{
 							"source": schema.StringAttribute{
-								MarkdownDescription: validValuesString(sourceValues),
+								MarkdownDescription: utils.ValidValuesString(sourceValues),
 								Computed:            true,
 							},
 							"value": schema.StringAttribute{
@@ -119,7 +116,7 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
 								"source": schema.StringAttribute{
-									MarkdownDescription: validValuesString(sourceValues[1:]),
+									MarkdownDescription: utils.ValidValuesString(sourceValues[1:]),
 									Computed:            true,
 								},
 								"attribute_name": schema.StringAttribute{

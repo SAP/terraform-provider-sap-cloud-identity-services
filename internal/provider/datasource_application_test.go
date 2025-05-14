@@ -25,7 +25,6 @@ func TestDataSourceApplication(t *testing.T) {
 					Config: providerConfig("", user) + DataSourceApplication("testApp", "oac.accounts.sap.com"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("data.sci_application.testApp", "id", regexpUUID),
-						resource.TestCheckResourceAttr("data.sci_application.testApp", "global_account", "b37ef791-a3d6-4aef-b700-fb7e0c353c43"),
 						resource.TestCheckResourceAttr("data.sci_application.testApp", "multi_tenant_app", "false"),
 						resource.TestCheckResourceAttr("data.sci_application.testApp", "name", "oac.accounts.sap.com"),
 						resource.TestCheckResourceAttr("data.sci_application.testApp", "parent_application_id", ""),

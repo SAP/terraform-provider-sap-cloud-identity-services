@@ -78,12 +78,12 @@ Optional:
 - `assertion_attributes` (Attributes List) User attributes to be sent to the application. The Source of these attributes is always the Identity Directory, thus only valid attribute values will be accepted. (see [below for nested schema](#nestedatt--authentication_schema--assertion_attributes))
 - `conditional_authentication` (Attributes List) Define rules for authenticating identity provider according to email domain, user type, user group, and IP range. Each rule is evaluated by priority until the criteria of a rule are fulfilled. (see [below for nested schema](#nestedatt--authentication_schema--conditional_authentication))
 - `default_authenticating_idp` (String) A default identity provider can be used for users with any user domain, group and type. This identity provider is used when none of the defined authentication rules meets the criteria.
-- `sso_type` (String) The preferred protocol for the application. Acceptable values are : `openIdConnect`, `saml2`,
+- `sso_type` (String) The preferred protocol for the application. Acceptable values are : `openIdConnect`, `saml2`.
 - `subject_name_identifier` (Attributes) The attribute by which the application uses to identify the users. Used by the application to uniquely identify the user during logon.
 Identity Authentication sends the attribute to the application as :
 	 - subject in OpenID Connect tokens
 	 - name ID in SAML 2.0 assertions (see [below for nested schema](#nestedatt--authentication_schema--subject_name_identifier))
-- `subject_name_identifier_function` (String) Convert the subject name identifier to uppercase or lowercase. Acceptable values are : `none`, `upperCase`, `lowerCase`,
+- `subject_name_identifier_function` (String) Convert the subject name identifier to uppercase or lowercase. Acceptable values are : `none`, `upperCase`, `lowerCase`.
 
 <a id="nestedatt--authentication_schema--advanced_assertion_attributes"></a>
 ### Nested Schema for `authentication_schema.advanced_assertion_attributes`
@@ -92,7 +92,7 @@ Optional:
 
 - `attribute_name` (String) Name of the attribute
 - `attribute_value` (String) Value of the attribute
-- `source` (String) Acceptable values are : `Corporate Identity Provider`, `Expression`,
+- `source` (String) Acceptable values are : `Corporate Identity Provider`, `Expression`.
 
 Read-Only:
 
@@ -121,7 +121,7 @@ Optional:
 - `ip_network_range` (String) Valid IP range to be authenticated.
 - `user_email_domain` (String) Valid email domain to be authenticated.
 - `user_group` (String) The user group to be authenticated.
-- `user_type` (String) The type of user to be authenticated. Acceptable values are :Acceptable values are : `public`, `employee`, `customer`, `partner`, `external`, `onboardee`,
+- `user_type` (String) The type of user to be authenticated. Acceptable values are :Acceptable values are : `public`, `employee`, `customer`, `partner`, `external`, `onboardee`.
 
 
 <a id="nestedatt--authentication_schema--subject_name_identifier"></a>
@@ -129,7 +129,7 @@ Optional:
 
 Optional:
 
-- `source` (String) Acceptable values are : `Identity Directory`, `Corporate Identity Provider`, `Expression`,
+- `source` (String) Acceptable values are : `Identity Directory`, `Corporate Identity Provider`, `Expression`.
 - `value` (String) If the source is Identity Directory, the only acceptable values are `none`, `uid`, `mail`, `loginName`, `displayName`, `personnelNumber`, `userUuid`
 
 ## Import

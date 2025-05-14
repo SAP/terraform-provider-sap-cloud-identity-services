@@ -61,7 +61,7 @@ Read-Only:
 - `attribute_name` (String) Name of the attribute
 - `attribute_value` (String) Value of the attribute
 - `inherited` (Boolean) Indicates whether the attribute has been inherited from a parent application.
-- `source` (String) Acceptable values are : `Corporate Identity Provider`, `Expression`,
+- `source` (String) Acceptable values are : `Corporate Identity Provider`, `Expression`.
 
 
 <a id="nestedatt--values--authentication_schema--assertion_attributes"></a>
@@ -91,5 +91,5 @@ Read-Only:
 
 Read-Only:
 
-- `source` (String) Acceptable values are : `Identity Directory`, `Corporate Identity Provider`, `Expression`,
+- `source` (String) Acceptable values are : `Identity Directory`, `Corporate Identity Provider`, `Expression`.
 - `value` (String) If the source is Identity Directory, the only acceptable values are " none, uid, mail, loginName, displayName, personnelNumber, userUuid"

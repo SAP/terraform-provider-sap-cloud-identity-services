@@ -99,16 +99,6 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 					boolplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"global_account": schema.StringAttribute{
-				Optional: true,
-				Computed: true,
-				Validators: []validator.String{
-					stringvalidator.LengthBetween(1, 255),
-				},
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
 			"authentication_schema": schema.SingleNestedAttribute{
 				MarkdownDescription: "Configure attributes particular to the schema \"urn:sap:identity:application:schemas:extension:sci:1.0:Authentication\"",
 				Optional:            true,
@@ -118,7 +108,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 				},
 				Attributes: map[string]schema.Attribute{
 					"sso_type": schema.StringAttribute{
-						MarkdownDescription: "The preferred protocol for the application. " + validValuesString(ssoValues),
+						MarkdownDescription: "The preferred protocol for the application. " + utils.ValidValuesString(ssoValues),
 						Optional:            true,
 						Computed:            true,
 						Validators: []validator.String{
@@ -146,7 +136,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 						},
 						Attributes: map[string]schema.Attribute{
 							"source": schema.StringAttribute{
-								MarkdownDescription: validValuesString(sourceValues),
+								MarkdownDescription: utils.ValidValuesString(sourceValues),
 								Optional:            true,
 								Validators: []validator.String{
 									stringvalidator.OneOf(sourceValues...),
@@ -166,7 +156,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 						},
 					},
 					"subject_name_identifier_function": schema.StringAttribute{
-						MarkdownDescription: "Convert the subject name identifier to uppercase or lowercase. " + validValuesString(subjectNameIdentifierFunctionValues),
+						MarkdownDescription: "Convert the subject name identifier to uppercase or lowercase. " + utils.ValidValuesString(subjectNameIdentifierFunctionValues),
 						Optional:            true,
 						Validators: []validator.String{
 							stringvalidator.OneOf(subjectNameIdentifierFunctionValues...),
@@ -230,7 +220,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
 								"source": schema.StringAttribute{
-									MarkdownDescription: validValuesString(sourceValues[1:]),
+									MarkdownDescription: utils.ValidValuesString(sourceValues[1:]),
 									Optional:            true,
 									Validators: []validator.String{
 										stringvalidator.OneOf(sourceValues[1:]...),
@@ -289,7 +279,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 									},
 								},
 								"user_type": schema.StringAttribute{
-									MarkdownDescription: "The type of user to be authenticated. Acceptable values are :" + validValuesString(usersTypeValues),
+									MarkdownDescription: "The type of user to be authenticated. Acceptable values are :" + utils.ValidValuesString(usersTypeValues),
 									Optional:            true,
 									Validators: []validator.String{
 										stringvalidator.OneOf(usersTypeValues...),
@@ -332,16 +322,20 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 
 func (r *applicationResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 
-	var config applicationData
-
-	diags := req.Config.Get(ctx, &config)
+	var plan applicationData
+	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
-	args, diags := getApplicationRequest(ctx, config)
+	args, diags := getApplicationRequest(ctx, plan)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	res, _, err := r.cli.Application.Create(ctx, args)
-
 	if err != nil {
 		resp.Diagnostics.AddError("Error creating application", fmt.Sprintf("%s", err))
 		return
@@ -349,6 +343,9 @@ func (r *applicationResource) Create(ctx context.Context, req resource.CreateReq
 
 	state, diags := applicationValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	diags = resp.State.Set(ctx, &state)
 
@@ -357,12 +354,15 @@ func (r *applicationResource) Create(ctx context.Context, req resource.CreateReq
 
 // Read refreshes the Terraform state with the latest data.
 func (r *applicationResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+	
 	var config applicationData
 	diags := req.State.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	res, _, err := r.cli.Application.GetByAppId(ctx, config.Id.ValueString())
-
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving application", fmt.Sprintf("%s", err))
 		return
@@ -370,6 +370,9 @@ func (r *applicationResource) Read(ctx context.Context, req resource.ReadRequest
 
 	state, diags := applicationValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -377,14 +380,21 @@ func (r *applicationResource) Read(ctx context.Context, req resource.ReadRequest
 
 // Update updates the resource and sets the updated Terraform state on success.
 func (r *applicationResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	var config applicationData
-	diags := req.Config.Get(ctx, &config)
+	
+	var plan applicationData
+	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Retrieve the current state to get the existing application ID
 	var state applicationData
 	diags = req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	if state.Id.IsNull() {
 		resp.Diagnostics.AddError("Application ID is missing", "Please provide a valid ID")
@@ -392,8 +402,11 @@ func (r *applicationResource) Update(ctx context.Context, req resource.UpdateReq
 	}
 
 	// Update the application details
-	args, diags := getApplicationRequest(ctx, config)
+	args, diags := getApplicationRequest(ctx, plan)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	args.Id = state.Id.ValueString()
 
@@ -402,8 +415,12 @@ func (r *applicationResource) Update(ctx context.Context, req resource.UpdateReq
 		resp.Diagnostics.AddError("Error updating application", fmt.Sprintf("%s", err))
 		return
 	}
+
 	updatedState, diags := applicationValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	diags = resp.State.Set(ctx, &updatedState)
 	resp.Diagnostics.Append(diags...)
@@ -411,9 +428,13 @@ func (r *applicationResource) Update(ctx context.Context, req resource.UpdateReq
 
 // Delete deletes the resource and removes the Terraform state on success.
 func (r *applicationResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+	
 	var config applicationData
 	diags := req.State.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	if config.Id.IsNull() {
 		resp.Diagnostics.AddError("Application ID is missing", "Please provide a valid ID")
@@ -442,14 +463,9 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 		Description:    plan.Description.ValueString(),
 		MultiTenantApp: plan.MultiTenantApp.ValueBool(),
 	}
-	diagnostics.Append(diags...)
 
 	if !plan.ParentApplicationId.IsNull() {
 		args.ParentApplicationId = plan.ParentApplicationId.ValueString()
-	}
-
-	if !plan.GlobalAccount.IsNull() {
-		args.GlobalAccount = plan.GlobalAccount.ValueString()
 	}
 
 	if plan.AuthenticationSchema != nil {
@@ -478,6 +494,9 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 			var attributes []applications.AssertionAttribute
 			diags := authenticationSchema.AssertionAttributes.ElementsAs(ctx, &attributes, true)
 			diagnostics.Append(diags...)
+			if diagnostics.HasError() {
+				return nil, diagnostics
+			}
 
 			args.AuthenticationSchema.AssertionAttributes = attributes
 		}
@@ -486,6 +505,9 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 			var advancedAssertionAttributes []advancedAssertionAttributesData
 			diags := authenticationSchema.AdvancedAssertionAttributes.ElementsAs(ctx, &advancedAssertionAttributes, true)
 			diagnostics.Append(diags...)
+			if diagnostics.HasError() { 
+				return nil, diagnostics
+			}
 
 			for _, attribute := range advancedAssertionAttributes {
 
@@ -508,22 +530,13 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 			var authrules []applications.AuthenicationRule
 			diags = authenticationSchema.AuthenticationRules.ElementsAs(ctx, &authrules, true)
 			diagnostics.Append(diags...)
+			if diagnostics.HasError() { 
+				return nil, diagnostics
+			}
 
 			args.AuthenticationSchema.ConditionalAuthentication = authrules
 		}
 	}
 
 	return args, diagnostics
-}
-
-// string together the array of valid values for the attribute
-func validValuesString(values []string) string {
-
-	valString := "Acceptable values are : "
-
-	for _, val := range values {
-		valString += fmt.Sprintf("`%s`, ", val)
-	}
-
-	return valString
 }

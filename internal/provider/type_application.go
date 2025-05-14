@@ -54,7 +54,6 @@ type applicationData struct {
 	Description          types.String              `tfsdk:"description"`
 	ParentApplicationId  types.String              `tfsdk:"parent_application_id"`
 	MultiTenantApp       types.Bool                `tfsdk:"multi_tenant_app"`
-	GlobalAccount        types.String              `tfsdk:"global_account"`
 	AuthenticationSchema *authenticationSchemaData `tfsdk:"authentication_schema"`
 }
 
@@ -70,7 +69,6 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 		Id:             types.StringValue(a.Id),
 		Name:           types.StringValue(a.Name),
 		MultiTenantApp: types.BoolValue(a.MultiTenantApp),
-		GlobalAccount:  types.StringValue(a.GlobalAccount),
 	}
 
 	// reading attributes : description and parent_application_id
