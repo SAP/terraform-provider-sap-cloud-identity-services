@@ -31,7 +31,6 @@ Read-Only:
 
 - `authentication_schema` (Attributes) Configure attributes particular to the schema "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication" (see [below for nested schema](#nestedatt--values--authentication_schema))
 - `description` (String) Free text description of the Application
-- `global_account` (String)
 - `id` (String) Id of the application
 - `multi_tenant_app` (Boolean) Only for Internal Use
 - `name` (String) Name of the application

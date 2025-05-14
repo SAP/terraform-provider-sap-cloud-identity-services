@@ -14,7 +14,7 @@ Gets an application from the SAP Cloud Identity services.
 ```terraform
 # Read an application by ID
 data "sci_application" "by_id" {
-  id = "app_1234567890"
+  id = "app_1234567890"     # Must be a valid UUID
 }
 ```
 
@@ -29,7 +29,6 @@ data "sci_application" "by_id" {
 
 - `authentication_schema` (Attributes) Configure attributes particular to the schema "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication" (see [below for nested schema](#nestedatt--authentication_schema))
 - `description` (String) Free text description of the Application
-- `global_account` (String)
 - `multi_tenant_app` (Boolean) Only for Internal Use
 - `name` (String) Name of the application
 - `parent_application_id` (String) ID of the parent, from which the application will inherit its configurations
