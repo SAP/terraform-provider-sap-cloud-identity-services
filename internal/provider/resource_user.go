@@ -3,8 +3,8 @@ package provider
 import (
 	"context"
 	"fmt"
-	"terraform-provider-sci/internal/cli"
-	"terraform-provider-sci/internal/utils"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -22,7 +22,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
-	"terraform-provider-sci/internal/cli/apiObjects/users"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/users"
 )
 
 var (

@@ -1,6 +1,6 @@
 package groups
 
-import "terraform-provider-sci/internal/cli/apiObjects/users"
+import "github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/users"
 
 type GroupExtension struct {
 	AdditionalId string `json:"additionalId,omitempty"`
