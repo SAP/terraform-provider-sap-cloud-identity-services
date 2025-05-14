@@ -354,7 +354,7 @@ func (r *applicationResource) Create(ctx context.Context, req resource.CreateReq
 
 // Read refreshes the Terraform state with the latest data.
 func (r *applicationResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	
+
 	var config applicationData
 	diags := req.State.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
@@ -380,7 +380,7 @@ func (r *applicationResource) Read(ctx context.Context, req resource.ReadRequest
 
 // Update updates the resource and sets the updated Terraform state on success.
 func (r *applicationResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	
+
 	var plan applicationData
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
@@ -428,7 +428,7 @@ func (r *applicationResource) Update(ctx context.Context, req resource.UpdateReq
 
 // Delete deletes the resource and removes the Terraform state on success.
 func (r *applicationResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	
+
 	var config applicationData
 	diags := req.State.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
@@ -505,7 +505,7 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 			var advancedAssertionAttributes []advancedAssertionAttributesData
 			diags := authenticationSchema.AdvancedAssertionAttributes.ElementsAs(ctx, &advancedAssertionAttributes, true)
 			diagnostics.Append(diags...)
-			if diagnostics.HasError() { 
+			if diagnostics.HasError() {
 				return nil, diagnostics
 			}
 
@@ -530,7 +530,7 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 			var authrules []applications.AuthenicationRule
 			diags = authenticationSchema.AuthenticationRules.ElementsAs(ctx, &authrules, true)
 			diagnostics.Append(diags...)
-			if diagnostics.HasError() { 
+			if diagnostics.HasError() {
 				return nil, diagnostics
 			}
 

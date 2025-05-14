@@ -16,23 +16,23 @@ func TestResourceUser(t *testing.T) {
 		UserName: "jdoe",
 		Emails: []users.Email{
 			{
-				Type:  "work",
-				Value: "joe.doe@test.com",
+				Type:    "work",
+				Value:   "joe.doe@test.com",
 				Primary: true,
 			},
 		},
 		Name: users.Name{
-			FamilyName: "Doe",
-			GivenName:  "Joe",
+			FamilyName:      "Doe",
+			GivenName:       "Joe",
 			HonorificPrefix: "Mr.",
 		},
 		DisplayName: "Joe Doe",
-		UserType: "employee",
-		Active: true,
+		UserType:    "employee",
+		Active:      true,
 		SAPExtension: users.SAPExtension{
-			SendMail: false,
+			SendMail:     false,
 			MailVerified: true,
-			Status: "active",
+			Status:       "active",
 		},
 	}
 
@@ -73,32 +73,32 @@ func TestResourceUser(t *testing.T) {
 		rec, user := setupVCR(t, "fixtures/resource_user_updated")
 		defer stopQuietly(rec)
 
-		updatedSciUser := users.User {
+		updatedSciUser := users.User{
 			UserName: "jdoe_s",
 			Emails: []users.Email{
 				{
-					Type:  "work",
-					Value: "joe.doe@test.com",
+					Type:    "work",
+					Value:   "joe.doe@test.com",
 					Primary: true,
 				},
 				{
-					Type:  "home",
-					Value: "joe.doe.s@test.com",
+					Type:    "home",
+					Value:   "joe.doe.s@test.com",
 					Primary: false,
 				},
 			},
 			Name: users.Name{
-				FamilyName: "Doe S",
-				GivenName:  "Joe",
+				FamilyName:      "Doe S",
+				GivenName:       "Joe",
 				HonorificPrefix: "Mr.",
 			},
 			DisplayName: "Joe Doe S",
-			UserType: "customer",
-			Active: true,
+			UserType:    "customer",
+			Active:      true,
 			SAPExtension: users.SAPExtension{
-				SendMail: false,
+				SendMail:     false,
 				MailVerified: false,
-				Status: "active",
+				Status:       "active",
 			},
 		}
 
@@ -302,7 +302,7 @@ func TestResourceUser(t *testing.T) {
 	})
 
 	t.Run("error path - user type must be a valid value", func(t *testing.T) {
-		
+
 		sciUser.UserType = "this-is-not-a-valid-user-type"
 
 		resource.Test(t, resource.TestCase{
@@ -318,9 +318,9 @@ func TestResourceUser(t *testing.T) {
 	})
 
 	t.Run("error path - status must be a valid value", func(t *testing.T) {
-		
+
 		sciUser.SAPExtension.Status = "this-is-not-a-valid-status"
-		
+
 		resource.Test(t, resource.TestCase{
 			IsUnitTest:               true,
 			ProtoV6ProviderFactories: getTestProviders(nil),
@@ -467,14 +467,14 @@ func ResourceUserWithStatus(resourceName string, user users.User) string {
 }
 
 func ResourceUserWithCustomSchemas(resourceName string, user users.User, customSchemas string) string {
-	
-	var schemas string 
+
+	var schemas string
 	for _, schema := range user.Schemas {
 		schemas += fmt.Sprintf(`
 			"%s" ,
 		`, schema)
 	}
-	
+
 	return fmt.Sprintf(`
 	resource "sci_user" "%s"{
 		schemas = [%s]
@@ -489,9 +489,9 @@ func ResourceUserWithCustomSchemas(resourceName string, user users.User, customS
 	`, resourceName, schemas, user.UserName, user.Name.FamilyName, user.Name.GivenName, getEmails(user.Emails), customSchemas)
 }
 
-func getEmails (userEmails []users.Email) string {
+func getEmails(userEmails []users.Email) string {
 
-	var emails string 
+	var emails string
 	for _, email := range userEmails {
 		emails += fmt.Sprintf(`
 			{
@@ -504,4 +504,3 @@ func getEmails (userEmails []users.Email) string {
 	}
 	return emails
 }
- 

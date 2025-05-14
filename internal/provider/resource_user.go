@@ -145,8 +145,8 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 			},
 			"user_type": schema.StringAttribute{
 				MarkdownDescription: "Specifies the type of the user. The default type is \"public\". " + utils.ValidValuesString(userTypeValues),
-				Optional: true,
-				Computed: true,
+				Optional:            true,
+				Computed:            true,
 				Validators: []validator.String{
 					stringvalidator.OneOf(userTypeValues...),
 				},
@@ -246,7 +246,7 @@ func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, r
 }
 
 func (r *userResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	
+
 	var config userData
 	diags := req.State.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
@@ -274,7 +274,7 @@ func (r *userResource) Read(ctx context.Context, req resource.ReadRequest, resp 
 }
 
 func (r *userResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	
+
 	var plan userData
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
@@ -322,7 +322,7 @@ func (r *userResource) Update(ctx context.Context, req resource.UpdateRequest, r
 }
 
 func (r *userResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	
+
 	var config userData
 	diags := req.State.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
@@ -368,7 +368,7 @@ func getUserRequest(ctx context.Context, plan userData) (*users.User, string, di
 	args := &users.User{
 		UserName: plan.UserName.ValueString(),
 		Emails:   emails,
-		Schemas: schemas,
+		Schemas:  schemas,
 	}
 
 	if !plan.DisplayName.IsNull() {
@@ -402,7 +402,7 @@ func getUserRequest(ctx context.Context, plan userData) (*users.User, string, di
 	}
 
 	if !plan.SapExtensionUser.IsNull() && !plan.SapExtensionUser.IsUnknown() {
-		
+
 		var sapExtensionUser sapExtensionUserData
 		diags = plan.SapExtensionUser.As(ctx, &sapExtensionUser, basetypes.ObjectAsOptions{})
 		diagnostics.Append(diags...)
@@ -410,18 +410,18 @@ func getUserRequest(ctx context.Context, plan userData) (*users.User, string, di
 			return nil, "", diagnostics
 		}
 
-		if !sapExtensionUser.SendMail.IsNull() && !sapExtensionUser.SendMail.IsUnknown() { 
-			args.SAPExtension.SendMail = sapExtensionUser.SendMail.ValueBool() 
+		if !sapExtensionUser.SendMail.IsNull() && !sapExtensionUser.SendMail.IsUnknown() {
+			args.SAPExtension.SendMail = sapExtensionUser.SendMail.ValueBool()
 		}
 
-		if !sapExtensionUser.MailVerified.IsNull() && !sapExtensionUser.MailVerified.IsUnknown() { 
-			args.SAPExtension.MailVerified = sapExtensionUser.MailVerified.ValueBool() 
+		if !sapExtensionUser.MailVerified.IsNull() && !sapExtensionUser.MailVerified.IsUnknown() {
+			args.SAPExtension.MailVerified = sapExtensionUser.MailVerified.ValueBool()
 		}
 
-		if !sapExtensionUser.Status.IsNull() && !sapExtensionUser.Status.IsUnknown() {	
-			args.SAPExtension.Status = sapExtensionUser.Status.ValueString() 
+		if !sapExtensionUser.Status.IsNull() && !sapExtensionUser.Status.IsUnknown() {
+			args.SAPExtension.Status = sapExtensionUser.Status.ValueString()
 		}
-		
+
 	}
 
 	var customSchemas string

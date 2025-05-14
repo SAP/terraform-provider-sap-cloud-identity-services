@@ -26,7 +26,7 @@ type usersData struct {
 }
 
 var sapExtensionUserObjType = map[string]attr.Type{
-	"send_mail": types.BoolType,
+	"send_mail":     types.BoolType,
 	"mail_verified": types.BoolType,
 	"status":        types.StringType,
 }
@@ -199,7 +199,7 @@ func (d *usersDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 	var config usersData
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() { 
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
@@ -213,7 +213,7 @@ func (d *usersDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 
 	config.Values, diags = types.ListValueFrom(ctx, userObjType, resUsers)
 	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() { 
+	if resp.Diagnostics.HasError() {
 		return
 	}
 

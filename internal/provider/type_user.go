@@ -28,17 +28,17 @@ type nameData struct {
 }
 
 type userData struct {
-	Id               types.String          `tfsdk:"id"`
-	Schemas          types.Set             `tfsdk:"schemas"`
-	UserName         types.String          `tfsdk:"user_name"`
-	Name             *nameData             `tfsdk:"name"`
-	DisplayName      types.String          `tfsdk:"display_name"`
-	Emails           types.Set             `tfsdk:"emails"`
-	InitialPassword  types.String          `tfsdk:"initial_password"`
-	UserType         types.String          `tfsdk:"user_type"`
-	Active           types.Bool            `tfsdk:"active"`
-	SapExtensionUser types.Object 		   `tfsdk:"sap_extension_user"`
-	CustomSchemas    types.String          `tfsdk:"custom_schemas"`
+	Id               types.String `tfsdk:"id"`
+	Schemas          types.Set    `tfsdk:"schemas"`
+	UserName         types.String `tfsdk:"user_name"`
+	Name             *nameData    `tfsdk:"name"`
+	DisplayName      types.String `tfsdk:"display_name"`
+	Emails           types.Set    `tfsdk:"emails"`
+	InitialPassword  types.String `tfsdk:"initial_password"`
+	UserType         types.String `tfsdk:"user_type"`
+	Active           types.Bool   `tfsdk:"active"`
+	SapExtensionUser types.Object `tfsdk:"sap_extension_user"`
+	CustomSchemas    types.String `tfsdk:"custom_schemas"`
 }
 
 func userValueFrom(ctx context.Context, u users.User, cS string) (userData, diag.Diagnostics) {

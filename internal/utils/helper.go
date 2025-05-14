@@ -19,7 +19,7 @@ func ValidValuesString(values []string) string {
 	return valString
 }
 
-// string together the default schemas 
+// string together the default schemas
 func PrintDefaultSchemas(schemas []attr.Value) string {
 	schemasString := ""
 	for _, schema := range schemas {

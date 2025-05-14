@@ -142,7 +142,7 @@ func (d *userDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 	var config userData
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() { 
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
@@ -159,7 +159,7 @@ func (d *userDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 
 	state, diags := userValueFrom(ctx, res, customSchemasRes)
 	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() { 
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
