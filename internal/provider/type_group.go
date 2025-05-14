@@ -2,7 +2,7 @@ package provider
 
 import (
 	"context"
-	"terraform-provider-sci/internal/cli/apiObjects/groups"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/groups"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"

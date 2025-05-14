@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
-	"terraform-provider-sci/internal/cli/apiObjects/users"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/users"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"

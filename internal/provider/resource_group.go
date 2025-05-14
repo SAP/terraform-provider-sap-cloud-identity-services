@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"terraform-provider-sci/internal/cli"
-	"terraform-provider-sci/internal/cli/apiObjects/groups"
-	"terraform-provider-sci/internal/utils"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/groups"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"

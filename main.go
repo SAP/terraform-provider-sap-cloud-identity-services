@@ -8,7 +8,7 @@ import (
 	"context"
 	"flag"
 	"log"
-	"terraform-provider-sci/internal/provider"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/provider"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	// "sci/cli/apiObjects/users"
