@@ -6,7 +6,7 @@ import (
 
 	"fmt"
 	"net/http"
-	"terraform-provider-sci/internal/cli/apiObjects/applications"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/applications"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

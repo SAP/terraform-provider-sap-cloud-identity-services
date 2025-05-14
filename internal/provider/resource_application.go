@@ -3,9 +3,9 @@ package provider
 import (
 	"context"
 	"fmt"
-	"terraform-provider-sci/internal/cli"
-	"terraform-provider-sci/internal/cli/apiObjects/applications"
-	"terraform-provider-sci/internal/utils"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/applications"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/objectvalidator"

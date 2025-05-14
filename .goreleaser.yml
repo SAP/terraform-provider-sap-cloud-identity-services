@@ -16,7 +16,7 @@ builds:
     flags:
       - -trimpath
     ldflags:
-      - "-s -w -X 'github.com/SAP/terraform-provider-for-sap-cloud-identity-services/internal/version.ProviderVersion={{.Version}}'"
+      - "-s -w -X 'github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/version.ProviderVersion={{.Version}}'"
     goos:
       - freebsd
       - windows

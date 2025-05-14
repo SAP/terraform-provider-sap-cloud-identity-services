@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"terraform-provider-sci/internal/cli/apiObjects/applications"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/applications"
 )
 
 type ApplicationsCli struct {

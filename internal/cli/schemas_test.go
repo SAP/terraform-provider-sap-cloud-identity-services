@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"terraform-provider-sci/internal/cli/apiObjects/schemas"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/schemas"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

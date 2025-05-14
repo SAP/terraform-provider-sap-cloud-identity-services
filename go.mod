@@ -1,4 +1,4 @@
-module terraform-provider-sci
+module github.com/SAP/terraform-provider-sap-cloud-identity-services
 
 go 1.24
 

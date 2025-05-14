@@ -3,7 +3,7 @@ package cli
 import (
 	"context"
 	"fmt"
-	"terraform-provider-sci/internal/cli/apiObjects/groups"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/groups"
 )
 
 type GroupsCli struct {

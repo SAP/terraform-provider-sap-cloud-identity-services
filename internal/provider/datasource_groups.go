@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"terraform-provider-sci/internal/cli"
-	"terraform-provider-sci/internal/utils"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"

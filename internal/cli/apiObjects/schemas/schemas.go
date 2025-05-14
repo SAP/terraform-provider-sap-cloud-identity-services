@@ -1,7 +1,7 @@
 package schemas
 
 import (
-	"terraform-provider-sci/internal/cli/apiObjects/users"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/users"
 )
 
 type Attribute struct {
