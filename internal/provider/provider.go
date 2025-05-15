@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli"
 	"net/http"
 	"net/url"
 	"os"
-	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"

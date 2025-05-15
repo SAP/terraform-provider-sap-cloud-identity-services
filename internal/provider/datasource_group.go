@@ -3,7 +3,6 @@ package provider
 import (
 	"context"
 	"fmt"
-	"strings"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
 
@@ -47,13 +46,14 @@ func (d *groupDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, 
 			"schemas": schema.SetAttribute{
 				ElementType: types.StringType,
 				Computed:    true,
-				//MarkdownDescription:
+				MarkdownDescription: "List of SCIM schemas to configure groups. The attribute is configured with default values :\n" +
+					utils.PrintDefaultSchemas(defaultGroupSchemas),
 			},
 			"display_name": schema.StringAttribute{
 				Computed:            true,
 				MarkdownDescription: "Display Name of the group.",
 			},
-			"group_members": schema.ListNestedAttribute{
+			"group_members": schema.SetNestedAttribute{
 				Computed:            true,
 				MarkdownDescription: "Specify the members to be part of the group.",
 				NestedObject: schema.NestedAttributeObject{
@@ -64,18 +64,14 @@ func (d *groupDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, 
 						},
 						"type": schema.StringAttribute{
 							Computed:            true,
-							MarkdownDescription: fmt.Sprintf("Type of the member added to the group. Valid Values can be one of the following : %s", strings.Join(memberTypeValues, ",")),
+							MarkdownDescription: "Type of the member added to the group.",
 						},
 					},
 				},
 			},
-			"external_id": schema.StringAttribute{
-				Computed:            true,
-				MarkdownDescription: "Unique and global identifier for the given group",
-			},
 			"group_extension": schema.SingleNestedAttribute{
-				// MarkdownDescription: ,
-				Computed: true,
+				MarkdownDescription: "Configure attributes particular to the schema `" + defaultGroupSchemas[1].String() + "`.",
+				Computed:            true,
 				Attributes: map[string]schema.Attribute{
 					"name": schema.StringAttribute{
 						MarkdownDescription: "Provide a unique name for the group.",
@@ -96,6 +92,9 @@ func (d *groupDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 	var config groupData
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	if config.Id.IsNull() {
 		resp.Diagnostics.AddError("Group ID is missing", "Please provide a valid ID")
@@ -103,7 +102,6 @@ func (d *groupDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 	}
 
 	res, _, err := d.cli.Group.GetByGroupId(ctx, config.Id.ValueString())
-
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving group", fmt.Sprintf("%s", err))
 		return
@@ -111,6 +109,9 @@ func (d *groupDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 
 	state, diags := groupValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)

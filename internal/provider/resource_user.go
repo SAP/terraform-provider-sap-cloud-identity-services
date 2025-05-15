@@ -13,7 +13,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -21,14 +25,16 @@ import (
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/users"
 )
 
-var defaultUserSchemas = []attr.Value{
-	types.StringValue("urn:ietf:params:scim:schemas:core:2.0:User"),
-	types.StringValue("urn:ietf:params:scim:schemas:extension:sap:2.0:User"),
-}
+var (
+	defaultUserSchemas = []attr.Value{
+		types.StringValue("urn:ietf:params:scim:schemas:core:2.0:User"),
+		types.StringValue("urn:ietf:params:scim:schemas:extension:sap:2.0:User"),
+	}
 
-var emailTypeValues = []string{"work", "home", "other"}
-var userTypeValues = []string{"public", "partner", "customer", "external", "onboardee", "employee"}
-var activeValues = []string{"active", "inactive", "new"}
+	emailTypeValues = []string{"work", "home", "other"}
+	userTypeValues  = []string{"public", "partner", "customer", "external", "onboardee", "employee"}
+	activeValues    = []string{"active", "inactive", "new"}
+)
 
 func newUserResource() resource.Resource {
 	return &userResource{}
@@ -55,17 +61,19 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 		MarkdownDescription: `Creates a user in the SAP Cloud Identity Services.`,
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				MarkdownDescription: "Unique ID of the resource.",
+				MarkdownDescription: "ID of the user.",
 				Computed:            true,
 				Validators: []validator.String{
 					utils.ValidUUID(),
 				},
 			},
 			"schemas": schema.SetAttribute{
+				MarkdownDescription: "List of SCIM schemas to configure users. The attribute is configured with default values :\n" +
+					utils.PrintDefaultSchemas(defaultUserSchemas) +
+					fmt.Sprintln("\n \t If the attribute must be overridden with custom values, the default schemas must be provided in addition to the custom schemas."),
 				ElementType: types.StringType,
 				Optional:    true,
 				Computed:    true,
-				// MarkdownDescription
 				Default: setdefault.StaticValue(
 					types.SetValueMust(
 						types.StringType,
@@ -81,126 +89,120 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 				MarkdownDescription: "Unique user name of the user.",
 				Required:            true,
 			},
-			"name": schema.SingleNestedAttribute{
-				MarkdownDescription: "Name of the user",
-				Required:            true,
-				Attributes: map[string]schema.Attribute{
-					"family_name": schema.StringAttribute{
-						MarkdownDescription: "The following characters: <, >, : are not allowed.",
-						Required:            true,
-					},
-					"given_name": schema.StringAttribute{
-						MarkdownDescription: "The following characters: <, >, : are not allowed.",
-						Required:            true,
-					},
-					"formatted": schema.StringAttribute{
-						// MarkdownDescription: ,
-						Optional: true,
-						Computed: true,
-					},
-					"middle_name": schema.StringAttribute{
-						// MarkdownDescription: ,
-						Optional: true,
-						Computed: true,
-					},
-					"honoric_prefix": schema.StringAttribute{
-						// MarkdownDescription: ,
-						Optional: true,
-						Computed: true,
-					},
-					"honoric_suffix": schema.StringAttribute{
-						// MarkdownDescription: ,
-						Optional: true,
-						Computed: true,
-					},
-				},
-			},
 			"emails": schema.SetNestedAttribute{
-				MarkdownDescription: "Email of the user.",
+				MarkdownDescription: "Emails of the user.",
 				Required:            true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"value": schema.StringAttribute{
-							MarkdownDescription: "Value of the email of the user.",
+							MarkdownDescription: "Value of the user's email.",
 							Required:            true,
 						},
 						"type": schema.StringAttribute{
-							MarkdownDescription: "Type of the email of the user.",
+							MarkdownDescription: "Type of the user's email. " + utils.ValidValuesString(emailTypeValues),
 							Required:            true,
 							Validators: []validator.String{
 								stringvalidator.OneOf(emailTypeValues...),
 							},
 						},
-						"display": schema.StringAttribute{
-							// MarkdownDescription: "",
-							Computed: true,
-							Optional: true,
-						},
 						"primary": schema.BoolAttribute{
-							MarkdownDescription: "Set the email to be primary",
+							MarkdownDescription: "Set the email to be primary or not.",
 							Computed:            true,
 							Optional:            true,
+							PlanModifiers: []planmodifier.Bool{
+								boolplanmodifier.UseStateForUnknown(),
+							},
 						},
 					},
 				},
 			},
-			"password": schema.StringAttribute{
-				MarkdownDescription: "The password to be set for the user.",
+			"name": schema.SingleNestedAttribute{
+				MarkdownDescription: "Name of the user",
+				Optional:            true,
+				Attributes: map[string]schema.Attribute{
+					"family_name": schema.StringAttribute{
+						MarkdownDescription: "Last name of the user. The following characters: <, >, : are not allowed.",
+						Optional:            true,
+					},
+					"given_name": schema.StringAttribute{
+						MarkdownDescription: "First name of the user. The following characters: <, >, : are not allowed.",
+						Optional:            true,
+					},
+					"honorific_prefix": schema.StringAttribute{
+						MarkdownDescription: "HonorificPrefix is part of the Master Data attributes and have canonical values. The specific values for this attribute can be found on `<tenantUrl>/service/md/salutations`",
+						Optional:            true,
+					},
+				},
+			},
+			"initial_password": schema.StringAttribute{
+				MarkdownDescription: "The initial password to be configured for the user. If this attribute is configured, the password will have to be changed by the user at the first login.",
 				Optional:            true,
 				Sensitive:           true,
-				//regex to check validity, if check is added, add a test
 			},
 			"display_name": schema.StringAttribute{
 				MarkdownDescription: "The name to be displayed for the user.",
 				Optional:            true,
-				Computed:            true,
-			},
-			"title": schema.StringAttribute{
-				MarkdownDescription: "The title to be given for the user.",
-				Optional:            true,
-				Computed:            true,
 			},
 			"user_type": schema.StringAttribute{
-				MarkdownDescription: "Specifies the type of the user.The default type is \"public\".",
+				MarkdownDescription: "Specifies the type of the user. The default type is \"public\". " + utils.ValidValuesString(userTypeValues),
 				Optional:            true,
 				Computed:            true,
 				Validators: []validator.String{
 					stringvalidator.OneOf(userTypeValues...),
 				},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"active": schema.BoolAttribute{
-				MarkdownDescription: "Determines whether the user is active or not.The default value for the attribute is false.",
+				MarkdownDescription: "Determines whether the user is active or not. The default value for the attribute is false.",
 				Optional:            true,
 				Computed:            true,
+				PlanModifiers: []planmodifier.Bool{
+					boolplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"sap_extension_user": schema.SingleNestedAttribute{
-				// MarkdownDescription:
-				Optional: true,
-				Computed: true,
+				MarkdownDescription: "Configure attributes particular to the schema `" + defaultUserSchemas[1].String() + "`.",
+				Optional:            true,
+				Computed:            true,
+				PlanModifiers: []planmodifier.Object{
+					objectplanmodifier.UseStateForUnknown(),
+				},
 				Attributes: map[string]schema.Attribute{
 					"send_mail": schema.BoolAttribute{
 						MarkdownDescription: "Specifies if an activation mail should be sent. The value of the attribute only matters when creating the user.",
 						Optional:            true,
 						Computed:            true,
+						PlanModifiers: []planmodifier.Bool{
+							boolplanmodifier.UseStateForUnknown(),
+						},
 					},
 					"mail_verified": schema.BoolAttribute{
-						MarkdownDescription: "The attribute specifies if the e-mail of the newly created user is verified or not. So if the values of the \"mail_verified\" and \"send_mail\" attributes are true, the user will receive e-mail and they will be able to log on. On the other hand, if the \"send_mail\" is true, but the \"mail_verified\" is false, the user will receive e-mail and they have to click the verification link in the e-mail. If the attribute \"verified\" is not passed in the request body, the default value of \"mail_erified\" is false.",
+						MarkdownDescription: "The attribute specifies if the e-mail of the newly created user is verified or not. So if the values of the \"mail_verified\" and \"send_mail\" attributes are true, the user will receive an e-mail and they will be able to log on. On the other hand, if the \"send_mail\" is true, but the \"mail_verified\" is false, the user will receive e-mail and they have to click the verification link in the e-mail. If the attribute \"mail_verified\" is not configured, the default value is false.",
 						Optional:            true,
 						Computed:            true,
+						PlanModifiers: []planmodifier.Bool{
+							boolplanmodifier.UseStateForUnknown(),
+						},
 					},
 					"status": schema.StringAttribute{
-						MarkdownDescription: "Specifies if the user is created as active, inactive or new. If the attribute \"active\" is not passed in the request body, the default value of the attribute \"status\" is inactive.",
-						Optional:            true,
-						Computed:            true,
+						MarkdownDescription: "Specifies if the user is created as active, inactive or new. If the attribute \"active\" is not configured, the default value is inactive. " +
+							utils.ValidValuesString(activeValues),
+						Optional: true,
+						Computed: true,
 						Validators: []validator.String{
 							stringvalidator.OneOf(activeValues...),
+						},
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.UseStateForUnknown(),
 						},
 					},
 				},
 			},
 			"custom_schemas": schema.StringAttribute{
 				Optional:            true,
-				MarkdownDescription: "Furthur enhance your application with custom schemas.",
+				MarkdownDescription: "Furthur enhance your user with custom schemas. The attribute must configured as a valid JSON string.",
 				Validators: []validator.String{
 					utils.ValidJSON(),
 				},
@@ -212,9 +214,11 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 
 	var plan userData
-
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	args, customSchemas, diags := getUserRequest(ctx, plan)
 	resp.Diagnostics.Append(diags...)
@@ -223,10 +227,6 @@ func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, r
 	}
 
 	res, _, err := r.cli.User.Create(ctx, customSchemas, args)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
 	if err != nil {
 		resp.Diagnostics.AddError("Error creating user", fmt.Sprintf("%s", err))
 		return
@@ -234,20 +234,27 @@ func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, r
 
 	state, diags := userValueFrom(ctx, res, customSchemas)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
-	state.Password = plan.Password
+	// the initial password is not returned in the response, hence it must be read from the plan
+	state.InitialPassword = plan.InitialPassword
 
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 }
 
 func (r *userResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+
 	var config userData
 	diags := req.State.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	res, customSchemasRes, err := r.cli.User.GetByUserId(ctx, config.Id.ValueString())
-
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving user", fmt.Sprintf("%s", err))
 		return
@@ -255,22 +262,32 @@ func (r *userResource) Read(ctx context.Context, req resource.ReadRequest, resp 
 
 	state, diags := userValueFrom(ctx, res, customSchemasRes)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
-	state.Password = config.Password
-	state.Schemas = config.Schemas
+	// the initial password is not returned in the response, hence it must be read from the state
+	state.InitialPassword = config.InitialPassword
 
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 }
 
 func (r *userResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+
 	var plan userData
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	var state userData
 	diags = req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	if state.Id.IsNull() {
 		resp.Diagnostics.AddError("User ID is missing", "Please provide a valid ID")
@@ -279,6 +296,9 @@ func (r *userResource) Update(ctx context.Context, req resource.UpdateRequest, r
 
 	args, customSchemas, diags := getUserRequest(ctx, plan)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	args.Id = state.Id.ValueString()
 
@@ -290,18 +310,25 @@ func (r *userResource) Update(ctx context.Context, req resource.UpdateRequest, r
 
 	updatedState, diags := userValueFrom(ctx, res, customSchemas)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
-	updatedState.Password = plan.Password
-	updatedState.Schemas = plan.Schemas
+	// the initial password is not returned in the response, hence it must be read from the plan
+	updatedState.InitialPassword = plan.InitialPassword
 
 	diags = resp.State.Set(ctx, &updatedState)
 	resp.Diagnostics.Append(diags...)
 }
 
 func (r *userResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+
 	var config userData
 	diags := req.State.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	if config.Id.IsNull() {
 		resp.Diagnostics.AddError("User ID is missing", "Please provide a valid ID")
@@ -324,39 +351,54 @@ func getUserRequest(ctx context.Context, plan userData) (*users.User, string, di
 
 	var diagnostics diag.Diagnostics
 
-	var schemas []string
-	diags := plan.Schemas.ElementsAs(ctx, &schemas, true)
+	var emails []users.Email
+	diags := plan.Emails.ElementsAs(ctx, &emails, true)
 	diagnostics.Append(diags...)
-
-	if len(schemas) == 0 {
-		diagnostics.AddError("The Schemas attribute cannot be Null or Empty", "Provide a valid value for \"schemas\"")
+	if diagnostics.HasError() {
 		return nil, "", diagnostics
 	}
 
-	var name nameData
-	diags = plan.Name.As(ctx, &name, basetypes.ObjectAsOptions{})
+	var schemas []string
+	diags = plan.Schemas.ElementsAs(ctx, &schemas, true)
 	diagnostics.Append(diags...)
-
-	var emails []emailData
-	diags = plan.Emails.ElementsAs(ctx, &emails, true)
-	diagnostics.Append(diags...)
+	if diagnostics.HasError() {
+		return nil, "", diagnostics
+	}
 
 	args := &users.User{
-		Schemas:  schemas,
 		UserName: plan.UserName.ValueString(),
-		Name: users.Name{
-			FamilyName:    name.FamilyName.ValueString(),
-			GivenName:     name.GivenName.ValueString(),
-			Formatted:     name.Formatted.ValueString(),
-			MiddleName:    name.MiddleName.ValueString(),
-			HonoricPrefix: name.HonoricPrefix.ValueString(),
-			HonoricSuffix: name.HonoricSuffix.ValueString(),
-		},
-		DisplayName: plan.DisplayName.ValueString(),
-		Password:    plan.Password.ValueString(),
-		Title:       plan.Title.ValueString(),
-		UserType:    plan.UserType.ValueString(),
-		Active:      plan.Active.ValueBool(),
+		Emails:   emails,
+		Schemas:  schemas,
+	}
+
+	if !plan.DisplayName.IsNull() {
+		args.DisplayName = plan.DisplayName.ValueString()
+	}
+
+	if plan.Name != nil {
+		name := plan.Name
+
+		if !name.FamilyName.IsNull() {
+			args.Name.FamilyName = name.FamilyName.ValueString()
+		}
+		if !name.GivenName.IsNull() {
+			args.Name.GivenName = name.GivenName.ValueString()
+		}
+		if !name.HonorificPrefix.IsNull() {
+			args.Name.HonorificPrefix = name.HonorificPrefix.ValueString()
+		}
+	}
+
+	if !plan.InitialPassword.IsNull() {
+		args.Password = plan.InitialPassword.ValueString()
+	}
+
+	if !plan.UserType.IsNull() && !plan.UserType.IsUnknown() {
+		args.UserType = plan.UserType.ValueString()
+	}
+
+	if !plan.Active.IsNull() && !plan.Active.IsUnknown() {
+		args.Active = plan.Active.ValueBool()
 	}
 
 	if !plan.SapExtensionUser.IsNull() && !plan.SapExtensionUser.IsUnknown() {
@@ -364,20 +406,22 @@ func getUserRequest(ctx context.Context, plan userData) (*users.User, string, di
 		var sapExtensionUser sapExtensionUserData
 		diags = plan.SapExtensionUser.As(ctx, &sapExtensionUser, basetypes.ObjectAsOptions{})
 		diagnostics.Append(diags...)
-
-		args.SAPExtension.SendMail = sapExtensionUser.SendMail.ValueBool()
-		args.SAPExtension.MailVerified = sapExtensionUser.MailVerified.ValueBool()
-		args.SAPExtension.Status = sapExtensionUser.Status.ValueString()
-	}
-
-	for _, email := range emails {
-		userEmail := users.Email{
-			Value:   email.Value.ValueString(),
-			Type:    email.Type.ValueString(),
-			Display: email.Display.ValueString(),
-			Primary: email.Primary.ValueBool(),
+		if diagnostics.HasError() {
+			return nil, "", diagnostics
 		}
-		args.Emails = append([]users.Email{userEmail}, args.Emails...)
+
+		if !sapExtensionUser.SendMail.IsNull() && !sapExtensionUser.SendMail.IsUnknown() {
+			args.SAPExtension.SendMail = sapExtensionUser.SendMail.ValueBool()
+		}
+
+		if !sapExtensionUser.MailVerified.IsNull() && !sapExtensionUser.MailVerified.IsUnknown() {
+			args.SAPExtension.MailVerified = sapExtensionUser.MailVerified.ValueBool()
+		}
+
+		if !sapExtensionUser.Status.IsNull() && !sapExtensionUser.Status.IsUnknown() {
+			args.SAPExtension.Status = sapExtensionUser.Status.ValueString()
+		}
+
 	}
 
 	var customSchemas string

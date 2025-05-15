@@ -15,26 +15,38 @@ Creates a user in the SAP Cloud Identity Services.
 # Create a user in SAP Cloud Identity Services
 resource "sci_user" "new_user" {
   user_name   = "jdoe"
-  name = {
-    family_name = "John"
-    given_name  = "Doe"
-  }
   emails = [
     {
       value = "john.doe@sap.com",
       type  = "work"
+      primary = true
     }
   ]
+  name = {
+    family_name = "John"
+    given_name  = "Doe"
+    honorific_prefix = "Mr."
+  }
+  initial_password = "1234"       # Must be a valid password 
+  display_name = "John Doe"
+  user_type = "customer"          # Refer to the documentation for valid values
+  active = false
+  sap_extension_user = {
+    send_mail = false
+    mail_verified = true
+    status = "active"             # Refer to the documentation for valid values
+  }
 }
 
 
 # Create a user in SAP Cloud Identity Services with customSchemas
 resource "sci_user" "new_user" {
-  user_name   = "TO BE DONE"
-  name = {
-    family_name = "John"
-    given_name  = "Doe"
-  }
+  schemas = [                    # If custom schemas are to be used, ensure a valid schema ID is provided
+    "urn:ietf:params:scim:schemas:core:2.0:User",
+    "urn:ietf:params:scim:schemas:extension:sap:2.0:User",
+    "urn:custom:SCI:1.0:User"
+  ]
+  user_name   = "jdoe"
   emails = [
     {
       value = "john.doe@sap.com",
@@ -42,8 +54,10 @@ resource "sci_user" "new_user" {
     }
   ]
   custom_schemas = jsonencode({
-    "schema_id" : ["attr1"]}
-    )
+    "urn:custom:SCI:1.0:User" : {
+      custom_attr : "custom_val"
+    }
+  })
 }
 ```
 
@@ -52,53 +66,49 @@ resource "sci_user" "new_user" {
 
 ### Required
 
-- `emails` (Attributes Set) Email of the user. (see [below for nested schema](#nestedatt--emails))
-- `name` (Attributes) Name of the user (see [below for nested schema](#nestedatt--name))
+- `emails` (Attributes Set) Emails of the user. (see [below for nested schema](#nestedatt--emails))
 - `user_name` (String) Unique user name of the user.
 
 ### Optional
 
-- `active` (Boolean) Determines whether the user is active or not.The default value for the attribute is false.
-- `custom_schemas` (String) Furthur enhance your application with custom schemas.
+- `active` (Boolean) Determines whether the user is active or not. The default value for the attribute is false.
+- `custom_schemas` (String) Furthur enhance your user with custom schemas. The attribute must configured as a valid JSON string.
 - `display_name` (String) The name to be displayed for the user.
-- `password` (String, Sensitive) The password to be set for the user.
-- `sap_extension_user` (Attributes) (see [below for nested schema](#nestedatt--sap_extension_user))
-- `schemas` (Set of String)
-- `title` (String) The title to be given for the user.
-- `user_type` (String) Specifies the type of the user.The default type is "public".
+- `initial_password` (String, Sensitive) The initial password to be configured for the user. If this attribute is configured, the password will have to be changed by the user at the first login.
+- `name` (Attributes) Name of the user (see [below for nested schema](#nestedatt--name))
+- `sap_extension_user` (Attributes) Configure attributes particular to the schema `"urn:ietf:params:scim:schemas:extension:sap:2.0:User"`. (see [below for nested schema](#nestedatt--sap_extension_user))
+- `schemas` (Set of String) List of SCIM schemas to configure users. The attribute is configured with default values :
+	- `urn:ietf:params:scim:schemas:core:2.0:User` 
+	- `urn:ietf:params:scim:schemas:extension:sap:2.0:User` 
+
+ 	 If the attribute must be overridden with custom values, the default schemas must be provided in addition to the custom schemas.
+- `user_type` (String) Specifies the type of the user. The default type is "public". Acceptable values are : `public`, `partner`, `customer`, `external`, `onboardee`, `employee`.
 
 ### Read-Only
 
-- `id` (String) Unique ID of the resource.
+- `id` (String) ID of the user.
 
 <a id="nestedatt--emails"></a>
 ### Nested Schema for `emails`
 
 Required:
 
-- `type` (String) Type of the email of the user.
-- `value` (String) Value of the email of the user.
+- `type` (String) Type of the user's email. Acceptable values are : `work`, `home`, `other`.
+- `value` (String) Value of the user's email.
 
 Optional:
 
-- `display` (String)
-- `primary` (Boolean) Set the email to be primary
+- `primary` (Boolean) Set the email to be primary or not.
 
 
 <a id="nestedatt--name"></a>
 ### Nested Schema for `name`
 
-Required:
-
-- `family_name` (String) The following characters: <, >, : are not allowed.
-- `given_name` (String) The following characters: <, >, : are not allowed.
-
 Optional:
 
-- `formatted` (String)
-- `honoric_prefix` (String)
-- `honoric_suffix` (String)
-- `middle_name` (String)
+- `family_name` (String) Last name of the user. The following characters: <, >, : are not allowed.
+- `given_name` (String) First name of the user. The following characters: <, >, : are not allowed.
+- `honorific_prefix` (String) HonorificPrefix is part of the Master Data attributes and have canonical values. The specific values for this attribute can be found on `<tenantUrl>/service/md/salutations`
 
 
 <a id="nestedatt--sap_extension_user"></a>
@@ -106,9 +116,9 @@ Optional:
 
 Optional:
 
-- `mail_verified` (Boolean) The attribute specifies if the e-mail of the newly created user is verified or not. So if the values of the "mail_verified" and "send_mail" attributes are true, the user will receive e-mail and they will be able to log on. On the other hand, if the "send_mail" is true, but the "mail_verified" is false, the user will receive e-mail and they have to click the verification link in the e-mail. If the attribute "verified" is not passed in the request body, the default value of "mail_erified" is false.
+- `mail_verified` (Boolean) The attribute specifies if the e-mail of the newly created user is verified or not. So if the values of the "mail_verified" and "send_mail" attributes are true, the user will receive an e-mail and they will be able to log on. On the other hand, if the "send_mail" is true, but the "mail_verified" is false, the user will receive e-mail and they have to click the verification link in the e-mail. If the attribute "mail_verified" is not configured, the default value is false.
 - `send_mail` (Boolean) Specifies if an activation mail should be sent. The value of the attribute only matters when creating the user.
-- `status` (String) Specifies if the user is created as active, inactive or new. If the attribute "active" is not passed in the request body, the default value of the attribute "status" is inactive.
+- `status` (String) Specifies if the user is created as active, inactive or new. If the attribute "active" is not configured, the default value is inactive. Acceptable values are : `active`, `inactive`, `new`.
 
 ## Import
 

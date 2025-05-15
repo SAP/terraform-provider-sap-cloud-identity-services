@@ -22,8 +22,7 @@ type groupData struct {
 	Id             types.String `tfsdk:"id"`
 	Schemas        types.Set    `tfsdk:"schemas"`
 	DisplayName    types.String `tfsdk:"display_name"`
-	GroupMembers   types.List   `tfsdk:"group_members"`
-	ExternalId     types.String `tfsdk:"external_id"`
+	GroupMembers   types.Set    `tfsdk:"group_members"`
 	GroupExtension types.Object `tfsdk:"group_extension"`
 }
 
@@ -32,7 +31,9 @@ type groupsData struct {
 }
 
 func groupValueFrom(ctx context.Context, g groups.Group) (groupData, diag.Diagnostics) {
+
 	var diagnostics, diags diag.Diagnostics
+
 	group := groupData{
 		Id:          types.StringValue(g.Id),
 		DisplayName: types.StringValue(g.DisplayName),
@@ -41,13 +42,12 @@ func groupValueFrom(ctx context.Context, g groups.Group) (groupData, diag.Diagno
 	group.Schemas, diags = types.SetValueFrom(ctx, types.StringType, g.Schemas)
 	diagnostics.Append(diags...)
 
-	if len(g.ExternalId) > 0 {
-		group.ExternalId = types.StringValue(g.ExternalId)
+	groupExtension := groupExtensionData{
+		Name: types.StringValue(g.GroupExtension.Name),
 	}
 
-	groupExtension := groupExtensionData{
-		Name:        types.StringValue(g.GroupExtension.Name),
-		Description: types.StringValue(g.GroupExtension.Description),
+	if len(g.GroupExtension.Description) > 0 {
+		groupExtension.Description = types.StringValue(g.GroupExtension.Description)
 	}
 
 	group.GroupExtension, diags = types.ObjectValueFrom(ctx, groupExtensionObjType, groupExtension)
@@ -65,9 +65,9 @@ func groupValueFrom(ctx context.Context, g groups.Group) (groupData, diag.Diagno
 	}
 
 	if len(groupMembers) > 0 {
-		group.GroupMembers, diags = types.ListValueFrom(ctx, membersObjType, groupMembers)
+		group.GroupMembers, diags = types.SetValueFrom(ctx, membersObjType, groupMembers)
 	} else {
-		group.GroupMembers = types.ListNull(membersObjType)
+		group.GroupMembers = types.SetNull(membersObjType)
 	}
 	diagnostics.Append(diags...)
 

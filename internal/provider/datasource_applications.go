@@ -22,7 +22,6 @@ type applicationsDataSource struct {
 }
 
 type applicationsData struct {
-	// Id 		types.String	`tfsdk:"id"`
 	Values types.List `tfsdk:"values"`
 }
 
@@ -39,7 +38,7 @@ var authenticationSchemaObjType = map[string]attr.Type{
 		ElemType: advancedAssertionAttributesObjType,
 	},
 	"default_authenticating_idp": types.StringType,
-	"authentication_rules": types.ListType{
+	"conditional_authentication": types.ListType{
 		ElemType: authenticationRulesObjType,
 	},
 }
@@ -83,7 +82,6 @@ var appObjType = types.ObjectType{
 		"description":           types.StringType,
 		"parent_application_id": types.StringType,
 		"multi_tenant_app":      types.BoolType,
-		"global_account":        types.StringType,
 		"authentication_schema": types.ObjectType{
 			AttrTypes: authenticationSchemaObjType,
 		},
@@ -117,11 +115,11 @@ func (d *applicationsDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 							},
 						},
 						"name": schema.StringAttribute{
-							MarkdownDescription: "Free text description of the Application",
+							MarkdownDescription: "Name of the application",
 							Computed:            true,
 						},
 						"description": schema.StringAttribute{
-							MarkdownDescription: "Description for the application",
+							MarkdownDescription: "Free text description of the Application",
 							Computed:            true,
 						},
 						"parent_application_id": schema.StringAttribute{
@@ -135,23 +133,23 @@ func (d *applicationsDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 							MarkdownDescription: "Only for Internal Use",
 							Computed:            true,
 						},
-						"global_account": schema.StringAttribute{
-							// MarkdownDescription: "",
-							Computed: true,
-						},
 						"authentication_schema": schema.SingleNestedAttribute{
-							Computed: true,
+							MarkdownDescription: "Configure attributes particular to the schema \"urn:sap:identity:application:schemas:extension:sci:1.0:Authentication\"",
+							Computed:            true,
 							Attributes: map[string]schema.Attribute{
 								"sso_type": schema.StringAttribute{
 									MarkdownDescription: "The preferred protocol for the application",
 									Computed:            true,
 								},
 								"subject_name_identifier": schema.SingleNestedAttribute{
-									MarkdownDescription: "The attribute by which the application uses to identify the users. Identity Authentication sends the attribute to the application as subject in OpenID Connect tokens.",
-									Computed:            true,
+									MarkdownDescription: "The attribute by which the application uses to identify the users. Used by the application to uniquely identify the user during logon.\n" +
+										fmt.Sprintln("Identity Authentication sends the attribute to the application as :") +
+										fmt.Sprintln("\t - subject in OpenID Connect tokens") +
+										fmt.Sprintln("\t - name ID in SAML 2.0 assertions"),
+									Computed: true,
 									Attributes: map[string]schema.Attribute{
 										"source": schema.StringAttribute{
-											MarkdownDescription: "Acceptable values: \"Identity Directory\", \"Corporate Idenity Provider\", \"Expression\"",
+											MarkdownDescription: utils.ValidValuesString(sourceValues),
 											Computed:            true,
 										},
 										"value": schema.StringAttribute{
@@ -161,11 +159,11 @@ func (d *applicationsDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 									},
 								},
 								"subject_name_identifier_function": schema.StringAttribute{
-									MarkdownDescription: "Convert the subject name identifier to uppercase or lowercase. The only acceptable values are \"none\", \"upperCase\", \"lowerCase\"",
+									MarkdownDescription: "Convert the subject name identifier to uppercase or lowercase",
 									Computed:            true,
 								},
 								"assertion_attributes": schema.ListNestedAttribute{
-									MarkdownDescription: "User attributes to be sent to the application. The Source of these attributes is always the Identity Directory, thus only valid attribute values will be accepted.",
+									MarkdownDescription: "User attributes to be sent to the application. The Source of these attributes is always the Identity Directory",
 									Computed:            true,
 									NestedObject: schema.NestedAttributeObject{
 										Attributes: map[string]schema.Attribute{
@@ -190,7 +188,7 @@ func (d *applicationsDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 									NestedObject: schema.NestedAttributeObject{
 										Attributes: map[string]schema.Attribute{
 											"source": schema.StringAttribute{
-												MarkdownDescription: "Acceptable values: \"Corporate Idenity Provider\", \"Expression\"",
+												MarkdownDescription: utils.ValidValuesString(sourceValues[1:]),
 												Computed:            true,
 											},
 											"attribute_name": schema.StringAttribute{
@@ -212,8 +210,8 @@ func (d *applicationsDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 									MarkdownDescription: "A default identity provider can be used for users with any user domain, group and type. This identity provider is used when none of the defined authentication rules meets the criteria.",
 									Computed:            true,
 								},
-								"authentication_rules": schema.ListNestedAttribute{
-									MarkdownDescription: "Rules to manage authentication. Each rule is evaluated by priority until the criteria of a rule are fulfilled.",
+								"conditional_authentication": schema.ListNestedAttribute{
+									MarkdownDescription: "Define rules for authenticating identity provider according to email domain, user type, user group, and IP range. Each rule is evaluated by priority until the criteria of a rule are fulfilled.",
 									Computed:            true,
 									NestedObject: schema.NestedAttributeObject{
 										Attributes: map[string]schema.Attribute{

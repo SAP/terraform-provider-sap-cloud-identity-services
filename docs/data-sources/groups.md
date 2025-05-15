@@ -30,11 +30,12 @@ data "sci_groups" "all" {
 Read-Only:
 
 - `display_name` (String) Display Name of the group.
-- `external_id` (String) Unique and global identifier for the given group
-- `group_extension` (Attributes) (see [below for nested schema](#nestedatt--values--group_extension))
-- `group_members` (Attributes List) Specify the members to be part of the group. (see [below for nested schema](#nestedatt--values--group_members))
+- `group_extension` (Attributes) Configure attributes particular to the schema `"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"`. (see [below for nested schema](#nestedatt--values--group_extension))
+- `group_members` (Attributes Set) Specify the members to be part of the group. (see [below for nested schema](#nestedatt--values--group_members))
 - `id` (String) Unique ID of the group.
-- `schemas` (Set of String)
+- `schemas` (Set of String) List of SCIM schemas to configure groups. The attribute is configured with default values :
+	- `urn:ietf:params:scim:schemas:core:2.0:Group` 
+	- `urn:sap:cloud:scim:schemas:extension:custom:2.0:Group`
 
 <a id="nestedatt--values--group_extension"></a>
 ### Nested Schema for `values.group_extension`
@@ -50,5 +51,5 @@ Read-Only:
 
 Read-Only:
 
-- `type` (String) Type of the member added to the group. Valid Values can be one of the following : User,Group
+- `type` (String) Type of the member added to the group.
 - `value` (String) SCIM ID of the user or the group

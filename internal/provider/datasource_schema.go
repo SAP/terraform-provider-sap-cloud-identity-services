@@ -3,8 +3,9 @@ package provider
 import (
 	"context"
 	"fmt"
-	"strings"
+
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -36,11 +37,11 @@ func (d *schemaDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 		MarkdownDescription: `Gets a schema from the SAP Cloud Identity services.`,
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				MarkdownDescription: "A unique id by which the schema can be referenced in other entities",
+				MarkdownDescription: "Unique id by which the schema can be referenced in other entities",
 				Required:            true,
 			},
 			"name": schema.StringAttribute{
-				MarkdownDescription: "A unique name for the schema",
+				MarkdownDescription: "Unique name for the schema",
 				Computed:            true,
 			},
 			"attributes": schema.ListNestedAttribute{
@@ -54,21 +55,19 @@ func (d *schemaDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 						},
 						"type": schema.StringAttribute{
 							Computed:            true,
-							MarkdownDescription: fmt.Sprintf("The attribute data type. Valid values include : %s", strings.Join(attributeDataTypes, ",")),
+							MarkdownDescription: "The attribute data type",
 						},
 						"mutability": schema.StringAttribute{
 							Computed:            true,
-							MarkdownDescription: fmt.Sprintf("Control the Read or Write access of the attribute. Valid values include : %s", strings.Join(attributeMutabilityValues, ",")),
+							MarkdownDescription: "Control the Read or Write access of the attribute",
 						},
 						"returned": schema.StringAttribute{
-							Computed: true,
-							//description must be enhanced
-							MarkdownDescription: fmt.Sprintf("Valid values include : %s", strings.Join(attributeReturnValues, ",")),
+							Computed:            true,
+							MarkdownDescription: "Configure how the attribute's value must be returned",
 						},
 						"uniqueness": schema.StringAttribute{
-							Computed: true,
-							// description must be enhanced
-							MarkdownDescription: fmt.Sprintf("Define the context in which the attribute must be unique. Valid values include : %s", strings.Join(attributeReturnValues, ",")),
+							Computed:            true,
+							MarkdownDescription: "Define the context in which the attribute must be unique.",
 						},
 						"canonical_values": schema.ListAttribute{
 							ElementType:         types.StringType,
@@ -76,22 +75,20 @@ func (d *schemaDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 							MarkdownDescription: "A collection of suggested canonical values that may be used",
 						},
 						"multivalued": schema.BoolAttribute{
-							Computed: true,
-							// MarkDownDescription
+							Computed:            true,
+							MarkdownDescription: "Confgire if the attribute can have more than one value.",
 						},
 						"description": schema.StringAttribute{
 							Computed:            true,
 							MarkdownDescription: "A brief description for the attribute",
 						},
 						"required": schema.BoolAttribute{
-							Computed: true,
-							//enhance description
-							MarkdownDescription: "Set a restriction on whether the attribute may be mandatory or not",
+							Computed:            true,
+							MarkdownDescription: "Configure if the attribute must be mandatory or not.",
 						},
 						"case_exact": schema.BoolAttribute{
-							Computed: true,
-							//enhance description
-							MarkdownDescription: "Set a restriction on whether the attribute may be case-sensitive or not",
+							Computed:            true,
+							MarkdownDescription: "Configure if the attribute must be case-sensitive or not.",
 						},
 					},
 				},
@@ -99,15 +96,12 @@ func (d *schemaDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 			"schemas": schema.SetAttribute{
 				ElementType: types.StringType,
 				Computed:    true,
-				//MarkdownDescription
+				MarkdownDescription: "List of SCIM schemas to configure schemas. The attribute is configured with default values :\n" +
+					utils.PrintDefaultSchemas(defaultSchemaSchemas),
 			},
 			"description": schema.StringAttribute{
 				Computed:            true,
 				MarkdownDescription: "A description for the schema",
-			},
-			"external_id": schema.StringAttribute{
-				Computed:            true,
-				MarkdownDescription: "Unique and global identifier for the given schema",
 			},
 		},
 	}
@@ -118,9 +112,11 @@ func (d *schemaDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	var config schemaData
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	res, _, err := d.cli.Schema.GetBySchemaId(ctx, config.Id.ValueString())
-
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving schema", fmt.Sprintf("%s", err))
 		return
@@ -128,6 +124,9 @@ func (d *schemaDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 
 	state, diags := schemaValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)

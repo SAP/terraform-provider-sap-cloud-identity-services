@@ -6,9 +6,9 @@ type CorporateGroup struct {
 
 type SAPExtension struct {
 	SendMail     bool   `json:"sendMail,omitempty"`
-	TargetUrl    string `json:"targetUrl,omitempty"`
 	MailVerified bool   `json:"mailVerified,omitempty"`
 	Status       string `json:"status,omitempty"`
+	// TargetUrl    string `json:"targetUrl,omitempty"`
 	// TotpEnabled         bool             `json:"totpEnabled"`
 	// WebAuthEnabled      bool             `json:"webAuthEnabled"`
 	// MfaEnabled          bool             `json:"mfaEnabled"`
@@ -48,19 +48,18 @@ type EnterpriseUser struct {
 }
 
 type Name struct {
-	FamilyName    string `json:"familyName"`
-	GivenName     string `json:"givenName"`
-	Formatted     string `json:"formatted,omitempty"`
-	MiddleName    string `json:"middleName,omitempty"`
-	HonoricPrefix string `json:"honoricPrefix,omitempty"`
-	HonoricSuffix string `json:"honoricSuffix,omitempty"`
+	FamilyName      string `json:"familyName,omitempty"`
+	GivenName       string `json:"givenName,omitempty"`
+	HonorificPrefix string `json:"honorificPrefix,omitempty"`
+	// Formatted     string `json:"formatted,omitempty"`
+	// MiddleName    string `json:"middleName,omitempty"`
+	// HonorificSuffix string `json:"honorificSuffix,omitempty"`
 }
 
 type Email struct {
-	Value   string `json:"value"`
-	Type    string `json:"type"`
-	Display string `json:"display,omitempty"`
-	Primary bool   `json:"primary,omitempty"`
+	Value   string `json:"value" tfsdk:"value"`
+	Type    string `json:"type" tfsdk:"type"`
+	Primary bool   `json:"primary,omitempty" tfsdk:"primary"`
 }
 
 type PhoneNumber struct {
@@ -120,7 +119,6 @@ type User struct {
 	DisplayName       string         `json:"displayName,omitempty"`
 	NickName          string         `json:"nickName,omitempty"`
 	ProfileUrl        string         `json:"profileUrl,omitempty"`
-	Title             string         `json:"title,omitempty"`
 	UserType          string         `json:"userType,omitempty"`
 	PreferredLanguage string         `json:"preferredLanguage,omitempty"`
 	Locale            string         `json:"locale,omitempty"`
@@ -133,6 +131,7 @@ type User struct {
 	Entitlements      []Enititlement `json:"entitlements,omitempty"`
 	Roles             []Role         `json:"roles,omitempty"`
 	SAPExtension      SAPExtension   `json:"urn:ietf:params:scim:schemas:extension:sap:2.0:User,omitempty"`
+	// Title             string         `json:"title,omitempty"`
 	// EnterpriseUser    	EnterpriseUser 	`json:"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User,omitempty"`
 }
 

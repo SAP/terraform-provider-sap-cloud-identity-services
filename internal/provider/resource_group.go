@@ -3,7 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
-	"strings"
+
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/groups"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
@@ -15,18 +15,22 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
 
-var defaultGroupSchemas = []attr.Value{
-	types.StringValue("urn:ietf:params:scim:schemas:core:2.0:Group"),
-	types.StringValue("urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"),
-}
-
-var memberTypeValues = []string{"User", "Group"}
+var (
+	defaultGroupSchemas = []attr.Value{
+		types.StringValue("urn:ietf:params:scim:schemas:core:2.0:Group"),
+		types.StringValue("urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"),
+	}
+	memberTypeValues = []string{"User", "Group"}
+)
 
 func newGroupResource() resource.Resource {
 	return &groupResource{}
@@ -60,7 +64,8 @@ func (r *groupResource) Schema(_ context.Context, _ resource.SchemaRequest, resp
 				},
 			},
 			"schemas": schema.SetAttribute{
-				// MarkdownDescription: ,
+				MarkdownDescription: "List of SCIM schemas to configure groups. The attribute is configured with default values :\n" +
+					utils.PrintDefaultSchemas(defaultGroupSchemas),
 				Optional:    true,
 				Computed:    true,
 				ElementType: types.StringType,
@@ -79,14 +84,18 @@ func (r *groupResource) Schema(_ context.Context, _ resource.SchemaRequest, resp
 				MarkdownDescription: "Display Name of the group.",
 				Required:            true,
 			},
-			"group_members": schema.ListNestedAttribute{
+			"group_members": schema.SetNestedAttribute{
 				MarkdownDescription: "Specify the members to be part of the group.",
 				Optional:            true,
-				Computed:            true,
+				Validators: []validator.Set{
+					setvalidator.AlsoRequires(
+						path.MatchRoot("group_members").AtAnySetValue().AtName("value"),
+					),
+				},
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"value": schema.StringAttribute{
-							Required:            true,
+							Optional:            true,
 							MarkdownDescription: "SCIM ID of the user or the group",
 							Validators: []validator.String{
 								utils.ValidUUID(),
@@ -95,32 +104,36 @@ func (r *groupResource) Schema(_ context.Context, _ resource.SchemaRequest, resp
 						"type": schema.StringAttribute{
 							Optional:            true,
 							Computed:            true,
-							MarkdownDescription: fmt.Sprintf("Type of the member added to the group. Valid Values can be one of the following : %s", strings.Join(memberTypeValues, ",")),
+							MarkdownDescription: "Type of the member added to the group. " + utils.ValidValuesString(memberTypeValues),
 							Validators: []validator.String{
 								stringvalidator.OneOf(memberTypeValues...),
+							},
+							PlanModifiers: []planmodifier.String{
+								stringplanmodifier.UseStateForUnknown(),
 							},
 						},
 					},
 				},
 			},
-			"external_id": schema.StringAttribute{
-				MarkdownDescription: "Unique and global identifier for the given group",
-				Computed:            true,
-			},
 			"group_extension": schema.SingleNestedAttribute{
-				// MarkdownDescription: ,
-				Optional: true,
-				Computed: true,
+				MarkdownDescription: "Configure attributes particular to the schema `" + defaultGroupSchemas[1].String() + "`.",
+				Optional:            true,
+				Computed:            true,
+				PlanModifiers: []planmodifier.Object{
+					objectplanmodifier.UseStateForUnknown(),
+				},
 				Attributes: map[string]schema.Attribute{
 					"name": schema.StringAttribute{
 						MarkdownDescription: "Provide a unique name for the group.",
 						Optional:            true,
 						Computed:            true,
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.UseStateForUnknown(),
+						},
 					},
 					"description": schema.StringAttribute{
 						MarkdownDescription: "Briefly describe the nature of the group.",
 						Optional:            true,
-						Computed:            true,
 					},
 				},
 			},
@@ -131,19 +144,19 @@ func (r *groupResource) Schema(_ context.Context, _ resource.SchemaRequest, resp
 func (r *groupResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 
 	var plan groupData
-
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	args, diags := r.GetGroupRequest(ctx, plan)
 	resp.Diagnostics.Append(diags...)
-
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	res, _, err := r.cli.Group.Create(ctx, args)
-
 	if err != nil {
 		resp.Diagnostics.AddError("Error creating user", fmt.Sprintf("%s", err))
 		return
@@ -151,6 +164,9 @@ func (r *groupResource) Create(ctx context.Context, req resource.CreateRequest, 
 
 	state, diags := groupValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -161,9 +177,11 @@ func (r *groupResource) Read(ctx context.Context, req resource.ReadRequest, resp
 	var config groupData
 	diags := req.State.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	res, _, err := r.cli.Group.GetByGroupId(ctx, config.Id.ValueString())
-
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving user", fmt.Sprintf("%s", err))
 		return
@@ -171,6 +189,9 @@ func (r *groupResource) Read(ctx context.Context, req resource.ReadRequest, resp
 
 	state, diags := groupValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -181,10 +202,16 @@ func (r *groupResource) Update(ctx context.Context, req resource.UpdateRequest, 
 	var plan groupData
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	var state groupData
 	diags = req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	if state.Id.IsNull() {
 		resp.Diagnostics.AddError("Group ID is missing", "Please provide a valid ID")
@@ -193,7 +220,6 @@ func (r *groupResource) Update(ctx context.Context, req resource.UpdateRequest, 
 
 	args, diags := r.GetGroupRequest(ctx, plan)
 	resp.Diagnostics.Append(diags...)
-
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -201,7 +227,6 @@ func (r *groupResource) Update(ctx context.Context, req resource.UpdateRequest, 
 	args.Id = state.Id.ValueString()
 
 	res, _, err := r.cli.Group.Update(ctx, args)
-
 	if err != nil {
 		resp.Diagnostics.AddError("Error updating application", fmt.Sprintf("%s", err))
 		return
@@ -209,6 +234,9 @@ func (r *groupResource) Update(ctx context.Context, req resource.UpdateRequest, 
 
 	updatedState, diags := groupValueFrom(ctx, res)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	diags = resp.State.Set(ctx, &updatedState)
 	resp.Diagnostics.Append(diags...)
@@ -219,6 +247,9 @@ func (r *groupResource) Delete(ctx context.Context, req resource.DeleteRequest, 
 	var config groupData
 	diags := req.State.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	if config.Id.IsNull() {
 		resp.Diagnostics.AddError("Group ID is missing", "Please provide a valid ID")
@@ -226,7 +257,6 @@ func (r *groupResource) Delete(ctx context.Context, req resource.DeleteRequest, 
 	}
 
 	err := r.cli.Group.Delete(ctx, config.Id.ValueString())
-
 	if err != nil {
 		resp.Diagnostics.AddError("Error deleting user", fmt.Sprintf("%s", err))
 		return
@@ -244,6 +274,9 @@ func (r *groupResource) GetGroupRequest(ctx context.Context, plan groupData) (*g
 	var schemas []string
 	diags := plan.Schemas.ElementsAs(ctx, &schemas, true)
 	diagnostics.Append(diags...)
+	if diagnostics.HasError() {
+		return nil, diagnostics
+	}
 
 	args := &groups.Group{
 		Schemas:     schemas,
@@ -255,6 +288,9 @@ func (r *groupResource) GetGroupRequest(ctx context.Context, plan groupData) (*g
 		var members []memberData
 		diags = plan.GroupMembers.ElementsAs(ctx, &members, true)
 		diagnostics.Append(diags...)
+		if diagnostics.HasError() {
+			return nil, diagnostics
+		}
 
 		for _, member := range members {
 
@@ -285,9 +321,17 @@ func (r *groupResource) GetGroupRequest(ctx context.Context, plan groupData) (*g
 		var groupExtension groupExtensionData
 		diags = plan.GroupExtension.As(ctx, &groupExtension, basetypes.ObjectAsOptions{})
 		diagnostics.Append(diags...)
+		if diagnostics.HasError() {
+			return nil, diagnostics
+		}
 
-		args.GroupExtension.Name = groupExtension.Name.ValueString()
-		args.GroupExtension.Description = groupExtension.Description.ValueString()
+		if !groupExtension.Name.IsNull() {
+			args.GroupExtension.Name = groupExtension.Name.ValueString()
+		}
+
+		if !groupExtension.Description.IsNull() {
+			args.GroupExtension.Description = groupExtension.Description.ValueString()
+		}
 	}
 
 	return args, diagnostics

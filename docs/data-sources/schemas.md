@@ -27,14 +27,17 @@ data "sci_schemas" "all" {
 <a id="nestedatt--values"></a>
 ### Nested Schema for `values`
 
+Required:
+
+- `id` (String) Unique id by which the schema can be referenced in other entities
+
 Read-Only:
 
 - `attributes` (Attributes List) The list of attribites that comprise the schema (see [below for nested schema](#nestedatt--values--attributes))
 - `description` (String) A description for the schema
-- `external_id` (String) Unique and global identifier for the given schema
-- `id` (String) A unique id by which the schema can be referenced in other entities
-- `name` (String) A unique name for the schema
-- `schemas` (Set of String)
+- `name` (String) Unique name for the schema
+- `schemas` (Set of String) List of SCIM schemas to configure schemas. The attribute is configured with default values :
+	- `urn:ietf:params:scim:schemas:core:2.0:Schema`
 
 <a id="nestedatt--values--attributes"></a>
 ### Nested Schema for `values.attributes`
@@ -42,12 +45,12 @@ Read-Only:
 Read-Only:
 
 - `canonical_values` (List of String) A collection of suggested canonical values that may be used
-- `case_exact` (Boolean) Set a restriction on whether the attribute may be case-sensitive or not
+- `case_exact` (Boolean) Configure if the attribute must be case-sensitive or not.
 - `description` (String) A brief description for the attribute
-- `multivalued` (Boolean)
-- `mutability` (String) Control the Read or Write access of the attribute. Valid values include : readOnly,readWrite,writeOnly,immutable
+- `multivalued` (Boolean) Confgire if the attribute can have more than one value.
+- `mutability` (String) Control the Read or Write access of the attribute
 - `name` (String) The attribute name. Only alphanumeric characters and underscores are allowed.
-- `required` (Boolean) Set a restriction on whether the attribute may be mandatory or not
-- `returned` (String) Valid values include : always,never,default,request
-- `type` (String) The attribute data type. Valid values include : string,boolean,decimal,integer,dateTime,binary,reference,complex
-- `uniqueness` (String) Define the context in which the attribute must be unique. Valid values include : always,never,default,request
+- `required` (Boolean) Configure if the attribute must be mandatory or not.
+- `returned` (String) Configure how the attribute's value must be returned
+- `type` (String) The attribute data type
+- `uniqueness` (String) Define the context in which the attribute must be unique.

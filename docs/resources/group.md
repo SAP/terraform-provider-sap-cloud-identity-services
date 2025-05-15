@@ -14,7 +14,17 @@ Creates a group in the SAP Cloud Identity Services.
 ```terraform
 # Create a basic group in SAP Cloud Identity Services
 resource "sci_group" "basic_group" {
-  group = "my basic group"
+    display_name = "My Basic Group"
+    group_members = [
+      {
+        value = "valid-uuid",
+        type = "User"                       # Refer to the documentation for valid values
+      }
+    ]
+    group_extension = {
+      name = "Terraform"
+      description = "Group for terraform users"
+    }
 }
 ```
 
@@ -27,13 +37,14 @@ resource "sci_group" "basic_group" {
 
 ### Optional
 
-- `group_extension` (Attributes) (see [below for nested schema](#nestedatt--group_extension))
-- `group_members` (Attributes List) Specify the members to be part of the group. (see [below for nested schema](#nestedatt--group_members))
-- `schemas` (Set of String)
+- `group_extension` (Attributes) Configure attributes particular to the schema `"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"`. (see [below for nested schema](#nestedatt--group_extension))
+- `group_members` (Attributes Set) Specify the members to be part of the group. (see [below for nested schema](#nestedatt--group_members))
+- `schemas` (Set of String) List of SCIM schemas to configure groups. The attribute is configured with default values :
+	- `urn:ietf:params:scim:schemas:core:2.0:Group` 
+	- `urn:sap:cloud:scim:schemas:extension:custom:2.0:Group`
 
 ### Read-Only
 
-- `external_id` (String) Unique and global identifier for the given group
 - `id` (String) Unique ID of the group.
 
 <a id="nestedatt--group_extension"></a>
@@ -48,13 +59,10 @@ Optional:
 <a id="nestedatt--group_members"></a>
 ### Nested Schema for `group_members`
 
-Required:
-
-- `value` (String) SCIM ID of the user or the group
-
 Optional:
 
-- `type` (String) Type of the member added to the group. Valid Values can be one of the following : User,Group
+- `type` (String) Type of the member added to the group. Acceptable values are : `User`, `Group`.
+- `value` (String) SCIM ID of the user or the group
 
 ## Import
 

@@ -20,7 +20,6 @@ type Group struct {
 	Schemas        []string       `json:"schemas,omitempty"`
 	DisplayName    string         `json:"displayName,omitempty"`
 	GroupMembers   []GroupMember  `json:"members,omitempty"`
-	ExternalId     string         `json:"externalId,omitempty"`
 	GroupExtension GroupExtension `json:"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group,omitempty"`
 }
 

@@ -29,28 +29,28 @@ data "sci_userss" "all" {
 
 Read-Only:
 
-- `active` (Boolean) Determines whether the user is active or not.The default value for the attribute is false.
-- `custom_schemas` (String) Furthur enhance the user created with custom schemas.
+- `active` (Boolean) Determines whether the user is active or not. The default value for the attribute is false.
+- `custom_schemas` (String) Furthur enhance your user with custom schemas.
 - `display_name` (String) The name to be displayed for the user.
-- `emails` (Attributes Set) Email of the user. (see [below for nested schema](#nestedatt--values--emails))
-- `id` (String)
-- `name` (Attributes) (see [below for nested schema](#nestedatt--values--name))
-- `password` (String) The password to be set for the user.
-- `sap_extension_user` (Attributes) (see [below for nested schema](#nestedatt--values--sap_extension_user))
-- `schemas` (Set of String)
-- `title` (String) The title to be given for the user.
+- `emails` (Attributes Set) Emails of the user. (see [below for nested schema](#nestedatt--values--emails))
+- `id` (String) ID of the user.
+- `initial_password` (String, Sensitive) The initial password to be configured for the user.
+- `name` (Attributes) Name of the user (see [below for nested schema](#nestedatt--values--name))
+- `sap_extension_user` (Attributes) Configure attributes particular to the schema `"urn:ietf:params:scim:schemas:extension:sap:2.0:User"`. (see [below for nested schema](#nestedatt--values--sap_extension_user))
+- `schemas` (Set of String) List of SCIM schemas to configure users. The attribute is configured with default values :
+	- `urn:ietf:params:scim:schemas:core:2.0:User` 
+	- `urn:ietf:params:scim:schemas:extension:sap:2.0:User`
 - `user_name` (String) Unique user name of the user.
-- `user_type` (String) Specifies the type of the user.The default type is "public".
+- `user_type` (String) Specifies the type of the user. The default type is "public".
 
 <a id="nestedatt--values--emails"></a>
 ### Nested Schema for `values.emails`
 
 Read-Only:
 
-- `display` (String)
 - `primary` (Boolean) Set the email to be primary or not.
-- `type` (String) Type of the email of the user.
-- `value` (String) Value of the email of the user.
+- `type` (String) Type of the user's email.
+- `value` (String) Value of the user's email.
 
 
 <a id="nestedatt--values--name"></a>
@@ -58,12 +58,9 @@ Read-Only:
 
 Read-Only:
 
-- `family_name` (String) The following characters: <, >, : are not allowed.
-- `formatted` (String)
-- `given_name` (String) The following characters: <, >, : are not allowed.
-- `honoric_prefix` (String)
-- `honoric_suffix` (String)
-- `middle_name` (String)
+- `family_name` (String) Last name of the user. The following characters: <, >, : are not allowed.
+- `given_name` (String) First name of the user. The following characters: <, >, : are not allowed.
+- `honorific_prefix` (String) HonorificPrefix is part of the Master Data attributes and have canonical values. The specific values for this attribute can be found on `<tenantUrl>/service/md/salutations`
 
 
 <a id="nestedatt--values--sap_extension_user"></a>
@@ -71,6 +68,6 @@ Read-Only:
 
 Read-Only:
 
-- `mail_verified` (Boolean) The attribute specifies if the e-mail of the newly created user is verified or not. So if the values of the "mail_verified" and "send_mail" attributes are true, the user will receive e-mail and they will be able to log on. On the other hand, if the "send_mail" is true, but the "mail_verified" is false, the user will receive e-mail and they have to click the verification link in the e-mail. If the attribute "verified" is not passed in the request body, the default value of "mail_erified" is false.
+- `mail_verified` (Boolean) The attribute specifies if the e-mail of the newly created user is verified or not. So if the values of the "mail_verified" and "send_mail" attributes are true, the user will receive an e-mail and they will be able to log on. On the other hand, if the "send_mail" is true, but the "mail_verified" is false, the user will receive e-mail and they have to click the verification link in the e-mail. If the attribute "mail_verified" is not configured, the default value is false.
 - `send_mail` (Boolean) Specifies if an activation mail should be sent. The value of the attribute only matters when creating the user.
-- `status` (String) Specifies if the user is created as active, inactive or new. If the attribute "active" is not passed in the request body, the default value of the attribute "status" is inactive.
+- `status` (String) Specifies if the user is created as active, inactive or new. If the attribute "active" is not configured, the default value is inactive.
