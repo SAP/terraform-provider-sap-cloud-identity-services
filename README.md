@@ -46,9 +46,3 @@ The Terraform Provider for SAP Cloud Identity Services supports [OpenTofu](https
 2. **Feature Limitations**: The provider does not support OpenTofu specific features or functions outside the standard Terraform functionality.
 3. **Issue Reporting**: Any issues reported for the Terraform Provider for SAP Cloud Identity Services will only be addressed if they are reproducible using the Terraform CLI.
 
-
-## Additional Information and Guides
-
-Through the course of the development of the Terraform provider for SAP Cloud Identity Services and during the constant exchange with customers, several points and questions crossed our path have gathered additional information and guides that might be useful for you. You can find them in the [guides folder](./guides/) covering the following topics:
-
-TODO
