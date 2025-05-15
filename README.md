@@ -8,7 +8,7 @@
 
 The Terraform provider for SAP Cloud Identity Services allows the management of resources on the [SAP Cloud Identity Services](https://help.sap.com/docs/cloud-identity-services) via [Terraform](https://terraform.io/).
 
-You will find the detailed information about the [provider](https://registry.terraform.io/browse/providers) in the official [documentation](https://registry.terraform.io/browse/providers) in the [Terraform registry](https://registry.terraform.io/).
+You will find the detailed information about the [provider](https://registry.terraform.io/browse/providers) in the official [documentation](https://registry.terraform.io/providers/SAP/sap-cloud-identity-services/latest/docs) in the [Terraform registry](https://registry.terraform.io/).
 
 
 ## Usage of the Provider
