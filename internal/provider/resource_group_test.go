@@ -12,7 +12,7 @@ import (
 func TestResourceGroup(t *testing.T) {
 	t.Parallel()
 
-	group :=  groups.Group {
+	group := groups.Group{
 		DisplayName: "Test Group",
 		GroupMembers: []groups.GroupMember{
 			{
@@ -21,7 +21,7 @@ func TestResourceGroup(t *testing.T) {
 			},
 		},
 		GroupExtension: groups.GroupExtension{
-			Name: "Test-Group",
+			Name:        "Test-Group",
 			Description: "For testing purposes",
 		},
 	}
@@ -51,8 +51,8 @@ func TestResourceGroup(t *testing.T) {
 	})
 
 	t.Run("happy path - group update", func(t *testing.T) {
-	
-		updatedGroup := groups.Group {
+
+		updatedGroup := groups.Group{
 			DisplayName: "Test Group - New",
 			GroupMembers: []groups.GroupMember{
 				{
@@ -61,11 +61,11 @@ func TestResourceGroup(t *testing.T) {
 				},
 				{
 					Value: "59aeb87b-777a-4034-8f3e-709d39fb1a18",
-					Type: "Group",
+					Type:  "Group",
 				},
 			},
 			GroupExtension: groups.GroupExtension{
-				Name: "Test-Group",
+				Name:        "Test-Group",
 				Description: "For testing purposes",
 			},
 		}
@@ -228,8 +228,8 @@ func ResourceGroupWithoutDisplayName(resoureName string) string {
 	`, resoureName)
 }
 
-func getGroupMembers (groupMembers []groups.GroupMember) string {
-	
+func getGroupMembers(groupMembers []groups.GroupMember) string {
+
 	members := ""
 	for _, member := range groupMembers {
 		members += fmt.Sprintf(`{

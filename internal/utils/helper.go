@@ -24,7 +24,15 @@ func PrintDefaultSchemas(schemas []attr.Value) string {
 	schemasString := ""
 	for _, schema := range schemas {
 		str := schema.String()
-		str = str[1 : len(str)-1] // remove the quotes
+
+		// check and remove beginning and ending quotes
+		if str[0] == '"' {
+			str = str[1:]
+		}
+		if str[len(str)-1] == '"' {
+			str = str[:len(str)-1]
+		}
+
 		schemasString += fmt.Sprintf("\t- `%s` \n", str)
 	}
 	return schemasString

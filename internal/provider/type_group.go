@@ -22,7 +22,7 @@ type groupData struct {
 	Id             types.String `tfsdk:"id"`
 	Schemas        types.Set    `tfsdk:"schemas"`
 	DisplayName    types.String `tfsdk:"display_name"`
-	GroupMembers   types.Set   `tfsdk:"group_members"`
+	GroupMembers   types.Set    `tfsdk:"group_members"`
 	GroupExtension types.Object `tfsdk:"group_extension"`
 }
 

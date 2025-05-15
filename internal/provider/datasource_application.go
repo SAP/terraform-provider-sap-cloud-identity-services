@@ -71,9 +71,9 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 					},
 					"subject_name_identifier": schema.SingleNestedAttribute{
 						MarkdownDescription: "The attribute by which the application uses to identify the users. Used by the application to uniquely identify the user during logon.\n" +
-							fmt.Sprintf(`Identity Authentication sends the attribute to the application as : 
-							                     - subject in OpenID Connect tokens
-							                     - name ID in SAML 2.0 assertions`),
+							fmt.Sprintln("Identity Authentication sends the attribute to the application as :") +
+							fmt.Sprintln("\t - subject in OpenID Connect tokens") +
+							fmt.Sprintln("\t - name ID in SAML 2.0 assertions"),
 						Computed: true,
 						Attributes: map[string]schema.Attribute{
 							"source": schema.StringAttribute{
