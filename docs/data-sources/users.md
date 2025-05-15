@@ -13,7 +13,7 @@ Gets a list of users from the SAP Cloud Identity services.
 
 ```terraform
 # List all users
-data "sci_userss" "all" {
+data "sci_users" "all" {
 }
 ```
 

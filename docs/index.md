@@ -14,15 +14,15 @@ The Terraform provider for SAP Cloud Identity Services enables you to automate t
 terraform {
   required_providers {
     sci = {
-      source  = "SAP/sci"
-      version = "0.1.0-beta1"
+      source  = "SAP/sap-cloud-identity-services"
+      version = "0.1.0-alpha0"
     }
   }
 }
 
-# Configure the BTP Provider
+# Configure the SAP Cloud Identity Services Provider
 provider "sci" {
-  tenant_url = "https://<tenant>.authentication.eu10.hana.ondemand.com"
+  tenant_url = "https://<tenant>.accounts.ondemand.com"
 }
 ```
 

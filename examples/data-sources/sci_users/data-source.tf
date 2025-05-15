@@ -1,3 +1,3 @@
 # List all users
-data "sci_userss" "all" {
+data "sci_users" "all" {
 }

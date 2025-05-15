@@ -1,6 +1,6 @@
 provider_installation {
   dev_overrides {
-    "sap/sci" = "/go/bin"
+    "sap/sap-cloud-identity-services" = "/go/bin"
   }
 
   direct {}
