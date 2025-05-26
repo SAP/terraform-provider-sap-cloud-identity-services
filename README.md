@@ -37,7 +37,8 @@ Members, contributors, and leaders pledge to make participation in our community
 
 ## Licensing
 
-Copyright 2025 SAP SE or an SAP affiliate company and `terraform-provider-sap-cloud-identity-services` contributors. See our [LICENSE](LICENSE) for copyright and license information. Detailed information, including third-party components and their licensing/copyright information, is available [via the REUSE tool](https://api.reuse.software/info/github.com/SAP/terraform-provider-for-sap-cloud-identity-services).
+Copyright 2025 SAP SE or an SAP affiliate company and `terraform-provider-sap-cloud-identity-services` contributors. See our [LICENSE](LICENSE) for copyright and license information. Detailed information, including third-party components and their licensing/copyright information, is available [via the REUSE tool](https://api.reuse.software/info/github.com/SAP/terraform-provider-sap-cloud-identity-services).
+
 
 ## OpenTofu Compatibility
 
@@ -45,4 +46,3 @@ The Terraform Provider for SAP Cloud Identity Services supports [OpenTofu](https
 1. **Drop-In Replacement**: The provider can be used with [OpenTofu CLI](https://opentofu.org/docs/cli/) as a direct replacement for [HashiCorp Terraform CLI](https://developer.hashicorp.com/terraform/cli) without modifications.
 2. **Feature Limitations**: The provider does not support OpenTofu specific features or functions outside the standard Terraform functionality.
 3. **Issue Reporting**: Any issues reported for the Terraform Provider for SAP Cloud Identity Services will only be addressed if they are reproducible using the Terraform CLI.
-
