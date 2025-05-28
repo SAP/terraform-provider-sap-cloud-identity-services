@@ -1,8 +1,10 @@
-# Terraform Provider for for SAP Cloud Identity Services
-
 ![Golang](https://img.shields.io/badge/Go-1.24-informational)
+[![Go Report Card](https://goreportcard.com/badge/github.com/SAP/terraform-provider-sap-cloud-identity-services)](https://goreportcard.com/report/github.com/SAP/terraform-provider-sap-cloud-identity-services)
+[![CodeQL](https://github.com/SAP/terraform-provider-sap-cloud-identity-services/actions/workflows/codeql.yml/badge.svg)](https://github.com/SAP/terraform-provider-sap-cloud-identity-services/actions/workflows/codeql.yml)
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP/terraform-provider-sap-cloud-identity-services)](https://api.reuse.software/info/github.com/SAP/terraform-provider-sap-cloud-identity-services)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/10660/badge)](https://www.bestpractices.dev/projects/10660)
 
+# Terraform Provider for for SAP Cloud Identity Services
 
 ## About This Project
 
