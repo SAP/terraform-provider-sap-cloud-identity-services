@@ -35,7 +35,9 @@ provider "sci" {
 
 ### Optional
 
+- `certificate_path` (String) Path to the client certificate PEM file for x509 authentication
 - `password` (String, Sensitive)
+- `private_key_path` (String) Path to the client private key PEM file for x509 authentication
 - `username` (String)
 
 ## Best Practices
