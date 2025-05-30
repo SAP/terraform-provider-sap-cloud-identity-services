@@ -48,7 +48,6 @@ type Client struct {
 
 func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, body any, customSchemas string, reqHeader string) (*http.Response, error) {
 	parsedUrl, err := url.Parse(endpoint)
-
 	if err != nil {
 		return nil, err
 	}
@@ -57,9 +56,11 @@ func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, 
 	if body != nil {
 		encoder := json.NewEncoder(&encodedBody)
 		err := encoder.Encode(body)
+		if err != nil {
+			return nil, err
+		}
 
 		if len(customSchemas) > 0 {
-
 			// remove the ending characters '}\n' from the encoded buffer
 			body := encodedBody.String()[:len(encodedBody.String())-2]
 			// remove the beginning character '{' from the custom schemas string
@@ -69,10 +70,6 @@ func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, 
 			encodedBody.Reset()
 			encodedBody.WriteString(body + "," + customSchemas)
 		}
-
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	completeUrl := c.ServerURL.ResolveReference(parsedUrl)
@@ -81,18 +78,17 @@ func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, 
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Authorization", "Basic "+c.AuthorizationToken)
+
+	// Only set Authorization header if it's not empty
+	if c.AuthorizationToken != "" {
+		req.Header.Set("Authorization", "Basic "+c.AuthorizationToken)
+	}
+
 	req.Header.Set("Accept", "*/*")
 	req.Header.Set("DataServiceVersion", "2.0")
 	req.Header.Set("Content-Type", reqHeader)
 
-	res, err := c.HttpClient.Do(req)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
+	return c.HttpClient.Do(req)
 }
 
 func (c *Client) Execute(ctx context.Context, method string, endpoint string, body any, customSchemas string, reqHeader string, headers []string) (interface{}, map[string]string, error) {
