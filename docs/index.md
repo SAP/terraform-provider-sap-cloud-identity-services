@@ -31,13 +31,13 @@ provider "sci" {
 
 ### Required
 
-- `tenant_url` (String) The URL of the SCI tenant
+- `tenant_url` (String) The URL of the SCI tenant.
 
 ### Optional
 
-- `certificate_path` (String) Path to the client certificate PEM file for x509 authentication
+- `p12_password` (String, Sensitive) Password to decrypt the `.p12` certificate file.
+- `p12_path` (String) Path to the `.p12` (PKCS#12) certificate bundle file used for x509 authentication.
 - `password` (String, Sensitive)
-- `private_key_path` (String) Path to the client private key PEM file for x509 authentication
 - `username` (String)
 
 ## Best Practices
