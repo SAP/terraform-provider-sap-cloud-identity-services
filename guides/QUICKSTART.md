@@ -52,4 +52,4 @@ Replace `<your_username>` and `<your_password>` with your admin username and pas
 
 ## Documentation
 
-Terraform Provider for SAP Cloud Identity Services [Documentation]((https://registry.terraform.io/providers/SAP/sap-cloud-identity-services/latest/docs))
+Terraform Provider for SAP Cloud Identity Services [Documentation](https://registry.terraform.io/providers/SAP/sap-cloud-identity-services/latest/docs)
