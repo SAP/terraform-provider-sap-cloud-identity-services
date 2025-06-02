@@ -2,12 +2,14 @@ package provider
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/base64"
 	"fmt"
-	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli"
 	"net/http"
 	"net/url"
 	"os"
+
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -32,9 +34,11 @@ type SciProvider struct {
 }
 
 type SciProviderData struct {
-	TenantUrl types.String `tfsdk:"tenant_url"`
-	Username  types.String `tfsdk:"username"`
-	Password  types.String `tfsdk:"password"`
+	TenantUrl       types.String `tfsdk:"tenant_url"`
+	Username        types.String `tfsdk:"username"`
+	Password        types.String `tfsdk:"password"`
+	CertificatePath types.String `tfsdk:"certificate_path"`
+	PrivateKeyPath  types.String `tfsdk:"private_key_path"`
 }
 
 func (p *SciProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -56,12 +60,19 @@ func (p *SciProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *
 				Optional:  true,
 				Sensitive: true,
 			},
+			"certificate_path": schema.StringAttribute{
+				MarkdownDescription: "Path to the client certificate PEM file for x509 authentication",
+				Optional:            true,
+			},
+			"private_key_path": schema.StringAttribute{
+				MarkdownDescription: "Path to the client private key PEM file for x509 authentication",
+				Optional:            true,
+			},
 		},
 	}
 }
 
 func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
-
 	var config SciProviderData
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
@@ -71,30 +82,69 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		return
 	}
 
-	pasrsedUrl, err := url.Parse(config.TenantUrl.ValueString())
-
+	parsedUrl, err := url.Parse(config.TenantUrl.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("Unable to parse URL", fmt.Sprintf("%s", err))
 		return
 	}
 
-	client := cli.NewSciClient(cli.NewClient(p.httpClient, pasrsedUrl))
+	var httpClient *http.Client
+	var cert *tls.Certificate
 
-	var username string
-	if config.Username.IsNull() {
-		username = os.Getenv("SCI_USERNAME")
+	// Load x509 cert and key if provided
+	if !config.CertificatePath.IsNull() && !config.PrivateKeyPath.IsNull() {
+		certData, err := os.ReadFile(config.CertificatePath.ValueString())
+		if err != nil {
+			resp.Diagnostics.AddError("Failed to read certificate", err.Error())
+			return
+		}
+
+		keyData, err := os.ReadFile(config.PrivateKeyPath.ValueString())
+		if err != nil {
+			resp.Diagnostics.AddError("Failed to read private key", err.Error())
+			return
+		}
+
+		certificate, err := tls.X509KeyPair(certData, keyData)
+		if err != nil {
+			resp.Diagnostics.AddError("Failed to parse certificate/key pair", err.Error())
+			return
+		}
+		cert = &certificate
+
+		tlsConfig := &tls.Config{
+			Certificates:       []tls.Certificate{*cert},
+			InsecureSkipVerify: false, // ⚠️ only set to true for local testing
+		}
+		transport := &http.Transport{
+			TLSClientConfig: tlsConfig,
+		}
+		httpClient = &http.Client{Transport: transport}
 	} else {
-		username = config.Username.ValueString()
+		// Fallback to default HTTP client and basic auth if no certs are set
+		httpClient = p.httpClient
 	}
 
-	var password string
-	if config.Password.IsNull() {
-		password = os.Getenv("SCI_PASSWORD")
-	} else {
-		password = config.Password.ValueString()
-	}
+	client := cli.NewSciClient(cli.NewClient(httpClient, parsedUrl))
 
-	client.AuthorizationToken = base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
+	// Skip Basic Auth if cert is used
+	if cert == nil {
+		var username string
+		if config.Username.IsNull() {
+			username = os.Getenv("SCI_USERNAME")
+		} else {
+			username = config.Username.ValueString()
+		}
+
+		var password string
+		if config.Password.IsNull() {
+			password = os.Getenv("SCI_PASSWORD")
+		} else {
+			password = config.Password.ValueString()
+		}
+
+		client.AuthorizationToken = base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
+	}
 
 	resp.DataSourceData = client
 	resp.ResourceData = client
