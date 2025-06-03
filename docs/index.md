@@ -2,11 +2,11 @@
 page_title: "SAP Cloud Identity Services Provider"
 subcategory: ""
 description: |-
-  The Terraform provider for SAP Cloud Identity Services enables you to automate the provisioning, management, and configuration of resources in the SAP Cloud Identity Services https://help.sap.com/docs/cloud-identity-services. By leveraging this provider, you can simplify and streamline the configuration of applications, groups, schemas and users.
+  The Terraform provider for SAP Cloud Identity Services enables you to automate the provisioning, management, and configuration of resources in the SAP Cloud Identity Services https://help.sap.com/docs/cloud-identity-services.
 ---
 # Terraform Provider for SAP Cloud Identity Services
 
-The Terraform provider for SAP Cloud Identity Services enables you to automate the provisioning, management, and configuration of resources in the [SAP Cloud Identity Services](https://help.sap.com/docs/cloud-identity-services). By leveraging this provider, you can simplify and streamline the configuration of applications, groups, schemas and users.
+The Terraform provider for SAP Cloud Identity Services enables you to automate the provisioning, management, and configuration of resources in the [SAP Cloud Identity Services](https://help.sap.com/docs/cloud-identity-services).
 
 ## Example Usage
 
@@ -35,8 +35,8 @@ provider "sci" {
 
 ### Optional
 
-- `p12_password` (String, Sensitive) Password to decrypt the `.p12` certificate file.
-- `p12_path` (String) Path to the `.p12` (PKCS#12) certificate bundle file used for x509 authentication.
+- `p12_certificate_content` (String, Sensitive) Base64-encoded content of the `.p12` (PKCS#12) certificate bundle file used for x509 authentication. You can use `filebase64("cert-4.p12")` to load it.
+- `p12_certificate_password` (String, Sensitive) Password to decrypt the `.p12` certificate content.
 - `password` (String, Sensitive)
 - `username` (String)
 

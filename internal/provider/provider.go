@@ -35,11 +35,11 @@ type SciProvider struct {
 }
 
 type SciProviderData struct {
-	TenantUrl   types.String `tfsdk:"tenant_url"`
-	Username    types.String `tfsdk:"username"`
-	Password    types.String `tfsdk:"password"`
-	P12Path     types.String `tfsdk:"p12_path"`
-	P12Password types.String `tfsdk:"p12_password"`
+	TenantUrl              types.String `tfsdk:"tenant_url"`
+	Username               types.String `tfsdk:"username"`
+	Password               types.String `tfsdk:"password"`
+	P12CertificateContent  types.String `tfsdk:"p12_certificate_content"`
+	P12CertificatePassword types.String `tfsdk:"p12_certificate_password"`
 }
 
 func (p *SciProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -48,7 +48,7 @@ func (p *SciProvider) Metadata(_ context.Context, _ provider.MetadataRequest, re
 
 func (p *SciProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: `The Terraform provider for SAP Cloud Identity Services enables you to automate the provisioning, management, and configuration of resources in the [SAP Cloud Identity Services](https://help.sap.com/docs/cloud-identity-services). By leveraging this provider, you can simplify and streamline the configuration of applications, groups, schemas and users.`,
+		MarkdownDescription: `The Terraform provider for SAP Cloud Identity Services enables you to automate the provisioning, management, and configuration of resources in the [SAP Cloud Identity Services](https://help.sap.com/docs/cloud-identity-services).`,
 		Attributes: map[string]schema.Attribute{
 			"tenant_url": schema.StringAttribute{
 				MarkdownDescription: "The URL of the SCI tenant.",
@@ -61,12 +61,13 @@ func (p *SciProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *
 				Optional:  true,
 				Sensitive: true,
 			},
-			"p12_path": schema.StringAttribute{
-				MarkdownDescription: "Path to the `.p12` (PKCS#12) certificate bundle file used for x509 authentication.",
+			"p12_certificate_content": schema.StringAttribute{
+				MarkdownDescription: "Base64-encoded content of the `.p12` (PKCS#12) certificate bundle file used for x509 authentication. You can use `filebase64(\"cert-4.p12\")` to load it.",
 				Optional:            true,
+				Sensitive:           true,
 			},
-			"p12_password": schema.StringAttribute{
-				MarkdownDescription: "Password to decrypt the `.p12` certificate file.",
+			"p12_certificate_password": schema.StringAttribute{
+				MarkdownDescription: "Password to decrypt the `.p12` certificate content.",
 				Optional:            true,
 				Sensitive:           true,
 			},
@@ -93,16 +94,16 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 	var httpClient *http.Client
 	var cert *tls.Certificate
 
-	if !config.P12Path.IsNull() && !config.P12Password.IsNull() {
-		p12Data, err := os.ReadFile(config.P12Path.ValueString())
+	if !config.P12CertificateContent.IsNull() && !config.P12CertificatePassword.IsNull() {
+		decoded, err := base64.StdEncoding.DecodeString(config.P12CertificateContent.ValueString())
 		if err != nil {
-			resp.Diagnostics.AddError("Failed to read .p12 file", err.Error())
+			resp.Diagnostics.AddError("Failed to decode base64 content", err.Error())
 			return
 		}
 
-		privateKey, leafCert, caCerts, err := pkcs12.DecodeChain(p12Data, config.P12Password.ValueString())
+		privateKey, leafCert, caCerts, err := pkcs12.DecodeChain(decoded, config.P12CertificatePassword.ValueString())
 		if err != nil {
-			resp.Diagnostics.AddError("Failed to decode .p12 file", err.Error())
+			resp.Diagnostics.AddError("Failed to decode .p12 certificate", err.Error())
 			return
 		}
 
@@ -134,7 +135,7 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 
 	client := cli.NewSciClient(cli.NewClient(httpClient, parsedUrl))
 
-	// Use basic auth if cert is not used
+	// Use basic auth if certificate is not used
 	if cert == nil {
 		var username string
 		if config.Username.IsNull() {
