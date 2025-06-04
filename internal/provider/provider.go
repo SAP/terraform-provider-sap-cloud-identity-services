@@ -103,7 +103,7 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 
 		privateKey, leafCert, caCerts, err := pkcs12.DecodeChain(decoded, config.P12CertificatePassword.ValueString())
 		if err != nil {
-			resp.Diagnostics.AddError("Failed to decode .p12 certificate", err.Error())
+			resp.Diagnostics.AddError("Invalid .p12 certificate", err.Error())
 			return
 		}
 
