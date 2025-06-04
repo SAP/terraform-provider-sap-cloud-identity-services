@@ -35,7 +35,7 @@ provider "sci" {
 
 ### Optional
 
-- `p12_certificate_content` (String, Sensitive) Base64-encoded content of the `.p12` (PKCS#12) certificate bundle file used for x509 authentication. For example you can use `filebase64("certifiacte.p12")` to load the file content, but any valid base64 string is accepted.
+- `p12_certificate_content` (String, Sensitive) Base64-encoded content of the `.p12` (PKCS#12) certificate bundle file used for x509 authentication. For example you can use `filebase64("certifiacte.p12")` to load the file content, But any source that provides a valid .p12 certificate base64 string is accepted.
 - `p12_certificate_password` (String, Sensitive) Password to decrypt the `.p12` certificate content.
 - `password` (String, Sensitive)
 - `username` (String)
