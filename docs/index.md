@@ -2,7 +2,7 @@
 page_title: "SAP Cloud Identity Services Provider"
 subcategory: ""
 description: |-
-  The Terraform provider for SAP Cloud Identity Services enables you to automate the provisioning, management, and configuration of resources in the SAP Cloud Identity Services https://help.sap.com/docs/cloud-identity-services.
+The Terraform provider for SAP Cloud Identity Services enables you to automate the provisioning, management, and configuration of resources in the [SAP Cloud Identity Services](https://help.sap.com/docs/cloud-identity-services)
 ---
 # Terraform Provider for SAP Cloud Identity Services
 
