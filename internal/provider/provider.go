@@ -62,7 +62,7 @@ func (p *SciProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *
 				Sensitive: true,
 			},
 			"p12_certificate_content": schema.StringAttribute{
-				MarkdownDescription: "Base64-encoded content of the `.p12` (PKCS#12) certificate bundle file used for x509 authentication. You can use `filebase64(\"certifiacte.p12\")` to load it.",
+				MarkdownDescription: "Base64-encoded content of the `.p12` (PKCS#12) certificate bundle file used for x509 authentication. For example you can use `filebase64(\"certifiacte.p12\")` to load the file content, but any valid base64 string is accepted.",
 				Optional:            true,
 				Sensitive:           true,
 			},
