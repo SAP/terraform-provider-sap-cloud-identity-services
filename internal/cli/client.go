@@ -115,7 +115,7 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 			var responseError ScimError
 
 			if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
-				err = fmt.Errorf("%s", responseError.Detail)
+				err = fmt.Errorf("SCIM error %s \n%s", responseError.Status, responseError.Detail)
 			} else {
 				err = fmt.Errorf("responded with unknown error : %s", responseError.Status)
 			}
@@ -125,7 +125,7 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 				Error ApplicationError `json:"error"`
 			}
 			if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
-				err = fmt.Errorf("%s", responseError.Error.Message)
+				err = fmt.Errorf("application error %d \n%s", responseError.Error.Code, responseError.Error.Message)
 
 				for _, errMessage := range responseError.Error.Details {
 					err = fmt.Errorf("%v : %s", err, errMessage.Message)

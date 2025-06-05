@@ -69,7 +69,7 @@ func TestGroups_Create(t *testing.T) {
 
 		assert.Zero(t, res)
 		assert.Error(t, err)
-		assert.Equal(t, "create failed", err.Error())
+		assert.Equal(t, "SCIM error 400 \ncreate failed", err.Error())
 	})
 }
 
@@ -121,7 +121,7 @@ func TestGroups_Get(t *testing.T) {
 
 		assert.Zero(t, res)
 		assert.Error(t, err)
-		assert.Equal(t, "get failed", err.Error())
+		assert.Equal(t, "SCIM error 400 \nget failed", err.Error())
 	})
 }
 
@@ -166,7 +166,7 @@ func TestGroups_GetByGroupId(t *testing.T) {
 
 		assert.Zero(t, res)
 		assert.Error(t, err)
-		assert.Equal(t, "get failed", err.Error())
+		assert.Equal(t, "SCIM error 400 \nget failed", err.Error())
 	})
 }
 
@@ -212,7 +212,7 @@ func TestGroups_Update(t *testing.T) {
 
 		assert.Zero(t, res)
 		assert.Error(t, err)
-		assert.Equal(t, "update failed", err.Error())
+		assert.Equal(t, "SCIM error 400 \nupdate failed", err.Error())
 	})
 }
 
@@ -251,6 +251,6 @@ func TestGroups_Delete(t *testing.T) {
 		err := client.Group.Delete(context.TODO(), "valid-group-id")
 
 		assert.Error(t, err)
-		assert.Equal(t, "delete failed", err.Error())
+		assert.Equal(t, "SCIM error 400 \ndelete failed", err.Error())
 	})
 }
