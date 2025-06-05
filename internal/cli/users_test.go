@@ -100,7 +100,7 @@ func TestUsers_Create(t *testing.T) {
 
 		assert.Zero(t, res)
 		assert.Error(t, err)
-		assert.Equal(t, "create failed", err.Error())
+		assert.Equal(t, "SCIM error 400 \ncreate failed", err.Error())
 	})
 
 	t.Run("validate the API request with custom schemas - error", func(t *testing.T) {
@@ -170,7 +170,7 @@ func TestUsers_Get(t *testing.T) {
 
 		assert.Zero(t, res)
 		assert.Error(t, err)
-		assert.Equal(t, "get failed", err.Error())
+		assert.Equal(t, "SCIM error 400 \nget failed", err.Error())
 	})
 }
 
@@ -215,7 +215,7 @@ func TestUsers_GetByUserId(t *testing.T) {
 
 		assert.Zero(t, res)
 		assert.Error(t, err)
-		assert.Equal(t, "get failed", err.Error())
+		assert.Equal(t, "SCIM error 400 \nget failed", err.Error())
 	})
 }
 
@@ -291,7 +291,7 @@ func TestUsers_Update(t *testing.T) {
 
 		assert.Zero(t, res)
 		assert.Error(t, err)
-		assert.Equal(t, "update failed", err.Error())
+		assert.Equal(t, "SCIM error 400 \nupdate failed", err.Error())
 	})
 
 	t.Run("validate the API request with custom schemas - error", func(t *testing.T) {
@@ -348,7 +348,7 @@ func TestUsers_Delete(t *testing.T) {
 		err := client.User.Delete(context.TODO(), "valid-user-id")
 
 		assert.Error(t, err)
-		assert.Equal(t, "delete failed", err.Error())
+		assert.Equal(t, "SCIM error 400 \ndelete failed", err.Error())
 	})
 }
 

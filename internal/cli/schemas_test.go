@@ -76,7 +76,7 @@ func TestSchemas_Create(t *testing.T) {
 
 		assert.Zero(t, res)
 		assert.Error(t, err)
-		assert.Equal(t, "create failed", err.Error())
+		assert.Equal(t, "SCIM error 400 \ncreate failed", err.Error())
 	})
 }
 
@@ -128,7 +128,7 @@ func TestSchemas_Get(t *testing.T) {
 
 		assert.Zero(t, res)
 		assert.Error(t, err)
-		assert.Equal(t, "get failed", err.Error())
+		assert.Equal(t, "SCIM error 400 \nget failed", err.Error())
 	})
 }
 
@@ -173,7 +173,7 @@ func TestSchemas_GetBySchemaId(t *testing.T) {
 
 		assert.Zero(t, res)
 		assert.Error(t, err)
-		assert.Equal(t, "get failed", err.Error())
+		assert.Equal(t, "SCIM error 400 \nget failed", err.Error())
 	})
 }
 
@@ -212,7 +212,7 @@ func TestSchemas_Delete(t *testing.T) {
 		err := client.Schema.Delete(context.TODO(), "valid-schema-id")
 
 		assert.Error(t, err)
-		assert.Equal(t, "delete failed", err.Error())
+		assert.Equal(t, "SCIM error 400 \ndelete failed", err.Error())
 	})
 
 }
