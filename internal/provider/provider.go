@@ -4,10 +4,13 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 
 	pkcs12 "software.sslmate.com/src/go-pkcs12"
 
@@ -38,6 +41,8 @@ type SciProviderData struct {
 	TenantUrl              types.String `tfsdk:"tenant_url"`
 	Username               types.String `tfsdk:"username"`
 	Password               types.String `tfsdk:"password"`
+	ClientID               types.String `tfsdk:"client_id"`
+	ClientSecret           types.String `tfsdk:"client_secret"`
 	P12CertificateContent  types.String `tfsdk:"p12_certificate_content"`
 	P12CertificatePassword types.String `tfsdk:"p12_certificate_password"`
 }
@@ -60,6 +65,16 @@ func (p *SciProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *
 			"password": schema.StringAttribute{
 				Optional:  true,
 				Sensitive: true,
+			},
+			"client_id": schema.StringAttribute{
+				MarkdownDescription: "The client ID for OAuth2 authentication.",
+				Optional:            true,
+				Sensitive:           true,
+			},
+			"client_secret": schema.StringAttribute{
+				MarkdownDescription: "The client secret for OAuth2 authentication.",
+				Optional:            true,
+				Sensitive:           true,
 			},
 			"p12_certificate_content": schema.StringAttribute{
 				MarkdownDescription: "Base64-encoded content of the `.p12` (PKCS#12) certificate bundle file used for x509 authentication. For example you can use `filebase64(\"certifiacte.p12\")` to load the file content, But any source that provides a valid .p12 certificate base64 string is accepted.",
@@ -129,14 +144,34 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		}
 		cert = &tlsCert
 	} else {
-		// Fallback to default HTTP client
 		httpClient = p.httpClient
 	}
 
 	client := cli.NewSciClient(cli.NewClient(httpClient, parsedUrl))
 
-	// Use basic auth if certificate is not used
-	if cert == nil {
+	// OAuth2 authentication using client_id and client_secret
+	var clientID, clientSecret string
+	if config.ClientID.IsNull() {
+		clientID = os.Getenv("SCI_CLIENT_ID")
+	} else {
+		clientID = config.ClientID.ValueString()
+	}
+
+	if config.ClientSecret.IsNull() {
+		clientSecret = os.Getenv("SCI_CLIENT_SECRET")
+	} else {
+		clientSecret = config.ClientSecret.ValueString()
+	}
+
+	if clientID != "" && clientSecret != "" {
+		token, err := fetchOAuthToken(httpClient, parsedUrl.String(), clientID, clientSecret)
+		if err != nil {
+			resp.Diagnostics.AddError("OAuth2 Authentication Failed", err.Error())
+			return
+		}
+		client.AuthorizationToken = "Bearer " + token
+	} else if cert == nil {
+		// Fallback to Basic Auth (username + password)
 		var username string
 		if config.Username.IsNull() {
 			username = os.Getenv("SCI_USERNAME")
@@ -151,7 +186,7 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 			password = config.Password.ValueString()
 		}
 
-		client.AuthorizationToken = base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
+		client.AuthorizationToken = "Basic " + base64.StdEncoding.EncodeToString([]byte(username+":"+password))
 	}
 
 	resp.DataSourceData = client
@@ -178,4 +213,48 @@ func (p *SciProvider) Resources(_ context.Context) []func() resource.Resource {
 		newSchemaResource,
 		newGroupResource,
 	}
+}
+
+func fetchOAuthToken(httpClient *http.Client, tenantURL, clientID, clientSecret string) (string, error) {
+	tokenURL := strings.TrimSuffix(tenantURL, "/") + "/oauth2/token"
+
+	data := url.Values{}
+	data.Set("grant_type", "client_credentials")
+	data.Set("client_id", clientID)
+	data.Set("client_secret", clientSecret)
+
+	req, err := http.NewRequest("POST", tokenURL, strings.NewReader(data.Encode()))
+	if err != nil {
+		return "", fmt.Errorf("failed to create token request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("failed to send token request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("failed to read token response: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("token request failed with status %d: %s", resp.StatusCode, string(body))
+	}
+
+	var tokenResp struct {
+		AccessToken string `json:"access_token"`
+		TokenType   string `json:"token_type"` // usually "Bearer"
+	}
+	if err := json.Unmarshal(body, &tokenResp); err != nil {
+		return "", fmt.Errorf("failed to parse token response: %w", err)
+	}
+
+	if tokenResp.AccessToken == "" {
+		return "", fmt.Errorf("empty access token in response")
+	}
+
+	return tokenResp.AccessToken, nil
 }

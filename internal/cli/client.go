@@ -81,7 +81,7 @@ func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, 
 
 	// Only set Authorization header if it's not empty
 	if c.AuthorizationToken != "" {
-		req.Header.Set("Authorization", "Basic "+c.AuthorizationToken)
+		req.Header.Set("Authorization", c.AuthorizationToken)
 	}
 
 	req.Header.Set("Accept", "*/*")
@@ -117,7 +117,7 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 			if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
 				err = fmt.Errorf("SCIM error %s \n%s", responseError.Status, responseError.Detail)
 			} else {
-				err = fmt.Errorf("responded with unknown error : %s", responseError.Status)
+				err = fmt.Errorf("SCIM error decoding failed: %v", err) // Improved error message
 			}
 
 		} else {
@@ -131,7 +131,7 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 					err = fmt.Errorf("%v : %s", err, errMessage.Message)
 				}
 			} else {
-				err = fmt.Errorf("responded with unknown error : %d", responseError.Error.Code)
+				err = fmt.Errorf("application error decoding failed: %v", err) // Improved error message
 			}
 
 		}
@@ -146,6 +146,6 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 	if err = json.NewDecoder(res.Body).Decode(&O); err == nil || err == io.EOF {
 		return O, out, nil
 	} else {
-		return nil, out, err
+		return nil, out, fmt.Errorf("response body decoding failed: %v", err) // Improved error message
 	}
 }
