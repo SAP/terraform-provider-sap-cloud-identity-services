@@ -27,6 +27,16 @@ type User struct {
 	Password string
 }
 
+func providerConfig(_ string, testUser User) string {
+	return fmt.Sprintf(`
+	provider "sci" {
+	  tenant_url = "https://iasprovidertestblr.accounts400.ondemand.com/"
+	  username   = "%s"
+	  password   = "%s"
+	}
+	`, testUser.Username, testUser.Password)
+}
+
 func getTestProviders(httpClient *http.Client) map[string]func() (tfprotov6.ProviderServer, error) {
 	sciProvider := NewWithClient(httpClient)
 	return map[string]func() (tfprotov6.ProviderServer, error){
