@@ -117,7 +117,7 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 			if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
 				err = fmt.Errorf("SCIM error %s \n%s", responseError.Status, responseError.Detail)
 			} else {
-				err = fmt.Errorf("SCIM error decoding failed: %v", err) // Improved error message
+				err = fmt.Errorf("responded with unknown error : %s", responseError.Status)
 			}
 
 		} else {
@@ -131,7 +131,7 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 					err = fmt.Errorf("%v : %s", err, errMessage.Message)
 				}
 			} else {
-				err = fmt.Errorf("application error decoding failed: %v", err) // Improved error message
+				err = fmt.Errorf("responded with unknown error : %d", responseError.Error.Code)
 			}
 
 		}
@@ -146,6 +146,6 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 	if err = json.NewDecoder(res.Body).Decode(&O); err == nil || err == io.EOF {
 		return O, out, nil
 	} else {
-		return nil, out, fmt.Errorf("response body decoding failed: %v", err) // Improved error message
+		return nil, out, err
 	}
 }
