@@ -104,7 +104,7 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 
 	defer func() {
 		if tempErr := res.Body.Close(); tempErr != nil {
-			err = tempErr
+			err = fmt.Errorf("error closing response body: %v", tempErr)
 		}
 	}()
 
