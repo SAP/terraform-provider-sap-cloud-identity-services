@@ -9,13 +9,14 @@ require (
 	github.com/hashicorp/terraform-plugin-testing v1.13.1
 	github.com/stretchr/testify v1.10.0
 	gopkg.in/dnaeon/go-vcr.v3 v3.2.0
+	software.sslmate.com/src/go-pkcs12 v0.5.0
 )
 
 require (
 	github.com/ProtonMail/go-crypto v1.1.6 // indirect
 	github.com/agext/levenshtein v1.2.2 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
-	github.com/cloudflare/circl v1.6.0 // indirect
+	github.com/cloudflare/circl v1.6.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
@@ -65,5 +66,4 @@ require (
 	google.golang.org/grpc v1.72.1 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	software.sslmate.com/src/go-pkcs12 v0.5.0 // indirect
 )
