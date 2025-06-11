@@ -233,7 +233,11 @@ func fetchOAuthToken(httpClient *http.Client, tenantURL, clientID, clientSecret 
 	if err != nil {
 		return "", fmt.Errorf("failed to send token request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil {
+			fmt.Fprintf(os.Stderr, "warning: failed to close response body: %v\n", cerr)
+		}
+	}()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
