@@ -155,8 +155,14 @@ func TestAccSciProvider_withOAuth2(t *testing.T) {
 
 	clientID := os.Getenv("SCI_CLIENT_ID")
 	clientSecret := os.Getenv("SCI_CLIENT_SECRET")
-	if clientID == "" || clientSecret == "" {
-		t.Skip("SCI_CLIENT_ID and SCI_CLIENT_SECRET must be set")
+
+	if rec.IsRecording() {
+		if clientID == "" || clientSecret == "" {
+			t.Skip("SCI_CLIENT_ID and SCI_CLIENT_SECRET must be set for recording")
+		}
+	} else {
+		clientID = "test-client-id"
+		clientSecret = "test-client-secret"
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -175,13 +181,17 @@ func TestAccSciProvider_withOAuth2(t *testing.T) {
 func TestAccSciProvider_withP12(t *testing.T) {
 	rec, _ := setupVCR(t, "fixtures/provider_p12")
 	defer stopQuietly(rec)
+
 	base64Content := os.Getenv("SCI_CERTIFICATE_CONTENT")
-	if base64Content == "" {
-		t.Fatal("SCI_CERTIFICATE_CONTENT must be set")
-	}
 	password := os.Getenv("SCI_P12_PASSWORD")
-	if password == "" {
-		t.Skip("SCI_P12_PASSWORD must be set")
+
+	if rec.IsRecording() {
+		if base64Content == "" || password == "" {
+			t.Skip("SCI_CERTIFICATE_CONTENT and SCI_P12_PASSWORD must be set for recording")
+		}
+	} else {
+		base64Content = "ZHVtbXk=" // base64 for testing
+		password = "test-password"
 	}
 
 	resource.Test(t, resource.TestCase{
