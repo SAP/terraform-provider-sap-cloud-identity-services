@@ -151,7 +151,7 @@ func TestSciProvider_AllDataSources(t *testing.T) {
 }
 
 func TestAccSciProvider_withOAuth2(t *testing.T) {
-	rec, _ := setupVCR(t, "provider_oauth")
+	rec, _ := setupVCR(t, "fixtures/provider_oauth")
 	defer stopQuietly(rec)
 
 	clientID := os.Getenv("SCI_CLIENT_ID")
@@ -174,12 +174,12 @@ func TestAccSciProvider_withOAuth2(t *testing.T) {
 }
 
 func TestAccSciProvider_withP12(t *testing.T) {
-	rec, _ := setupVCR(t, "provider_p12")
+	rec, _ := setupVCR(t, "fixtures/provider_p12")
 	defer stopQuietly(rec)
 
 	content, err := os.ReadFile("test-fixtures/cert.p12")
 	if err != nil {
-		t.Skipf("skipping test: failed to read cert.p12: %v", err)
+		t.Fatalf("failed to read cert.p12: %v", err)
 	}
 	base64Content := base64.StdEncoding.EncodeToString(content)
 	password := os.Getenv("SCI_P12_PASSWORD")
