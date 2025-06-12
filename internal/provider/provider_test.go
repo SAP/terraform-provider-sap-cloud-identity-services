@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	"io"
 	"net/http"
@@ -176,12 +175,10 @@ func TestAccSciProvider_withOAuth2(t *testing.T) {
 func TestAccSciProvider_withP12(t *testing.T) {
 	rec, _ := setupVCR(t, "fixtures/provider_p12")
 	defer stopQuietly(rec)
-
-	content, err := os.ReadFile("test-fixtures/cert.p12")
-	if err != nil {
-		t.Fatalf("failed to read cert.p12: %v", err)
+	base64Content := os.Getenv("SCI_CERTIFICATE_CONTENT")
+	if base64Content == "" {
+		t.Fatal("SCI_CERTIFICATE_CONTENT must be set")
 	}
-	base64Content := base64.StdEncoding.EncodeToString(content)
 	password := os.Getenv("SCI_P12_PASSWORD")
 	if password == "" {
 		t.Skip("SCI_P12_PASSWORD must be set")
