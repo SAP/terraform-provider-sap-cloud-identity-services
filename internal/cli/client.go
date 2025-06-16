@@ -14,7 +14,7 @@ import (
 	"net/url"
 )
 
-type ScimError struct {
+type ScimResponseError struct {
 	Detail  string   `json:"detail"`
 	Schemas []string `json:"schemas"`
 	Status  string   `json:"status"`
@@ -24,14 +24,14 @@ type ErrorDetail struct {
 	Message string `json:"message"`
 }
 
-type ApplicationError struct {
+type ResponseError struct {
 	Code    int           `json:"code"`
 	Message string        `json:"message"`
 	Details []ErrorDetail `json:"details"`
 }
 
-const ApplicationHeader = "application/json"
-const DirectoryHeader = "application/scim+json"
+const RequestHeader = "application/json"
+const ScimRequestHeader = "application/scim+json"
 
 func NewClient(h *http.Client, u *url.URL) *Client {
 	return &Client{
@@ -112,7 +112,7 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 
 		if strings.Contains(reqHeader, "scim") {
 
-			var responseError ScimError
+			var responseError ScimResponseError
 
 			if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
 				err = fmt.Errorf("SCIM error %s \n%s", responseError.Status, responseError.Detail)
@@ -122,7 +122,7 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 
 		} else {
 			var responseError struct {
-				Error ApplicationError `json:"error"`
+				Error ResponseError `json:"error"`
 			}
 			if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
 				err = fmt.Errorf("application error %d \n%s", responseError.Error.Code, responseError.Error.Message)
