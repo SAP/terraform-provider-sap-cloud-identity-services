@@ -177,5 +177,6 @@ func (p *SciProvider) Resources(_ context.Context) []func() resource.Resource {
 		newUserResource,
 		newSchemaResource,
 		newGroupResource,
+		newCorporateIdPResource,
 	}
 }

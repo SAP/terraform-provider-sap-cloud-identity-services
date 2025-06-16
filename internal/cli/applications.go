@@ -22,7 +22,7 @@ func (a *ApplicationsCli) getUrl() string {
 
 func (a *ApplicationsCli) Get(ctx context.Context) (applications.ApplicationsResponse, string, error) {
 
-	res, _, err := a.cliClient.Execute(ctx, "GET", a.getUrl(), nil, "", ApplicationHeader, nil)
+	res, _, err := a.cliClient.Execute(ctx, "GET", a.getUrl(), nil, "", RequestHeader, nil)
 
 	if err != nil {
 		return applications.ApplicationsResponse{}, "", err
@@ -33,7 +33,7 @@ func (a *ApplicationsCli) Get(ctx context.Context) (applications.ApplicationsRes
 
 func (a *ApplicationsCli) GetByAppId(ctx context.Context, appId string) (applications.Application, string, error) {
 
-	res, _, err := a.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", a.getUrl(), appId), nil, "", ApplicationHeader, nil)
+	res, _, err := a.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", a.getUrl(), appId), nil, "", RequestHeader, nil)
 
 	if err != nil {
 		return applications.Application{}, "", err
@@ -45,7 +45,7 @@ func (a *ApplicationsCli) GetByAppId(ctx context.Context, appId string) (applica
 func (a *ApplicationsCli) Create(ctx context.Context, args *applications.Application) (applications.Application, string, error) {
 
 	// The API returns the unique ID of the created application in the header key "location"
-	_, headers, err := a.cliClient.Execute(ctx, "POST", a.getUrl(), args, "", ApplicationHeader, []string{
+	_, headers, err := a.cliClient.Execute(ctx, "POST", a.getUrl(), args, "", RequestHeader, []string{
 		"location",
 	})
 
@@ -60,7 +60,7 @@ func (a *ApplicationsCli) Create(ctx context.Context, args *applications.Applica
 
 func (a *ApplicationsCli) Update(ctx context.Context, args *applications.Application) (applications.Application, string, error) {
 
-	_, _, err := a.cliClient.Execute(ctx, "PUT", fmt.Sprintf("%s%s", a.getUrl(), args.Id), args, "", ApplicationHeader, nil)
+	_, _, err := a.cliClient.Execute(ctx, "PUT", fmt.Sprintf("%s%s", a.getUrl(), args.Id), args, "", RequestHeader, nil)
 
 	if err != nil {
 		return applications.Application{}, "", err
@@ -70,6 +70,6 @@ func (a *ApplicationsCli) Update(ctx context.Context, args *applications.Applica
 }
 
 func (a *ApplicationsCli) Delete(ctx context.Context, appId string) error {
-	_, _, err := a.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", a.getUrl(), appId), nil, "", ApplicationHeader, nil)
+	_, _, err := a.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", a.getUrl(), appId), nil, "", RequestHeader, nil)
 	return err
 }
