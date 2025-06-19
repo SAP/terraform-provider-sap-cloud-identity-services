@@ -6,10 +6,10 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"regexp"
+	"strconv"
 	"strings"
 	"testing"
-
-	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
@@ -204,5 +204,84 @@ func TestAccSciProvider_withP12(t *testing.T) {
 			  p12_certificate_password = "%s"
 			}`, base64Content, password),
 		}},
+	})
+}
+
+func TestProvider_InvalidConfiguration(t *testing.T) {
+	// Test case for missing tenant_url
+	config := `
+	provider "sci" {
+	  username = "test-user"
+	  password = "test-password"
+	}
+	`
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
+		Steps: []resource.TestStep{
+			{
+				Config:      config,
+				ExpectError: regexp.MustCompile("tenant_url is required"),
+			},
+		},
+	})
+}
+
+func TestProvider_AuthenticationFailure(t *testing.T) {
+	// Test case for invalid credentials
+	config := `
+	provider "sci" {
+	  tenant_url = "https://iasprovidertestblr.accounts400.ondemand.com/"
+	  username   = "invalid-user"
+	  password   = "invalid-password"
+	}
+	`
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
+		Steps: []resource.TestStep{
+			{
+				Config:      config,
+				ExpectError: regexp.MustCompile("authentication failed"),
+			},
+		},
+	})
+}
+
+func TestProvider_InvalidCertificateContent(t *testing.T) {
+	// Test case for malformed certificate content
+	config := `
+	provider "sci" {
+	  tenant_url               = "https://iasprovidertestblr.accounts400.ondemand.com/"
+	  p12_certificate_content  = "invalid-base64"
+	  p12_certificate_password = "test-password"
+	}
+	`
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
+		Steps: []resource.TestStep{
+			{
+				Config:      config,
+				ExpectError: regexp.MustCompile("invalid certificate content"),
+			},
+		},
+	})
+}
+
+func TestProvider_NetworkError(t *testing.T) {
+	// Test case for unreachable tenant_url
+	config := `
+	provider "sci" {
+	  tenant_url = "https://invalid-url.com/"
+	  username   = "test-user"
+	  password   = "test-password"
+	}
+	`
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
+		Steps: []resource.TestStep{
+			{
+				Config:      config,
+				ExpectError: regexp.MustCompile("unable to reach tenant_url"),
+			},
+		},
 	})
 }
