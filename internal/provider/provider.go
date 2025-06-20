@@ -189,8 +189,22 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		client.AuthorizationToken = "Basic " + base64.StdEncoding.EncodeToString([]byte(username+":"+password))
 	}
 
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	resp.DataSourceData = client
 	resp.ResourceData = client
+}
+
+func (p *SciProvider) ValidateConfig(ctx context.Context, req provider.ValidateConfigRequest, resp *provider.ValidateConfigResponse) {
+	var config SciProviderData
+	diags := req.Config.Get(ctx, &config)
+	resp.Diagnostics.Append(diags...)
+
+	if config.TenantUrl.IsNull() {
+		resp.Diagnostics.AddError("Tenant URL missing", "Please provide a valid tenant URL.")
+	}
 }
 
 func (p *SciProvider) DataSources(_ context.Context) []func() datasource.DataSource {
