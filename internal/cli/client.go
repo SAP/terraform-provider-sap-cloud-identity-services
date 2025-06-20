@@ -81,7 +81,7 @@ func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, 
 
 	// Only set Authorization header if it's not empty
 	if c.AuthorizationToken != "" {
-		req.Header.Set("Authorization", "Basic "+c.AuthorizationToken)
+		req.Header.Set("Authorization", c.AuthorizationToken)
 	}
 
 	req.Header.Set("Accept", "*/*")
