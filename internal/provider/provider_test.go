@@ -156,31 +156,30 @@ func TestSciProvider_AllDataSources(t *testing.T) {
 	assert.ElementsMatch(t, expectedDataSources, registeredDataSources)
 }
 
-func TestAccSciProvider_withOAuth2(t *testing.T) {
-	rec, _ := setupVCR(t, "fixtures/provider_oauth")
-	defer stopQuietly(rec)
+func TestUnitSciProvider_withOAuth2(t *testing.T) {
+	t.Parallel()
 
 	clientID := os.Getenv("SCI_CLIENT_ID")
 	clientSecret := os.Getenv("SCI_CLIENT_SECRET")
 
-	if rec.IsRecording() {
-		if clientID == "" || clientSecret == "" {
-			t.Skip("SCI_CLIENT_ID and SCI_CLIENT_SECRET must be set for recording")
-		}
-	} else {
-		clientID = "test-client-id"
-		clientSecret = "test-client-secret"
+	if clientID == "" || clientSecret == "" {
+		t.Skip("SCI_CLIENT_ID and SCI_CLIENT_SECRET must be set")
 	}
 
 	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+		IsUnitTest:               true,
+		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
 		Steps: []resource.TestStep{{
 			Config: fmt.Sprintf(`
-			provider "sci" {
-			  tenant_url    = "https://iasprovidertestblr.accounts400.ondemand.com/"
-			  client_id     = "%s"
-			  client_secret = "%s"
-			}`, clientID, clientSecret),
+provider "sci" {
+  tenant_url    = "https://iasprovidertestblr.accounts400.ondemand.com/"
+  client_id     = "%s"
+  client_secret = "%s"
+}
+
+data "sci_users" "test" {}
+`, clientID, clientSecret),
+			ExpectNonEmptyPlan: false,
 		}},
 	})
 }
