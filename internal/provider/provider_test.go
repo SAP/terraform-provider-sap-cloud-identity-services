@@ -339,3 +339,89 @@ func TestProvider_InvalidCertificateFormat(t *testing.T) {
 		}},
 	})
 }
+
+func TestFetchOAuthToken_HTTPErrorStatus(t *testing.T) {
+	httpClient := &http.Client{
+		Transport: RoundTripperFunc(func(req *http.Request) (*http.Response, error) {
+			return &http.Response{
+				StatusCode: http.StatusUnauthorized,
+				Body:       io.NopCloser(strings.NewReader(`{"error": "unauthorized"}`)),
+			}, nil
+		}),
+	}
+
+	token, err := fetchOAuthToken(httpClient, "https://example.com", "id", "secret")
+	assert.Error(t, err)
+	assert.Empty(t, token)
+	assert.Contains(t, err.Error(), "token request failed with status 401")
+}
+
+func TestFetchOAuthToken_InvalidJSONResponse(t *testing.T) {
+	httpClient := &http.Client{
+		Transport: RoundTripperFunc(func(req *http.Request) (*http.Response, error) {
+			return &http.Response{
+				StatusCode: http.StatusOK,
+				Body:       io.NopCloser(strings.NewReader("not a json")),
+			}, nil
+		}),
+	}
+
+	token, err := fetchOAuthToken(httpClient, "https://example.com", "id", "secret")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to parse token response")
+	assert.Empty(t, token)
+}
+
+func TestFetchOAuthToken_EmptyAccessToken(t *testing.T) {
+	httpClient := &http.Client{
+		Transport: RoundTripperFunc(func(req *http.Request) (*http.Response, error) {
+			return &http.Response{
+				StatusCode: http.StatusOK,
+				Body:       io.NopCloser(strings.NewReader(`{"token_type":"Bearer"}`)),
+			}, nil
+		}),
+	}
+
+	token, err := fetchOAuthToken(httpClient, "https://example.com", "id", "secret")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "empty access token")
+	assert.Empty(t, token)
+}
+
+func TestAccConfigure_Error_InvalidBase64Content(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
+		Steps: []resource.TestStep{
+			{
+				Config: `
+				provider "sci" {
+				  tenant_url               = "https://example.com"
+				  p12_certificate_content  = "%%%invalid-base64%%%"
+				  p12_certificate_password = "dummy"
+				}
+				`,
+				ExpectNonEmptyPlan: false,
+			},
+		},
+	})
+}
+
+func TestAccConfigure_Error_InvalidP12Certificate(t *testing.T) {
+	badP12 := base64.StdEncoding.EncodeToString([]byte("not-a-valid-p12"))
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+				provider "sci" {
+				  tenant_url               = "https://example.com"
+				  p12_certificate_content  = "%s"
+				  p12_certificate_password = "wrong-password"
+				}
+				`, badP12),
+				ExpectNonEmptyPlan: false,
+			},
+		},
+	})
+}
