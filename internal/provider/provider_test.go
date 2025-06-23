@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"testing"
@@ -399,8 +400,10 @@ func TestAccConfigure_Error_InvalidBase64Content(t *testing.T) {
 				  p12_certificate_content  = "%%%invalid-base64%%%"
 				  p12_certificate_password = "dummy"
 				}
+
+				data "sci_users" "test" {}
 				`,
-				ExpectNonEmptyPlan: false,
+				ExpectError: regexp.MustCompile("Failed to decode base64 content"),
 			},
 		},
 	})
@@ -419,8 +422,10 @@ func TestAccConfigure_Error_InvalidP12Certificate(t *testing.T) {
 				  p12_certificate_content  = "%s"
 				  p12_certificate_password = "wrong-password"
 				}
+
+				data "sci_users" "test" {}
 				`, badP12),
-				ExpectNonEmptyPlan: false,
+				ExpectError: regexp.MustCompile("Invalid .p12 certificate"),
 			},
 		},
 	})
