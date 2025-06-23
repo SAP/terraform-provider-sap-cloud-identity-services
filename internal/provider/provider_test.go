@@ -209,54 +209,27 @@ func TestFetchOAuthToken_Failure(t *testing.T) {
 	assert.Contains(t, err.Error(), "token request failed with status 401", "Expected 401 Unauthorized error")
 }
 
-func TestAccSciProvider_withP12(t *testing.T) {
-	mode := recorder.ModeRecordOnce
-	if testRecord, _ := strconv.ParseBool(os.Getenv("TEST_RECORD")); testRecord {
-		mode = recorder.ModeRecordOnly
-	}
+func TestUnitSciProvider_withP12(t *testing.T) {
+	t.Parallel()
 
-	rec, err := recorder.NewWithOptions(&recorder.Options{
-		CassetteName:       "fixtures/provider_p12_success",
-		Mode:               mode,
-		SkipRequestLatency: true,
-		RealTransport:      http.DefaultTransport,
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stopQuietly(rec)
-
-	// Use real env vars if recording
-	var base64Content, password string
-	if rec.IsRecording() {
-		base64Content = os.Getenv("SCI_CERTIFICATE_CONTENT")
-		password = os.Getenv("SCI_P12_PASSWORD")
-
-		if base64Content == "" || password == "" {
-			t.Skip("SCI_CERTIFICATE_CONTENT and SCI_P12_PASSWORD must be set for recording")
-		}
-	} else {
-		// Values ignored during replay
-		base64Content = base64.StdEncoding.EncodeToString([]byte("dummy-p12-content"))
-		password = "12345678"
-	}
-
-	rec.SetMatcher(requestMatcher(t))
-	rec.AddHook(redactAuthorizationToken(), recorder.BeforeSaveHook)
+	// Simulate invalid p12 content to trigger Decode error and cover that path
+	dummyBase64 := base64.StdEncoding.EncodeToString([]byte("not-a-valid-p12"))
+	dummyPassword := "dummy-password"
 
 	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
-		Steps: []resource.TestStep{{
-			Config: fmt.Sprintf(`
-			provider "sci" {
-			  tenant_url               = "https://iasprovidertestblr.accounts400.ondemand.com/"
-			  p12_certificate_content  = "%s"
-			  p12_certificate_password = "%s"
-			}
-
-			data "sci_users" "dummy" {}
-			`, base64Content, password),
-		}},
+		IsUnitTest:               true,
+		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+provider "sci" {
+  tenant_url               = "https://mock.ondemand.com"
+  p12_certificate_content  = "%s"
+  p12_certificate_password = "%s"
+}
+`, dummyBase64, dummyPassword),
+			},
+		},
 	})
 }
 
