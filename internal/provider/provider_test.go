@@ -210,31 +210,39 @@ func TestFetchOAuthToken_Failure(t *testing.T) {
 }
 
 func TestAccSciProvider_withP12(t *testing.T) {
-	rec, _ := setupVCR(t, "fixtures/provider_p12")
+	rec, _ := setupVCR(t, "fixtures/provider_p12_success")
 	defer stopQuietly(rec)
 
-	base64Content := os.Getenv("SCI_CERTIFICATE_CONTENT")
-	password := os.Getenv("SCI_P12_PASSWORD")
+	var base64Content, password string
 
 	if rec.IsRecording() {
+		base64Content = os.Getenv("SCI_CERTIFICATE_CONTENT")
+		password = os.Getenv("SCI_P12_PASSWORD")
+
 		if base64Content == "" || password == "" {
 			t.Skip("SCI_CERTIFICATE_CONTENT and SCI_P12_PASSWORD must be set for recording")
 		}
 	} else {
-		base64Content = "ZHVtbXk=" // base64 for testing
-		password = "test-password"
+		// Use recorded interaction
+		base64Content = "placeholder"
+		password = "placeholder"
 	}
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
-		Steps: []resource.TestStep{{
-			Config: fmt.Sprintf(`
-			provider "sci" {
-			  tenant_url               = "https://iasprovidertestblr.accounts400.ondemand.com/"
-			  p12_certificate_content  = "%s"
-			  p12_certificate_password = "%s"
-			}`, base64Content, password),
-		}},
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+				provider "sci" {
+				  tenant_url               = "https://iasprovidertestblr.accounts400.ondemand.com/"
+				  p12_certificate_content  = "%s"
+				  p12_certificate_password = "%s"
+				}
+
+				data "sci_users" "dummy" {}
+				`, base64Content, password),
+			},
+		},
 	})
 }
 
