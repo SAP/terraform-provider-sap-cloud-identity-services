@@ -4,22 +4,26 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
+	"time"
 
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/clientcredentials"
 	pkcs12 "software.sslmate.com/src/go-pkcs12"
 
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -55,36 +59,110 @@ func (p *SciProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *
 	resp.Schema = schema.Schema{
 		MarkdownDescription: `The Terraform provider for SAP Cloud Identity Services enables you to automate the provisioning, management, and configuration of resources in the [SAP Cloud Identity Services](https://help.sap.com/docs/cloud-identity-services).`,
 		Attributes: map[string]schema.Attribute{
+
 			"tenant_url": schema.StringAttribute{
 				MarkdownDescription: "The URL of the SCI tenant.",
 				Required:            true,
 			},
+			// Basic Authentication
 			"username": schema.StringAttribute{
-				Optional: true,
+				Optional:            true,
+				MarkdownDescription: "Your user name for Basic Authentication.",
+				Validators: []validator.String{
+					stringvalidator.ConflictsWith(
+						path.MatchRoot("client_id"),
+						path.MatchRoot("client_secret"),
+						path.MatchRoot("p12_certificate_content"),
+						path.MatchRoot("p12_certificate_password"),
+					),
+					stringvalidator.AlsoRequires(
+						path.MatchRoot("password"),
+					),
+				},
 			},
 			"password": schema.StringAttribute{
-				Optional:  true,
-				Sensitive: true,
-			},
-			"client_id": schema.StringAttribute{
-				MarkdownDescription: "The client ID for OAuth2 authentication.",
 				Optional:            true,
 				Sensitive:           true,
+				MarkdownDescription: "Your password for Basic Authentication.",
+				Validators: []validator.String{
+					stringvalidator.ConflictsWith(
+						path.MatchRoot("client_id"),
+						path.MatchRoot("client_secret"),
+						path.MatchRoot("p12_certificate_content"),
+						path.MatchRoot("p12_certificate_password"),
+					),
+					stringvalidator.AlsoRequires(
+						path.MatchRoot("username"),
+					),
+				},
+			},
+
+			// OAuth2 Client Credentials
+			"client_id": schema.StringAttribute{
+				Optional:            true,
+				Sensitive:           true,
+				MarkdownDescription: "The client ID for OAuth2 authentication.",
+				Validators: []validator.String{
+					stringvalidator.ConflictsWith(
+						path.MatchRoot("username"),
+						path.MatchRoot("password"),
+						path.MatchRoot("p12_certificate_content"),
+						path.MatchRoot("p12_certificate_password"),
+					),
+					stringvalidator.AlsoRequires(
+						path.MatchRoot("client_secret"),
+					),
+				},
 			},
 			"client_secret": schema.StringAttribute{
+				Optional:            true,
+				Sensitive:           true,
 				MarkdownDescription: "The client secret for OAuth2 authentication.",
-				Optional:            true,
-				Sensitive:           true,
+				Validators: []validator.String{
+					stringvalidator.ConflictsWith(
+						path.MatchRoot("username"),
+						path.MatchRoot("password"),
+						path.MatchRoot("p12_certificate_content"),
+						path.MatchRoot("p12_certificate_password"),
+					),
+					stringvalidator.AlsoRequires(
+						path.MatchRoot("client_id"),
+					),
+				},
 			},
+
+			// X.509 Certificate Auth
 			"p12_certificate_content": schema.StringAttribute{
-				MarkdownDescription: "Base64-encoded content of the `.p12` (PKCS#12) certificate bundle file used for x509 authentication. For example you can use `filebase64(\"certifiacte.p12\")` to load the file content, But any source that provides a valid .p12 certificate base64 string is accepted.",
 				Optional:            true,
 				Sensitive:           true,
+				MarkdownDescription: "Base64-encoded content of the `.p12` (PKCS#12) certificate bundle file used for x509 authentication. For example you can use `filebase64(\"certifiacte.p12\")` to load the file content, But any source that provides a valid .p12 certificate base64 string is accepted.",
+				Validators: []validator.String{
+					stringvalidator.ConflictsWith(
+						path.MatchRoot("username"),
+						path.MatchRoot("password"),
+						path.MatchRoot("client_id"),
+						path.MatchRoot("client_secret"),
+					),
+					stringvalidator.AlsoRequires(
+						path.MatchRoot("p12_certificate_password"),
+					),
+				},
 			},
 			"p12_certificate_password": schema.StringAttribute{
-				MarkdownDescription: "Password to decrypt the `.p12` certificate content.",
 				Optional:            true,
 				Sensitive:           true,
+				MarkdownDescription: "Password to decrypt the `.p12` certificate content.",
+				Validators: []validator.String{
+					stringvalidator.ConflictsWith(
+						path.MatchRoot("username"),
+						path.MatchRoot("password"),
+						path.MatchRoot("client_id"),
+						path.MatchRoot("client_secret"),
+					),
+					stringvalidator.AlsoRequires(
+						path.MatchRoot("p12_certificate_content"),
+					),
+				},
 			},
 		},
 	}
@@ -137,7 +215,9 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 			Certificates:       []tls.Certificate{tlsCert},
 			InsecureSkipVerify: false,
 		}
+
 		httpClient = &http.Client{
+			Timeout: 30 * time.Second,
 			Transport: &http.Transport{
 				TLSClientConfig: tlsConfig,
 			},
@@ -164,6 +244,10 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 	}
 
 	if clientID != "" && clientSecret != "" {
+		if cert != nil {
+			resp.Diagnostics.AddWarning("Multiple authentication methods detected", "Both client credentials and certificate-based authentication are provided. Client credentials will be used.")
+		}
+
 		token, err := fetchOAuthToken(httpClient, parsedUrl.String(), clientID, clientSecret)
 		if err != nil {
 			resp.Diagnostics.AddError("OAuth2 Authentication Failed", err.Error())
@@ -172,14 +256,13 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		client.AuthorizationToken = "Bearer " + token
 	} else if cert == nil {
 		// Fallback to Basic Auth (username + password)
-		var username string
+		var username, password string
 		if config.Username.IsNull() {
 			username = os.Getenv("SCI_USERNAME")
 		} else {
 			username = config.Username.ValueString()
 		}
 
-		var password string
 		if config.Password.IsNull() {
 			password = os.Getenv("SCI_PASSWORD")
 		} else {
@@ -195,16 +278,6 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 
 	resp.DataSourceData = client
 	resp.ResourceData = client
-}
-
-func (p *SciProvider) ValidateConfig(ctx context.Context, req provider.ValidateConfigRequest, resp *provider.ValidateConfigResponse) {
-	var config SciProviderData
-	diags := req.Config.Get(ctx, &config)
-	resp.Diagnostics.Append(diags...)
-
-	if config.TenantUrl.IsNull() {
-		resp.Diagnostics.AddError("Tenant URL missing", "Please provide a valid tenant URL.")
-	}
 }
 
 func (p *SciProvider) DataSources(_ context.Context) []func() datasource.DataSource {
@@ -230,49 +303,24 @@ func (p *SciProvider) Resources(_ context.Context) []func() resource.Resource {
 }
 
 func fetchOAuthToken(httpClient *http.Client, tenantURL, clientID, clientSecret string) (string, error) {
-	tokenURL := strings.TrimSuffix(tenantURL, "/") + "/oauth2/token"
+	config := &clientcredentials.Config{
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
+		TokenURL:     strings.TrimSuffix(tenantURL, "/") + "/oauth2/token",
+		AuthStyle:    oauth2.AuthStyleInParams,
+	}
 
-	data := url.Values{}
-	data.Set("grant_type", "client_credentials")
-	data.Set("client_id", clientID)
-	data.Set("client_secret", clientSecret)
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, oauth2.HTTPClient, httpClient)
 
-	req, err := http.NewRequest("POST", tokenURL, strings.NewReader(data.Encode()))
+	token, err := config.Token(ctx)
 	if err != nil {
-		return "", fmt.Errorf("failed to create token request: %w", err)
-	}
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return "", fmt.Errorf("failed to send token request: %w", err)
-	}
-	defer func() {
-		if cerr := resp.Body.Close(); cerr != nil {
-			fmt.Fprintf(os.Stderr, "warning: failed to close response body: %v\n", cerr)
-		}
-	}()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", fmt.Errorf("failed to read token response: %w", err)
+		return "", fmt.Errorf("failed to retrieve token: %w", err)
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("token request failed with status %d: %s", resp.StatusCode, string(body))
+	if token.AccessToken == "" {
+		return "", fmt.Errorf("empty access token received")
 	}
 
-	var tokenResp struct {
-		AccessToken string `json:"access_token"`
-		TokenType   string `json:"token_type"` // usually "Bearer"
-	}
-	if err := json.Unmarshal(body, &tokenResp); err != nil {
-		return "", fmt.Errorf("failed to parse token response: %w", err)
-	}
-
-	if tokenResp.AccessToken == "" {
-		return "", fmt.Errorf("empty access token in response")
-	}
-
-	return tokenResp.AccessToken, nil
+	return token.AccessToken, nil
 }

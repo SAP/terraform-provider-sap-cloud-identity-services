@@ -185,13 +185,12 @@ data "sci_users" "test" {}
 }
 
 func TestFetchOAuthToken_Failure(t *testing.T) {
-
 	httpClient := &http.Client{
 		Transport: RoundTripperFunc(func(req *http.Request) (*http.Response, error) {
 			// Simulate a 401 Unauthorized response
 			return &http.Response{
 				StatusCode: http.StatusUnauthorized,
-				Body:       io.NopCloser(strings.NewReader(`{"error": "invalid_client"}`)),
+				Body:       io.NopCloser(strings.NewReader(`"invalid_client"`)),
 			}, nil
 		}),
 	}
@@ -202,34 +201,10 @@ func TestFetchOAuthToken_Failure(t *testing.T) {
 
 	token, err := fetchOAuthToken(httpClient, tenantURL, clientID, clientSecret)
 
-	// Assertion that the token is empty and an error is returned
 	assert.Empty(t, token, "Expected token to be empty for invalid credentials")
 	assert.Error(t, err, "Expected error for invalid credentials")
-	assert.Contains(t, err.Error(), "token request failed with status 401", "Expected 401 Unauthorized error")
-}
-
-func TestUnitSciProvider_withP12(t *testing.T) {
-	t.Parallel()
-
-	// Simulate invalid p12 content to trigger Decode error and cover that path
-	dummyBase64 := base64.StdEncoding.EncodeToString([]byte("not-a-valid-p12"))
-	dummyPassword := "dummy-password"
-
-	resource.Test(t, resource.TestCase{
-		IsUnitTest:               true,
-		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
-		Steps: []resource.TestStep{
-			{
-				Config: fmt.Sprintf(`
-provider "sci" {
-  tenant_url               = "https://mock.ondemand.com"
-  p12_certificate_content  = "%s"
-  p12_certificate_password = "%s"
-}
-`, dummyBase64, dummyPassword),
-			},
-		},
-	})
+	assert.Contains(t, err.Error(), "failed to retrieve token")
+	assert.Contains(t, err.Error(), "invalid_client")
 }
 
 func TestProvider_AuthenticationFailure(t *testing.T) {
@@ -238,23 +213,6 @@ func TestProvider_AuthenticationFailure(t *testing.T) {
 	  tenant_url = "https://iasprovidertestblr.accounts400.ondemand.com/"
 	  username   = "invalid-user"
 	  password   = "invalid-password"
-	}
-	`
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
-		Steps: []resource.TestStep{{
-			Config:             config,
-			ExpectNonEmptyPlan: false,
-		}},
-	})
-}
-
-func TestProvider_InvalidCertificateContent(t *testing.T) {
-	config := `
-	provider "sci" {
-	  tenant_url               = "https://iasprovidertestblr.accounts400.ondemand.com/"
-	  p12_certificate_content  = "not-a-valid-base64-string"
-	  p12_certificate_password = "test-password"
 	}
 	`
 	resource.Test(t, resource.TestCase{
@@ -299,56 +257,22 @@ func TestProvider_InvalidTenantURL(t *testing.T) {
 	})
 }
 
-func TestProvider_InvalidCertificateBase64(t *testing.T) {
-	config := `
-	provider "sci" {
-	  tenant_url               = "https://iasprovidertestblr.accounts400.ondemand.com/"
-	  p12_certificate_content  = "invalid-base64-@@@"
-	  p12_certificate_password = "any"
-	}
-	`
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
-		Steps: []resource.TestStep{{
-			Config:             config,
-			ExpectNonEmptyPlan: false,
-		}},
-	})
-}
-
-func TestProvider_InvalidCertificateFormat(t *testing.T) {
-	invalidP12Content := base64.StdEncoding.EncodeToString([]byte("not-a-valid-p12-content"))
-	config := fmt.Sprintf(`
-	provider "sci" {
-	  tenant_url               = "https://iasprovidertestblr.accounts400.ondemand.com/"
-	  p12_certificate_content  = "%s"
-	  p12_certificate_password = "wrong-password"
-	}
-	`, invalidP12Content)
-
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
-		Steps: []resource.TestStep{{
-			Config:             config,
-			ExpectNonEmptyPlan: false,
-		}},
-	})
-}
-
 func TestFetchOAuthToken_HTTPErrorStatus(t *testing.T) {
 	httpClient := &http.Client{
 		Transport: RoundTripperFunc(func(req *http.Request) (*http.Response, error) {
 			return &http.Response{
 				StatusCode: http.StatusUnauthorized,
-				Body:       io.NopCloser(strings.NewReader(`{"error": "unauthorized"}`)),
+				Body:       io.NopCloser(strings.NewReader(`"unauthorized"`)), // just a JSON string
 			}, nil
 		}),
 	}
 
 	token, err := fetchOAuthToken(httpClient, "https://example.com", "id", "secret")
+
 	assert.Error(t, err)
 	assert.Empty(t, token)
-	assert.Contains(t, err.Error(), "token request failed with status 401")
+	assert.Contains(t, err.Error(), `failed to retrieve token`)
+	assert.Contains(t, err.Error(), `unauthorized`) // response string is used as-is
 }
 
 func TestFetchOAuthToken_InvalidJSONResponse(t *testing.T) {
@@ -362,8 +286,9 @@ func TestFetchOAuthToken_InvalidJSONResponse(t *testing.T) {
 	}
 
 	token, err := fetchOAuthToken(httpClient, "https://example.com", "id", "secret")
+
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "failed to parse token response")
+	assert.Contains(t, err.Error(), "invalid character") // general check for JSON parse error
 	assert.Empty(t, token)
 }
 
@@ -378,8 +303,9 @@ func TestFetchOAuthToken_EmptyAccessToken(t *testing.T) {
 	}
 
 	token, err := fetchOAuthToken(httpClient, "https://example.com", "id", "secret")
+
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "empty access token")
+	assert.Contains(t, err.Error(), "server response missing access_token")
 	assert.Empty(t, token)
 }
 
@@ -389,14 +315,14 @@ func TestAccConfigure_Error_InvalidBase64Content(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: `
-				provider "sci" {
-				  tenant_url               = "https://example.com"
-				  p12_certificate_content  = "%%%invalid-base64%%%"
-				  p12_certificate_password = "dummy"
-				}
+provider "sci" {
+  tenant_url               = "https://example.com"
+  p12_certificate_content  = "%%%invalid-base64%%%"
+  p12_certificate_password = "dummy"
+}
 
-				data "sci_users" "test" {}
-				`,
+data "sci_users" "test" {}
+`,
 				ExpectError: regexp.MustCompile("Failed to decode base64 content"),
 			},
 		},
@@ -404,21 +330,21 @@ func TestAccConfigure_Error_InvalidBase64Content(t *testing.T) {
 }
 
 func TestAccConfigure_Error_InvalidP12Certificate(t *testing.T) {
-	badP12 := base64.StdEncoding.EncodeToString([]byte("not-a-valid-p12"))
+	invalidP12 := base64.StdEncoding.EncodeToString([]byte("not-a-valid-p12"))
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
 		Steps: []resource.TestStep{
 			{
 				Config: fmt.Sprintf(`
-				provider "sci" {
-				  tenant_url               = "https://example.com"
-				  p12_certificate_content  = "%s"
-				  p12_certificate_password = "wrong-password"
-				}
+provider "sci" {
+  tenant_url               = "https://example.com"
+  p12_certificate_content  = "%s"
+  p12_certificate_password = "wrong-password"
+}
 
-				data "sci_users" "test" {}
-				`, badP12),
+data "sci_users" "test" {}
+`, invalidP12),
 				ExpectError: regexp.MustCompile("Invalid .p12 certificate"),
 			},
 		},
