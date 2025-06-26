@@ -27,6 +27,27 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
+var (
+	basicAuthConflicts = []path.Expression{
+		path.MatchRoot("client_id"),
+		path.MatchRoot("client_secret"),
+		path.MatchRoot("p12_certificate_content"),
+		path.MatchRoot("p12_certificate_password"),
+	}
+	oauthConflicts = []path.Expression{
+		path.MatchRoot("username"),
+		path.MatchRoot("password"),
+		path.MatchRoot("p12_certificate_content"),
+		path.MatchRoot("p12_certificate_password"),
+	}
+	x509Conflicts = []path.Expression{
+		path.MatchRoot("username"),
+		path.MatchRoot("password"),
+		path.MatchRoot("client_id"),
+		path.MatchRoot("client_secret"),
+	}
+)
+
 func New() provider.Provider {
 	return NewWithClient(http.DefaultClient)
 }
@@ -69,15 +90,8 @@ func (p *SciProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *
 				Optional:            true,
 				MarkdownDescription: "Your user name for Basic Authentication.",
 				Validators: []validator.String{
-					stringvalidator.ConflictsWith(
-						path.MatchRoot("client_id"),
-						path.MatchRoot("client_secret"),
-						path.MatchRoot("p12_certificate_content"),
-						path.MatchRoot("p12_certificate_password"),
-					),
-					stringvalidator.AlsoRequires(
-						path.MatchRoot("password"),
-					),
+					stringvalidator.ConflictsWith(basicAuthConflicts...),
+					stringvalidator.AlsoRequires(path.MatchRoot("password")),
 				},
 			},
 			"password": schema.StringAttribute{
@@ -85,15 +99,8 @@ func (p *SciProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *
 				Sensitive:           true,
 				MarkdownDescription: "Your password for Basic Authentication.",
 				Validators: []validator.String{
-					stringvalidator.ConflictsWith(
-						path.MatchRoot("client_id"),
-						path.MatchRoot("client_secret"),
-						path.MatchRoot("p12_certificate_content"),
-						path.MatchRoot("p12_certificate_password"),
-					),
-					stringvalidator.AlsoRequires(
-						path.MatchRoot("username"),
-					),
+					stringvalidator.ConflictsWith(basicAuthConflicts...),
+					stringvalidator.AlsoRequires(path.MatchRoot("username")),
 				},
 			},
 
@@ -103,15 +110,8 @@ func (p *SciProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *
 				Sensitive:           true,
 				MarkdownDescription: "The client ID for OAuth2 authentication.",
 				Validators: []validator.String{
-					stringvalidator.ConflictsWith(
-						path.MatchRoot("username"),
-						path.MatchRoot("password"),
-						path.MatchRoot("p12_certificate_content"),
-						path.MatchRoot("p12_certificate_password"),
-					),
-					stringvalidator.AlsoRequires(
-						path.MatchRoot("client_secret"),
-					),
+					stringvalidator.ConflictsWith(oauthConflicts...),
+					stringvalidator.AlsoRequires(path.MatchRoot("client_secret")),
 				},
 			},
 			"client_secret": schema.StringAttribute{
@@ -119,15 +119,8 @@ func (p *SciProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *
 				Sensitive:           true,
 				MarkdownDescription: "The client secret for OAuth2 authentication.",
 				Validators: []validator.String{
-					stringvalidator.ConflictsWith(
-						path.MatchRoot("username"),
-						path.MatchRoot("password"),
-						path.MatchRoot("p12_certificate_content"),
-						path.MatchRoot("p12_certificate_password"),
-					),
-					stringvalidator.AlsoRequires(
-						path.MatchRoot("client_id"),
-					),
+					stringvalidator.ConflictsWith(oauthConflicts...),
+					stringvalidator.AlsoRequires(path.MatchRoot("client_id")),
 				},
 			},
 
@@ -137,15 +130,8 @@ func (p *SciProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *
 				Sensitive:           true,
 				MarkdownDescription: "Base64-encoded content of the `.p12` (PKCS#12) certificate bundle file used for x509 authentication. For example you can use `filebase64(\"certifiacte.p12\")` to load the file content, But any source that provides a valid .p12 certificate base64 string is accepted.",
 				Validators: []validator.String{
-					stringvalidator.ConflictsWith(
-						path.MatchRoot("username"),
-						path.MatchRoot("password"),
-						path.MatchRoot("client_id"),
-						path.MatchRoot("client_secret"),
-					),
-					stringvalidator.AlsoRequires(
-						path.MatchRoot("p12_certificate_password"),
-					),
+					stringvalidator.ConflictsWith(x509Conflicts...),
+					stringvalidator.AlsoRequires(path.MatchRoot("p12_certificate_password")),
 				},
 			},
 			"p12_certificate_password": schema.StringAttribute{
@@ -153,15 +139,8 @@ func (p *SciProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *
 				Sensitive:           true,
 				MarkdownDescription: "Password to decrypt the `.p12` certificate content.",
 				Validators: []validator.String{
-					stringvalidator.ConflictsWith(
-						path.MatchRoot("username"),
-						path.MatchRoot("password"),
-						path.MatchRoot("client_id"),
-						path.MatchRoot("client_secret"),
-					),
-					stringvalidator.AlsoRequires(
-						path.MatchRoot("p12_certificate_content"),
-					),
+					stringvalidator.ConflictsWith(x509Conflicts...),
+					stringvalidator.AlsoRequires(path.MatchRoot("p12_certificate_content")),
 				},
 			},
 		},
