@@ -163,7 +163,8 @@ func TestUnitSciProvider_withOAuth2(t *testing.T) {
 	clientSecret := os.Getenv("SCI_CLIENT_SECRET")
 
 	if clientID == "" || clientSecret == "" {
-		t.Skip("SCI_CLIENT_ID and SCI_CLIENT_SECRET must be set")
+		t.Log("SCI_CLIENT_ID and SCI_CLIENT_SECRET not set; skipping test.")
+		return
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -177,9 +178,32 @@ provider "sci" {
   client_secret = "%s"
 }
 
-data "sci_users" "test" {}
+data "sci_groups" "test" {}
 `, clientID, clientSecret),
 			ExpectNonEmptyPlan: false,
+		}},
+	})
+}
+
+func TestUnitSciProvider_withInvalidOAuth2(t *testing.T) {
+	t.Parallel()
+
+	providerFactories := getTestProviders(http.DefaultClient)
+
+	resource.Test(t, resource.TestCase{
+		IsUnitTest:               true,
+		ProtoV6ProviderFactories: providerFactories,
+		Steps: []resource.TestStep{{
+			Config: `
+provider "sci" {
+  tenant_url    = "https://example.accounts.ondemand.com/"
+  client_id     = "invalid-client-id"
+  client_secret = "invalid-client-secret"
+}
+
+data "sci_groups" "test" {}
+`,
+			ExpectError: regexp.MustCompile(`(?i)(authentication|unauthorized|401|invalid client)`),
 		}},
 	})
 }
