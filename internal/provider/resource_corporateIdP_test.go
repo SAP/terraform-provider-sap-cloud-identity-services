@@ -496,10 +496,11 @@ func ResourceCorporateIdPConfigTypeMismtach(resourceName string, idpName string,
 	return fmt.Sprintf(`
 	resource "sci_corporate_idp" "%s" {
 		display_name = "%s"
+		name = "%s"
 		type = "%s"
 		%s
 	}
-	`, resourceName, idpName, idpType, idpConfig)
+	`, resourceName, idpName, idpName, idpType, idpConfig)
 }
 
 func ResourceOidcCorporateIdP(resourceName string, idpDisplayName string, idpName string, idpType string, oidcConfig string) string {
