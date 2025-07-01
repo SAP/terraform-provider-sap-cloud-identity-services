@@ -26,13 +26,13 @@ import (
 )
 
 var (
-	idpTypeValues                  = []string{"sapSSO", "microsoftADFS", "saml2", "openIdConnect"}
-	loginHintTypeValues            = []string{"none", "userInput", "mail", "loginName"}
-	sendMethodValues               = []string{"urlParam", "authRequest"}
-	digestAlgorithmValues          = []string{"sha1", "sha256", "sha512"}
-	nameIdFormatValues             = []string{"default", "none", "unspecified", "email"}
-	allowCreateValues              = []string{"default", "none", "true", "false"}
-	endpointBindingValues          = []string{"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST", "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect", "urn:oasis:names:tc:SAML:2.0:bindings:SOAP", "urn:oasis:names:tc:SAML:2.0:bindings:URI"}
+	idpTypeValues         = []string{"sapSSO", "microsoftADFS", "saml2", "openIdConnect"}
+	loginHintTypeValues   = []string{"none", "userInput", "mail", "loginName"}
+	sendMethodValues      = []string{"urlParam", "authRequest"}
+	digestAlgorithmValues = []string{"sha1", "sha256", "sha512"}
+	nameIdFormatValues    = []string{"default", "none", "unspecified", "email"}
+	allowCreateValues     = []string{"default", "none", "true", "false"}
+	endpointBindingValues = []string{"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST", "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect", "urn:oasis:names:tc:SAML:2.0:bindings:SOAP", "urn:oasis:names:tc:SAML:2.0:bindings:URI"}
 )
 
 func newCorporateIdPResource() resource.Resource {
@@ -199,7 +199,7 @@ func (r *corporateIdPResource) Schema(_ context.Context, _ resource.SchemaReques
 					objectvalidator.All(
 						utils.ValidType(
 							path.MatchRoot("type"),
-							idpTypeValues[:3], 
+							idpTypeValues[:3],
 						),
 					),
 				},

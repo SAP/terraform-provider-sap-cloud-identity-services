@@ -100,7 +100,6 @@ func TestCorporateIdPs_Create(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-
 	t.Run("validate the API request - error", func(t *testing.T) {
 
 		resErr, _ := json.Marshal(struct {
