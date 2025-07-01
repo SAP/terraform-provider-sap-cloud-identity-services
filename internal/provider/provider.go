@@ -168,6 +168,8 @@ func (p *SciProvider) DataSources(_ context.Context) []func() datasource.DataSou
 		newSchemaDataSource,
 		newGroupsDataSource,
 		newGroupDataSource,
+		newCorporateIdPDataSource,
+		newCorporateIdPsDataSource,
 	}
 }
 

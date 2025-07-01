@@ -9,91 +9,90 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-type SchemaSetValidator struct {
-	DefaultSchemas types.Set
+type DefaultValuesValidator struct {
+	DefaultParamValues types.Set
 }
 
-func (s SchemaSetValidator) Description(_ context.Context) string {
-	return "Ensures the schema attribute contains all required default schemas."
+func (s DefaultValuesValidator) Description(_ context.Context) string {
+	return "Ensures the attribute contains all required default values."
 }
 
-func (s SchemaSetValidator) MarkdownDescription(_ context.Context) string {
-	return "Ensures the schema attribute contains all required default schemas."
+func (s DefaultValuesValidator) MarkdownDescription(_ context.Context) string {
+	return "Ensures the attribute contains all required default values."
 }
 
-func (s SchemaSetValidator) ValidateSet(ctx context.Context, req validator.SetRequest, resp *validator.SetResponse) {
+func (s DefaultValuesValidator) ValidateSet(ctx context.Context, req validator.SetRequest, resp *validator.SetResponse) {
 
-	// check for the missing schemas
-	missingSchemas, containsAllDefaultSchemas := s.CheckSchemas(ctx, req, resp)
+	// check for the missing values
+	missingValues, containsAllDefaultValues := s.CheckDefaultValues(ctx, req, resp)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	// add an error if not all deafault schemas are present
-	if !containsAllDefaultSchemas {
+	// add an error if not all deafault values are present
+	if !containsAllDefaultValues {
 		resp.Diagnostics.AddAttributeError(
 			req.Path,
-			"Missing schema values",
-			fmt.Sprintf("Please add the schemas :\n%v", missingSchemas),
+			"Missing values",
+			fmt.Sprintf("Please add the values :\n%v", missingValues),
 		)
 	}
 }
 
-// checks if all the default schemas are present in the schema attribute
-func (s SchemaSetValidator) CheckSchemas(ctx context.Context, req validator.SetRequest, resp *validator.SetResponse) ([]string, bool) {
+// checks if all the default values are present in the attribute
+func (s DefaultValuesValidator) CheckDefaultValues(ctx context.Context, req validator.SetRequest, resp *validator.SetResponse) ([]string, bool) {
 
-	// if attribute is not configured, the default schemas will be added by the setdefault
 	if req.ConfigValue.IsNull() {
 		return nil, true
 	}
 
-	// extract config schemas
-	var schemas []string
-	diags := req.ConfigValue.ElementsAs(ctx, &schemas, true)
+	// extract config values
+	var values []string
+	diags := req.ConfigValue.ElementsAs(ctx, &values, true)
 	if diags.HasError() {
 		resp.Diagnostics.Append(diags...)
 		return nil, false
 	}
 
-	// extract default schemas
-	var defaultSchemas []string
-	diags = s.DefaultSchemas.ElementsAs(ctx, &defaultSchemas, true)
+	// extract default values
+	var defaultValues []string
+	diags = s.DefaultParamValues.ElementsAs(ctx, &defaultValues, true)
 	if diags.HasError() {
 		resp.Diagnostics.Append(diags...)
 		return nil, false
 	}
 
-	// create a map of default schemas
-	schemasMap := make(map[string]bool)
-	for _, schema := range defaultSchemas {
-		schemasMap[schema] = false
+	// create a map of default values
+	valuesMap := make(map[string]bool)
+	for _, value := range defaultValues {
+		valuesMap[value] = false
 	}
 
-	// check if the config schemas are present in the default schemas
-	for _, schema := range schemas {
-		if _, ok := schemasMap[schema]; ok {
-			schemasMap[schema] = true
+	// check if the config values are present in the default values
+	for _, value := range values {
+		if _, ok := valuesMap[value]; ok {
+			valuesMap[value] = true
 		}
 	}
 
-	// check for missing schemas
-	var missingSchemas []string
-	for key, value := range schemasMap {
+	// check for missing values
+	var missingValues []string
+	for key, value := range valuesMap {
 		if !value {
-			missingSchemas = append(missingSchemas, key)
+			missingValues = append(missingValues, key)
 		}
 	}
 
-	// return missing schemas, if any
-	return missingSchemas, len(missingSchemas) == 0
+	// return missing values, if any
+	return missingValues, len(missingValues) == 0
 }
 
-func SchemaValidator(defaultSchemas []attr.Value) validator.Set {
-	// convert the default schemas to a set
-	defaultSchemasSet := types.SetValueMust(types.StringType, defaultSchemas)
+func DefaultValuesChecker(defaultParamValues []attr.Value) validator.Set {
+	// convert the default values to a set
+	defaultParamsSet := types.SetValueMust(types.StringType, defaultParamValues)
 
-	return SchemaSetValidator{
-		DefaultSchemas: defaultSchemasSet,
+	return DefaultValuesValidator{
+		DefaultParamValues: defaultParamsSet,
 	}
 }

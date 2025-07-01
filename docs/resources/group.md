@@ -61,7 +61,7 @@ Optional:
 
 Optional:
 
-- `type` (String) Type of the member added to the group. Acceptable values are : `User`, `Group`.
+- `type` (String) Type of the member added to the group. Acceptable values are : `User`, `Group`
 - `value` (String) SCIM ID of the user or the group
 
 ## Import

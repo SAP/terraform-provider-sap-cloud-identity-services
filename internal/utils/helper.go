@@ -15,7 +15,7 @@ func ValidValuesString(values []string) string {
 		valString += fmt.Sprintf("`%s`, ", val)
 	}
 
-	valString = valString[:len(valString)-2] + "." // remove the last comma and space and add a fullstop
+	valString = valString[:len(valString)-2] // remove the last comma and space
 	return valString
 }
 

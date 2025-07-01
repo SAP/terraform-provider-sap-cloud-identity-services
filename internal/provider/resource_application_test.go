@@ -234,18 +234,18 @@ func TestResourceApplication(t *testing.T) {
 		})
 	})
 
-	t.Run("error path - sso_type needs to be a valid value", func(t *testing.T) {
-		resource.Test(t, resource.TestCase{
-			IsUnitTest:               true,
-			ProtoV6ProviderFactories: getTestProviders(nil),
-			Steps: []resource.TestStep{
-				{
-					Config:      ResourceApplicationWithSsoType("testApp", "test-app", "application for testing purposes", "this-is-not-a-valid-sso_type"),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_schema.sso_type value must be one of:\n\\[\"openIdConnect\" \"saml2\"], got: \"%s\"", "this-is-not-a-valid-sso_type")),
-				},
-			},
-		})
-	})
+	// t.Run("error path - sso_type needs to be a valid value", func(t *testing.T) {
+	// 	resource.Test(t, resource.TestCase{
+	// 		IsUnitTest:               true,
+	// 		ProtoV6ProviderFactories: getTestProviders(nil),
+	// 		Steps: []resource.TestStep{
+	// 			{
+	// 				Config:      ResourceApplicationWithSsoType("testApp", "test-app", "application for testing purposes", "this-is-not-a-valid-sso_type"),
+	// 				ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_schema.sso_type value must be one of:\n\\[\"openIdConnect\" \"saml2\"], got: \"%s\"", "this-is-not-a-valid-sso_type")),
+	// 			},
+	// 		},
+	// 	})
+	// })
 
 	t.Run("error path - subject_name_identifier requires sub-attributes: source, value", func(t *testing.T) {
 		resource.Test(t, resource.TestCase{

@@ -1,0 +1,1395 @@
+---
+version: 2
+interactions:
+    - id: 0
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            Accept:
+                - '*/*'
+            Authorization:
+                - redacted
+            Content-Type:
+                - application/json
+            Dataserviceversion:
+                - "2.0"
+        url: https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: true
+        body: |-
+            {
+              "totalResults" : 6,
+              "itemsPerPage" : 6,
+              "identityProviders" : [ {
+                "id" : "259c0cc5-8a1e-4a9d-8046-5f6237fa5b0d",
+                "meta" : {
+                  "created" : "2025-06-27T16:18:37.541Z",
+                  "lastModified" : "2025-06-27T16:18:37.541Z",
+                  "createdBy" : "P000003",
+                  "location" : "https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/259c0cc5-8a1e-4a9d-8046-5f6237fa5b0d"
+                },
+                "name" : "test",
+                "displayName" : "test",
+                "companyId" : "global",
+                "type" : "openIdConnect",
+                "forwardAllSsoRequests" : false,
+                "identityFederation" : {
+                  "useLocalUserStore" : false,
+                  "allowLocalUsersOnly" : false,
+                  "applyLocalIdPAuthnChecks" : false
+                },
+                "automaticRedirect" : true,
+                "loginHintConfiguration" : {
+                  "loginHintType" : "userInput",
+                  "sendMethod" : "urlParam"
+                },
+                "saml2Configuration" : {
+                  "digestAlgorithm" : "sha256",
+                  "includeScoping" : true,
+                  "defaultNameIdFormat" : "default",
+                  "allowCreate" : "none"
+                },
+                "oidcConfiguration" : {
+                  "subjectNameIdentifier" : "none",
+                  "scopes" : [ "openid" ],
+                  "isClientSecretConfigured" : false,
+                  "pkceEnabled" : false
+                }
+              }, {
+                "id" : "7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1",
+                "meta" : {
+                  "created" : "2025-06-26T21:03:35.428Z",
+                  "lastModified" : "2025-06-26T21:09:34.189Z",
+                  "createdBy" : "P000003",
+                  "modifiedBy" : "P000003",
+                  "location" : "https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1"
+                },
+                "name" : "Oidc - Test",
+                "displayName" : "Terraform - OIDC",
+                "companyId" : "global",
+                "type" : "openIdConnect",
+                "logoutUrl" : "https://test.com",
+                "forwardAllSsoRequests" : true,
+                "identityFederation" : {
+                  "useLocalUserStore" : true,
+                  "allowLocalUsersOnly" : true,
+                  "applyLocalIdPAuthnChecks" : false,
+                  "requiredGroups" : [ "Test Group" ]
+                },
+                "automaticRedirect" : true,
+                "loginHintConfiguration" : {
+                  "loginHintType" : "mail",
+                  "sendMethod" : "urlParam"
+                },
+                "saml2Configuration" : {
+                  "digestAlgorithm" : "sha256",
+                  "includeScoping" : true,
+                  "defaultNameIdFormat" : "default",
+                  "allowCreate" : "none"
+                },
+                "oidcConfiguration" : {
+                  "subjectNameIdentifier" : "email",
+                  "discoveryUrl" : "https://token.actions.githubusercontent.com",
+                  "issuer" : "https://token.actions.githubusercontent.com",
+                  "jwksUri" : "https://token.actions.githubusercontent.com/.well-known/jwks",
+                  "jwkSetPlain" : "{\"keys\":[{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"kid\":\"cc413527-173f-5a05-976e-9c52b1d7b431\",\"alg\":\"RS256\",\"n\":\"w4M936N3ZxNaEblcUoBm-xu0-V9JxNx5S7TmF0M3SBK-2bmDyAeDdeIOTcIVZHG-ZX9N9W0u1yWafgWewHrsz66BkxXq3bscvQUTAw7W3s6TEeYY7o9shPkFfOiU3x_KYgOo06SpiFdymwJflRs9cnbaU88i5fZJmUepUHVllP2tpPWTi-7UA3AdP3cdcCs5bnFfTRKzH2W0xqKsY_jIG95aQJRBDpbiesefjuyxcQnOv88j9tCKWzHpJzRKYjAUM6OPgN4HYnaSWrPJj1v41eEkFM1kORuj-GSH2qMVD02VklcqaerhQHIqM-RjeHsN7G05YtwYzomE5G-fZuwgvQ\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"ykNaY4qM_ta4k2TgZOCEYLkcYlA\",\"kid\":\"38826b17-6a30-5f9b-b169-8beb8202f723\",\"x5c\":[\"MIIDKzCCAhOgAwIBAgIUDnwm6eRIqGFA3o/P1oBrChvx/nowDQYJKoZIhvcNAQELBQAwJTEjMCEGA1UEAwwaYWN0aW9ucy5zZWxmLXNpZ25lZC5naXRodWIwHhcNMjQwMTIzMTUyNTM2WhcNMzQwMTIwMTUyNTM2WjAlMSMwIQYDVQQDDBphY3Rpb25zLnNlbGYtc2lnbmVkLmdpdGh1YjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAOTGp5svs8LJN8BH7VzXShWXnOK0lhDVuI0xnr5bwHFPc924CwaIEFb6mC7bvW2lZtgd633uaJ2naG6vKaOVGpCdGLE4ohH11nUk+2CNknZL7/oTmDHGSmGeHRb7kjtb0Ng4BJMPzmTYmCNUudfDFhHDcZz1Obuu85GsABrC5ZlzWzspYFXwUSaxvII+rHK/rAbOC2gmt5IOSLmgh3taQfp0mB6Lxlf89HoBPNwtPfBX8DtXTWQVnqODm4W+WfmWBSyXGX54DGNMyZwlTZqR0FjoMXxopId3MIuDGKxa2weDU5cW60N2y/qxikeV99fL3sg5aPA8s9iljKG0+MAfVNUCAwEAAaNTMFEwHQYDVR0OBBYEFIPALo5VanJ6E1B9eLQgGO+uGV65MB8GA1UdIwQYMBaAFIPALo5VanJ6E1B9eLQgGO+uGV65MA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAGS0hZE+DqKIRi49Z2KDOMOaSZnAYgqq6ws9HJHT09MXWlMHB8E/apvy2ZuFrcSu14ZLweJid+PrrooXEXEO6azEakzCjeUb9G1QwlzP4CkTcMGCw1Snh3jWZIuKaw21f7mp2rQ+YNltgHVDKY2s8AD273E8musEsWxJl80/MNvMie8Hfh4n4/Xl2r6t1YPmUJMoXAXdTBb0hkPy1fUu3r2T+1oi7Rw6kuVDfAZjaHupNHzJeDOg2KxUoK/GF2/M2qpVrd19Pv/JXNkQXRE4DFbErMmA7tXpp1tkXJRPhFui/Pv5H9cPgObEf9x6W4KnCXzT3ReeeRDKF8SqGTPELsc=\"],\"alg\":\"RS256\",\"n\":\"5Manmy-zwsk3wEftXNdKFZec4rSWENW4jTGevlvAcU9z3bgLBogQVvqYLtu9baVm2B3rfe5onadobq8po5UakJ0YsTiiEfXWdST7YI2Sdkvv-hOYMcZKYZ4dFvuSO1vQ2DgEkw_OZNiYI1S518MWEcNxnPU5u67zkawAGsLlmXNbOylgVfBRJrG8gj6scr-sBs4LaCa3kg5IuaCHe1pB-nSYHovGV_z0egE83C098FfwO1dNZBWeo4Obhb5Z-ZYFLJcZfngMY0zJnCVNmpHQWOgxfGikh3cwi4MYrFrbB4NTlxbrQ3bL-rGKR5X318veyDlo8Dyz2KWMobT4wB9U1Q\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"Hyq4NATAjsnqC7mdrtAhhrCR2_Q\",\"kid\":\"1F2AB83404C08EC9EA0BB99DAED02186B091DBF4\",\"x5c\":[\"MIIDrDCCApSgAwIBAgIQAP4blP36Q3WmMOhWf0RBMzANBgkqhkiG9w0BAQsFADA2MTQwMgYDVQQDEyt2c3RzLXZzdHNnaHJ0LWdoLXZzby1vYXV0aC52aXN1YWxzdHVkaW8uY29tMB4XDTIzMTAyNDE0NTI1NVoXDTI1MTAyNDE1MDI1NVowNjE0MDIGA1UEAxMrdnN0cy12c3RzZ2hydC1naC12c28tb2F1dGgudmlzdWFsc3R1ZGlvLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALvM0mJ+SUfzucssEnjoZllnezjKC25YeIhk3iIUzlaJ/uXueESt9GEA3lAo6W/bt73R0zu10u4uhM5MC27FDoq9u7oaqBRhll0gGaz6HDqG0haCwuZdDb0ikalbaaAAzh3AIefby26/Hc98bRBBsf6pS083xX1ogiGFosteQtqKNXjT8c0Hzr3bu2Hrejn+JrrFdBLOf5jRE6XhzlRK4vD1n8c8OPOVByI97KHJeC5PyN4g8h34KU+PbSCWIRxOTSJizXcDIWtXAQiGyTMtXSQn3aCvNux4vaisgZn7TUD4XsxlUbDo7H9gX1Bsxj+aQhqxQYxDnC4Y/94/kyXm4L0CAwEAAaOBtTCBsjAOBgNVHQ8BAf8EBAMCBaAwCQYDVR0TBAIwADAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwNgYDVR0RBC8wLYIrdnN0cy12c3RzZ2hydC1naC12c28tb2F1dGgudmlzdWFsc3R1ZGlvLmNvbTAfBgNVHSMEGDAWgBSmWMP5CXuaSzoLKwcLXYZnoeCJmDAdBgNVHQ4EFgQUpljD+Ql7mks6CysHC12GZ6HgiZgwDQYJKoZIhvcNAQELBQADggEBAINwybFwYpXJkvauL5QbtrykIDYeP8oFdVIeVY8YI9MGfx7OwWDsNBVXv2B62zAZ49hK5G87++NmFI/FHnGOCISDYoJkRSCy2Nbeyr7Nx2VykWzUQqHLZfvr5KqW4Gj1OFHUqTl8lP3FWDd/P+lil3JobaSiICQshgF0GnX2a8ji8mfXpJSP20gzrLw84brmtmheAvJ9X/sLbM/RBkkT6g4NV2QbTMqo6k601qBNQBsH+lTDDWPCkRoAlW6a0z9bWIhGHWJ2lcR70zagcxIVl5/Fq35770/aMGroSrIx3JayOEqsvgIthYBKHzpT2VFwUz1VpBpNVJg9/u6jCwLY7QA=\"],\"alg\":\"RS256\",\"n\":\"u8zSYn5JR_O5yywSeOhmWWd7OMoLblh4iGTeIhTOVon-5e54RK30YQDeUCjpb9u3vdHTO7XS7i6EzkwLbsUOir27uhqoFGGWXSAZrPocOobSFoLC5l0NvSKRqVtpoADOHcAh59vLbr8dz3xtEEGx_qlLTzfFfWiCIYWiy15C2oo1eNPxzQfOvdu7Yet6Of4musV0Es5_mNETpeHOVEri8PWfxzw485UHIj3socl4Lk_I3iDyHfgpT49tIJYhHE5NImLNdwMha1cBCIbJMy1dJCfdoK827Hi9qKyBmftNQPhezGVRsOjsf2BfUGzGP5pCGrFBjEOcLhj_3j-TJebgvQ\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"AB3c0BSoSOiCRXez5POu2zvPX_0\",\"kid\":\"001DDCD014A848E8824577B3E4F3AEDB3BCF5FFD\",\"x5c\":[\"MIIDrDCCApSgAwIBAgIQKiyRrA01T5qtxdzvZ/ErzjANBgkqhkiG9w0BAQsFADA2MTQwMgYDVQQDEyt2c3RzLXZzdHNnaHJ0LWdoLXZzby1vYXV0aC52aXN1YWxzdHVkaW8uY29tMB4XDTIzMTAxODE1MDExOFoXDTI1MTAxODE1MTExOFowNjE0MDIGA1UEAxMrdnN0cy12c3RzZ2hydC1naC12c28tb2F1dGgudmlzdWFsc3R1ZGlvLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALCP6+IjsL0cZLEqL8mTfHWubvnYdO33XKoexY8iimQjla+3WvPfMZNExvXme5XwNQpgUx+LF+Xr4OGINsXRQ8WCuMZi2XMDMkGSA4mXHSLo57bWqqZazL/7/mMgGqRxZrnWwTvDVbjh94JhmidNhvLtVXX/Atz3TStd3IeMKTb8qMcKmiFhj0s7nQOphjxqL0S4buXRDjiUibbC8xMTbzZh54TyWZNOq+xXj5AVkkNQgh1wM6QfmlFhGQtRSjEoqtnb3zgsoibbRHco/Dv+cqm9MCwD2/vDXc5KaW0WpdlhqMKFPgHo6qFiJoXw85TgUErZ4bgJbiqQOrB9InypULECAwEAAaOBtTCBsjAOBgNVHQ8BAf8EBAMCBaAwCQYDVR0TBAIwADAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwNgYDVR0RBC8wLYIrdnN0cy12c3RzZ2hydC1naC12c28tb2F1dGgudmlzdWFsc3R1ZGlvLmNvbTAfBgNVHSMEGDAWgBQ45rBfvl4JJ7vg3WgLjQTfhDihvzAdBgNVHQ4EFgQUOOawX75eCSe74N1oC40E34Q4ob8wDQYJKoZIhvcNAQELBQADggEBABdN6HPheRdzwvJgi4xGHnf9pvlUC8981kAtgHnPT0VEYXh/dCMnKJSvCDJADpdmkuKxLxAfACeZR2CUHkQ0eO1ek/ihLvPqywDhLENq6Lvzu3qlhvUPBkGYjydpLtXQ1bBXUQ1FzT5/L1U19P2rJso9mC4ltu2OHJ9NLCKG0zffBItAJqhAiXtKbCUg4c9RbQxi9T2/xr9R72di4Qygfnmr3QleAqmjRG918cm5/uJ0s5EaK3QI7GQy7+tc44o3H3AI5eFtrHwIV0zoY4A9YIsaRmMHq9soHFBEO1HDKKRUOl/4tjpx8zHpp5Clz0wiZMgvSIdBa3/fTeUJ3flUYMo=\"],\"alg\":\"RS256\",\"n\":\"sI_r4iOwvRxksSovyZN8da5u-dh07fdcqh7FjyKKZCOVr7da898xk0TG9eZ7lfA1CmBTH4sX5evg4Yg2xdFDxYK4xmLZcwMyQZIDiZcdIujnttaqplrMv_v-YyAapHFmudbBO8NVuOH3gmGaJ02G8u1Vdf8C3PdNK13ch4wpNvyoxwqaIWGPSzudA6mGPGovRLhu5dEOOJSJtsLzExNvNmHnhPJZk06r7FePkBWSQ1CCHXAzpB-aUWEZC1FKMSiq2dvfOCyiJttEdyj8O_5yqb0wLAPb-8NdzkppbRal2WGowoU-AejqoWImhfDzlOBQStnhuAluKpA6sH0ifKlQsQ\"}]}",
+                  "scopes" : [ "openid" ],
+                  "clientId" : "Oidc - Test",
+                  "isClientSecretConfigured" : false,
+                  "pkceEnabled" : false
+                }
+              }, {
+                "id" : "9e35a298-36c1-4d21-967d-c8525ebfa84e",
+                "meta" : {
+                  "created" : "2025-06-08T04:02:37.939Z",
+                  "lastModified" : "2025-06-08T04:02:37.939Z",
+                  "createdBy" : "P000003",
+                  "location" : "https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/9e35a298-36c1-4d21-967d-c8525ebfa84e"
+                },
+                "displayName" : "test",
+                "companyId" : "company id",
+                "type" : "saml2",
+                "forwardAllSsoRequests" : false,
+                "identityFederation" : {
+                  "useLocalUserStore" : false,
+                  "allowLocalUsersOnly" : false,
+                  "applyLocalIdPAuthnChecks" : false
+                },
+                "automaticRedirect" : true,
+                "loginHintConfiguration" : {
+                  "loginHintType" : "userInput",
+                  "sendMethod" : "urlParam"
+                },
+                "saml2Configuration" : {
+                  "digestAlgorithm" : "sha256",
+                  "includeScoping" : true,
+                  "defaultNameIdFormat" : "default",
+                  "allowCreate" : "none"
+                },
+                "oidcConfiguration" : {
+                  "subjectNameIdentifier" : "none",
+                  "scopes" : [ "openid" ],
+                  "isClientSecretConfigured" : false,
+                  "pkceEnabled" : false
+                }
+              }, {
+                "id" : "b89c4228-8cfb-4d7b-94d7-1c300898d722",
+                "meta" : {
+                  "created" : "2025-05-22T07:35:15.206Z",
+                  "lastModified" : "2025-05-23T09:11:48.097Z",
+                  "createdBy" : "P000003",
+                  "modifiedBy" : "P000003",
+                  "location" : "https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/b89c4228-8cfb-4d7b-94d7-1c300898d722"
+                },
+                "name" : "Federation with entra ID",
+                "displayName" : "Federation with Entra ID",
+                "companyId" : "global",
+                "type" : "openIdConnect",
+                "forwardAllSsoRequests" : false,
+                "identityFederation" : {
+                  "useLocalUserStore" : true,
+                  "allowLocalUsersOnly" : true,
+                  "applyLocalIdPAuthnChecks" : false
+                },
+                "automaticRedirect" : true,
+                "loginHintConfiguration" : {
+                  "loginHintType" : "userInput",
+                  "sendMethod" : "urlParam"
+                },
+                "saml2Configuration" : {
+                  "digestAlgorithm" : "sha256",
+                  "includeScoping" : true,
+                  "defaultNameIdFormat" : "default",
+                  "allowCreate" : "none"
+                },
+                "oidcConfiguration" : {
+                  "subjectNameIdentifier" : "email",
+                  "discoveryUrl" : "https://login.microsoftonline.com/bda9fde1-6400-4097-a39e-cc0e0cc36b34/v2.0/.well-known/openid-configuration",
+                  "issuer" : "https://login.microsoftonline.com/bda9fde1-6400-4097-a39e-cc0e0cc36b34/v2.0",
+                  "tokenEndpoint" : "https://login.microsoftonline.com/bda9fde1-6400-4097-a39e-cc0e0cc36b34/oauth2/v2.0/token",
+                  "authorizationEndpoint" : "https://login.microsoftonline.com/bda9fde1-6400-4097-a39e-cc0e0cc36b34/oauth2/v2.0/authorize",
+                  "endSessionEndpoint" : "https://login.microsoftonline.com/bda9fde1-6400-4097-a39e-cc0e0cc36b34/oauth2/v2.0/logout",
+                  "userInfoEndpoint" : "https://graph.microsoft.com/oidc/userinfo",
+                  "jwksUri" : "https://login.microsoftonline.com/bda9fde1-6400-4097-a39e-cc0e0cc36b34/discovery/v2.0/keys",
+                  "jwkSetPlain" : "{\"keys\":[{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"JYhSOsHhDZrc5kfqQg8ujkHMTNY\",\"kid\":\"JYhSOsHhDZrc5kfqQg8ujkHMTNY\",\"x5c\":[\"MIIC/TCCAeWgAwIBAgIIY81p6sALmU8wDQYJKoZIhvcNAQELBQAwLTErMCkGA1UEAxMiYWNjb3VudHMuYWNjZXNzY29udHJvbC53aW5kb3dzLm5ldDAeFw0yNTAyMjQwOTMyNTdaFw0zMDAyMjQwOTMyNTdaMC0xKzApBgNVBAMTImFjY291bnRzLmFjY2Vzc2NvbnRyb2wud2luZG93cy5uZXQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDHExFy6zLBEh390lH951z6p78ze+Fc40LPtAOGNV+iodZu32VAJcJUiwij1UkjWcZPUXo2RcQgG3jrbHanXDZyB/gAXzp0aFtOlH6TzVYtHmA2OSGk+oHU8KK2JyFUgpscC87JgQBomcTIKImoiVT9mDkvkXNGq/83/f5+Fi9YrSlzebU6HJ3aQ1GDU1tynmiC3uYGN5zswSt+L43Sjni9d+wrqEzabuHSxnBV3gLGA+qekG2baG0z3FoqmfCRigQve9rds8jVUYan1AtnAxXpEAc7L85GnPjFqsb7PuVlQIs7RfVKjTmufvDl50GZ9uVRCU8vcGWNtRUHdpt31I1fAgMBAAGjITAfMB0GA1UdDgQWBBQc8G/33OWrtOT/XnksiamjCcQKcDANBgkqhkiG9w0BAQsFAAOCAQEAt5GZmtTxoJ4fQMS787qU8PHcw2ihIzx1gzP0JNYTG+7qdP/oZsYISZ4EyTnZ8gkJfgZIYHoGe/5BcZ4N56LtUl3HIw/b4WYPjbFNHaAiNmQDqPp1/HtIhv7FZNKXu6az0fBfSc5RetWGnZ7Ex3mmhjJisAt+Ml+fRYLfjvQghtiNTsdOCQRWQpaCVJC7lV9x5gfSWm6qIAquGJE3xqVWnUlCjFJk67UbqmqNltJ5dDNEk6N2BSM2WlA9lf9FIhdBWBCn2zplQHcA0EU+0p3iwLH/AjwjJnW41NcJO51bN5Jye6dhSaS9yQm9iKTK8H6DOpkzj3oR4Sf9Ki31+kxiTQ==\"],\"n\":\"xxMRcusywRId_dJR_edc-qe_M3vhXONCz7QDhjVfoqHWbt9lQCXCVIsIo9VJI1nGT1F6NkXEIBt462x2p1w2cgf4AF86dGhbTpR-k81WLR5gNjkhpPqB1PCitichVIKbHAvOyYEAaJnEyCiJqIlU_Zg5L5FzRqv_N_3-fhYvWK0pc3m1Ohyd2kNRg1Nbcp5ogt7mBjec7MErfi-N0o54vXfsK6hM2m7h0sZwVd4CxgPqnpBtm2htM9xaKpnwkYoEL3va3bPI1VGGp9QLZwMV6RAHOy_ORpz4xarG-z7lZUCLO0X1So05rn7w5edBmfblUQlPL3BljbUVB3abd9SNXw\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"CNv0OI3RwqlHFEVnaoMAshCH2XE\",\"kid\":\"CNv0OI3RwqlHFEVnaoMAshCH2XE\",\"x5c\":[\"MIIC/TCCAeWgAwIBAgIICu+WfBLOqBAwDQYJKoZIhvcNAQELBQAwLTErMCkGA1UEAxMiYWNjb3VudHMuYWNjZXNzY29udHJvbC53aW5kb3dzLm5ldDAeFw0yNTAzMTYyMDE3MjNaFw0zMDAzMTYyMDE3MjNaMC0xKzApBgNVBAMTImFjY291bnRzLmFjY2Vzc2NvbnRyb2wud2luZG93cy5uZXQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCHPp9RIJIC6LJDPovWdCPjNryQi168nPGFVt5wyKBMiX2ldlIdlreDMyC1qmdvWr3oIbmq9Hvx0fpm9MovwzM3hV8aBmG8sS/kskp6jS0aAEhLrnDEiIliP0TEQOoWTD1F2FbWc3wg3147vo9sL590Q+0N6QDYFohNjYMBEhIo3gp7REsERY2sp4SOM7OvKBLZ7dD01XMTnVkYZAAYdq7tq0fLwz+oDWed3Z0xSBQycRggzMMFNIrPXsbqK0k51qca8bfBe92md0p9+cOmlo+TJZufJt0wjgg/urpawKqe3ca2D5toboYOplBAQGn0L2AsAW/g5FNGWkPfDSAIyHvHAgMBAAGjITAfMB0GA1UdDgQWBBSsQvFDUwCTJXK+ltZFLaHUGzIS6jANBgkqhkiG9w0BAQsFAAOCAQEAUsfNQA+O7eXGI4IL/FmafEmmFjoXC+Ym9UIzG/vXcXzQEK9S9nV35Q0Fn9PsL1w8Sud3itm/V6t9UtB9yaRvWREPOdEYsHEkZahoSFi2fgOLP+AsTtQq0ePeBbqAQvnfrTvFuv+j1we3uxxov77pt7U+pB+6Sq8+yww85qeTCWmV4av2WWXB+6pW9oUd/D9htlxKL5WzNsaVojP56eg3mwhBmOpqxkYnL7RAPGOYRjaeHic9ONrctC8HImjf21UC5wK8G/lcVQATcvPZm/AYJg10fNsxZ/8ApFLblf9Q8l0QcKZfjs/si3VKcWvilDrfO9Dg83Ou6tvsLnPU5lV3aA==\"],\"n\":\"hz6fUSCSAuiyQz6L1nQj4za8kItevJzxhVbecMigTIl9pXZSHZa3gzMgtapnb1q96CG5qvR78dH6ZvTKL8MzN4VfGgZhvLEv5LJKeo0tGgBIS65wxIiJYj9ExEDqFkw9RdhW1nN8IN9eO76PbC-fdEPtDekA2BaITY2DARISKN4Ke0RLBEWNrKeEjjOzrygS2e3Q9NVzE51ZGGQAGHau7atHy8M_qA1nnd2dMUgUMnEYIMzDBTSKz17G6itJOdanGvG3wXvdpndKffnDppaPkyWbnybdMI4IP7q6WsCqnt3Gtg-baG6GDqZQQEBp9C9gLAFv4ORTRlpD3w0gCMh7xw\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"PoVKeirIOvmTyLQ9G9BenBwos7k\",\"kid\":\"PoVKeirIOvmTyLQ9G9BenBwos7k\",\"x5c\":[\"MIIC/jCCAeagAwIBAgIJAM52mWWK+FEeMA0GCSqGSIb3DQEBCwUAMC0xKzApBgNVBAMTImFjY291bnRzLmFjY2Vzc2NvbnRyb2wud2luZG93cy5uZXQwHhcNMjUwMzIwMDAwNTAyWhcNMzAwMzIwMDAwNTAyWjAtMSswKQYDVQQDEyJhY2NvdW50cy5hY2Nlc3Njb250cm9sLndpbmRvd3MubmV0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAruYyUq1ElSb8QCCt0XWWRSFpUq0JkyfEvvlCa4fPDi0GZbSGgJg3qYa0co2RsBIYHczXkc71kHVpktySAgYK1KMK264e+s7Vymeq+ypHEDpRsaWric/kKEIvKZzRsyUBUWf0CUhtuUvAbDTuaFnQ4g5lfoa7u3vtsv1za5Gmn6DUPirrL/+xqijP9IsHGUKaTmB4M/qnAu6vUHCpXZnN0YTJDoK7XrVJFaKj8RrTdJB89GFJeTFHA2OX472ToyLdCDn5UatYwmht62nXGlH7/G1kW1YMpeSSwzpnMEzUUk7A8UXrvFTHXEpfXhsv0LA59dm9Hi1mIXaOe1w+icA/rQIDAQABoyEwHzAdBgNVHQ4EFgQUcZ2MLLOas+d9WbkFSnPdxag09YIwDQYJKoZIhvcNAQELBQADggEBABPXBmwv703IlW8Zc9Kj7W215+vyM5lrJjUubnl+s8vQVXvyN7bh5xP2hzEKWb+u5g/brSIKX/A7qP3m/z6C8R9GvP5WRtF2w1CAxYZ9TWTzTS1La78edME546QejjveC1gX9qcLbEwuLAbYpau2r3vlIqgyXo+8WLXA0neGIRa2JWTNy8FJo0wnUttGJz9LQE4L37nR3HWIxflmOVgbaeyeaj2VbzUE7MIHIkK1bqye2OiKU82w1QWLV/YCny0xdLipE1g2uNL8QVob8fTU2zowd2j54c1YTBDy/hTsxpXfCFutKwtELqWzYxKTqYfrRCc1h0V4DGLKzIjtggTC+CY=\"],\"n\":\"ruYyUq1ElSb8QCCt0XWWRSFpUq0JkyfEvvlCa4fPDi0GZbSGgJg3qYa0co2RsBIYHczXkc71kHVpktySAgYK1KMK264e-s7Vymeq-ypHEDpRsaWric_kKEIvKZzRsyUBUWf0CUhtuUvAbDTuaFnQ4g5lfoa7u3vtsv1za5Gmn6DUPirrL_-xqijP9IsHGUKaTmB4M_qnAu6vUHCpXZnN0YTJDoK7XrVJFaKj8RrTdJB89GFJeTFHA2OX472ToyLdCDn5UatYwmht62nXGlH7_G1kW1YMpeSSwzpnMEzUUk7A8UXrvFTHXEpfXhsv0LA59dm9Hi1mIXaOe1w-icA_rQ\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"_jNwjeSnvTTK8XEdr5QUPkBRLLo\",\"kid\":\"_jNwjeSnvTTK8XEdr5QUPkBRLLo\",\"x5c\":[\"MIIC/jCCAeagAwIBAgIJAJD6gin3pOAKMA0GCSqGSIb3DQEBCwUAMC0xKzApBgNVBAMTImFjY291bnRzLmFjY2Vzc2NvbnRyb2wud2luZG93cy5uZXQwHhcNMjUwNDA5MDgwMzQwWhcNMzAwNDA5MDgwMzQwWjAtMSswKQYDVQQDEyJhY2NvdW50cy5hY2Nlc3Njb250cm9sLndpbmRvd3MubmV0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJt2QCzZVnqP35tVsxvqIPFyYh0Muz5H2JtVkKinANHtG7TCX0Plxj+mZ1OtRQWX8a7d/2legFkf+0UJDs9LxWxHj8zV9WdNO1KYucXqiyPSo6Z7Gaww6zkLHaHHqhEWVi4yXHw1pbxdDPCBQ6FLtspLtEbFkagCY5vON5cw0GUjfMPcRfyVylq8lxy3JhLQa2CuDstDYQ491oTAUP5Xn3lAIyp1SbJ038E0gfxx5EpTxw1Ef14SlRqfg6Izy82BUz8aJtv097IVxM5fjfMH1de7dGXAyaCagTMMCySUk7vLdY0jOOhQNQ69IQbCllR1NMCk/bliXYUjDg5k1FeoYQIDAQABoyEwHzAdBgNVHQ4EFgQU7Iuc3W2qX7BqcsnyHsXO0TwI1ZMwDQYJKoZIhvcNAQELBQADggEBAJPUFzBQ+khAL6K7d0ctRBkPfvT84bILRW6xcw8GCAdyEmqm+jG0N+VWp7NM70nMuM5jrGarFuUJwEewQHLXu0gHDcZ+28i5bMgHQSlwiVyNTzesy3cJu76BgYWTLfXTI/9/aZMBfdJhtHDorj4hxTrROcwdlFQpK0Ld6ZUhgIGMY7nBsQ+n0SoI2AYtJt+MpwcsHbzklHQJAucOwEOqIaaJagSYbOVGq5M+d8bdaQsuvepzj8V0H9QTLcnJnIhCeq7RZ205hZcsPu1ATSN4qGYYLoCiAVnEMiPzKXLF0ZqkJDOBPQjXsmJ2Dhnvt8RvkjLy0GEiayzbHGSkII+GIHo=\"],\"n\":\"tJt2QCzZVnqP35tVsxvqIPFyYh0Muz5H2JtVkKinANHtG7TCX0Plxj-mZ1OtRQWX8a7d_2legFkf-0UJDs9LxWxHj8zV9WdNO1KYucXqiyPSo6Z7Gaww6zkLHaHHqhEWVi4yXHw1pbxdDPCBQ6FLtspLtEbFkagCY5vON5cw0GUjfMPcRfyVylq8lxy3JhLQa2CuDstDYQ491oTAUP5Xn3lAIyp1SbJ038E0gfxx5EpTxw1Ef14SlRqfg6Izy82BUz8aJtv097IVxM5fjfMH1de7dGXAyaCagTMMCySUk7vLdY0jOOhQNQ69IQbCllR1NMCk_bliXYUjDg5k1FeoYQ\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"-cgAvjmmQ24Ks20zIpDB4SW894w\",\"kid\":\"-cgAvjmmQ24Ks20zIpDB4SW894w\",\"x5c\":[\"MIIC6TCCAdGgAwIBAgIIU6yE1PeZiB0wDQYJKoZIhvcNAQELBQAwIzEhMB8GA1UEAxMYbG9naW4ubWljcm9zb2Z0b25saW5lLnVzMB4XDTI1MDMwNjE3MDIxMFoXDTMwMDMwNjE3MDIxMFowIzEhMB8GA1UEAxMYbG9naW4ubWljcm9zb2Z0b25saW5lLnVzMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAotM7AZjL81wdSVdrkQtt6shrQiAT8OZJeIKTeRJgrDYXKzaVXs0WFXVCjCv9GuCktF+tereotfZlcskamfuupe574o76CJy6AUtuY7wt0OKqxoSJMRuUJvA/NNkT50C/dTDHTtF7kiGBwWvHEkHeZAgT52E8bfNJswV28GsPscM9vG2ylUPyiaEIsGi0cg/JllbnfBjGhfA/lzmrB9Iw75E3f1Hnk2uAs1KcHJGSH3EwHJ5tUeo9WtLGjRAfH1kGtPjkktNaw3V8EukEzgIfILV8udpWYE79A/p5jFUnTNkQxsviNxG537JMooa1ZoYveDv/f6LCj1o7MNZQVlD3twIDAQABoyEwHzAdBgNVHQ4EFgQU3EskzzkGT8sZ1hAEn+cJIrUfDkswDQYJKoZIhvcNAQELBQADggEBAB3T/AA53U6c0mmdckiw/Evh27tluqKDwzF1l95zJTmmNzj8ND5KsS6J+g7Xzg8H8sccxhvrUPuJLzSJKGS4vygDAJHJvuXSwUWSf/n6O6u3pinIu/uqm8sQRo/yDrsI7LjvSeIVFbpNBOW/hoYH3GbRVCXqFX9Sztj8my60cSzV9JcNbIDse+GEfbFf5L2kfa1XydThFOvc/lXDFPPorNF4u8djP8u5BojO6QdylRHPWIoG1Q8l4yqLPf+sgBkzQ4pyOpgdAvefunCHeAwYyIZj0SOZgarNeplcicAYDFUZgPu1WbiIK2cREcY5XUnyMYtyq28AJrdMEKkCtXWI8jQ=\"],\"n\":\"otM7AZjL81wdSVdrkQtt6shrQiAT8OZJeIKTeRJgrDYXKzaVXs0WFXVCjCv9GuCktF-tereotfZlcskamfuupe574o76CJy6AUtuY7wt0OKqxoSJMRuUJvA_NNkT50C_dTDHTtF7kiGBwWvHEkHeZAgT52E8bfNJswV28GsPscM9vG2ylUPyiaEIsGi0cg_JllbnfBjGhfA_lzmrB9Iw75E3f1Hnk2uAs1KcHJGSH3EwHJ5tUeo9WtLGjRAfH1kGtPjkktNaw3V8EukEzgIfILV8udpWYE79A_p5jFUnTNkQxsviNxG537JMooa1ZoYveDv_f6LCj1o7MNZQVlD3tw\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"Km8oaDUbb_pVUGsT38eHX87v078\",\"kid\":\"Km8oaDUbb_pVUGsT38eHX87v078\",\"x5c\":[\"MIIC6TCCAdGgAwIBAgIIP8cyEA0NDykwDQYJKoZIhvcNAQELBQAwIzEhMB8GA1UEAxMYbG9naW4ubWljcm9zb2Z0b25saW5lLnVzMB4XDTI1MDMyMzE2MDEzN1oXDTMwMDMyMzE2MDEzN1owIzEhMB8GA1UEAxMYbG9naW4ubWljcm9zb2Z0b25saW5lLnVzMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAikFbcYO8PviJWVrHaVEp3eDnVEvFJRl7a32NQldBBGUWtkiLuMFKJMYvVik36AtJQ1/TDwfP46VHBDv8dMus8dxFWTAK25spIrW7avPa/Ok77aqFoeLi0f1iKRGkKDzqPpl7J9xvwQyLnzxBFWIYq2THkO0EO3vH+8tGO9kr6vF8l6j20cBuJ7dcOUz3W+dwEAQ+GxoLqPs9jxUNHJ84fnz64XEZWo1L4ZRBVh2IqjYUKdfurBhffqYZM8U4GBq0wc3KJY6+RA7Q9dMA2m2GPe1j33GoFVqFpQy8IhOz/CSPiVNt2olEM4ANwOBsndn9ldsRNsIp6BobOawcMT9vtwIDAQABoyEwHzAdBgNVHQ4EFgQUumi3x/LmmEju66W1mDxz934H6TwwDQYJKoZIhvcNAQELBQADggEBAHrVrhnTWoEDYiPeakkmVRP9fb13cPHDdj4fIbkIP8aOgZgF2mGjWc/AH/7vSeJ8dNxbzArfaLwcvYqa3QGbuhzEC/z3TV0j2OkOh49N8GydbcVEpcMgGj2QnJEyQEvcZgZp2ugdJYWkQ5GlkjOPxEvVaiaFvg47BAa9Cz1wxVYaXwGVr2qN4dmTOxxcgzpeG8UtZGQpTjh+Cl5Anu3ca8OfZxYq/KS/Suh1gDrtPi0lyEuIeZTm9lX9JBBA77zXIFHAZVqYKAKgs/9eDCTtjajjdZP+ws+gzdnFZDaMV63L+XrbXGV9hXU8Sjx7MPzbG3pX2ssCMlsDb8a3/8QqjIg=\"],\"n\":\"ikFbcYO8PviJWVrHaVEp3eDnVEvFJRl7a32NQldBBGUWtkiLuMFKJMYvVik36AtJQ1_TDwfP46VHBDv8dMus8dxFWTAK25spIrW7avPa_Ok77aqFoeLi0f1iKRGkKDzqPpl7J9xvwQyLnzxBFWIYq2THkO0EO3vH-8tGO9kr6vF8l6j20cBuJ7dcOUz3W-dwEAQ-GxoLqPs9jxUNHJ84fnz64XEZWo1L4ZRBVh2IqjYUKdfurBhffqYZM8U4GBq0wc3KJY6-RA7Q9dMA2m2GPe1j33GoFVqFpQy8IhOz_CSPiVNt2olEM4ANwOBsndn9ldsRNsIp6BobOawcMT9vtw\"}]}",
+                  "tokenEndpointAuthMethod" : "privateKeyJwtRfc7523",
+                  "scopes" : [ "openid", "email", "profile", "offline_access" ],
+                  "clientId" : "ed865090-235d-4df0-b5f4-a0e99ebb18f3",
+                  "isClientSecretConfigured" : false,
+                  "pkceEnabled" : false,
+                  "additionalConfig" : {
+                    "enforceNonce" : false,
+                    "enforceIssuerCheck" : false,
+                    "omitIDTokenHintForLogout" : false
+                  }
+                }
+              }, {
+                "id" : "c93f6b04-7a0f-42c1-b3c5-3b30d0ad8910",
+                "meta" : {
+                  "created" : "2025-06-26T20:17:27.355Z",
+                  "lastModified" : "2025-06-26T20:20:15.419Z",
+                  "createdBy" : "P000003",
+                  "modifiedBy" : "P000003",
+                  "location" : "https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/c93f6b04-7a0f-42c1-b3c5-3b30d0ad8910"
+                },
+                "name" : "Saml2 - Test",
+                "displayName" : "Terraform - SAML2",
+                "companyId" : "global",
+                "type" : "saml2",
+                "logoutUrl" : "https://test.com",
+                "forwardAllSsoRequests" : true,
+                "identityFederation" : {
+                  "useLocalUserStore" : true,
+                  "allowLocalUsersOnly" : true,
+                  "applyLocalIdPAuthnChecks" : false,
+                  "requiredGroups" : [ "Test Group" ]
+                },
+                "automaticRedirect" : true,
+                "loginHintConfiguration" : {
+                  "loginHintType" : "userInput",
+                  "sendMethod" : "authRequest"
+                },
+                "saml2Configuration" : {
+                  "digestAlgorithm" : "sha256",
+                  "includeScoping" : true,
+                  "defaultNameIdFormat" : "default",
+                  "allowCreate" : "none",
+                  "assertionAttributes" : [ {
+                    "name" : "test_attr",
+                    "value" : "test_value"
+                  } ],
+                  "ssoEndpoints" : [ {
+                    "bindingName" : "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+                    "location" : "https://test.com",
+                    "isDefault" : true
+                  } ],
+                  "sloEndpoints" : [ {
+                    "bindingName" : "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+                    "location" : "https://test.com",
+                    "isDefault" : true
+                  } ],
+                  "certificatesForSigning" : [ {
+                    "dn" : "CN=test (P000003),L=iasprovidertestblr.accounts400.ondemand.com,OU=8e1affb2-62a1-43cc-a687-2ba75e4b3d84,OU=Canary,OU=SAP Cloud Platform Clients,O=SAP SE,C=DE",
+                    "base64Certificate" : "redacted",
+                    "validFrom" : "2025-06-10T06:53:33Z",
+                    "validTo" : "2026-06-10T07:53:33Z",
+                    "isDefault" : true
+                  } ]
+                },
+                "oidcConfiguration" : {
+                  "subjectNameIdentifier" : "none",
+                  "isClientSecretConfigured" : false,
+                  "pkceEnabled" : false
+                }
+              }, {
+                "id" : "d102d994-68db-47df-ab2d-7efaeef6dae5",
+                "meta" : {
+                  "created" : "2025-06-08T04:03:11.441Z",
+                  "lastModified" : "2025-06-08T04:03:11.441Z",
+                  "createdBy" : "P000003",
+                  "location" : "https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/d102d994-68db-47df-ab2d-7efaeef6dae5"
+                },
+                "displayName" : "test",
+                "companyId" : "company id",
+                "type" : "saml2",
+                "forwardAllSsoRequests" : false,
+                "identityFederation" : {
+                  "useLocalUserStore" : false,
+                  "allowLocalUsersOnly" : false,
+                  "applyLocalIdPAuthnChecks" : false
+                },
+                "automaticRedirect" : true,
+                "loginHintConfiguration" : {
+                  "loginHintType" : "userInput",
+                  "sendMethod" : "urlParam"
+                },
+                "saml2Configuration" : {
+                  "digestAlgorithm" : "sha256",
+                  "includeScoping" : true,
+                  "defaultNameIdFormat" : "default",
+                  "allowCreate" : "none"
+                },
+                "oidcConfiguration" : {
+                  "subjectNameIdentifier" : "none",
+                  "scopes" : [ "openid" ],
+                  "isClientSecretConfigured" : false,
+                  "pkceEnabled" : false
+                }
+              } ]
+            }
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
+            Content-Type:
+                - application/json;charset=UTF-8
+            Critical-Origin-Trial:
+                - Tpcd
+            Date:
+                - Sun, 29 Jun 2025 18:40:01 GMT
+            Expires:
+                - "0"
+            Origin-Trial:
+                - Avu6rn7emV5gK8gvyGHlX8TMqM9uo1FacP2j/RWTq+8j+yKnqcTO0TQh0bXJ/7QntxD4/JzXv8aXoqxxZQuqXgYAAABdeyJvcmlnaW4iOiJodHRwczovL29uZGVtYW5kLmNvbTo0NDMiLCJmZWF0dXJlIjoiVHBjZCIsImV4cGlyeSI6MTczNTM0Mzk5OSwiaXNTdWJkb21haW4iOnRydWV9
+            Pragma:
+                - no-cache
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains; preload
+            Vary:
+                - accept-encoding,X-CSP-STRIP
+            X-Content-Type-Options:
+                - nosniff
+            X-Ids-Id:
+                - 24D00068-98A2-4A80-8177-8C33B43773D8
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-c6ct8
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Robots-Tag:
+                - none
+            X-Xss-Protection:
+                - 1; mode=block
+        status: '200 '
+        code: 200
+        duration: 234.300072ms
+    - id: 1
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            Accept:
+                - '*/*'
+            Authorization:
+                - redacted
+            Content-Type:
+                - application/json
+            Dataserviceversion:
+                - "2.0"
+        url: https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: true
+        body: |-
+            {
+              "id" : "7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1",
+              "meta" : {
+                "created" : "2025-06-26T21:03:35.428Z",
+                "lastModified" : "2025-06-26T21:09:34.189Z",
+                "createdBy" : "P000003",
+                "modifiedBy" : "P000003",
+                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1"
+              },
+              "name" : "Oidc - Test",
+              "displayName" : "Terraform - OIDC",
+              "companyId" : "global",
+              "type" : "openIdConnect",
+              "logoutUrl" : "https://test.com",
+              "forwardAllSsoRequests" : true,
+              "identityFederation" : {
+                "useLocalUserStore" : true,
+                "allowLocalUsersOnly" : true,
+                "applyLocalIdPAuthnChecks" : false,
+                "requiredGroups" : [ "Test Group" ]
+              },
+              "automaticRedirect" : true,
+              "loginHintConfiguration" : {
+                "loginHintType" : "mail",
+                "sendMethod" : "urlParam"
+              },
+              "saml2Configuration" : {
+                "digestAlgorithm" : "sha256",
+                "includeScoping" : true,
+                "defaultNameIdFormat" : "default",
+                "allowCreate" : "none"
+              },
+              "oidcConfiguration" : {
+                "subjectNameIdentifier" : "email",
+                "discoveryUrl" : "https://token.actions.githubusercontent.com",
+                "issuer" : "https://token.actions.githubusercontent.com",
+                "jwksUri" : "https://token.actions.githubusercontent.com/.well-known/jwks",
+                "jwkSetPlain" : "{\"keys\":[{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"kid\":\"cc413527-173f-5a05-976e-9c52b1d7b431\",\"alg\":\"RS256\",\"n\":\"w4M936N3ZxNaEblcUoBm-xu0-V9JxNx5S7TmF0M3SBK-2bmDyAeDdeIOTcIVZHG-ZX9N9W0u1yWafgWewHrsz66BkxXq3bscvQUTAw7W3s6TEeYY7o9shPkFfOiU3x_KYgOo06SpiFdymwJflRs9cnbaU88i5fZJmUepUHVllP2tpPWTi-7UA3AdP3cdcCs5bnFfTRKzH2W0xqKsY_jIG95aQJRBDpbiesefjuyxcQnOv88j9tCKWzHpJzRKYjAUM6OPgN4HYnaSWrPJj1v41eEkFM1kORuj-GSH2qMVD02VklcqaerhQHIqM-RjeHsN7G05YtwYzomE5G-fZuwgvQ\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"ykNaY4qM_ta4k2TgZOCEYLkcYlA\",\"kid\":\"38826b17-6a30-5f9b-b169-8beb8202f723\",\"x5c\":[\"MIIDKzCCAhOgAwIBAgIUDnwm6eRIqGFA3o/P1oBrChvx/nowDQYJKoZIhvcNAQELBQAwJTEjMCEGA1UEAwwaYWN0aW9ucy5zZWxmLXNpZ25lZC5naXRodWIwHhcNMjQwMTIzMTUyNTM2WhcNMzQwMTIwMTUyNTM2WjAlMSMwIQYDVQQDDBphY3Rpb25zLnNlbGYtc2lnbmVkLmdpdGh1YjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAOTGp5svs8LJN8BH7VzXShWXnOK0lhDVuI0xnr5bwHFPc924CwaIEFb6mC7bvW2lZtgd633uaJ2naG6vKaOVGpCdGLE4ohH11nUk+2CNknZL7/oTmDHGSmGeHRb7kjtb0Ng4BJMPzmTYmCNUudfDFhHDcZz1Obuu85GsABrC5ZlzWzspYFXwUSaxvII+rHK/rAbOC2gmt5IOSLmgh3taQfp0mB6Lxlf89HoBPNwtPfBX8DtXTWQVnqODm4W+WfmWBSyXGX54DGNMyZwlTZqR0FjoMXxopId3MIuDGKxa2weDU5cW60N2y/qxikeV99fL3sg5aPA8s9iljKG0+MAfVNUCAwEAAaNTMFEwHQYDVR0OBBYEFIPALo5VanJ6E1B9eLQgGO+uGV65MB8GA1UdIwQYMBaAFIPALo5VanJ6E1B9eLQgGO+uGV65MA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAGS0hZE+DqKIRi49Z2KDOMOaSZnAYgqq6ws9HJHT09MXWlMHB8E/apvy2ZuFrcSu14ZLweJid+PrrooXEXEO6azEakzCjeUb9G1QwlzP4CkTcMGCw1Snh3jWZIuKaw21f7mp2rQ+YNltgHVDKY2s8AD273E8musEsWxJl80/MNvMie8Hfh4n4/Xl2r6t1YPmUJMoXAXdTBb0hkPy1fUu3r2T+1oi7Rw6kuVDfAZjaHupNHzJeDOg2KxUoK/GF2/M2qpVrd19Pv/JXNkQXRE4DFbErMmA7tXpp1tkXJRPhFui/Pv5H9cPgObEf9x6W4KnCXzT3ReeeRDKF8SqGTPELsc=\"],\"alg\":\"RS256\",\"n\":\"5Manmy-zwsk3wEftXNdKFZec4rSWENW4jTGevlvAcU9z3bgLBogQVvqYLtu9baVm2B3rfe5onadobq8po5UakJ0YsTiiEfXWdST7YI2Sdkvv-hOYMcZKYZ4dFvuSO1vQ2DgEkw_OZNiYI1S518MWEcNxnPU5u67zkawAGsLlmXNbOylgVfBRJrG8gj6scr-sBs4LaCa3kg5IuaCHe1pB-nSYHovGV_z0egE83C098FfwO1dNZBWeo4Obhb5Z-ZYFLJcZfngMY0zJnCVNmpHQWOgxfGikh3cwi4MYrFrbB4NTlxbrQ3bL-rGKR5X318veyDlo8Dyz2KWMobT4wB9U1Q\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"Hyq4NATAjsnqC7mdrtAhhrCR2_Q\",\"kid\":\"1F2AB83404C08EC9EA0BB99DAED02186B091DBF4\",\"x5c\":[\"MIIDrDCCApSgAwIBAgIQAP4blP36Q3WmMOhWf0RBMzANBgkqhkiG9w0BAQsFADA2MTQwMgYDVQQDEyt2c3RzLXZzdHNnaHJ0LWdoLXZzby1vYXV0aC52aXN1YWxzdHVkaW8uY29tMB4XDTIzMTAyNDE0NTI1NVoXDTI1MTAyNDE1MDI1NVowNjE0MDIGA1UEAxMrdnN0cy12c3RzZ2hydC1naC12c28tb2F1dGgudmlzdWFsc3R1ZGlvLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALvM0mJ+SUfzucssEnjoZllnezjKC25YeIhk3iIUzlaJ/uXueESt9GEA3lAo6W/bt73R0zu10u4uhM5MC27FDoq9u7oaqBRhll0gGaz6HDqG0haCwuZdDb0ikalbaaAAzh3AIefby26/Hc98bRBBsf6pS083xX1ogiGFosteQtqKNXjT8c0Hzr3bu2Hrejn+JrrFdBLOf5jRE6XhzlRK4vD1n8c8OPOVByI97KHJeC5PyN4g8h34KU+PbSCWIRxOTSJizXcDIWtXAQiGyTMtXSQn3aCvNux4vaisgZn7TUD4XsxlUbDo7H9gX1Bsxj+aQhqxQYxDnC4Y/94/kyXm4L0CAwEAAaOBtTCBsjAOBgNVHQ8BAf8EBAMCBaAwCQYDVR0TBAIwADAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwNgYDVR0RBC8wLYIrdnN0cy12c3RzZ2hydC1naC12c28tb2F1dGgudmlzdWFsc3R1ZGlvLmNvbTAfBgNVHSMEGDAWgBSmWMP5CXuaSzoLKwcLXYZnoeCJmDAdBgNVHQ4EFgQUpljD+Ql7mks6CysHC12GZ6HgiZgwDQYJKoZIhvcNAQELBQADggEBAINwybFwYpXJkvauL5QbtrykIDYeP8oFdVIeVY8YI9MGfx7OwWDsNBVXv2B62zAZ49hK5G87++NmFI/FHnGOCISDYoJkRSCy2Nbeyr7Nx2VykWzUQqHLZfvr5KqW4Gj1OFHUqTl8lP3FWDd/P+lil3JobaSiICQshgF0GnX2a8ji8mfXpJSP20gzrLw84brmtmheAvJ9X/sLbM/RBkkT6g4NV2QbTMqo6k601qBNQBsH+lTDDWPCkRoAlW6a0z9bWIhGHWJ2lcR70zagcxIVl5/Fq35770/aMGroSrIx3JayOEqsvgIthYBKHzpT2VFwUz1VpBpNVJg9/u6jCwLY7QA=\"],\"alg\":\"RS256\",\"n\":\"u8zSYn5JR_O5yywSeOhmWWd7OMoLblh4iGTeIhTOVon-5e54RK30YQDeUCjpb9u3vdHTO7XS7i6EzkwLbsUOir27uhqoFGGWXSAZrPocOobSFoLC5l0NvSKRqVtpoADOHcAh59vLbr8dz3xtEEGx_qlLTzfFfWiCIYWiy15C2oo1eNPxzQfOvdu7Yet6Of4musV0Es5_mNETpeHOVEri8PWfxzw485UHIj3socl4Lk_I3iDyHfgpT49tIJYhHE5NImLNdwMha1cBCIbJMy1dJCfdoK827Hi9qKyBmftNQPhezGVRsOjsf2BfUGzGP5pCGrFBjEOcLhj_3j-TJebgvQ\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"AB3c0BSoSOiCRXez5POu2zvPX_0\",\"kid\":\"001DDCD014A848E8824577B3E4F3AEDB3BCF5FFD\",\"x5c\":[\"MIIDrDCCApSgAwIBAgIQKiyRrA01T5qtxdzvZ/ErzjANBgkqhkiG9w0BAQsFADA2MTQwMgYDVQQDEyt2c3RzLXZzdHNnaHJ0LWdoLXZzby1vYXV0aC52aXN1YWxzdHVkaW8uY29tMB4XDTIzMTAxODE1MDExOFoXDTI1MTAxODE1MTExOFowNjE0MDIGA1UEAxMrdnN0cy12c3RzZ2hydC1naC12c28tb2F1dGgudmlzdWFsc3R1ZGlvLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALCP6+IjsL0cZLEqL8mTfHWubvnYdO33XKoexY8iimQjla+3WvPfMZNExvXme5XwNQpgUx+LF+Xr4OGINsXRQ8WCuMZi2XMDMkGSA4mXHSLo57bWqqZazL/7/mMgGqRxZrnWwTvDVbjh94JhmidNhvLtVXX/Atz3TStd3IeMKTb8qMcKmiFhj0s7nQOphjxqL0S4buXRDjiUibbC8xMTbzZh54TyWZNOq+xXj5AVkkNQgh1wM6QfmlFhGQtRSjEoqtnb3zgsoibbRHco/Dv+cqm9MCwD2/vDXc5KaW0WpdlhqMKFPgHo6qFiJoXw85TgUErZ4bgJbiqQOrB9InypULECAwEAAaOBtTCBsjAOBgNVHQ8BAf8EBAMCBaAwCQYDVR0TBAIwADAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwNgYDVR0RBC8wLYIrdnN0cy12c3RzZ2hydC1naC12c28tb2F1dGgudmlzdWFsc3R1ZGlvLmNvbTAfBgNVHSMEGDAWgBQ45rBfvl4JJ7vg3WgLjQTfhDihvzAdBgNVHQ4EFgQUOOawX75eCSe74N1oC40E34Q4ob8wDQYJKoZIhvcNAQELBQADggEBABdN6HPheRdzwvJgi4xGHnf9pvlUC8981kAtgHnPT0VEYXh/dCMnKJSvCDJADpdmkuKxLxAfACeZR2CUHkQ0eO1ek/ihLvPqywDhLENq6Lvzu3qlhvUPBkGYjydpLtXQ1bBXUQ1FzT5/L1U19P2rJso9mC4ltu2OHJ9NLCKG0zffBItAJqhAiXtKbCUg4c9RbQxi9T2/xr9R72di4Qygfnmr3QleAqmjRG918cm5/uJ0s5EaK3QI7GQy7+tc44o3H3AI5eFtrHwIV0zoY4A9YIsaRmMHq9soHFBEO1HDKKRUOl/4tjpx8zHpp5Clz0wiZMgvSIdBa3/fTeUJ3flUYMo=\"],\"alg\":\"RS256\",\"n\":\"sI_r4iOwvRxksSovyZN8da5u-dh07fdcqh7FjyKKZCOVr7da898xk0TG9eZ7lfA1CmBTH4sX5evg4Yg2xdFDxYK4xmLZcwMyQZIDiZcdIujnttaqplrMv_v-YyAapHFmudbBO8NVuOH3gmGaJ02G8u1Vdf8C3PdNK13ch4wpNvyoxwqaIWGPSzudA6mGPGovRLhu5dEOOJSJtsLzExNvNmHnhPJZk06r7FePkBWSQ1CCHXAzpB-aUWEZC1FKMSiq2dvfOCyiJttEdyj8O_5yqb0wLAPb-8NdzkppbRal2WGowoU-AejqoWImhfDzlOBQStnhuAluKpA6sH0ifKlQsQ\"}]}",
+                "scopes" : [ "openid" ],
+                "clientId" : "Oidc - Test",
+                "isClientSecretConfigured" : false,
+                "pkceEnabled" : false
+              }
+            }
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
+            Content-Type:
+                - application/json;charset=UTF-8
+            Critical-Origin-Trial:
+                - Tpcd
+            Date:
+                - Sun, 29 Jun 2025 18:40:01 GMT
+            Expires:
+                - "0"
+            Origin-Trial:
+                - Avu6rn7emV5gK8gvyGHlX8TMqM9uo1FacP2j/RWTq+8j+yKnqcTO0TQh0bXJ/7QntxD4/JzXv8aXoqxxZQuqXgYAAABdeyJvcmlnaW4iOiJodHRwczovL29uZGVtYW5kLmNvbTo0NDMiLCJmZWF0dXJlIjoiVHBjZCIsImV4cGlyeSI6MTczNTM0Mzk5OSwiaXNTdWJkb21haW4iOnRydWV9
+            Pragma:
+                - no-cache
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains; preload
+            Vary:
+                - accept-encoding,X-CSP-STRIP
+            X-Content-Type-Options:
+                - nosniff
+            X-Ids-Id:
+                - F5511C92-3C43-42D0-99A2-B2BF3D9949E3
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-c6ct8
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Robots-Tag:
+                - none
+            X-Xss-Protection:
+                - 1; mode=block
+        status: '200 '
+        code: 200
+        duration: 224.008512ms
+    - id: 2
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            Accept:
+                - '*/*'
+            Authorization:
+                - redacted
+            Content-Type:
+                - application/json
+            Dataserviceversion:
+                - "2.0"
+        url: https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: true
+        body: |-
+            {
+              "totalResults" : 6,
+              "itemsPerPage" : 6,
+              "identityProviders" : [ {
+                "id" : "259c0cc5-8a1e-4a9d-8046-5f6237fa5b0d",
+                "meta" : {
+                  "created" : "2025-06-27T16:18:37.541Z",
+                  "lastModified" : "2025-06-27T16:18:37.541Z",
+                  "createdBy" : "P000003",
+                  "location" : "https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/259c0cc5-8a1e-4a9d-8046-5f6237fa5b0d"
+                },
+                "name" : "test",
+                "displayName" : "test",
+                "companyId" : "global",
+                "type" : "openIdConnect",
+                "forwardAllSsoRequests" : false,
+                "identityFederation" : {
+                  "useLocalUserStore" : false,
+                  "allowLocalUsersOnly" : false,
+                  "applyLocalIdPAuthnChecks" : false
+                },
+                "automaticRedirect" : true,
+                "loginHintConfiguration" : {
+                  "loginHintType" : "userInput",
+                  "sendMethod" : "urlParam"
+                },
+                "saml2Configuration" : {
+                  "digestAlgorithm" : "sha256",
+                  "includeScoping" : true,
+                  "defaultNameIdFormat" : "default",
+                  "allowCreate" : "none"
+                },
+                "oidcConfiguration" : {
+                  "subjectNameIdentifier" : "none",
+                  "scopes" : [ "openid" ],
+                  "isClientSecretConfigured" : false,
+                  "pkceEnabled" : false
+                }
+              }, {
+                "id" : "7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1",
+                "meta" : {
+                  "created" : "2025-06-26T21:03:35.428Z",
+                  "lastModified" : "2025-06-26T21:09:34.189Z",
+                  "createdBy" : "P000003",
+                  "modifiedBy" : "P000003",
+                  "location" : "https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1"
+                },
+                "name" : "Oidc - Test",
+                "displayName" : "Terraform - OIDC",
+                "companyId" : "global",
+                "type" : "openIdConnect",
+                "logoutUrl" : "https://test.com",
+                "forwardAllSsoRequests" : true,
+                "identityFederation" : {
+                  "useLocalUserStore" : true,
+                  "allowLocalUsersOnly" : true,
+                  "applyLocalIdPAuthnChecks" : false,
+                  "requiredGroups" : [ "Test Group" ]
+                },
+                "automaticRedirect" : true,
+                "loginHintConfiguration" : {
+                  "loginHintType" : "mail",
+                  "sendMethod" : "urlParam"
+                },
+                "saml2Configuration" : {
+                  "digestAlgorithm" : "sha256",
+                  "includeScoping" : true,
+                  "defaultNameIdFormat" : "default",
+                  "allowCreate" : "none"
+                },
+                "oidcConfiguration" : {
+                  "subjectNameIdentifier" : "email",
+                  "discoveryUrl" : "https://token.actions.githubusercontent.com",
+                  "issuer" : "https://token.actions.githubusercontent.com",
+                  "jwksUri" : "https://token.actions.githubusercontent.com/.well-known/jwks",
+                  "jwkSetPlain" : "{\"keys\":[{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"kid\":\"cc413527-173f-5a05-976e-9c52b1d7b431\",\"alg\":\"RS256\",\"n\":\"w4M936N3ZxNaEblcUoBm-xu0-V9JxNx5S7TmF0M3SBK-2bmDyAeDdeIOTcIVZHG-ZX9N9W0u1yWafgWewHrsz66BkxXq3bscvQUTAw7W3s6TEeYY7o9shPkFfOiU3x_KYgOo06SpiFdymwJflRs9cnbaU88i5fZJmUepUHVllP2tpPWTi-7UA3AdP3cdcCs5bnFfTRKzH2W0xqKsY_jIG95aQJRBDpbiesefjuyxcQnOv88j9tCKWzHpJzRKYjAUM6OPgN4HYnaSWrPJj1v41eEkFM1kORuj-GSH2qMVD02VklcqaerhQHIqM-RjeHsN7G05YtwYzomE5G-fZuwgvQ\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"ykNaY4qM_ta4k2TgZOCEYLkcYlA\",\"kid\":\"38826b17-6a30-5f9b-b169-8beb8202f723\",\"x5c\":[\"MIIDKzCCAhOgAwIBAgIUDnwm6eRIqGFA3o/P1oBrChvx/nowDQYJKoZIhvcNAQELBQAwJTEjMCEGA1UEAwwaYWN0aW9ucy5zZWxmLXNpZ25lZC5naXRodWIwHhcNMjQwMTIzMTUyNTM2WhcNMzQwMTIwMTUyNTM2WjAlMSMwIQYDVQQDDBphY3Rpb25zLnNlbGYtc2lnbmVkLmdpdGh1YjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAOTGp5svs8LJN8BH7VzXShWXnOK0lhDVuI0xnr5bwHFPc924CwaIEFb6mC7bvW2lZtgd633uaJ2naG6vKaOVGpCdGLE4ohH11nUk+2CNknZL7/oTmDHGSmGeHRb7kjtb0Ng4BJMPzmTYmCNUudfDFhHDcZz1Obuu85GsABrC5ZlzWzspYFXwUSaxvII+rHK/rAbOC2gmt5IOSLmgh3taQfp0mB6Lxlf89HoBPNwtPfBX8DtXTWQVnqODm4W+WfmWBSyXGX54DGNMyZwlTZqR0FjoMXxopId3MIuDGKxa2weDU5cW60N2y/qxikeV99fL3sg5aPA8s9iljKG0+MAfVNUCAwEAAaNTMFEwHQYDVR0OBBYEFIPALo5VanJ6E1B9eLQgGO+uGV65MB8GA1UdIwQYMBaAFIPALo5VanJ6E1B9eLQgGO+uGV65MA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAGS0hZE+DqKIRi49Z2KDOMOaSZnAYgqq6ws9HJHT09MXWlMHB8E/apvy2ZuFrcSu14ZLweJid+PrrooXEXEO6azEakzCjeUb9G1QwlzP4CkTcMGCw1Snh3jWZIuKaw21f7mp2rQ+YNltgHVDKY2s8AD273E8musEsWxJl80/MNvMie8Hfh4n4/Xl2r6t1YPmUJMoXAXdTBb0hkPy1fUu3r2T+1oi7Rw6kuVDfAZjaHupNHzJeDOg2KxUoK/GF2/M2qpVrd19Pv/JXNkQXRE4DFbErMmA7tXpp1tkXJRPhFui/Pv5H9cPgObEf9x6W4KnCXzT3ReeeRDKF8SqGTPELsc=\"],\"alg\":\"RS256\",\"n\":\"5Manmy-zwsk3wEftXNdKFZec4rSWENW4jTGevlvAcU9z3bgLBogQVvqYLtu9baVm2B3rfe5onadobq8po5UakJ0YsTiiEfXWdST7YI2Sdkvv-hOYMcZKYZ4dFvuSO1vQ2DgEkw_OZNiYI1S518MWEcNxnPU5u67zkawAGsLlmXNbOylgVfBRJrG8gj6scr-sBs4LaCa3kg5IuaCHe1pB-nSYHovGV_z0egE83C098FfwO1dNZBWeo4Obhb5Z-ZYFLJcZfngMY0zJnCVNmpHQWOgxfGikh3cwi4MYrFrbB4NTlxbrQ3bL-rGKR5X318veyDlo8Dyz2KWMobT4wB9U1Q\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"Hyq4NATAjsnqC7mdrtAhhrCR2_Q\",\"kid\":\"1F2AB83404C08EC9EA0BB99DAED02186B091DBF4\",\"x5c\":[\"MIIDrDCCApSgAwIBAgIQAP4blP36Q3WmMOhWf0RBMzANBgkqhkiG9w0BAQsFADA2MTQwMgYDVQQDEyt2c3RzLXZzdHNnaHJ0LWdoLXZzby1vYXV0aC52aXN1YWxzdHVkaW8uY29tMB4XDTIzMTAyNDE0NTI1NVoXDTI1MTAyNDE1MDI1NVowNjE0MDIGA1UEAxMrdnN0cy12c3RzZ2hydC1naC12c28tb2F1dGgudmlzdWFsc3R1ZGlvLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALvM0mJ+SUfzucssEnjoZllnezjKC25YeIhk3iIUzlaJ/uXueESt9GEA3lAo6W/bt73R0zu10u4uhM5MC27FDoq9u7oaqBRhll0gGaz6HDqG0haCwuZdDb0ikalbaaAAzh3AIefby26/Hc98bRBBsf6pS083xX1ogiGFosteQtqKNXjT8c0Hzr3bu2Hrejn+JrrFdBLOf5jRE6XhzlRK4vD1n8c8OPOVByI97KHJeC5PyN4g8h34KU+PbSCWIRxOTSJizXcDIWtXAQiGyTMtXSQn3aCvNux4vaisgZn7TUD4XsxlUbDo7H9gX1Bsxj+aQhqxQYxDnC4Y/94/kyXm4L0CAwEAAaOBtTCBsjAOBgNVHQ8BAf8EBAMCBaAwCQYDVR0TBAIwADAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwNgYDVR0RBC8wLYIrdnN0cy12c3RzZ2hydC1naC12c28tb2F1dGgudmlzdWFsc3R1ZGlvLmNvbTAfBgNVHSMEGDAWgBSmWMP5CXuaSzoLKwcLXYZnoeCJmDAdBgNVHQ4EFgQUpljD+Ql7mks6CysHC12GZ6HgiZgwDQYJKoZIhvcNAQELBQADggEBAINwybFwYpXJkvauL5QbtrykIDYeP8oFdVIeVY8YI9MGfx7OwWDsNBVXv2B62zAZ49hK5G87++NmFI/FHnGOCISDYoJkRSCy2Nbeyr7Nx2VykWzUQqHLZfvr5KqW4Gj1OFHUqTl8lP3FWDd/P+lil3JobaSiICQshgF0GnX2a8ji8mfXpJSP20gzrLw84brmtmheAvJ9X/sLbM/RBkkT6g4NV2QbTMqo6k601qBNQBsH+lTDDWPCkRoAlW6a0z9bWIhGHWJ2lcR70zagcxIVl5/Fq35770/aMGroSrIx3JayOEqsvgIthYBKHzpT2VFwUz1VpBpNVJg9/u6jCwLY7QA=\"],\"alg\":\"RS256\",\"n\":\"u8zSYn5JR_O5yywSeOhmWWd7OMoLblh4iGTeIhTOVon-5e54RK30YQDeUCjpb9u3vdHTO7XS7i6EzkwLbsUOir27uhqoFGGWXSAZrPocOobSFoLC5l0NvSKRqVtpoADOHcAh59vLbr8dz3xtEEGx_qlLTzfFfWiCIYWiy15C2oo1eNPxzQfOvdu7Yet6Of4musV0Es5_mNETpeHOVEri8PWfxzw485UHIj3socl4Lk_I3iDyHfgpT49tIJYhHE5NImLNdwMha1cBCIbJMy1dJCfdoK827Hi9qKyBmftNQPhezGVRsOjsf2BfUGzGP5pCGrFBjEOcLhj_3j-TJebgvQ\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"AB3c0BSoSOiCRXez5POu2zvPX_0\",\"kid\":\"001DDCD014A848E8824577B3E4F3AEDB3BCF5FFD\",\"x5c\":[\"MIIDrDCCApSgAwIBAgIQKiyRrA01T5qtxdzvZ/ErzjANBgkqhkiG9w0BAQsFADA2MTQwMgYDVQQDEyt2c3RzLXZzdHNnaHJ0LWdoLXZzby1vYXV0aC52aXN1YWxzdHVkaW8uY29tMB4XDTIzMTAxODE1MDExOFoXDTI1MTAxODE1MTExOFowNjE0MDIGA1UEAxMrdnN0cy12c3RzZ2hydC1naC12c28tb2F1dGgudmlzdWFsc3R1ZGlvLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALCP6+IjsL0cZLEqL8mTfHWubvnYdO33XKoexY8iimQjla+3WvPfMZNExvXme5XwNQpgUx+LF+Xr4OGINsXRQ8WCuMZi2XMDMkGSA4mXHSLo57bWqqZazL/7/mMgGqRxZrnWwTvDVbjh94JhmidNhvLtVXX/Atz3TStd3IeMKTb8qMcKmiFhj0s7nQOphjxqL0S4buXRDjiUibbC8xMTbzZh54TyWZNOq+xXj5AVkkNQgh1wM6QfmlFhGQtRSjEoqtnb3zgsoibbRHco/Dv+cqm9MCwD2/vDXc5KaW0WpdlhqMKFPgHo6qFiJoXw85TgUErZ4bgJbiqQOrB9InypULECAwEAAaOBtTCBsjAOBgNVHQ8BAf8EBAMCBaAwCQYDVR0TBAIwADAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwNgYDVR0RBC8wLYIrdnN0cy12c3RzZ2hydC1naC12c28tb2F1dGgudmlzdWFsc3R1ZGlvLmNvbTAfBgNVHSMEGDAWgBQ45rBfvl4JJ7vg3WgLjQTfhDihvzAdBgNVHQ4EFgQUOOawX75eCSe74N1oC40E34Q4ob8wDQYJKoZIhvcNAQELBQADggEBABdN6HPheRdzwvJgi4xGHnf9pvlUC8981kAtgHnPT0VEYXh/dCMnKJSvCDJADpdmkuKxLxAfACeZR2CUHkQ0eO1ek/ihLvPqywDhLENq6Lvzu3qlhvUPBkGYjydpLtXQ1bBXUQ1FzT5/L1U19P2rJso9mC4ltu2OHJ9NLCKG0zffBItAJqhAiXtKbCUg4c9RbQxi9T2/xr9R72di4Qygfnmr3QleAqmjRG918cm5/uJ0s5EaK3QI7GQy7+tc44o3H3AI5eFtrHwIV0zoY4A9YIsaRmMHq9soHFBEO1HDKKRUOl/4tjpx8zHpp5Clz0wiZMgvSIdBa3/fTeUJ3flUYMo=\"],\"alg\":\"RS256\",\"n\":\"sI_r4iOwvRxksSovyZN8da5u-dh07fdcqh7FjyKKZCOVr7da898xk0TG9eZ7lfA1CmBTH4sX5evg4Yg2xdFDxYK4xmLZcwMyQZIDiZcdIujnttaqplrMv_v-YyAapHFmudbBO8NVuOH3gmGaJ02G8u1Vdf8C3PdNK13ch4wpNvyoxwqaIWGPSzudA6mGPGovRLhu5dEOOJSJtsLzExNvNmHnhPJZk06r7FePkBWSQ1CCHXAzpB-aUWEZC1FKMSiq2dvfOCyiJttEdyj8O_5yqb0wLAPb-8NdzkppbRal2WGowoU-AejqoWImhfDzlOBQStnhuAluKpA6sH0ifKlQsQ\"}]}",
+                  "scopes" : [ "openid" ],
+                  "clientId" : "Oidc - Test",
+                  "isClientSecretConfigured" : false,
+                  "pkceEnabled" : false
+                }
+              }, {
+                "id" : "9e35a298-36c1-4d21-967d-c8525ebfa84e",
+                "meta" : {
+                  "created" : "2025-06-08T04:02:37.939Z",
+                  "lastModified" : "2025-06-08T04:02:37.939Z",
+                  "createdBy" : "P000003",
+                  "location" : "https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/9e35a298-36c1-4d21-967d-c8525ebfa84e"
+                },
+                "displayName" : "test",
+                "companyId" : "company id",
+                "type" : "saml2",
+                "forwardAllSsoRequests" : false,
+                "identityFederation" : {
+                  "useLocalUserStore" : false,
+                  "allowLocalUsersOnly" : false,
+                  "applyLocalIdPAuthnChecks" : false
+                },
+                "automaticRedirect" : true,
+                "loginHintConfiguration" : {
+                  "loginHintType" : "userInput",
+                  "sendMethod" : "urlParam"
+                },
+                "saml2Configuration" : {
+                  "digestAlgorithm" : "sha256",
+                  "includeScoping" : true,
+                  "defaultNameIdFormat" : "default",
+                  "allowCreate" : "none"
+                },
+                "oidcConfiguration" : {
+                  "subjectNameIdentifier" : "none",
+                  "scopes" : [ "openid" ],
+                  "isClientSecretConfigured" : false,
+                  "pkceEnabled" : false
+                }
+              }, {
+                "id" : "b89c4228-8cfb-4d7b-94d7-1c300898d722",
+                "meta" : {
+                  "created" : "2025-05-22T07:35:15.206Z",
+                  "lastModified" : "2025-05-23T09:11:48.097Z",
+                  "createdBy" : "P000003",
+                  "modifiedBy" : "P000003",
+                  "location" : "https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/b89c4228-8cfb-4d7b-94d7-1c300898d722"
+                },
+                "name" : "Federation with entra ID",
+                "displayName" : "Federation with Entra ID",
+                "companyId" : "global",
+                "type" : "openIdConnect",
+                "forwardAllSsoRequests" : false,
+                "identityFederation" : {
+                  "useLocalUserStore" : true,
+                  "allowLocalUsersOnly" : true,
+                  "applyLocalIdPAuthnChecks" : false
+                },
+                "automaticRedirect" : true,
+                "loginHintConfiguration" : {
+                  "loginHintType" : "userInput",
+                  "sendMethod" : "urlParam"
+                },
+                "saml2Configuration" : {
+                  "digestAlgorithm" : "sha256",
+                  "includeScoping" : true,
+                  "defaultNameIdFormat" : "default",
+                  "allowCreate" : "none"
+                },
+                "oidcConfiguration" : {
+                  "subjectNameIdentifier" : "email",
+                  "discoveryUrl" : "https://login.microsoftonline.com/bda9fde1-6400-4097-a39e-cc0e0cc36b34/v2.0/.well-known/openid-configuration",
+                  "issuer" : "https://login.microsoftonline.com/bda9fde1-6400-4097-a39e-cc0e0cc36b34/v2.0",
+                  "tokenEndpoint" : "https://login.microsoftonline.com/bda9fde1-6400-4097-a39e-cc0e0cc36b34/oauth2/v2.0/token",
+                  "authorizationEndpoint" : "https://login.microsoftonline.com/bda9fde1-6400-4097-a39e-cc0e0cc36b34/oauth2/v2.0/authorize",
+                  "endSessionEndpoint" : "https://login.microsoftonline.com/bda9fde1-6400-4097-a39e-cc0e0cc36b34/oauth2/v2.0/logout",
+                  "userInfoEndpoint" : "https://graph.microsoft.com/oidc/userinfo",
+                  "jwksUri" : "https://login.microsoftonline.com/bda9fde1-6400-4097-a39e-cc0e0cc36b34/discovery/v2.0/keys",
+                  "jwkSetPlain" : "{\"keys\":[{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"JYhSOsHhDZrc5kfqQg8ujkHMTNY\",\"kid\":\"JYhSOsHhDZrc5kfqQg8ujkHMTNY\",\"x5c\":[\"MIIC/TCCAeWgAwIBAgIIY81p6sALmU8wDQYJKoZIhvcNAQELBQAwLTErMCkGA1UEAxMiYWNjb3VudHMuYWNjZXNzY29udHJvbC53aW5kb3dzLm5ldDAeFw0yNTAyMjQwOTMyNTdaFw0zMDAyMjQwOTMyNTdaMC0xKzApBgNVBAMTImFjY291bnRzLmFjY2Vzc2NvbnRyb2wud2luZG93cy5uZXQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDHExFy6zLBEh390lH951z6p78ze+Fc40LPtAOGNV+iodZu32VAJcJUiwij1UkjWcZPUXo2RcQgG3jrbHanXDZyB/gAXzp0aFtOlH6TzVYtHmA2OSGk+oHU8KK2JyFUgpscC87JgQBomcTIKImoiVT9mDkvkXNGq/83/f5+Fi9YrSlzebU6HJ3aQ1GDU1tynmiC3uYGN5zswSt+L43Sjni9d+wrqEzabuHSxnBV3gLGA+qekG2baG0z3FoqmfCRigQve9rds8jVUYan1AtnAxXpEAc7L85GnPjFqsb7PuVlQIs7RfVKjTmufvDl50GZ9uVRCU8vcGWNtRUHdpt31I1fAgMBAAGjITAfMB0GA1UdDgQWBBQc8G/33OWrtOT/XnksiamjCcQKcDANBgkqhkiG9w0BAQsFAAOCAQEAt5GZmtTxoJ4fQMS787qU8PHcw2ihIzx1gzP0JNYTG+7qdP/oZsYISZ4EyTnZ8gkJfgZIYHoGe/5BcZ4N56LtUl3HIw/b4WYPjbFNHaAiNmQDqPp1/HtIhv7FZNKXu6az0fBfSc5RetWGnZ7Ex3mmhjJisAt+Ml+fRYLfjvQghtiNTsdOCQRWQpaCVJC7lV9x5gfSWm6qIAquGJE3xqVWnUlCjFJk67UbqmqNltJ5dDNEk6N2BSM2WlA9lf9FIhdBWBCn2zplQHcA0EU+0p3iwLH/AjwjJnW41NcJO51bN5Jye6dhSaS9yQm9iKTK8H6DOpkzj3oR4Sf9Ki31+kxiTQ==\"],\"n\":\"xxMRcusywRId_dJR_edc-qe_M3vhXONCz7QDhjVfoqHWbt9lQCXCVIsIo9VJI1nGT1F6NkXEIBt462x2p1w2cgf4AF86dGhbTpR-k81WLR5gNjkhpPqB1PCitichVIKbHAvOyYEAaJnEyCiJqIlU_Zg5L5FzRqv_N_3-fhYvWK0pc3m1Ohyd2kNRg1Nbcp5ogt7mBjec7MErfi-N0o54vXfsK6hM2m7h0sZwVd4CxgPqnpBtm2htM9xaKpnwkYoEL3va3bPI1VGGp9QLZwMV6RAHOy_ORpz4xarG-z7lZUCLO0X1So05rn7w5edBmfblUQlPL3BljbUVB3abd9SNXw\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"CNv0OI3RwqlHFEVnaoMAshCH2XE\",\"kid\":\"CNv0OI3RwqlHFEVnaoMAshCH2XE\",\"x5c\":[\"MIIC/TCCAeWgAwIBAgIICu+WfBLOqBAwDQYJKoZIhvcNAQELBQAwLTErMCkGA1UEAxMiYWNjb3VudHMuYWNjZXNzY29udHJvbC53aW5kb3dzLm5ldDAeFw0yNTAzMTYyMDE3MjNaFw0zMDAzMTYyMDE3MjNaMC0xKzApBgNVBAMTImFjY291bnRzLmFjY2Vzc2NvbnRyb2wud2luZG93cy5uZXQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCHPp9RIJIC6LJDPovWdCPjNryQi168nPGFVt5wyKBMiX2ldlIdlreDMyC1qmdvWr3oIbmq9Hvx0fpm9MovwzM3hV8aBmG8sS/kskp6jS0aAEhLrnDEiIliP0TEQOoWTD1F2FbWc3wg3147vo9sL590Q+0N6QDYFohNjYMBEhIo3gp7REsERY2sp4SOM7OvKBLZ7dD01XMTnVkYZAAYdq7tq0fLwz+oDWed3Z0xSBQycRggzMMFNIrPXsbqK0k51qca8bfBe92md0p9+cOmlo+TJZufJt0wjgg/urpawKqe3ca2D5toboYOplBAQGn0L2AsAW/g5FNGWkPfDSAIyHvHAgMBAAGjITAfMB0GA1UdDgQWBBSsQvFDUwCTJXK+ltZFLaHUGzIS6jANBgkqhkiG9w0BAQsFAAOCAQEAUsfNQA+O7eXGI4IL/FmafEmmFjoXC+Ym9UIzG/vXcXzQEK9S9nV35Q0Fn9PsL1w8Sud3itm/V6t9UtB9yaRvWREPOdEYsHEkZahoSFi2fgOLP+AsTtQq0ePeBbqAQvnfrTvFuv+j1we3uxxov77pt7U+pB+6Sq8+yww85qeTCWmV4av2WWXB+6pW9oUd/D9htlxKL5WzNsaVojP56eg3mwhBmOpqxkYnL7RAPGOYRjaeHic9ONrctC8HImjf21UC5wK8G/lcVQATcvPZm/AYJg10fNsxZ/8ApFLblf9Q8l0QcKZfjs/si3VKcWvilDrfO9Dg83Ou6tvsLnPU5lV3aA==\"],\"n\":\"hz6fUSCSAuiyQz6L1nQj4za8kItevJzxhVbecMigTIl9pXZSHZa3gzMgtapnb1q96CG5qvR78dH6ZvTKL8MzN4VfGgZhvLEv5LJKeo0tGgBIS65wxIiJYj9ExEDqFkw9RdhW1nN8IN9eO76PbC-fdEPtDekA2BaITY2DARISKN4Ke0RLBEWNrKeEjjOzrygS2e3Q9NVzE51ZGGQAGHau7atHy8M_qA1nnd2dMUgUMnEYIMzDBTSKz17G6itJOdanGvG3wXvdpndKffnDppaPkyWbnybdMI4IP7q6WsCqnt3Gtg-baG6GDqZQQEBp9C9gLAFv4ORTRlpD3w0gCMh7xw\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"PoVKeirIOvmTyLQ9G9BenBwos7k\",\"kid\":\"PoVKeirIOvmTyLQ9G9BenBwos7k\",\"x5c\":[\"MIIC/jCCAeagAwIBAgIJAM52mWWK+FEeMA0GCSqGSIb3DQEBCwUAMC0xKzApBgNVBAMTImFjY291bnRzLmFjY2Vzc2NvbnRyb2wud2luZG93cy5uZXQwHhcNMjUwMzIwMDAwNTAyWhcNMzAwMzIwMDAwNTAyWjAtMSswKQYDVQQDEyJhY2NvdW50cy5hY2Nlc3Njb250cm9sLndpbmRvd3MubmV0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAruYyUq1ElSb8QCCt0XWWRSFpUq0JkyfEvvlCa4fPDi0GZbSGgJg3qYa0co2RsBIYHczXkc71kHVpktySAgYK1KMK264e+s7Vymeq+ypHEDpRsaWric/kKEIvKZzRsyUBUWf0CUhtuUvAbDTuaFnQ4g5lfoa7u3vtsv1za5Gmn6DUPirrL/+xqijP9IsHGUKaTmB4M/qnAu6vUHCpXZnN0YTJDoK7XrVJFaKj8RrTdJB89GFJeTFHA2OX472ToyLdCDn5UatYwmht62nXGlH7/G1kW1YMpeSSwzpnMEzUUk7A8UXrvFTHXEpfXhsv0LA59dm9Hi1mIXaOe1w+icA/rQIDAQABoyEwHzAdBgNVHQ4EFgQUcZ2MLLOas+d9WbkFSnPdxag09YIwDQYJKoZIhvcNAQELBQADggEBABPXBmwv703IlW8Zc9Kj7W215+vyM5lrJjUubnl+s8vQVXvyN7bh5xP2hzEKWb+u5g/brSIKX/A7qP3m/z6C8R9GvP5WRtF2w1CAxYZ9TWTzTS1La78edME546QejjveC1gX9qcLbEwuLAbYpau2r3vlIqgyXo+8WLXA0neGIRa2JWTNy8FJo0wnUttGJz9LQE4L37nR3HWIxflmOVgbaeyeaj2VbzUE7MIHIkK1bqye2OiKU82w1QWLV/YCny0xdLipE1g2uNL8QVob8fTU2zowd2j54c1YTBDy/hTsxpXfCFutKwtELqWzYxKTqYfrRCc1h0V4DGLKzIjtggTC+CY=\"],\"n\":\"ruYyUq1ElSb8QCCt0XWWRSFpUq0JkyfEvvlCa4fPDi0GZbSGgJg3qYa0co2RsBIYHczXkc71kHVpktySAgYK1KMK264e-s7Vymeq-ypHEDpRsaWric_kKEIvKZzRsyUBUWf0CUhtuUvAbDTuaFnQ4g5lfoa7u3vtsv1za5Gmn6DUPirrL_-xqijP9IsHGUKaTmB4M_qnAu6vUHCpXZnN0YTJDoK7XrVJFaKj8RrTdJB89GFJeTFHA2OX472ToyLdCDn5UatYwmht62nXGlH7_G1kW1YMpeSSwzpnMEzUUk7A8UXrvFTHXEpfXhsv0LA59dm9Hi1mIXaOe1w-icA_rQ\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"_jNwjeSnvTTK8XEdr5QUPkBRLLo\",\"kid\":\"_jNwjeSnvTTK8XEdr5QUPkBRLLo\",\"x5c\":[\"MIIC/jCCAeagAwIBAgIJAJD6gin3pOAKMA0GCSqGSIb3DQEBCwUAMC0xKzApBgNVBAMTImFjY291bnRzLmFjY2Vzc2NvbnRyb2wud2luZG93cy5uZXQwHhcNMjUwNDA5MDgwMzQwWhcNMzAwNDA5MDgwMzQwWjAtMSswKQYDVQQDEyJhY2NvdW50cy5hY2Nlc3Njb250cm9sLndpbmRvd3MubmV0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJt2QCzZVnqP35tVsxvqIPFyYh0Muz5H2JtVkKinANHtG7TCX0Plxj+mZ1OtRQWX8a7d/2legFkf+0UJDs9LxWxHj8zV9WdNO1KYucXqiyPSo6Z7Gaww6zkLHaHHqhEWVi4yXHw1pbxdDPCBQ6FLtspLtEbFkagCY5vON5cw0GUjfMPcRfyVylq8lxy3JhLQa2CuDstDYQ491oTAUP5Xn3lAIyp1SbJ038E0gfxx5EpTxw1Ef14SlRqfg6Izy82BUz8aJtv097IVxM5fjfMH1de7dGXAyaCagTMMCySUk7vLdY0jOOhQNQ69IQbCllR1NMCk/bliXYUjDg5k1FeoYQIDAQABoyEwHzAdBgNVHQ4EFgQU7Iuc3W2qX7BqcsnyHsXO0TwI1ZMwDQYJKoZIhvcNAQELBQADggEBAJPUFzBQ+khAL6K7d0ctRBkPfvT84bILRW6xcw8GCAdyEmqm+jG0N+VWp7NM70nMuM5jrGarFuUJwEewQHLXu0gHDcZ+28i5bMgHQSlwiVyNTzesy3cJu76BgYWTLfXTI/9/aZMBfdJhtHDorj4hxTrROcwdlFQpK0Ld6ZUhgIGMY7nBsQ+n0SoI2AYtJt+MpwcsHbzklHQJAucOwEOqIaaJagSYbOVGq5M+d8bdaQsuvepzj8V0H9QTLcnJnIhCeq7RZ205hZcsPu1ATSN4qGYYLoCiAVnEMiPzKXLF0ZqkJDOBPQjXsmJ2Dhnvt8RvkjLy0GEiayzbHGSkII+GIHo=\"],\"n\":\"tJt2QCzZVnqP35tVsxvqIPFyYh0Muz5H2JtVkKinANHtG7TCX0Plxj-mZ1OtRQWX8a7d_2legFkf-0UJDs9LxWxHj8zV9WdNO1KYucXqiyPSo6Z7Gaww6zkLHaHHqhEWVi4yXHw1pbxdDPCBQ6FLtspLtEbFkagCY5vON5cw0GUjfMPcRfyVylq8lxy3JhLQa2CuDstDYQ491oTAUP5Xn3lAIyp1SbJ038E0gfxx5EpTxw1Ef14SlRqfg6Izy82BUz8aJtv097IVxM5fjfMH1de7dGXAyaCagTMMCySUk7vLdY0jOOhQNQ69IQbCllR1NMCk_bliXYUjDg5k1FeoYQ\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"-cgAvjmmQ24Ks20zIpDB4SW894w\",\"kid\":\"-cgAvjmmQ24Ks20zIpDB4SW894w\",\"x5c\":[\"MIIC6TCCAdGgAwIBAgIIU6yE1PeZiB0wDQYJKoZIhvcNAQELBQAwIzEhMB8GA1UEAxMYbG9naW4ubWljcm9zb2Z0b25saW5lLnVzMB4XDTI1MDMwNjE3MDIxMFoXDTMwMDMwNjE3MDIxMFowIzEhMB8GA1UEAxMYbG9naW4ubWljcm9zb2Z0b25saW5lLnVzMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAotM7AZjL81wdSVdrkQtt6shrQiAT8OZJeIKTeRJgrDYXKzaVXs0WFXVCjCv9GuCktF+tereotfZlcskamfuupe574o76CJy6AUtuY7wt0OKqxoSJMRuUJvA/NNkT50C/dTDHTtF7kiGBwWvHEkHeZAgT52E8bfNJswV28GsPscM9vG2ylUPyiaEIsGi0cg/JllbnfBjGhfA/lzmrB9Iw75E3f1Hnk2uAs1KcHJGSH3EwHJ5tUeo9WtLGjRAfH1kGtPjkktNaw3V8EukEzgIfILV8udpWYE79A/p5jFUnTNkQxsviNxG537JMooa1ZoYveDv/f6LCj1o7MNZQVlD3twIDAQABoyEwHzAdBgNVHQ4EFgQU3EskzzkGT8sZ1hAEn+cJIrUfDkswDQYJKoZIhvcNAQELBQADggEBAB3T/AA53U6c0mmdckiw/Evh27tluqKDwzF1l95zJTmmNzj8ND5KsS6J+g7Xzg8H8sccxhvrUPuJLzSJKGS4vygDAJHJvuXSwUWSf/n6O6u3pinIu/uqm8sQRo/yDrsI7LjvSeIVFbpNBOW/hoYH3GbRVCXqFX9Sztj8my60cSzV9JcNbIDse+GEfbFf5L2kfa1XydThFOvc/lXDFPPorNF4u8djP8u5BojO6QdylRHPWIoG1Q8l4yqLPf+sgBkzQ4pyOpgdAvefunCHeAwYyIZj0SOZgarNeplcicAYDFUZgPu1WbiIK2cREcY5XUnyMYtyq28AJrdMEKkCtXWI8jQ=\"],\"n\":\"otM7AZjL81wdSVdrkQtt6shrQiAT8OZJeIKTeRJgrDYXKzaVXs0WFXVCjCv9GuCktF-tereotfZlcskamfuupe574o76CJy6AUtuY7wt0OKqxoSJMRuUJvA_NNkT50C_dTDHTtF7kiGBwWvHEkHeZAgT52E8bfNJswV28GsPscM9vG2ylUPyiaEIsGi0cg_JllbnfBjGhfA_lzmrB9Iw75E3f1Hnk2uAs1KcHJGSH3EwHJ5tUeo9WtLGjRAfH1kGtPjkktNaw3V8EukEzgIfILV8udpWYE79A_p5jFUnTNkQxsviNxG537JMooa1ZoYveDv_f6LCj1o7MNZQVlD3tw\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"Km8oaDUbb_pVUGsT38eHX87v078\",\"kid\":\"Km8oaDUbb_pVUGsT38eHX87v078\",\"x5c\":[\"MIIC6TCCAdGgAwIBAgIIP8cyEA0NDykwDQYJKoZIhvcNAQELBQAwIzEhMB8GA1UEAxMYbG9naW4ubWljcm9zb2Z0b25saW5lLnVzMB4XDTI1MDMyMzE2MDEzN1oXDTMwMDMyMzE2MDEzN1owIzEhMB8GA1UEAxMYbG9naW4ubWljcm9zb2Z0b25saW5lLnVzMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAikFbcYO8PviJWVrHaVEp3eDnVEvFJRl7a32NQldBBGUWtkiLuMFKJMYvVik36AtJQ1/TDwfP46VHBDv8dMus8dxFWTAK25spIrW7avPa/Ok77aqFoeLi0f1iKRGkKDzqPpl7J9xvwQyLnzxBFWIYq2THkO0EO3vH+8tGO9kr6vF8l6j20cBuJ7dcOUz3W+dwEAQ+GxoLqPs9jxUNHJ84fnz64XEZWo1L4ZRBVh2IqjYUKdfurBhffqYZM8U4GBq0wc3KJY6+RA7Q9dMA2m2GPe1j33GoFVqFpQy8IhOz/CSPiVNt2olEM4ANwOBsndn9ldsRNsIp6BobOawcMT9vtwIDAQABoyEwHzAdBgNVHQ4EFgQUumi3x/LmmEju66W1mDxz934H6TwwDQYJKoZIhvcNAQELBQADggEBAHrVrhnTWoEDYiPeakkmVRP9fb13cPHDdj4fIbkIP8aOgZgF2mGjWc/AH/7vSeJ8dNxbzArfaLwcvYqa3QGbuhzEC/z3TV0j2OkOh49N8GydbcVEpcMgGj2QnJEyQEvcZgZp2ugdJYWkQ5GlkjOPxEvVaiaFvg47BAa9Cz1wxVYaXwGVr2qN4dmTOxxcgzpeG8UtZGQpTjh+Cl5Anu3ca8OfZxYq/KS/Suh1gDrtPi0lyEuIeZTm9lX9JBBA77zXIFHAZVqYKAKgs/9eDCTtjajjdZP+ws+gzdnFZDaMV63L+XrbXGV9hXU8Sjx7MPzbG3pX2ssCMlsDb8a3/8QqjIg=\"],\"n\":\"ikFbcYO8PviJWVrHaVEp3eDnVEvFJRl7a32NQldBBGUWtkiLuMFKJMYvVik36AtJQ1_TDwfP46VHBDv8dMus8dxFWTAK25spIrW7avPa_Ok77aqFoeLi0f1iKRGkKDzqPpl7J9xvwQyLnzxBFWIYq2THkO0EO3vH-8tGO9kr6vF8l6j20cBuJ7dcOUz3W-dwEAQ-GxoLqPs9jxUNHJ84fnz64XEZWo1L4ZRBVh2IqjYUKdfurBhffqYZM8U4GBq0wc3KJY6-RA7Q9dMA2m2GPe1j33GoFVqFpQy8IhOz_CSPiVNt2olEM4ANwOBsndn9ldsRNsIp6BobOawcMT9vtw\"}]}",
+                  "tokenEndpointAuthMethod" : "privateKeyJwtRfc7523",
+                  "scopes" : [ "openid", "email", "profile", "offline_access" ],
+                  "clientId" : "ed865090-235d-4df0-b5f4-a0e99ebb18f3",
+                  "isClientSecretConfigured" : false,
+                  "pkceEnabled" : false,
+                  "additionalConfig" : {
+                    "enforceNonce" : false,
+                    "enforceIssuerCheck" : false,
+                    "omitIDTokenHintForLogout" : false
+                  }
+                }
+              }, {
+                "id" : "c93f6b04-7a0f-42c1-b3c5-3b30d0ad8910",
+                "meta" : {
+                  "created" : "2025-06-26T20:17:27.355Z",
+                  "lastModified" : "2025-06-26T20:20:15.419Z",
+                  "createdBy" : "P000003",
+                  "modifiedBy" : "P000003",
+                  "location" : "https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/c93f6b04-7a0f-42c1-b3c5-3b30d0ad8910"
+                },
+                "name" : "Saml2 - Test",
+                "displayName" : "Terraform - SAML2",
+                "companyId" : "global",
+                "type" : "saml2",
+                "logoutUrl" : "https://test.com",
+                "forwardAllSsoRequests" : true,
+                "identityFederation" : {
+                  "useLocalUserStore" : true,
+                  "allowLocalUsersOnly" : true,
+                  "applyLocalIdPAuthnChecks" : false,
+                  "requiredGroups" : [ "Test Group" ]
+                },
+                "automaticRedirect" : true,
+                "loginHintConfiguration" : {
+                  "loginHintType" : "userInput",
+                  "sendMethod" : "authRequest"
+                },
+                "saml2Configuration" : {
+                  "digestAlgorithm" : "sha256",
+                  "includeScoping" : true,
+                  "defaultNameIdFormat" : "default",
+                  "allowCreate" : "none",
+                  "assertionAttributes" : [ {
+                    "name" : "test_attr",
+                    "value" : "test_value"
+                  } ],
+                  "ssoEndpoints" : [ {
+                    "bindingName" : "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+                    "location" : "https://test.com",
+                    "isDefault" : true
+                  } ],
+                  "sloEndpoints" : [ {
+                    "bindingName" : "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+                    "location" : "https://test.com",
+                    "isDefault" : true
+                  } ],
+                  "certificatesForSigning" : [ {
+                    "dn" : "CN=test (P000003),L=iasprovidertestblr.accounts400.ondemand.com,OU=8e1affb2-62a1-43cc-a687-2ba75e4b3d84,OU=Canary,OU=SAP Cloud Platform Clients,O=SAP SE,C=DE",
+                    "base64Certificate" : "redacted",
+                    "validFrom" : "2025-06-10T06:53:33Z",
+                    "validTo" : "2026-06-10T07:53:33Z",
+                    "isDefault" : true
+                  } ]
+                },
+                "oidcConfiguration" : {
+                  "subjectNameIdentifier" : "none",
+                  "isClientSecretConfigured" : false,
+                  "pkceEnabled" : false
+                }
+              }, {
+                "id" : "d102d994-68db-47df-ab2d-7efaeef6dae5",
+                "meta" : {
+                  "created" : "2025-06-08T04:03:11.441Z",
+                  "lastModified" : "2025-06-08T04:03:11.441Z",
+                  "createdBy" : "P000003",
+                  "location" : "https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/d102d994-68db-47df-ab2d-7efaeef6dae5"
+                },
+                "displayName" : "test",
+                "companyId" : "company id",
+                "type" : "saml2",
+                "forwardAllSsoRequests" : false,
+                "identityFederation" : {
+                  "useLocalUserStore" : false,
+                  "allowLocalUsersOnly" : false,
+                  "applyLocalIdPAuthnChecks" : false
+                },
+                "automaticRedirect" : true,
+                "loginHintConfiguration" : {
+                  "loginHintType" : "userInput",
+                  "sendMethod" : "urlParam"
+                },
+                "saml2Configuration" : {
+                  "digestAlgorithm" : "sha256",
+                  "includeScoping" : true,
+                  "defaultNameIdFormat" : "default",
+                  "allowCreate" : "none"
+                },
+                "oidcConfiguration" : {
+                  "subjectNameIdentifier" : "none",
+                  "scopes" : [ "openid" ],
+                  "isClientSecretConfigured" : false,
+                  "pkceEnabled" : false
+                }
+              } ]
+            }
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
+            Content-Type:
+                - application/json;charset=UTF-8
+            Critical-Origin-Trial:
+                - Tpcd
+            Date:
+                - Sun, 29 Jun 2025 18:40:02 GMT
+            Expires:
+                - "0"
+            Origin-Trial:
+                - Avu6rn7emV5gK8gvyGHlX8TMqM9uo1FacP2j/RWTq+8j+yKnqcTO0TQh0bXJ/7QntxD4/JzXv8aXoqxxZQuqXgYAAABdeyJvcmlnaW4iOiJodHRwczovL29uZGVtYW5kLmNvbTo0NDMiLCJmZWF0dXJlIjoiVHBjZCIsImV4cGlyeSI6MTczNTM0Mzk5OSwiaXNTdWJkb21haW4iOnRydWV9
+            Pragma:
+                - no-cache
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains; preload
+            Vary:
+                - accept-encoding,X-CSP-STRIP
+            X-Content-Type-Options:
+                - nosniff
+            X-Ids-Id:
+                - 330D8D2D-DACE-4C0A-B74D-D6617DA3D837
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-v4flk
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Robots-Tag:
+                - none
+            X-Xss-Protection:
+                - 1; mode=block
+        status: '200 '
+        code: 200
+        duration: 228.66725ms
+    - id: 3
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            Accept:
+                - '*/*'
+            Authorization:
+                - redacted
+            Content-Type:
+                - application/json
+            Dataserviceversion:
+                - "2.0"
+        url: https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: true
+        body: |-
+            {
+              "id" : "7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1",
+              "meta" : {
+                "created" : "2025-06-26T21:03:35.428Z",
+                "lastModified" : "2025-06-26T21:09:34.189Z",
+                "createdBy" : "P000003",
+                "modifiedBy" : "P000003",
+                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1"
+              },
+              "name" : "Oidc - Test",
+              "displayName" : "Terraform - OIDC",
+              "companyId" : "global",
+              "type" : "openIdConnect",
+              "logoutUrl" : "https://test.com",
+              "forwardAllSsoRequests" : true,
+              "identityFederation" : {
+                "useLocalUserStore" : true,
+                "allowLocalUsersOnly" : true,
+                "applyLocalIdPAuthnChecks" : false,
+                "requiredGroups" : [ "Test Group" ]
+              },
+              "automaticRedirect" : true,
+              "loginHintConfiguration" : {
+                "loginHintType" : "mail",
+                "sendMethod" : "urlParam"
+              },
+              "saml2Configuration" : {
+                "digestAlgorithm" : "sha256",
+                "includeScoping" : true,
+                "defaultNameIdFormat" : "default",
+                "allowCreate" : "none"
+              },
+              "oidcConfiguration" : {
+                "subjectNameIdentifier" : "email",
+                "discoveryUrl" : "https://token.actions.githubusercontent.com",
+                "issuer" : "https://token.actions.githubusercontent.com",
+                "jwksUri" : "https://token.actions.githubusercontent.com/.well-known/jwks",
+                "jwkSetPlain" : "{\"keys\":[{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"kid\":\"cc413527-173f-5a05-976e-9c52b1d7b431\",\"alg\":\"RS256\",\"n\":\"w4M936N3ZxNaEblcUoBm-xu0-V9JxNx5S7TmF0M3SBK-2bmDyAeDdeIOTcIVZHG-ZX9N9W0u1yWafgWewHrsz66BkxXq3bscvQUTAw7W3s6TEeYY7o9shPkFfOiU3x_KYgOo06SpiFdymwJflRs9cnbaU88i5fZJmUepUHVllP2tpPWTi-7UA3AdP3cdcCs5bnFfTRKzH2W0xqKsY_jIG95aQJRBDpbiesefjuyxcQnOv88j9tCKWzHpJzRKYjAUM6OPgN4HYnaSWrPJj1v41eEkFM1kORuj-GSH2qMVD02VklcqaerhQHIqM-RjeHsN7G05YtwYzomE5G-fZuwgvQ\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"ykNaY4qM_ta4k2TgZOCEYLkcYlA\",\"kid\":\"38826b17-6a30-5f9b-b169-8beb8202f723\",\"x5c\":[\"MIIDKzCCAhOgAwIBAgIUDnwm6eRIqGFA3o/P1oBrChvx/nowDQYJKoZIhvcNAQELBQAwJTEjMCEGA1UEAwwaYWN0aW9ucy5zZWxmLXNpZ25lZC5naXRodWIwHhcNMjQwMTIzMTUyNTM2WhcNMzQwMTIwMTUyNTM2WjAlMSMwIQYDVQQDDBphY3Rpb25zLnNlbGYtc2lnbmVkLmdpdGh1YjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAOTGp5svs8LJN8BH7VzXShWXnOK0lhDVuI0xnr5bwHFPc924CwaIEFb6mC7bvW2lZtgd633uaJ2naG6vKaOVGpCdGLE4ohH11nUk+2CNknZL7/oTmDHGSmGeHRb7kjtb0Ng4BJMPzmTYmCNUudfDFhHDcZz1Obuu85GsABrC5ZlzWzspYFXwUSaxvII+rHK/rAbOC2gmt5IOSLmgh3taQfp0mB6Lxlf89HoBPNwtPfBX8DtXTWQVnqODm4W+WfmWBSyXGX54DGNMyZwlTZqR0FjoMXxopId3MIuDGKxa2weDU5cW60N2y/qxikeV99fL3sg5aPA8s9iljKG0+MAfVNUCAwEAAaNTMFEwHQYDVR0OBBYEFIPALo5VanJ6E1B9eLQgGO+uGV65MB8GA1UdIwQYMBaAFIPALo5VanJ6E1B9eLQgGO+uGV65MA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAGS0hZE+DqKIRi49Z2KDOMOaSZnAYgqq6ws9HJHT09MXWlMHB8E/apvy2ZuFrcSu14ZLweJid+PrrooXEXEO6azEakzCjeUb9G1QwlzP4CkTcMGCw1Snh3jWZIuKaw21f7mp2rQ+YNltgHVDKY2s8AD273E8musEsWxJl80/MNvMie8Hfh4n4/Xl2r6t1YPmUJMoXAXdTBb0hkPy1fUu3r2T+1oi7Rw6kuVDfAZjaHupNHzJeDOg2KxUoK/GF2/M2qpVrd19Pv/JXNkQXRE4DFbErMmA7tXpp1tkXJRPhFui/Pv5H9cPgObEf9x6W4KnCXzT3ReeeRDKF8SqGTPELsc=\"],\"alg\":\"RS256\",\"n\":\"5Manmy-zwsk3wEftXNdKFZec4rSWENW4jTGevlvAcU9z3bgLBogQVvqYLtu9baVm2B3rfe5onadobq8po5UakJ0YsTiiEfXWdST7YI2Sdkvv-hOYMcZKYZ4dFvuSO1vQ2DgEkw_OZNiYI1S518MWEcNxnPU5u67zkawAGsLlmXNbOylgVfBRJrG8gj6scr-sBs4LaCa3kg5IuaCHe1pB-nSYHovGV_z0egE83C098FfwO1dNZBWeo4Obhb5Z-ZYFLJcZfngMY0zJnCVNmpHQWOgxfGikh3cwi4MYrFrbB4NTlxbrQ3bL-rGKR5X318veyDlo8Dyz2KWMobT4wB9U1Q\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"Hyq4NATAjsnqC7mdrtAhhrCR2_Q\",\"kid\":\"1F2AB83404C08EC9EA0BB99DAED02186B091DBF4\",\"x5c\":[\"MIIDrDCCApSgAwIBAgIQAP4blP36Q3WmMOhWf0RBMzANBgkqhkiG9w0BAQsFADA2MTQwMgYDVQQDEyt2c3RzLXZzdHNnaHJ0LWdoLXZzby1vYXV0aC52aXN1YWxzdHVkaW8uY29tMB4XDTIzMTAyNDE0NTI1NVoXDTI1MTAyNDE1MDI1NVowNjE0MDIGA1UEAxMrdnN0cy12c3RzZ2hydC1naC12c28tb2F1dGgudmlzdWFsc3R1ZGlvLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALvM0mJ+SUfzucssEnjoZllnezjKC25YeIhk3iIUzlaJ/uXueESt9GEA3lAo6W/bt73R0zu10u4uhM5MC27FDoq9u7oaqBRhll0gGaz6HDqG0haCwuZdDb0ikalbaaAAzh3AIefby26/Hc98bRBBsf6pS083xX1ogiGFosteQtqKNXjT8c0Hzr3bu2Hrejn+JrrFdBLOf5jRE6XhzlRK4vD1n8c8OPOVByI97KHJeC5PyN4g8h34KU+PbSCWIRxOTSJizXcDIWtXAQiGyTMtXSQn3aCvNux4vaisgZn7TUD4XsxlUbDo7H9gX1Bsxj+aQhqxQYxDnC4Y/94/kyXm4L0CAwEAAaOBtTCBsjAOBgNVHQ8BAf8EBAMCBaAwCQYDVR0TBAIwADAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwNgYDVR0RBC8wLYIrdnN0cy12c3RzZ2hydC1naC12c28tb2F1dGgudmlzdWFsc3R1ZGlvLmNvbTAfBgNVHSMEGDAWgBSmWMP5CXuaSzoLKwcLXYZnoeCJmDAdBgNVHQ4EFgQUpljD+Ql7mks6CysHC12GZ6HgiZgwDQYJKoZIhvcNAQELBQADggEBAINwybFwYpXJkvauL5QbtrykIDYeP8oFdVIeVY8YI9MGfx7OwWDsNBVXv2B62zAZ49hK5G87++NmFI/FHnGOCISDYoJkRSCy2Nbeyr7Nx2VykWzUQqHLZfvr5KqW4Gj1OFHUqTl8lP3FWDd/P+lil3JobaSiICQshgF0GnX2a8ji8mfXpJSP20gzrLw84brmtmheAvJ9X/sLbM/RBkkT6g4NV2QbTMqo6k601qBNQBsH+lTDDWPCkRoAlW6a0z9bWIhGHWJ2lcR70zagcxIVl5/Fq35770/aMGroSrIx3JayOEqsvgIthYBKHzpT2VFwUz1VpBpNVJg9/u6jCwLY7QA=\"],\"alg\":\"RS256\",\"n\":\"u8zSYn5JR_O5yywSeOhmWWd7OMoLblh4iGTeIhTOVon-5e54RK30YQDeUCjpb9u3vdHTO7XS7i6EzkwLbsUOir27uhqoFGGWXSAZrPocOobSFoLC5l0NvSKRqVtpoADOHcAh59vLbr8dz3xtEEGx_qlLTzfFfWiCIYWiy15C2oo1eNPxzQfOvdu7Yet6Of4musV0Es5_mNETpeHOVEri8PWfxzw485UHIj3socl4Lk_I3iDyHfgpT49tIJYhHE5NImLNdwMha1cBCIbJMy1dJCfdoK827Hi9qKyBmftNQPhezGVRsOjsf2BfUGzGP5pCGrFBjEOcLhj_3j-TJebgvQ\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"AB3c0BSoSOiCRXez5POu2zvPX_0\",\"kid\":\"001DDCD014A848E8824577B3E4F3AEDB3BCF5FFD\",\"x5c\":[\"MIIDrDCCApSgAwIBAgIQKiyRrA01T5qtxdzvZ/ErzjANBgkqhkiG9w0BAQsFADA2MTQwMgYDVQQDEyt2c3RzLXZzdHNnaHJ0LWdoLXZzby1vYXV0aC52aXN1YWxzdHVkaW8uY29tMB4XDTIzMTAxODE1MDExOFoXDTI1MTAxODE1MTExOFowNjE0MDIGA1UEAxMrdnN0cy12c3RzZ2hydC1naC12c28tb2F1dGgudmlzdWFsc3R1ZGlvLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALCP6+IjsL0cZLEqL8mTfHWubvnYdO33XKoexY8iimQjla+3WvPfMZNExvXme5XwNQpgUx+LF+Xr4OGINsXRQ8WCuMZi2XMDMkGSA4mXHSLo57bWqqZazL/7/mMgGqRxZrnWwTvDVbjh94JhmidNhvLtVXX/Atz3TStd3IeMKTb8qMcKmiFhj0s7nQOphjxqL0S4buXRDjiUibbC8xMTbzZh54TyWZNOq+xXj5AVkkNQgh1wM6QfmlFhGQtRSjEoqtnb3zgsoibbRHco/Dv+cqm9MCwD2/vDXc5KaW0WpdlhqMKFPgHo6qFiJoXw85TgUErZ4bgJbiqQOrB9InypULECAwEAAaOBtTCBsjAOBgNVHQ8BAf8EBAMCBaAwCQYDVR0TBAIwADAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwNgYDVR0RBC8wLYIrdnN0cy12c3RzZ2hydC1naC12c28tb2F1dGgudmlzdWFsc3R1ZGlvLmNvbTAfBgNVHSMEGDAWgBQ45rBfvl4JJ7vg3WgLjQTfhDihvzAdBgNVHQ4EFgQUOOawX75eCSe74N1oC40E34Q4ob8wDQYJKoZIhvcNAQELBQADggEBABdN6HPheRdzwvJgi4xGHnf9pvlUC8981kAtgHnPT0VEYXh/dCMnKJSvCDJADpdmkuKxLxAfACeZR2CUHkQ0eO1ek/ihLvPqywDhLENq6Lvzu3qlhvUPBkGYjydpLtXQ1bBXUQ1FzT5/L1U19P2rJso9mC4ltu2OHJ9NLCKG0zffBItAJqhAiXtKbCUg4c9RbQxi9T2/xr9R72di4Qygfnmr3QleAqmjRG918cm5/uJ0s5EaK3QI7GQy7+tc44o3H3AI5eFtrHwIV0zoY4A9YIsaRmMHq9soHFBEO1HDKKRUOl/4tjpx8zHpp5Clz0wiZMgvSIdBa3/fTeUJ3flUYMo=\"],\"alg\":\"RS256\",\"n\":\"sI_r4iOwvRxksSovyZN8da5u-dh07fdcqh7FjyKKZCOVr7da898xk0TG9eZ7lfA1CmBTH4sX5evg4Yg2xdFDxYK4xmLZcwMyQZIDiZcdIujnttaqplrMv_v-YyAapHFmudbBO8NVuOH3gmGaJ02G8u1Vdf8C3PdNK13ch4wpNvyoxwqaIWGPSzudA6mGPGovRLhu5dEOOJSJtsLzExNvNmHnhPJZk06r7FePkBWSQ1CCHXAzpB-aUWEZC1FKMSiq2dvfOCyiJttEdyj8O_5yqb0wLAPb-8NdzkppbRal2WGowoU-AejqoWImhfDzlOBQStnhuAluKpA6sH0ifKlQsQ\"}]}",
+                "scopes" : [ "openid" ],
+                "clientId" : "Oidc - Test",
+                "isClientSecretConfigured" : false,
+                "pkceEnabled" : false
+              }
+            }
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
+            Content-Type:
+                - application/json;charset=UTF-8
+            Critical-Origin-Trial:
+                - Tpcd
+            Date:
+                - Sun, 29 Jun 2025 18:40:02 GMT
+            Expires:
+                - "0"
+            Origin-Trial:
+                - Avu6rn7emV5gK8gvyGHlX8TMqM9uo1FacP2j/RWTq+8j+yKnqcTO0TQh0bXJ/7QntxD4/JzXv8aXoqxxZQuqXgYAAABdeyJvcmlnaW4iOiJodHRwczovL29uZGVtYW5kLmNvbTo0NDMiLCJmZWF0dXJlIjoiVHBjZCIsImV4cGlyeSI6MTczNTM0Mzk5OSwiaXNTdWJkb21haW4iOnRydWV9
+            Pragma:
+                - no-cache
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains; preload
+            Vary:
+                - accept-encoding,X-CSP-STRIP
+            X-Content-Type-Options:
+                - nosniff
+            X-Ids-Id:
+                - 28F1C17E-DF6D-4E74-B346-E84CDBD93DE5
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-v4flk
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Robots-Tag:
+                - none
+            X-Xss-Protection:
+                - 1; mode=block
+        status: '200 '
+        code: 200
+        duration: 228.86661ms
+    - id: 4
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            Accept:
+                - '*/*'
+            Authorization:
+                - redacted
+            Content-Type:
+                - application/json
+            Dataserviceversion:
+                - "2.0"
+        url: https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: true
+        body: |-
+            {
+              "totalResults" : 6,
+              "itemsPerPage" : 6,
+              "identityProviders" : [ {
+                "id" : "259c0cc5-8a1e-4a9d-8046-5f6237fa5b0d",
+                "meta" : {
+                  "created" : "2025-06-27T16:18:37.541Z",
+                  "lastModified" : "2025-06-27T16:18:37.541Z",
+                  "createdBy" : "P000003",
+                  "location" : "https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/259c0cc5-8a1e-4a9d-8046-5f6237fa5b0d"
+                },
+                "name" : "test",
+                "displayName" : "test",
+                "companyId" : "global",
+                "type" : "openIdConnect",
+                "forwardAllSsoRequests" : false,
+                "identityFederation" : {
+                  "useLocalUserStore" : false,
+                  "allowLocalUsersOnly" : false,
+                  "applyLocalIdPAuthnChecks" : false
+                },
+                "automaticRedirect" : true,
+                "loginHintConfiguration" : {
+                  "loginHintType" : "userInput",
+                  "sendMethod" : "urlParam"
+                },
+                "saml2Configuration" : {
+                  "digestAlgorithm" : "sha256",
+                  "includeScoping" : true,
+                  "defaultNameIdFormat" : "default",
+                  "allowCreate" : "none"
+                },
+                "oidcConfiguration" : {
+                  "subjectNameIdentifier" : "none",
+                  "scopes" : [ "openid" ],
+                  "isClientSecretConfigured" : false,
+                  "pkceEnabled" : false
+                }
+              }, {
+                "id" : "7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1",
+                "meta" : {
+                  "created" : "2025-06-26T21:03:35.428Z",
+                  "lastModified" : "2025-06-26T21:09:34.189Z",
+                  "createdBy" : "P000003",
+                  "modifiedBy" : "P000003",
+                  "location" : "https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1"
+                },
+                "name" : "Oidc - Test",
+                "displayName" : "Terraform - OIDC",
+                "companyId" : "global",
+                "type" : "openIdConnect",
+                "logoutUrl" : "https://test.com",
+                "forwardAllSsoRequests" : true,
+                "identityFederation" : {
+                  "useLocalUserStore" : true,
+                  "allowLocalUsersOnly" : true,
+                  "applyLocalIdPAuthnChecks" : false,
+                  "requiredGroups" : [ "Test Group" ]
+                },
+                "automaticRedirect" : true,
+                "loginHintConfiguration" : {
+                  "loginHintType" : "mail",
+                  "sendMethod" : "urlParam"
+                },
+                "saml2Configuration" : {
+                  "digestAlgorithm" : "sha256",
+                  "includeScoping" : true,
+                  "defaultNameIdFormat" : "default",
+                  "allowCreate" : "none"
+                },
+                "oidcConfiguration" : {
+                  "subjectNameIdentifier" : "email",
+                  "discoveryUrl" : "https://token.actions.githubusercontent.com",
+                  "issuer" : "https://token.actions.githubusercontent.com",
+                  "jwksUri" : "https://token.actions.githubusercontent.com/.well-known/jwks",
+                  "jwkSetPlain" : "{\"keys\":[{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"kid\":\"cc413527-173f-5a05-976e-9c52b1d7b431\",\"alg\":\"RS256\",\"n\":\"w4M936N3ZxNaEblcUoBm-xu0-V9JxNx5S7TmF0M3SBK-2bmDyAeDdeIOTcIVZHG-ZX9N9W0u1yWafgWewHrsz66BkxXq3bscvQUTAw7W3s6TEeYY7o9shPkFfOiU3x_KYgOo06SpiFdymwJflRs9cnbaU88i5fZJmUepUHVllP2tpPWTi-7UA3AdP3cdcCs5bnFfTRKzH2W0xqKsY_jIG95aQJRBDpbiesefjuyxcQnOv88j9tCKWzHpJzRKYjAUM6OPgN4HYnaSWrPJj1v41eEkFM1kORuj-GSH2qMVD02VklcqaerhQHIqM-RjeHsN7G05YtwYzomE5G-fZuwgvQ\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"ykNaY4qM_ta4k2TgZOCEYLkcYlA\",\"kid\":\"38826b17-6a30-5f9b-b169-8beb8202f723\",\"x5c\":[\"MIIDKzCCAhOgAwIBAgIUDnwm6eRIqGFA3o/P1oBrChvx/nowDQYJKoZIhvcNAQELBQAwJTEjMCEGA1UEAwwaYWN0aW9ucy5zZWxmLXNpZ25lZC5naXRodWIwHhcNMjQwMTIzMTUyNTM2WhcNMzQwMTIwMTUyNTM2WjAlMSMwIQYDVQQDDBphY3Rpb25zLnNlbGYtc2lnbmVkLmdpdGh1YjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAOTGp5svs8LJN8BH7VzXShWXnOK0lhDVuI0xnr5bwHFPc924CwaIEFb6mC7bvW2lZtgd633uaJ2naG6vKaOVGpCdGLE4ohH11nUk+2CNknZL7/oTmDHGSmGeHRb7kjtb0Ng4BJMPzmTYmCNUudfDFhHDcZz1Obuu85GsABrC5ZlzWzspYFXwUSaxvII+rHK/rAbOC2gmt5IOSLmgh3taQfp0mB6Lxlf89HoBPNwtPfBX8DtXTWQVnqODm4W+WfmWBSyXGX54DGNMyZwlTZqR0FjoMXxopId3MIuDGKxa2weDU5cW60N2y/qxikeV99fL3sg5aPA8s9iljKG0+MAfVNUCAwEAAaNTMFEwHQYDVR0OBBYEFIPALo5VanJ6E1B9eLQgGO+uGV65MB8GA1UdIwQYMBaAFIPALo5VanJ6E1B9eLQgGO+uGV65MA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAGS0hZE+DqKIRi49Z2KDOMOaSZnAYgqq6ws9HJHT09MXWlMHB8E/apvy2ZuFrcSu14ZLweJid+PrrooXEXEO6azEakzCjeUb9G1QwlzP4CkTcMGCw1Snh3jWZIuKaw21f7mp2rQ+YNltgHVDKY2s8AD273E8musEsWxJl80/MNvMie8Hfh4n4/Xl2r6t1YPmUJMoXAXdTBb0hkPy1fUu3r2T+1oi7Rw6kuVDfAZjaHupNHzJeDOg2KxUoK/GF2/M2qpVrd19Pv/JXNkQXRE4DFbErMmA7tXpp1tkXJRPhFui/Pv5H9cPgObEf9x6W4KnCXzT3ReeeRDKF8SqGTPELsc=\"],\"alg\":\"RS256\",\"n\":\"5Manmy-zwsk3wEftXNdKFZec4rSWENW4jTGevlvAcU9z3bgLBogQVvqYLtu9baVm2B3rfe5onadobq8po5UakJ0YsTiiEfXWdST7YI2Sdkvv-hOYMcZKYZ4dFvuSO1vQ2DgEkw_OZNiYI1S518MWEcNxnPU5u67zkawAGsLlmXNbOylgVfBRJrG8gj6scr-sBs4LaCa3kg5IuaCHe1pB-nSYHovGV_z0egE83C098FfwO1dNZBWeo4Obhb5Z-ZYFLJcZfngMY0zJnCVNmpHQWOgxfGikh3cwi4MYrFrbB4NTlxbrQ3bL-rGKR5X318veyDlo8Dyz2KWMobT4wB9U1Q\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"Hyq4NATAjsnqC7mdrtAhhrCR2_Q\",\"kid\":\"1F2AB83404C08EC9EA0BB99DAED02186B091DBF4\",\"x5c\":[\"MIIDrDCCApSgAwIBAgIQAP4blP36Q3WmMOhWf0RBMzANBgkqhkiG9w0BAQsFADA2MTQwMgYDVQQDEyt2c3RzLXZzdHNnaHJ0LWdoLXZzby1vYXV0aC52aXN1YWxzdHVkaW8uY29tMB4XDTIzMTAyNDE0NTI1NVoXDTI1MTAyNDE1MDI1NVowNjE0MDIGA1UEAxMrdnN0cy12c3RzZ2hydC1naC12c28tb2F1dGgudmlzdWFsc3R1ZGlvLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALvM0mJ+SUfzucssEnjoZllnezjKC25YeIhk3iIUzlaJ/uXueESt9GEA3lAo6W/bt73R0zu10u4uhM5MC27FDoq9u7oaqBRhll0gGaz6HDqG0haCwuZdDb0ikalbaaAAzh3AIefby26/Hc98bRBBsf6pS083xX1ogiGFosteQtqKNXjT8c0Hzr3bu2Hrejn+JrrFdBLOf5jRE6XhzlRK4vD1n8c8OPOVByI97KHJeC5PyN4g8h34KU+PbSCWIRxOTSJizXcDIWtXAQiGyTMtXSQn3aCvNux4vaisgZn7TUD4XsxlUbDo7H9gX1Bsxj+aQhqxQYxDnC4Y/94/kyXm4L0CAwEAAaOBtTCBsjAOBgNVHQ8BAf8EBAMCBaAwCQYDVR0TBAIwADAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwNgYDVR0RBC8wLYIrdnN0cy12c3RzZ2hydC1naC12c28tb2F1dGgudmlzdWFsc3R1ZGlvLmNvbTAfBgNVHSMEGDAWgBSmWMP5CXuaSzoLKwcLXYZnoeCJmDAdBgNVHQ4EFgQUpljD+Ql7mks6CysHC12GZ6HgiZgwDQYJKoZIhvcNAQELBQADggEBAINwybFwYpXJkvauL5QbtrykIDYeP8oFdVIeVY8YI9MGfx7OwWDsNBVXv2B62zAZ49hK5G87++NmFI/FHnGOCISDYoJkRSCy2Nbeyr7Nx2VykWzUQqHLZfvr5KqW4Gj1OFHUqTl8lP3FWDd/P+lil3JobaSiICQshgF0GnX2a8ji8mfXpJSP20gzrLw84brmtmheAvJ9X/sLbM/RBkkT6g4NV2QbTMqo6k601qBNQBsH+lTDDWPCkRoAlW6a0z9bWIhGHWJ2lcR70zagcxIVl5/Fq35770/aMGroSrIx3JayOEqsvgIthYBKHzpT2VFwUz1VpBpNVJg9/u6jCwLY7QA=\"],\"alg\":\"RS256\",\"n\":\"u8zSYn5JR_O5yywSeOhmWWd7OMoLblh4iGTeIhTOVon-5e54RK30YQDeUCjpb9u3vdHTO7XS7i6EzkwLbsUOir27uhqoFGGWXSAZrPocOobSFoLC5l0NvSKRqVtpoADOHcAh59vLbr8dz3xtEEGx_qlLTzfFfWiCIYWiy15C2oo1eNPxzQfOvdu7Yet6Of4musV0Es5_mNETpeHOVEri8PWfxzw485UHIj3socl4Lk_I3iDyHfgpT49tIJYhHE5NImLNdwMha1cBCIbJMy1dJCfdoK827Hi9qKyBmftNQPhezGVRsOjsf2BfUGzGP5pCGrFBjEOcLhj_3j-TJebgvQ\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"AB3c0BSoSOiCRXez5POu2zvPX_0\",\"kid\":\"001DDCD014A848E8824577B3E4F3AEDB3BCF5FFD\",\"x5c\":[\"MIIDrDCCApSgAwIBAgIQKiyRrA01T5qtxdzvZ/ErzjANBgkqhkiG9w0BAQsFADA2MTQwMgYDVQQDEyt2c3RzLXZzdHNnaHJ0LWdoLXZzby1vYXV0aC52aXN1YWxzdHVkaW8uY29tMB4XDTIzMTAxODE1MDExOFoXDTI1MTAxODE1MTExOFowNjE0MDIGA1UEAxMrdnN0cy12c3RzZ2hydC1naC12c28tb2F1dGgudmlzdWFsc3R1ZGlvLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALCP6+IjsL0cZLEqL8mTfHWubvnYdO33XKoexY8iimQjla+3WvPfMZNExvXme5XwNQpgUx+LF+Xr4OGINsXRQ8WCuMZi2XMDMkGSA4mXHSLo57bWqqZazL/7/mMgGqRxZrnWwTvDVbjh94JhmidNhvLtVXX/Atz3TStd3IeMKTb8qMcKmiFhj0s7nQOphjxqL0S4buXRDjiUibbC8xMTbzZh54TyWZNOq+xXj5AVkkNQgh1wM6QfmlFhGQtRSjEoqtnb3zgsoibbRHco/Dv+cqm9MCwD2/vDXc5KaW0WpdlhqMKFPgHo6qFiJoXw85TgUErZ4bgJbiqQOrB9InypULECAwEAAaOBtTCBsjAOBgNVHQ8BAf8EBAMCBaAwCQYDVR0TBAIwADAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwNgYDVR0RBC8wLYIrdnN0cy12c3RzZ2hydC1naC12c28tb2F1dGgudmlzdWFsc3R1ZGlvLmNvbTAfBgNVHSMEGDAWgBQ45rBfvl4JJ7vg3WgLjQTfhDihvzAdBgNVHQ4EFgQUOOawX75eCSe74N1oC40E34Q4ob8wDQYJKoZIhvcNAQELBQADggEBABdN6HPheRdzwvJgi4xGHnf9pvlUC8981kAtgHnPT0VEYXh/dCMnKJSvCDJADpdmkuKxLxAfACeZR2CUHkQ0eO1ek/ihLvPqywDhLENq6Lvzu3qlhvUPBkGYjydpLtXQ1bBXUQ1FzT5/L1U19P2rJso9mC4ltu2OHJ9NLCKG0zffBItAJqhAiXtKbCUg4c9RbQxi9T2/xr9R72di4Qygfnmr3QleAqmjRG918cm5/uJ0s5EaK3QI7GQy7+tc44o3H3AI5eFtrHwIV0zoY4A9YIsaRmMHq9soHFBEO1HDKKRUOl/4tjpx8zHpp5Clz0wiZMgvSIdBa3/fTeUJ3flUYMo=\"],\"alg\":\"RS256\",\"n\":\"sI_r4iOwvRxksSovyZN8da5u-dh07fdcqh7FjyKKZCOVr7da898xk0TG9eZ7lfA1CmBTH4sX5evg4Yg2xdFDxYK4xmLZcwMyQZIDiZcdIujnttaqplrMv_v-YyAapHFmudbBO8NVuOH3gmGaJ02G8u1Vdf8C3PdNK13ch4wpNvyoxwqaIWGPSzudA6mGPGovRLhu5dEOOJSJtsLzExNvNmHnhPJZk06r7FePkBWSQ1CCHXAzpB-aUWEZC1FKMSiq2dvfOCyiJttEdyj8O_5yqb0wLAPb-8NdzkppbRal2WGowoU-AejqoWImhfDzlOBQStnhuAluKpA6sH0ifKlQsQ\"}]}",
+                  "scopes" : [ "openid" ],
+                  "clientId" : "Oidc - Test",
+                  "isClientSecretConfigured" : false,
+                  "pkceEnabled" : false
+                }
+              }, {
+                "id" : "9e35a298-36c1-4d21-967d-c8525ebfa84e",
+                "meta" : {
+                  "created" : "2025-06-08T04:02:37.939Z",
+                  "lastModified" : "2025-06-08T04:02:37.939Z",
+                  "createdBy" : "P000003",
+                  "location" : "https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/9e35a298-36c1-4d21-967d-c8525ebfa84e"
+                },
+                "displayName" : "test",
+                "companyId" : "company id",
+                "type" : "saml2",
+                "forwardAllSsoRequests" : false,
+                "identityFederation" : {
+                  "useLocalUserStore" : false,
+                  "allowLocalUsersOnly" : false,
+                  "applyLocalIdPAuthnChecks" : false
+                },
+                "automaticRedirect" : true,
+                "loginHintConfiguration" : {
+                  "loginHintType" : "userInput",
+                  "sendMethod" : "urlParam"
+                },
+                "saml2Configuration" : {
+                  "digestAlgorithm" : "sha256",
+                  "includeScoping" : true,
+                  "defaultNameIdFormat" : "default",
+                  "allowCreate" : "none"
+                },
+                "oidcConfiguration" : {
+                  "subjectNameIdentifier" : "none",
+                  "scopes" : [ "openid" ],
+                  "isClientSecretConfigured" : false,
+                  "pkceEnabled" : false
+                }
+              }, {
+                "id" : "b89c4228-8cfb-4d7b-94d7-1c300898d722",
+                "meta" : {
+                  "created" : "2025-05-22T07:35:15.206Z",
+                  "lastModified" : "2025-05-23T09:11:48.097Z",
+                  "createdBy" : "P000003",
+                  "modifiedBy" : "P000003",
+                  "location" : "https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/b89c4228-8cfb-4d7b-94d7-1c300898d722"
+                },
+                "name" : "Federation with entra ID",
+                "displayName" : "Federation with Entra ID",
+                "companyId" : "global",
+                "type" : "openIdConnect",
+                "forwardAllSsoRequests" : false,
+                "identityFederation" : {
+                  "useLocalUserStore" : true,
+                  "allowLocalUsersOnly" : true,
+                  "applyLocalIdPAuthnChecks" : false
+                },
+                "automaticRedirect" : true,
+                "loginHintConfiguration" : {
+                  "loginHintType" : "userInput",
+                  "sendMethod" : "urlParam"
+                },
+                "saml2Configuration" : {
+                  "digestAlgorithm" : "sha256",
+                  "includeScoping" : true,
+                  "defaultNameIdFormat" : "default",
+                  "allowCreate" : "none"
+                },
+                "oidcConfiguration" : {
+                  "subjectNameIdentifier" : "email",
+                  "discoveryUrl" : "https://login.microsoftonline.com/bda9fde1-6400-4097-a39e-cc0e0cc36b34/v2.0/.well-known/openid-configuration",
+                  "issuer" : "https://login.microsoftonline.com/bda9fde1-6400-4097-a39e-cc0e0cc36b34/v2.0",
+                  "tokenEndpoint" : "https://login.microsoftonline.com/bda9fde1-6400-4097-a39e-cc0e0cc36b34/oauth2/v2.0/token",
+                  "authorizationEndpoint" : "https://login.microsoftonline.com/bda9fde1-6400-4097-a39e-cc0e0cc36b34/oauth2/v2.0/authorize",
+                  "endSessionEndpoint" : "https://login.microsoftonline.com/bda9fde1-6400-4097-a39e-cc0e0cc36b34/oauth2/v2.0/logout",
+                  "userInfoEndpoint" : "https://graph.microsoft.com/oidc/userinfo",
+                  "jwksUri" : "https://login.microsoftonline.com/bda9fde1-6400-4097-a39e-cc0e0cc36b34/discovery/v2.0/keys",
+                  "jwkSetPlain" : "{\"keys\":[{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"JYhSOsHhDZrc5kfqQg8ujkHMTNY\",\"kid\":\"JYhSOsHhDZrc5kfqQg8ujkHMTNY\",\"x5c\":[\"MIIC/TCCAeWgAwIBAgIIY81p6sALmU8wDQYJKoZIhvcNAQELBQAwLTErMCkGA1UEAxMiYWNjb3VudHMuYWNjZXNzY29udHJvbC53aW5kb3dzLm5ldDAeFw0yNTAyMjQwOTMyNTdaFw0zMDAyMjQwOTMyNTdaMC0xKzApBgNVBAMTImFjY291bnRzLmFjY2Vzc2NvbnRyb2wud2luZG93cy5uZXQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDHExFy6zLBEh390lH951z6p78ze+Fc40LPtAOGNV+iodZu32VAJcJUiwij1UkjWcZPUXo2RcQgG3jrbHanXDZyB/gAXzp0aFtOlH6TzVYtHmA2OSGk+oHU8KK2JyFUgpscC87JgQBomcTIKImoiVT9mDkvkXNGq/83/f5+Fi9YrSlzebU6HJ3aQ1GDU1tynmiC3uYGN5zswSt+L43Sjni9d+wrqEzabuHSxnBV3gLGA+qekG2baG0z3FoqmfCRigQve9rds8jVUYan1AtnAxXpEAc7L85GnPjFqsb7PuVlQIs7RfVKjTmufvDl50GZ9uVRCU8vcGWNtRUHdpt31I1fAgMBAAGjITAfMB0GA1UdDgQWBBQc8G/33OWrtOT/XnksiamjCcQKcDANBgkqhkiG9w0BAQsFAAOCAQEAt5GZmtTxoJ4fQMS787qU8PHcw2ihIzx1gzP0JNYTG+7qdP/oZsYISZ4EyTnZ8gkJfgZIYHoGe/5BcZ4N56LtUl3HIw/b4WYPjbFNHaAiNmQDqPp1/HtIhv7FZNKXu6az0fBfSc5RetWGnZ7Ex3mmhjJisAt+Ml+fRYLfjvQghtiNTsdOCQRWQpaCVJC7lV9x5gfSWm6qIAquGJE3xqVWnUlCjFJk67UbqmqNltJ5dDNEk6N2BSM2WlA9lf9FIhdBWBCn2zplQHcA0EU+0p3iwLH/AjwjJnW41NcJO51bN5Jye6dhSaS9yQm9iKTK8H6DOpkzj3oR4Sf9Ki31+kxiTQ==\"],\"n\":\"xxMRcusywRId_dJR_edc-qe_M3vhXONCz7QDhjVfoqHWbt9lQCXCVIsIo9VJI1nGT1F6NkXEIBt462x2p1w2cgf4AF86dGhbTpR-k81WLR5gNjkhpPqB1PCitichVIKbHAvOyYEAaJnEyCiJqIlU_Zg5L5FzRqv_N_3-fhYvWK0pc3m1Ohyd2kNRg1Nbcp5ogt7mBjec7MErfi-N0o54vXfsK6hM2m7h0sZwVd4CxgPqnpBtm2htM9xaKpnwkYoEL3va3bPI1VGGp9QLZwMV6RAHOy_ORpz4xarG-z7lZUCLO0X1So05rn7w5edBmfblUQlPL3BljbUVB3abd9SNXw\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"CNv0OI3RwqlHFEVnaoMAshCH2XE\",\"kid\":\"CNv0OI3RwqlHFEVnaoMAshCH2XE\",\"x5c\":[\"MIIC/TCCAeWgAwIBAgIICu+WfBLOqBAwDQYJKoZIhvcNAQELBQAwLTErMCkGA1UEAxMiYWNjb3VudHMuYWNjZXNzY29udHJvbC53aW5kb3dzLm5ldDAeFw0yNTAzMTYyMDE3MjNaFw0zMDAzMTYyMDE3MjNaMC0xKzApBgNVBAMTImFjY291bnRzLmFjY2Vzc2NvbnRyb2wud2luZG93cy5uZXQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCHPp9RIJIC6LJDPovWdCPjNryQi168nPGFVt5wyKBMiX2ldlIdlreDMyC1qmdvWr3oIbmq9Hvx0fpm9MovwzM3hV8aBmG8sS/kskp6jS0aAEhLrnDEiIliP0TEQOoWTD1F2FbWc3wg3147vo9sL590Q+0N6QDYFohNjYMBEhIo3gp7REsERY2sp4SOM7OvKBLZ7dD01XMTnVkYZAAYdq7tq0fLwz+oDWed3Z0xSBQycRggzMMFNIrPXsbqK0k51qca8bfBe92md0p9+cOmlo+TJZufJt0wjgg/urpawKqe3ca2D5toboYOplBAQGn0L2AsAW/g5FNGWkPfDSAIyHvHAgMBAAGjITAfMB0GA1UdDgQWBBSsQvFDUwCTJXK+ltZFLaHUGzIS6jANBgkqhkiG9w0BAQsFAAOCAQEAUsfNQA+O7eXGI4IL/FmafEmmFjoXC+Ym9UIzG/vXcXzQEK9S9nV35Q0Fn9PsL1w8Sud3itm/V6t9UtB9yaRvWREPOdEYsHEkZahoSFi2fgOLP+AsTtQq0ePeBbqAQvnfrTvFuv+j1we3uxxov77pt7U+pB+6Sq8+yww85qeTCWmV4av2WWXB+6pW9oUd/D9htlxKL5WzNsaVojP56eg3mwhBmOpqxkYnL7RAPGOYRjaeHic9ONrctC8HImjf21UC5wK8G/lcVQATcvPZm/AYJg10fNsxZ/8ApFLblf9Q8l0QcKZfjs/si3VKcWvilDrfO9Dg83Ou6tvsLnPU5lV3aA==\"],\"n\":\"hz6fUSCSAuiyQz6L1nQj4za8kItevJzxhVbecMigTIl9pXZSHZa3gzMgtapnb1q96CG5qvR78dH6ZvTKL8MzN4VfGgZhvLEv5LJKeo0tGgBIS65wxIiJYj9ExEDqFkw9RdhW1nN8IN9eO76PbC-fdEPtDekA2BaITY2DARISKN4Ke0RLBEWNrKeEjjOzrygS2e3Q9NVzE51ZGGQAGHau7atHy8M_qA1nnd2dMUgUMnEYIMzDBTSKz17G6itJOdanGvG3wXvdpndKffnDppaPkyWbnybdMI4IP7q6WsCqnt3Gtg-baG6GDqZQQEBp9C9gLAFv4ORTRlpD3w0gCMh7xw\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"PoVKeirIOvmTyLQ9G9BenBwos7k\",\"kid\":\"PoVKeirIOvmTyLQ9G9BenBwos7k\",\"x5c\":[\"MIIC/jCCAeagAwIBAgIJAM52mWWK+FEeMA0GCSqGSIb3DQEBCwUAMC0xKzApBgNVBAMTImFjY291bnRzLmFjY2Vzc2NvbnRyb2wud2luZG93cy5uZXQwHhcNMjUwMzIwMDAwNTAyWhcNMzAwMzIwMDAwNTAyWjAtMSswKQYDVQQDEyJhY2NvdW50cy5hY2Nlc3Njb250cm9sLndpbmRvd3MubmV0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAruYyUq1ElSb8QCCt0XWWRSFpUq0JkyfEvvlCa4fPDi0GZbSGgJg3qYa0co2RsBIYHczXkc71kHVpktySAgYK1KMK264e+s7Vymeq+ypHEDpRsaWric/kKEIvKZzRsyUBUWf0CUhtuUvAbDTuaFnQ4g5lfoa7u3vtsv1za5Gmn6DUPirrL/+xqijP9IsHGUKaTmB4M/qnAu6vUHCpXZnN0YTJDoK7XrVJFaKj8RrTdJB89GFJeTFHA2OX472ToyLdCDn5UatYwmht62nXGlH7/G1kW1YMpeSSwzpnMEzUUk7A8UXrvFTHXEpfXhsv0LA59dm9Hi1mIXaOe1w+icA/rQIDAQABoyEwHzAdBgNVHQ4EFgQUcZ2MLLOas+d9WbkFSnPdxag09YIwDQYJKoZIhvcNAQELBQADggEBABPXBmwv703IlW8Zc9Kj7W215+vyM5lrJjUubnl+s8vQVXvyN7bh5xP2hzEKWb+u5g/brSIKX/A7qP3m/z6C8R9GvP5WRtF2w1CAxYZ9TWTzTS1La78edME546QejjveC1gX9qcLbEwuLAbYpau2r3vlIqgyXo+8WLXA0neGIRa2JWTNy8FJo0wnUttGJz9LQE4L37nR3HWIxflmOVgbaeyeaj2VbzUE7MIHIkK1bqye2OiKU82w1QWLV/YCny0xdLipE1g2uNL8QVob8fTU2zowd2j54c1YTBDy/hTsxpXfCFutKwtELqWzYxKTqYfrRCc1h0V4DGLKzIjtggTC+CY=\"],\"n\":\"ruYyUq1ElSb8QCCt0XWWRSFpUq0JkyfEvvlCa4fPDi0GZbSGgJg3qYa0co2RsBIYHczXkc71kHVpktySAgYK1KMK264e-s7Vymeq-ypHEDpRsaWric_kKEIvKZzRsyUBUWf0CUhtuUvAbDTuaFnQ4g5lfoa7u3vtsv1za5Gmn6DUPirrL_-xqijP9IsHGUKaTmB4M_qnAu6vUHCpXZnN0YTJDoK7XrVJFaKj8RrTdJB89GFJeTFHA2OX472ToyLdCDn5UatYwmht62nXGlH7_G1kW1YMpeSSwzpnMEzUUk7A8UXrvFTHXEpfXhsv0LA59dm9Hi1mIXaOe1w-icA_rQ\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"_jNwjeSnvTTK8XEdr5QUPkBRLLo\",\"kid\":\"_jNwjeSnvTTK8XEdr5QUPkBRLLo\",\"x5c\":[\"MIIC/jCCAeagAwIBAgIJAJD6gin3pOAKMA0GCSqGSIb3DQEBCwUAMC0xKzApBgNVBAMTImFjY291bnRzLmFjY2Vzc2NvbnRyb2wud2luZG93cy5uZXQwHhcNMjUwNDA5MDgwMzQwWhcNMzAwNDA5MDgwMzQwWjAtMSswKQYDVQQDEyJhY2NvdW50cy5hY2Nlc3Njb250cm9sLndpbmRvd3MubmV0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtJt2QCzZVnqP35tVsxvqIPFyYh0Muz5H2JtVkKinANHtG7TCX0Plxj+mZ1OtRQWX8a7d/2legFkf+0UJDs9LxWxHj8zV9WdNO1KYucXqiyPSo6Z7Gaww6zkLHaHHqhEWVi4yXHw1pbxdDPCBQ6FLtspLtEbFkagCY5vON5cw0GUjfMPcRfyVylq8lxy3JhLQa2CuDstDYQ491oTAUP5Xn3lAIyp1SbJ038E0gfxx5EpTxw1Ef14SlRqfg6Izy82BUz8aJtv097IVxM5fjfMH1de7dGXAyaCagTMMCySUk7vLdY0jOOhQNQ69IQbCllR1NMCk/bliXYUjDg5k1FeoYQIDAQABoyEwHzAdBgNVHQ4EFgQU7Iuc3W2qX7BqcsnyHsXO0TwI1ZMwDQYJKoZIhvcNAQELBQADggEBAJPUFzBQ+khAL6K7d0ctRBkPfvT84bILRW6xcw8GCAdyEmqm+jG0N+VWp7NM70nMuM5jrGarFuUJwEewQHLXu0gHDcZ+28i5bMgHQSlwiVyNTzesy3cJu76BgYWTLfXTI/9/aZMBfdJhtHDorj4hxTrROcwdlFQpK0Ld6ZUhgIGMY7nBsQ+n0SoI2AYtJt+MpwcsHbzklHQJAucOwEOqIaaJagSYbOVGq5M+d8bdaQsuvepzj8V0H9QTLcnJnIhCeq7RZ205hZcsPu1ATSN4qGYYLoCiAVnEMiPzKXLF0ZqkJDOBPQjXsmJ2Dhnvt8RvkjLy0GEiayzbHGSkII+GIHo=\"],\"n\":\"tJt2QCzZVnqP35tVsxvqIPFyYh0Muz5H2JtVkKinANHtG7TCX0Plxj-mZ1OtRQWX8a7d_2legFkf-0UJDs9LxWxHj8zV9WdNO1KYucXqiyPSo6Z7Gaww6zkLHaHHqhEWVi4yXHw1pbxdDPCBQ6FLtspLtEbFkagCY5vON5cw0GUjfMPcRfyVylq8lxy3JhLQa2CuDstDYQ491oTAUP5Xn3lAIyp1SbJ038E0gfxx5EpTxw1Ef14SlRqfg6Izy82BUz8aJtv097IVxM5fjfMH1de7dGXAyaCagTMMCySUk7vLdY0jOOhQNQ69IQbCllR1NMCk_bliXYUjDg5k1FeoYQ\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"-cgAvjmmQ24Ks20zIpDB4SW894w\",\"kid\":\"-cgAvjmmQ24Ks20zIpDB4SW894w\",\"x5c\":[\"MIIC6TCCAdGgAwIBAgIIU6yE1PeZiB0wDQYJKoZIhvcNAQELBQAwIzEhMB8GA1UEAxMYbG9naW4ubWljcm9zb2Z0b25saW5lLnVzMB4XDTI1MDMwNjE3MDIxMFoXDTMwMDMwNjE3MDIxMFowIzEhMB8GA1UEAxMYbG9naW4ubWljcm9zb2Z0b25saW5lLnVzMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAotM7AZjL81wdSVdrkQtt6shrQiAT8OZJeIKTeRJgrDYXKzaVXs0WFXVCjCv9GuCktF+tereotfZlcskamfuupe574o76CJy6AUtuY7wt0OKqxoSJMRuUJvA/NNkT50C/dTDHTtF7kiGBwWvHEkHeZAgT52E8bfNJswV28GsPscM9vG2ylUPyiaEIsGi0cg/JllbnfBjGhfA/lzmrB9Iw75E3f1Hnk2uAs1KcHJGSH3EwHJ5tUeo9WtLGjRAfH1kGtPjkktNaw3V8EukEzgIfILV8udpWYE79A/p5jFUnTNkQxsviNxG537JMooa1ZoYveDv/f6LCj1o7MNZQVlD3twIDAQABoyEwHzAdBgNVHQ4EFgQU3EskzzkGT8sZ1hAEn+cJIrUfDkswDQYJKoZIhvcNAQELBQADggEBAB3T/AA53U6c0mmdckiw/Evh27tluqKDwzF1l95zJTmmNzj8ND5KsS6J+g7Xzg8H8sccxhvrUPuJLzSJKGS4vygDAJHJvuXSwUWSf/n6O6u3pinIu/uqm8sQRo/yDrsI7LjvSeIVFbpNBOW/hoYH3GbRVCXqFX9Sztj8my60cSzV9JcNbIDse+GEfbFf5L2kfa1XydThFOvc/lXDFPPorNF4u8djP8u5BojO6QdylRHPWIoG1Q8l4yqLPf+sgBkzQ4pyOpgdAvefunCHeAwYyIZj0SOZgarNeplcicAYDFUZgPu1WbiIK2cREcY5XUnyMYtyq28AJrdMEKkCtXWI8jQ=\"],\"n\":\"otM7AZjL81wdSVdrkQtt6shrQiAT8OZJeIKTeRJgrDYXKzaVXs0WFXVCjCv9GuCktF-tereotfZlcskamfuupe574o76CJy6AUtuY7wt0OKqxoSJMRuUJvA_NNkT50C_dTDHTtF7kiGBwWvHEkHeZAgT52E8bfNJswV28GsPscM9vG2ylUPyiaEIsGi0cg_JllbnfBjGhfA_lzmrB9Iw75E3f1Hnk2uAs1KcHJGSH3EwHJ5tUeo9WtLGjRAfH1kGtPjkktNaw3V8EukEzgIfILV8udpWYE79A_p5jFUnTNkQxsviNxG537JMooa1ZoYveDv_f6LCj1o7MNZQVlD3tw\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"Km8oaDUbb_pVUGsT38eHX87v078\",\"kid\":\"Km8oaDUbb_pVUGsT38eHX87v078\",\"x5c\":[\"MIIC6TCCAdGgAwIBAgIIP8cyEA0NDykwDQYJKoZIhvcNAQELBQAwIzEhMB8GA1UEAxMYbG9naW4ubWljcm9zb2Z0b25saW5lLnVzMB4XDTI1MDMyMzE2MDEzN1oXDTMwMDMyMzE2MDEzN1owIzEhMB8GA1UEAxMYbG9naW4ubWljcm9zb2Z0b25saW5lLnVzMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAikFbcYO8PviJWVrHaVEp3eDnVEvFJRl7a32NQldBBGUWtkiLuMFKJMYvVik36AtJQ1/TDwfP46VHBDv8dMus8dxFWTAK25spIrW7avPa/Ok77aqFoeLi0f1iKRGkKDzqPpl7J9xvwQyLnzxBFWIYq2THkO0EO3vH+8tGO9kr6vF8l6j20cBuJ7dcOUz3W+dwEAQ+GxoLqPs9jxUNHJ84fnz64XEZWo1L4ZRBVh2IqjYUKdfurBhffqYZM8U4GBq0wc3KJY6+RA7Q9dMA2m2GPe1j33GoFVqFpQy8IhOz/CSPiVNt2olEM4ANwOBsndn9ldsRNsIp6BobOawcMT9vtwIDAQABoyEwHzAdBgNVHQ4EFgQUumi3x/LmmEju66W1mDxz934H6TwwDQYJKoZIhvcNAQELBQADggEBAHrVrhnTWoEDYiPeakkmVRP9fb13cPHDdj4fIbkIP8aOgZgF2mGjWc/AH/7vSeJ8dNxbzArfaLwcvYqa3QGbuhzEC/z3TV0j2OkOh49N8GydbcVEpcMgGj2QnJEyQEvcZgZp2ugdJYWkQ5GlkjOPxEvVaiaFvg47BAa9Cz1wxVYaXwGVr2qN4dmTOxxcgzpeG8UtZGQpTjh+Cl5Anu3ca8OfZxYq/KS/Suh1gDrtPi0lyEuIeZTm9lX9JBBA77zXIFHAZVqYKAKgs/9eDCTtjajjdZP+ws+gzdnFZDaMV63L+XrbXGV9hXU8Sjx7MPzbG3pX2ssCMlsDb8a3/8QqjIg=\"],\"n\":\"ikFbcYO8PviJWVrHaVEp3eDnVEvFJRl7a32NQldBBGUWtkiLuMFKJMYvVik36AtJQ1_TDwfP46VHBDv8dMus8dxFWTAK25spIrW7avPa_Ok77aqFoeLi0f1iKRGkKDzqPpl7J9xvwQyLnzxBFWIYq2THkO0EO3vH-8tGO9kr6vF8l6j20cBuJ7dcOUz3W-dwEAQ-GxoLqPs9jxUNHJ84fnz64XEZWo1L4ZRBVh2IqjYUKdfurBhffqYZM8U4GBq0wc3KJY6-RA7Q9dMA2m2GPe1j33GoFVqFpQy8IhOz_CSPiVNt2olEM4ANwOBsndn9ldsRNsIp6BobOawcMT9vtw\"}]}",
+                  "tokenEndpointAuthMethod" : "privateKeyJwtRfc7523",
+                  "scopes" : [ "openid", "email", "profile", "offline_access" ],
+                  "clientId" : "ed865090-235d-4df0-b5f4-a0e99ebb18f3",
+                  "isClientSecretConfigured" : false,
+                  "pkceEnabled" : false,
+                  "additionalConfig" : {
+                    "enforceNonce" : false,
+                    "enforceIssuerCheck" : false,
+                    "omitIDTokenHintForLogout" : false
+                  }
+                }
+              }, {
+                "id" : "c93f6b04-7a0f-42c1-b3c5-3b30d0ad8910",
+                "meta" : {
+                  "created" : "2025-06-26T20:17:27.355Z",
+                  "lastModified" : "2025-06-26T20:20:15.419Z",
+                  "createdBy" : "P000003",
+                  "modifiedBy" : "P000003",
+                  "location" : "https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/c93f6b04-7a0f-42c1-b3c5-3b30d0ad8910"
+                },
+                "name" : "Saml2 - Test",
+                "displayName" : "Terraform - SAML2",
+                "companyId" : "global",
+                "type" : "saml2",
+                "logoutUrl" : "https://test.com",
+                "forwardAllSsoRequests" : true,
+                "identityFederation" : {
+                  "useLocalUserStore" : true,
+                  "allowLocalUsersOnly" : true,
+                  "applyLocalIdPAuthnChecks" : false,
+                  "requiredGroups" : [ "Test Group" ]
+                },
+                "automaticRedirect" : true,
+                "loginHintConfiguration" : {
+                  "loginHintType" : "userInput",
+                  "sendMethod" : "authRequest"
+                },
+                "saml2Configuration" : {
+                  "digestAlgorithm" : "sha256",
+                  "includeScoping" : true,
+                  "defaultNameIdFormat" : "default",
+                  "allowCreate" : "none",
+                  "assertionAttributes" : [ {
+                    "name" : "test_attr",
+                    "value" : "test_value"
+                  } ],
+                  "ssoEndpoints" : [ {
+                    "bindingName" : "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+                    "location" : "https://test.com",
+                    "isDefault" : true
+                  } ],
+                  "sloEndpoints" : [ {
+                    "bindingName" : "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+                    "location" : "https://test.com",
+                    "isDefault" : true
+                  } ],
+                  "certificatesForSigning" : [ {
+                    "dn" : "CN=test (P000003),L=iasprovidertestblr.accounts400.ondemand.com,OU=8e1affb2-62a1-43cc-a687-2ba75e4b3d84,OU=Canary,OU=SAP Cloud Platform Clients,O=SAP SE,C=DE",
+                    "base64Certificate" : "redacted",
+                    "validFrom" : "2025-06-10T06:53:33Z",
+                    "validTo" : "2026-06-10T07:53:33Z",
+                    "isDefault" : true
+                  } ]
+                },
+                "oidcConfiguration" : {
+                  "subjectNameIdentifier" : "none",
+                  "isClientSecretConfigured" : false,
+                  "pkceEnabled" : false
+                }
+              }, {
+                "id" : "d102d994-68db-47df-ab2d-7efaeef6dae5",
+                "meta" : {
+                  "created" : "2025-06-08T04:03:11.441Z",
+                  "lastModified" : "2025-06-08T04:03:11.441Z",
+                  "createdBy" : "P000003",
+                  "location" : "https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/d102d994-68db-47df-ab2d-7efaeef6dae5"
+                },
+                "displayName" : "test",
+                "companyId" : "company id",
+                "type" : "saml2",
+                "forwardAllSsoRequests" : false,
+                "identityFederation" : {
+                  "useLocalUserStore" : false,
+                  "allowLocalUsersOnly" : false,
+                  "applyLocalIdPAuthnChecks" : false
+                },
+                "automaticRedirect" : true,
+                "loginHintConfiguration" : {
+                  "loginHintType" : "userInput",
+                  "sendMethod" : "urlParam"
+                },
+                "saml2Configuration" : {
+                  "digestAlgorithm" : "sha256",
+                  "includeScoping" : true,
+                  "defaultNameIdFormat" : "default",
+                  "allowCreate" : "none"
+                },
+                "oidcConfiguration" : {
+                  "subjectNameIdentifier" : "none",
+                  "scopes" : [ "openid" ],
+                  "isClientSecretConfigured" : false,
+                  "pkceEnabled" : false
+                }
+              } ]
+            }
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
+            Content-Type:
+                - application/json;charset=UTF-8
+            Critical-Origin-Trial:
+                - Tpcd
+            Date:
+                - Sun, 29 Jun 2025 18:40:03 GMT
+            Expires:
+                - "0"
+            Origin-Trial:
+                - Avu6rn7emV5gK8gvyGHlX8TMqM9uo1FacP2j/RWTq+8j+yKnqcTO0TQh0bXJ/7QntxD4/JzXv8aXoqxxZQuqXgYAAABdeyJvcmlnaW4iOiJodHRwczovL29uZGVtYW5kLmNvbTo0NDMiLCJmZWF0dXJlIjoiVHBjZCIsImV4cGlyeSI6MTczNTM0Mzk5OSwiaXNTdWJkb21haW4iOnRydWV9
+            Pragma:
+                - no-cache
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains; preload
+            Vary:
+                - accept-encoding,X-CSP-STRIP
+            X-Content-Type-Options:
+                - nosniff
+            X-Ids-Id:
+                - 19F55CE4-BD90-4F4D-A59B-83D49A3DEB5E
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-v4flk
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Robots-Tag:
+                - none
+            X-Xss-Protection:
+                - 1; mode=block
+        status: '200 '
+        code: 200
+        duration: 227.906931ms
+    - id: 5
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            Accept:
+                - '*/*'
+            Authorization:
+                - redacted
+            Content-Type:
+                - application/json
+            Dataserviceversion:
+                - "2.0"
+        url: https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: true
+        body: |-
+            {
+              "id" : "7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1",
+              "meta" : {
+                "created" : "2025-06-26T21:03:35.428Z",
+                "lastModified" : "2025-06-26T21:09:34.189Z",
+                "createdBy" : "P000003",
+                "modifiedBy" : "P000003",
+                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/IdentityProviders/v1/7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1"
+              },
+              "name" : "Oidc - Test",
+              "displayName" : "Terraform - OIDC",
+              "companyId" : "global",
+              "type" : "openIdConnect",
+              "logoutUrl" : "https://test.com",
+              "forwardAllSsoRequests" : true,
+              "identityFederation" : {
+                "useLocalUserStore" : true,
+                "allowLocalUsersOnly" : true,
+                "applyLocalIdPAuthnChecks" : false,
+                "requiredGroups" : [ "Test Group" ]
+              },
+              "automaticRedirect" : true,
+              "loginHintConfiguration" : {
+                "loginHintType" : "mail",
+                "sendMethod" : "urlParam"
+              },
+              "saml2Configuration" : {
+                "digestAlgorithm" : "sha256",
+                "includeScoping" : true,
+                "defaultNameIdFormat" : "default",
+                "allowCreate" : "none"
+              },
+              "oidcConfiguration" : {
+                "subjectNameIdentifier" : "email",
+                "discoveryUrl" : "https://token.actions.githubusercontent.com",
+                "issuer" : "https://token.actions.githubusercontent.com",
+                "jwksUri" : "https://token.actions.githubusercontent.com/.well-known/jwks",
+                "jwkSetPlain" : "{\"keys\":[{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"kid\":\"cc413527-173f-5a05-976e-9c52b1d7b431\",\"alg\":\"RS256\",\"n\":\"w4M936N3ZxNaEblcUoBm-xu0-V9JxNx5S7TmF0M3SBK-2bmDyAeDdeIOTcIVZHG-ZX9N9W0u1yWafgWewHrsz66BkxXq3bscvQUTAw7W3s6TEeYY7o9shPkFfOiU3x_KYgOo06SpiFdymwJflRs9cnbaU88i5fZJmUepUHVllP2tpPWTi-7UA3AdP3cdcCs5bnFfTRKzH2W0xqKsY_jIG95aQJRBDpbiesefjuyxcQnOv88j9tCKWzHpJzRKYjAUM6OPgN4HYnaSWrPJj1v41eEkFM1kORuj-GSH2qMVD02VklcqaerhQHIqM-RjeHsN7G05YtwYzomE5G-fZuwgvQ\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"ykNaY4qM_ta4k2TgZOCEYLkcYlA\",\"kid\":\"38826b17-6a30-5f9b-b169-8beb8202f723\",\"x5c\":[\"MIIDKzCCAhOgAwIBAgIUDnwm6eRIqGFA3o/P1oBrChvx/nowDQYJKoZIhvcNAQELBQAwJTEjMCEGA1UEAwwaYWN0aW9ucy5zZWxmLXNpZ25lZC5naXRodWIwHhcNMjQwMTIzMTUyNTM2WhcNMzQwMTIwMTUyNTM2WjAlMSMwIQYDVQQDDBphY3Rpb25zLnNlbGYtc2lnbmVkLmdpdGh1YjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAOTGp5svs8LJN8BH7VzXShWXnOK0lhDVuI0xnr5bwHFPc924CwaIEFb6mC7bvW2lZtgd633uaJ2naG6vKaOVGpCdGLE4ohH11nUk+2CNknZL7/oTmDHGSmGeHRb7kjtb0Ng4BJMPzmTYmCNUudfDFhHDcZz1Obuu85GsABrC5ZlzWzspYFXwUSaxvII+rHK/rAbOC2gmt5IOSLmgh3taQfp0mB6Lxlf89HoBPNwtPfBX8DtXTWQVnqODm4W+WfmWBSyXGX54DGNMyZwlTZqR0FjoMXxopId3MIuDGKxa2weDU5cW60N2y/qxikeV99fL3sg5aPA8s9iljKG0+MAfVNUCAwEAAaNTMFEwHQYDVR0OBBYEFIPALo5VanJ6E1B9eLQgGO+uGV65MB8GA1UdIwQYMBaAFIPALo5VanJ6E1B9eLQgGO+uGV65MA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAGS0hZE+DqKIRi49Z2KDOMOaSZnAYgqq6ws9HJHT09MXWlMHB8E/apvy2ZuFrcSu14ZLweJid+PrrooXEXEO6azEakzCjeUb9G1QwlzP4CkTcMGCw1Snh3jWZIuKaw21f7mp2rQ+YNltgHVDKY2s8AD273E8musEsWxJl80/MNvMie8Hfh4n4/Xl2r6t1YPmUJMoXAXdTBb0hkPy1fUu3r2T+1oi7Rw6kuVDfAZjaHupNHzJeDOg2KxUoK/GF2/M2qpVrd19Pv/JXNkQXRE4DFbErMmA7tXpp1tkXJRPhFui/Pv5H9cPgObEf9x6W4KnCXzT3ReeeRDKF8SqGTPELsc=\"],\"alg\":\"RS256\",\"n\":\"5Manmy-zwsk3wEftXNdKFZec4rSWENW4jTGevlvAcU9z3bgLBogQVvqYLtu9baVm2B3rfe5onadobq8po5UakJ0YsTiiEfXWdST7YI2Sdkvv-hOYMcZKYZ4dFvuSO1vQ2DgEkw_OZNiYI1S518MWEcNxnPU5u67zkawAGsLlmXNbOylgVfBRJrG8gj6scr-sBs4LaCa3kg5IuaCHe1pB-nSYHovGV_z0egE83C098FfwO1dNZBWeo4Obhb5Z-ZYFLJcZfngMY0zJnCVNmpHQWOgxfGikh3cwi4MYrFrbB4NTlxbrQ3bL-rGKR5X318veyDlo8Dyz2KWMobT4wB9U1Q\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"Hyq4NATAjsnqC7mdrtAhhrCR2_Q\",\"kid\":\"1F2AB83404C08EC9EA0BB99DAED02186B091DBF4\",\"x5c\":[\"MIIDrDCCApSgAwIBAgIQAP4blP36Q3WmMOhWf0RBMzANBgkqhkiG9w0BAQsFADA2MTQwMgYDVQQDEyt2c3RzLXZzdHNnaHJ0LWdoLXZzby1vYXV0aC52aXN1YWxzdHVkaW8uY29tMB4XDTIzMTAyNDE0NTI1NVoXDTI1MTAyNDE1MDI1NVowNjE0MDIGA1UEAxMrdnN0cy12c3RzZ2hydC1naC12c28tb2F1dGgudmlzdWFsc3R1ZGlvLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALvM0mJ+SUfzucssEnjoZllnezjKC25YeIhk3iIUzlaJ/uXueESt9GEA3lAo6W/bt73R0zu10u4uhM5MC27FDoq9u7oaqBRhll0gGaz6HDqG0haCwuZdDb0ikalbaaAAzh3AIefby26/Hc98bRBBsf6pS083xX1ogiGFosteQtqKNXjT8c0Hzr3bu2Hrejn+JrrFdBLOf5jRE6XhzlRK4vD1n8c8OPOVByI97KHJeC5PyN4g8h34KU+PbSCWIRxOTSJizXcDIWtXAQiGyTMtXSQn3aCvNux4vaisgZn7TUD4XsxlUbDo7H9gX1Bsxj+aQhqxQYxDnC4Y/94/kyXm4L0CAwEAAaOBtTCBsjAOBgNVHQ8BAf8EBAMCBaAwCQYDVR0TBAIwADAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwNgYDVR0RBC8wLYIrdnN0cy12c3RzZ2hydC1naC12c28tb2F1dGgudmlzdWFsc3R1ZGlvLmNvbTAfBgNVHSMEGDAWgBSmWMP5CXuaSzoLKwcLXYZnoeCJmDAdBgNVHQ4EFgQUpljD+Ql7mks6CysHC12GZ6HgiZgwDQYJKoZIhvcNAQELBQADggEBAINwybFwYpXJkvauL5QbtrykIDYeP8oFdVIeVY8YI9MGfx7OwWDsNBVXv2B62zAZ49hK5G87++NmFI/FHnGOCISDYoJkRSCy2Nbeyr7Nx2VykWzUQqHLZfvr5KqW4Gj1OFHUqTl8lP3FWDd/P+lil3JobaSiICQshgF0GnX2a8ji8mfXpJSP20gzrLw84brmtmheAvJ9X/sLbM/RBkkT6g4NV2QbTMqo6k601qBNQBsH+lTDDWPCkRoAlW6a0z9bWIhGHWJ2lcR70zagcxIVl5/Fq35770/aMGroSrIx3JayOEqsvgIthYBKHzpT2VFwUz1VpBpNVJg9/u6jCwLY7QA=\"],\"alg\":\"RS256\",\"n\":\"u8zSYn5JR_O5yywSeOhmWWd7OMoLblh4iGTeIhTOVon-5e54RK30YQDeUCjpb9u3vdHTO7XS7i6EzkwLbsUOir27uhqoFGGWXSAZrPocOobSFoLC5l0NvSKRqVtpoADOHcAh59vLbr8dz3xtEEGx_qlLTzfFfWiCIYWiy15C2oo1eNPxzQfOvdu7Yet6Of4musV0Es5_mNETpeHOVEri8PWfxzw485UHIj3socl4Lk_I3iDyHfgpT49tIJYhHE5NImLNdwMha1cBCIbJMy1dJCfdoK827Hi9qKyBmftNQPhezGVRsOjsf2BfUGzGP5pCGrFBjEOcLhj_3j-TJebgvQ\"},{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"x5t\":\"AB3c0BSoSOiCRXez5POu2zvPX_0\",\"kid\":\"001DDCD014A848E8824577B3E4F3AEDB3BCF5FFD\",\"x5c\":[\"MIIDrDCCApSgAwIBAgIQKiyRrA01T5qtxdzvZ/ErzjANBgkqhkiG9w0BAQsFADA2MTQwMgYDVQQDEyt2c3RzLXZzdHNnaHJ0LWdoLXZzby1vYXV0aC52aXN1YWxzdHVkaW8uY29tMB4XDTIzMTAxODE1MDExOFoXDTI1MTAxODE1MTExOFowNjE0MDIGA1UEAxMrdnN0cy12c3RzZ2hydC1naC12c28tb2F1dGgudmlzdWFsc3R1ZGlvLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALCP6+IjsL0cZLEqL8mTfHWubvnYdO33XKoexY8iimQjla+3WvPfMZNExvXme5XwNQpgUx+LF+Xr4OGINsXRQ8WCuMZi2XMDMkGSA4mXHSLo57bWqqZazL/7/mMgGqRxZrnWwTvDVbjh94JhmidNhvLtVXX/Atz3TStd3IeMKTb8qMcKmiFhj0s7nQOphjxqL0S4buXRDjiUibbC8xMTbzZh54TyWZNOq+xXj5AVkkNQgh1wM6QfmlFhGQtRSjEoqtnb3zgsoibbRHco/Dv+cqm9MCwD2/vDXc5KaW0WpdlhqMKFPgHo6qFiJoXw85TgUErZ4bgJbiqQOrB9InypULECAwEAAaOBtTCBsjAOBgNVHQ8BAf8EBAMCBaAwCQYDVR0TBAIwADAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwNgYDVR0RBC8wLYIrdnN0cy12c3RzZ2hydC1naC12c28tb2F1dGgudmlzdWFsc3R1ZGlvLmNvbTAfBgNVHSMEGDAWgBQ45rBfvl4JJ7vg3WgLjQTfhDihvzAdBgNVHQ4EFgQUOOawX75eCSe74N1oC40E34Q4ob8wDQYJKoZIhvcNAQELBQADggEBABdN6HPheRdzwvJgi4xGHnf9pvlUC8981kAtgHnPT0VEYXh/dCMnKJSvCDJADpdmkuKxLxAfACeZR2CUHkQ0eO1ek/ihLvPqywDhLENq6Lvzu3qlhvUPBkGYjydpLtXQ1bBXUQ1FzT5/L1U19P2rJso9mC4ltu2OHJ9NLCKG0zffBItAJqhAiXtKbCUg4c9RbQxi9T2/xr9R72di4Qygfnmr3QleAqmjRG918cm5/uJ0s5EaK3QI7GQy7+tc44o3H3AI5eFtrHwIV0zoY4A9YIsaRmMHq9soHFBEO1HDKKRUOl/4tjpx8zHpp5Clz0wiZMgvSIdBa3/fTeUJ3flUYMo=\"],\"alg\":\"RS256\",\"n\":\"sI_r4iOwvRxksSovyZN8da5u-dh07fdcqh7FjyKKZCOVr7da898xk0TG9eZ7lfA1CmBTH4sX5evg4Yg2xdFDxYK4xmLZcwMyQZIDiZcdIujnttaqplrMv_v-YyAapHFmudbBO8NVuOH3gmGaJ02G8u1Vdf8C3PdNK13ch4wpNvyoxwqaIWGPSzudA6mGPGovRLhu5dEOOJSJtsLzExNvNmHnhPJZk06r7FePkBWSQ1CCHXAzpB-aUWEZC1FKMSiq2dvfOCyiJttEdyj8O_5yqb0wLAPb-8NdzkppbRal2WGowoU-AejqoWImhfDzlOBQStnhuAluKpA6sH0ifKlQsQ\"}]}",
+                "scopes" : [ "openid" ],
+                "clientId" : "Oidc - Test",
+                "isClientSecretConfigured" : false,
+                "pkceEnabled" : false
+              }
+            }
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
+            Content-Type:
+                - application/json;charset=UTF-8
+            Critical-Origin-Trial:
+                - Tpcd
+            Date:
+                - Sun, 29 Jun 2025 18:40:03 GMT
+            Expires:
+                - "0"
+            Origin-Trial:
+                - Avu6rn7emV5gK8gvyGHlX8TMqM9uo1FacP2j/RWTq+8j+yKnqcTO0TQh0bXJ/7QntxD4/JzXv8aXoqxxZQuqXgYAAABdeyJvcmlnaW4iOiJodHRwczovL29uZGVtYW5kLmNvbTo0NDMiLCJmZWF0dXJlIjoiVHBjZCIsImV4cGlyeSI6MTczNTM0Mzk5OSwiaXNTdWJkb21haW4iOnRydWV9
+            Pragma:
+                - no-cache
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains; preload
+            Vary:
+                - accept-encoding,X-CSP-STRIP
+            X-Content-Type-Options:
+                - nosniff
+            X-Ids-Id:
+                - 8C1467B1-C667-4B0D-9975-493C6BD76807
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-v4flk
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Robots-Tag:
+                - none
+            X-Xss-Protection:
+                - 1; mode=block
+        status: '200 '
+        code: 200
+        duration: 231.74042ms

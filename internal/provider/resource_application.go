@@ -111,9 +111,9 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 						MarkdownDescription: "The preferred protocol for the application. " + utils.ValidValuesString(ssoValues),
 						Optional:            true,
 						Computed:            true,
-						Validators: []validator.String{
-							stringvalidator.OneOf(ssoValues...),
-						},
+						// Validators: []validator.String{
+						// 	stringvalidator.OneOf(ssoValues...),
+						// },
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
 						},

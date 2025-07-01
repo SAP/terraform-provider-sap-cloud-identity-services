@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 
 	"strconv"
@@ -76,7 +77,7 @@ func setupVCR(t *testing.T, cassetteName string) (*recorder.Recorder, User) {
 	}
 
 	rec.SetMatcher(requestMatcher(t))
-	rec.AddHook(redactAuthorizationToken(), recorder.BeforeSaveHook)
+	rec.AddHook(redactCredentials(), recorder.BeforeSaveHook)
 
 	return rec, testUser
 }
@@ -94,10 +95,11 @@ func requestMatcher(t *testing.T) cassette.MatcherFunc {
 
 		requestBody := string(bytes)
 		return requestBody == i.Body
+		// return true
 	}
 }
 
-func redactAuthorizationToken() recorder.HookFunc {
+func redactCredentials() recorder.HookFunc {
 	return func(i *cassette.Interaction) error {
 
 		redact := func(headers map[string][]string) {
@@ -110,6 +112,16 @@ func redactAuthorizationToken() recorder.HookFunc {
 
 		redact(i.Request.Headers)
 		redact(i.Response.Headers)
+
+		if strings.Contains(i.Response.Body, "base64Certificate") {
+			reBindingSecret := regexp.MustCompile(`"base64Certificate" : "(.*?)"`)
+			i.Response.Body = reBindingSecret.ReplaceAllString(i.Response.Body, `"base64Certificate" : "-----BEGIN CERTIFICATE-----\nredacted\n-----END CERTIFICATE-----"`)
+		}
+
+		if strings.Contains(i.Request.Body, "base64Certificate") {
+			reBindingSecret := regexp.MustCompile(`"base64Certificate":"(.*?)"`)
+			i.Request.Body = reBindingSecret.ReplaceAllString(i.Request.Body, `"base64Certificate":"-----BEGIN CERTIFICATE-----\nredacted\n-----END CERTIFICATE-----"`)
+		}
 
 		return nil
 	}
@@ -128,6 +140,7 @@ func TestSciProvider_AllResources(t *testing.T) {
 		"sci_user",
 		"sci_group",
 		"sci_schema",
+		"sci_corporate_idp",
 	}
 
 	ctx := context.Background()
