@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -95,6 +96,7 @@ func requestMatcher(t *testing.T) cassette.MatcherFunc {
 
 		requestBody := string(body)
 		return requestBody == i.Body
+	}
 }
 
 func redactCredentials() recorder.HookFunc {
