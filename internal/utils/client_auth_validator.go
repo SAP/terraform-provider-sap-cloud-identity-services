@@ -45,14 +45,14 @@ func (v clientAuthMethodValidator) ValidateString(ctx context.Context, request v
 		))
 		return
 	}
-	
+
 	val := typeVal.String()
 
 	// if the value of token_endpoint_auth_method is either "privateKeyJwt" or "privateKeyJwtRfc7523", the client_secret is not required
 	if val == fmt.Sprintf("\"%s\"", v.authMethods[0]) || val == fmt.Sprintf("\"%s\"", v.authMethods[1]) {
 		response.Diagnostics.Append(validatordiag.InvalidAttributeValueDiagnostic(
 			request.Path,
-			"attribute \"oidc_config.client_secret\" must be specified when oidc_config.token_endpoint_auth_method is set to one of: " + v.authMethods[0] + ", " + v.authMethods[1],
+			"attribute \"oidc_config.client_secret\" must be specified when oidc_config.token_endpoint_auth_method is set to one of: "+v.authMethods[0]+", "+v.authMethods[1],
 			request.ConfigValue.String(),
 		))
 		return
@@ -60,7 +60,7 @@ func (v clientAuthMethodValidator) ValidateString(ctx context.Context, request v
 
 }
 
-func CheckClientAuthMethod(typeExpr path.Expression, authMethods []string) validator.String{
+func CheckClientAuthMethod(typeExpr path.Expression, authMethods []string) validator.String {
 	return clientAuthMethodValidator{
 		typeExpr:    typeExpr,
 		authMethods: authMethods,
