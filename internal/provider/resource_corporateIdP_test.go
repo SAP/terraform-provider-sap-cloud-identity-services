@@ -210,7 +210,7 @@ func TestResourceCorporateIdP(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceCorporateIdPConfigTypeMismtach("testIdP", "Test IDP", "saml2", "oidc_config = { discovery_url = \"https://test.com\"\nclient_id = \"test-client-id\" }"),
-					ExpectError: regexp.MustCompile("Attribute oidc_config : value of attribute \"type\" must be modified to match\nthe IDP configuration provided. Acceptable values are : `openIdConnect`, got:\n\"saml2\""),
+					ExpectError: regexp.MustCompile("Attribute oidc_config : value of attribute \"type\" must be modified to match\nthe IDP configuration provided. Acceptable values are : `openIdConnect`, got:\nsaml2"),
 				},
 			},
 		})
@@ -365,102 +365,102 @@ func ResourceCorporateIdP(resourceName string, idp corporateidps.IdentityProvide
 		}
 	`, resourceName, idp.DisplayName, idp.Name, idp.LogoutUrl, idp.ForwardAllSsoRequests, idp.IdentityFederation.UseLocalUserStore, idp.IdentityFederation.AllowLocalUsersOnly, idp.IdentityFederation.ApplyLocalIdPAuthnChecks, groups, idp.LoginHintConfiguration.LoginHintType, idp.LoginHintConfiguration.SendMethod)
 
-	if idp.Type == "openIdConnect" {
+	switch idp.Type {
+		case "openIdConnect":
+			oidcConfig := idp.OidcConfiguration
 
-		oidcConfig := idp.OidcConfiguration
-
-		var scopes string
-		for _, scope := range oidcConfig.Scopes {
-			scopes += fmt.Sprintf(`
-				"%s",
-			`, scope)
-		}
-
-		additionalConfig := fmt.Sprintf(`
-			additional_config = {
-				enforce_nonce = %t
-				enforce_issuer_check = %t
-				disable_logout_id_token_hint = %t
+			var scopes string
+			for _, scope := range oidcConfig.Scopes {
+				scopes += fmt.Sprintf(`
+					"%s",
+				`, scope)
 			}
-		`, oidcConfig.AdditionalConfig.EnforceNonce, oidcConfig.AdditionalConfig.EnforceIssuerCheck, oidcConfig.AdditionalConfig.OmitIDTokenHintForLogout)
 
-		resourceIdP += fmt.Sprintf(`
-			type = "%s"
-			oidc_config = {
-				discovery_url = "%s"
-				client_id = "%s"
-				client_secret = "%s"
-				subject_name_identifier = "%s"
-				token_endpoint_auth_method = "%s"
-				scopes = [%s]
-				enable_pkce = %t
-				%s
+			additionalConfig := fmt.Sprintf(`
+				additional_config = {
+					enforce_nonce = %t
+					enforce_issuer_check = %t
+					disable_logout_id_token_hint = %t
+				}
+			`, oidcConfig.AdditionalConfig.EnforceNonce, oidcConfig.AdditionalConfig.EnforceIssuerCheck, oidcConfig.AdditionalConfig.OmitIDTokenHintForLogout)
+
+			resourceIdP += fmt.Sprintf(`
+				type = "%s"
+				oidc_config = {
+					discovery_url = "%s"
+					client_id = "%s"
+					client_secret = "%s"
+					subject_name_identifier = "%s"
+					token_endpoint_auth_method = "%s"
+					scopes = [%s]
+					enable_pkce = %t
+					%s
+				}
+			`, idp.Type, oidcConfig.DiscoveryUrl, oidcConfig.ClientId, oidcConfig.ClientSecret, oidcConfig.SubjectNameIdentifier, oidcConfig.TokenEndpointAuthMethod, scopes, oidcConfig.PkceEnabled, additionalConfig)
+	
+		case "saml2", "sapSSO", "microsoftADFS":
+			saml2Config := idp.Saml2Configuration
+
+			var assertionAttributes string
+			for _, attribute := range saml2Config.AssertionAttributes {
+				assertionAttributes += fmt.Sprintf(`
+					{
+						name = "%s"
+						value = "%s"
+					},
+				`, attribute.Name, attribute.Value)
 			}
-		`, idp.Type, oidcConfig.DiscoveryUrl, oidcConfig.ClientId, oidcConfig.ClientSecret, oidcConfig.SubjectNameIdentifier, oidcConfig.TokenEndpointAuthMethod, scopes, oidcConfig.PkceEnabled, additionalConfig)
 
-	} else if idp.Type == "sapSSO" || idp.Type == "microsoftADFS" || idp.Type == "saml2" {
-		saml2Config := idp.Saml2Configuration
-
-		var assertionAttributes string
-		for _, attribute := range saml2Config.AssertionAttributes {
-			assertionAttributes += fmt.Sprintf(`
-				{
-					name = "%s"
-					value = "%s"
-				},
-			`, attribute.Name, attribute.Value)
-		}
-
-		var certificates string
-		for _, certificate := range saml2Config.CertificatesForSigning {
-			certificates += fmt.Sprintf(`
-				{
-					base64_certificate = "%s"
-					dn = "%s"
-					default = %t
-					valid_from = "%s"
-					valid_to = "%s"
-				}
-			`, certificate.Base64Certificate, certificate.Dn, certificate.IsDefault, certificate.ValidFrom, certificate.ValidTo)
-		}
-
-		var ssoEndpoints string
-		for _, endpoint := range saml2Config.SsoEndpoints {
-			ssoEndpoints += fmt.Sprintf(`
-				{
-					binding_name = "%s"
-					location = "%s"
-					default = %t
-				}
-			`, endpoint.BindingName, endpoint.Location, endpoint.IsDefault)
-		}
-
-		var sloEndpoints string
-		for _, endpoint := range saml2Config.SloEndpoints {
-			sloEndpoints += fmt.Sprintf(`
-				{
-					binding_name = "%s"
-					location = "%s"
-					response_location = "%s"
-					default = %t
-				}
-			`, endpoint.BindingName, endpoint.Location, endpoint.ResponseLocation, endpoint.IsDefault)
-		}
-
-		resourceIdP += fmt.Sprintf(`
-		    type = "%s"
-			saml2_config = {
-				saml_metadata_url = "%s"
-				assertion_attributes = [%s]
-				digest_algorithm = "%s"
-				include_scoping = %t
-				name_id_format = "%s"
-				allow_create = "%s"
-				signing_certificates = [%s]
-				sso_endpoints = [%s]
-				slo_endpoints = [%s]
+			var certificates string
+			for _, certificate := range saml2Config.CertificatesForSigning {
+				certificates += fmt.Sprintf(`
+					{
+						base64_certificate = "%s"
+						dn = "%s"
+						default = %t
+						valid_from = "%s"
+						valid_to = "%s"
+					}
+				`, certificate.Base64Certificate, certificate.Dn, certificate.IsDefault, certificate.ValidFrom, certificate.ValidTo)
 			}
-		`, idp.Type, saml2Config.SamlMetadataUrl, assertionAttributes, saml2Config.DigestAlgorithm, saml2Config.IncludeScoping, saml2Config.DefaultNameIdFormat, saml2Config.AllowCreate, certificates, ssoEndpoints, sloEndpoints)
+
+			var ssoEndpoints string
+			for _, endpoint := range saml2Config.SsoEndpoints {
+				ssoEndpoints += fmt.Sprintf(`
+					{
+						binding_name = "%s"
+						location = "%s"
+						default = %t
+					}
+				`, endpoint.BindingName, endpoint.Location, endpoint.IsDefault)
+			}
+
+			var sloEndpoints string
+			for _, endpoint := range saml2Config.SloEndpoints {
+				sloEndpoints += fmt.Sprintf(`
+					{
+						binding_name = "%s"
+						location = "%s"
+						response_location = "%s"
+						default = %t
+					}
+				`, endpoint.BindingName, endpoint.Location, endpoint.ResponseLocation, endpoint.IsDefault)
+			}
+
+			resourceIdP += fmt.Sprintf(`
+				type = "%s"
+				saml2_config = {
+					saml_metadata_url = "%s"
+					assertion_attributes = [%s]
+					digest_algorithm = "%s"
+					include_scoping = %t
+					name_id_format = "%s"
+					allow_create = "%s"
+					signing_certificates = [%s]
+					sso_endpoints = [%s]
+					slo_endpoints = [%s]
+				}
+			`, idp.Type, saml2Config.SamlMetadataUrl, assertionAttributes, saml2Config.DigestAlgorithm, saml2Config.IncludeScoping, saml2Config.DefaultNameIdFormat, saml2Config.AllowCreate, certificates, ssoEndpoints, sloEndpoints)
 	}
 
 	resourceIdP += `}`
