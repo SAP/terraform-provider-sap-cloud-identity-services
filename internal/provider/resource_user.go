@@ -82,7 +82,7 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 				),
 				Validators: []validator.Set{
 					setvalidator.SizeAtLeast(1),
-					utils.SchemaValidator(defaultUserSchemas),
+					utils.DefaultValuesChecker(defaultUserSchemas),
 				},
 			},
 			"user_name": schema.StringAttribute{

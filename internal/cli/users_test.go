@@ -81,7 +81,7 @@ func TestUsers_Create(t *testing.T) {
 
 	t.Run("validate the API request - error", func(t *testing.T) {
 
-		resErr, _ := json.Marshal(ScimError{
+		resErr, _ := json.Marshal(ScimResponseError{
 			Detail: "create failed",
 			Status: "400",
 		})
@@ -151,7 +151,7 @@ func TestUsers_Get(t *testing.T) {
 
 	t.Run("validate the API request with error", func(t *testing.T) {
 
-		resErr, _ := json.Marshal(ScimError{
+		resErr, _ := json.Marshal(ScimResponseError{
 			Detail: "get failed",
 			Status: "400",
 		})
@@ -196,7 +196,7 @@ func TestUsers_GetByUserId(t *testing.T) {
 
 	t.Run("validate the API request with error", func(t *testing.T) {
 
-		resErr, _ := json.Marshal(ScimError{
+		resErr, _ := json.Marshal(ScimResponseError{
 			Detail: "get failed",
 			Status: "400",
 		})
@@ -272,7 +272,7 @@ func TestUsers_Update(t *testing.T) {
 
 	t.Run("validate the API request with error", func(t *testing.T) {
 
-		resErr, _ := json.Marshal(ScimError{
+		resErr, _ := json.Marshal(ScimResponseError{
 			Detail: "update failed",
 			Status: "400",
 		})
@@ -330,7 +330,7 @@ func TestUsers_Delete(t *testing.T) {
 
 	t.Run("validate the API request with error", func(t *testing.T) {
 
-		resErr, _ := json.Marshal(ScimError{
+		resErr, _ := json.Marshal(ScimResponseError{
 			Detail: "delete failed",
 			Status: "400",
 		})

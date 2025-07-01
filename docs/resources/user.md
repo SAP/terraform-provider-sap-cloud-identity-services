@@ -82,7 +82,7 @@ resource "sci_user" "new_user" {
 	- `urn:ietf:params:scim:schemas:extension:sap:2.0:User` 
 
  	 If the attribute must be overridden with custom values, the default schemas must be provided in addition to the custom schemas.
-- `user_type` (String) Specifies the type of the user. The default type is "public". Acceptable values are : `public`, `partner`, `customer`, `external`, `onboardee`, `employee`.
+- `user_type` (String) Specifies the type of the user. The default type is "public". Acceptable values are : `public`, `partner`, `customer`, `external`, `onboardee`, `employee`
 
 ### Read-Only
 
@@ -93,7 +93,7 @@ resource "sci_user" "new_user" {
 
 Required:
 
-- `type` (String) Type of the user's email. Acceptable values are : `work`, `home`, `other`.
+- `type` (String) Type of the user's email. Acceptable values are : `work`, `home`, `other`
 - `value` (String) Value of the user's email.
 
 Optional:
@@ -118,7 +118,7 @@ Optional:
 
 - `mail_verified` (Boolean) The attribute specifies if the e-mail of the newly created user is verified or not. So if the values of the "mail_verified" and "send_mail" attributes are true, the user will receive an e-mail and they will be able to log on. On the other hand, if the "send_mail" is true, but the "mail_verified" is false, the user will receive e-mail and they have to click the verification link in the e-mail. If the attribute "mail_verified" is not configured, the default value is false.
 - `send_mail` (Boolean) Specifies if an activation mail should be sent. The value of the attribute only matters when creating the user.
-- `status` (String) Specifies if the user is created as active, inactive or new. If the attribute "active" is not configured, the default value is inactive. Acceptable values are : `active`, `inactive`, `new`.
+- `status` (String) Specifies if the user is created as active, inactive or new. If the attribute "active" is not configured, the default value is inactive. Acceptable values are : `active`, `inactive`, `new`
 
 ## Import
 

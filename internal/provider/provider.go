@@ -269,6 +269,8 @@ func (p *SciProvider) DataSources(_ context.Context) []func() datasource.DataSou
 		newSchemaDataSource,
 		newGroupsDataSource,
 		newGroupDataSource,
+		newCorporateIdPDataSource,
+		newCorporateIdPsDataSource,
 	}
 }
 
@@ -278,6 +280,7 @@ func (p *SciProvider) Resources(_ context.Context) []func() resource.Resource {
 		newUserResource,
 		newSchemaResource,
 		newGroupResource,
+		newCorporateIdPResource,
 	}
 }
 

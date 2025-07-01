@@ -162,7 +162,7 @@ func (r *schemaResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 				),
 				Validators: []validator.Set{
 					setvalidator.SizeAtLeast(1),
-					utils.SchemaValidator(defaultSchemaSchemas),
+					utils.DefaultValuesChecker(defaultSchemaSchemas),
 				},
 			},
 			"description": schema.StringAttribute{

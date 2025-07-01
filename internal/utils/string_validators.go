@@ -11,6 +11,7 @@ var UuidRegexp = regexp.MustCompile(`^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA
 var AttributeNameRegexp = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9_]*$`)
 var IPRegexp = regexp.MustCompile(`^$|^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$`)
 var EmailDomainRegexp = regexp.MustCompile(`^$|^(((\*|([a-zA-Z0-9_\-]{1,63}))\.)(?:[a-zA-Z0-9_\-]{1,63}\.)*(?:[a-zA-Z]{2,})|((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))|(localhost))$`)
+var UrlRegexp = regexp.MustCompile(`^(((http|https):\/\/(\*\.)?localhost)|(https:\/\/(([\w-])+|(((\*\.([\w-]{1,63}\.))?([\w-]{1,63}\.)*)|(([\w-]{1,63}\.)*(\*\.)?([\w-]{1,63}\.){2,}))([a-zA-Z]{2,}))))(:[\d]+)?(\/([\w-()@:%+.~?&/=])*)?$`)
 
 // Checks that the String held in the attribute is a valid UUID
 func ValidUUID() validator.String {
@@ -30,4 +31,9 @@ func ValidIPAddress() validator.String {
 // Checks that the String held in the attribute is a valid Email Domain
 func ValidEmailDomain() validator.String {
 	return stringvalidator.RegexMatches(EmailDomainRegexp, "value must be a valid Email Domain")
+}
+
+// Checks that the String held in the attribute is a valid URL
+func ValidUrl() validator.String {
+	return stringvalidator.RegexMatches(UrlRegexp, "value must be a valid URL")
 }

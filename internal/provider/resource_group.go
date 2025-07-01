@@ -77,7 +77,7 @@ func (r *groupResource) Schema(_ context.Context, _ resource.SchemaRequest, resp
 				),
 				Validators: []validator.Set{
 					setvalidator.SizeAtLeast(1),
-					utils.SchemaValidator(defaultGroupSchemas),
+					utils.DefaultValuesChecker(defaultGroupSchemas),
 				},
 			},
 			"display_name": schema.StringAttribute{

@@ -82,9 +82,9 @@ func TestApplications_Create(t *testing.T) {
 	t.Run("validate the API request - error", func(t *testing.T) {
 
 		resErr, _ := json.Marshal(struct {
-			Error ApplicationError `json:"error"`
+			Error ResponseError `json:"error"`
 		}{
-			Error: ApplicationError{
+			Error: ResponseError{
 				Code:    400,
 				Message: "create failed",
 				Details: []ErrorDetail{
@@ -143,9 +143,9 @@ func TestApplications_Get(t *testing.T) {
 	t.Run("validate the API request - error", func(t *testing.T) {
 
 		resErr, _ := json.Marshal(struct {
-			Error ApplicationError `json:"error"`
+			Error ResponseError `json:"error"`
 		}{
-			Error: ApplicationError{
+			Error: ResponseError{
 				Code:    400,
 				Message: "get failed",
 				Details: []ErrorDetail{
@@ -196,9 +196,9 @@ func TestApplications_GetByAppId(t *testing.T) {
 	t.Run("validate the API request - error", func(t *testing.T) {
 
 		resErr, _ := json.Marshal(struct {
-			Error ApplicationError `json:"error"`
+			Error ResponseError `json:"error"`
 		}{
-			Error: ApplicationError{
+			Error: ResponseError{
 				Code:    400,
 				Message: "get failed",
 				Details: []ErrorDetail{
@@ -253,9 +253,9 @@ func TestApplications_Update(t *testing.T) {
 	t.Run("validate the API request - error", func(t *testing.T) {
 
 		resErr, _ := json.Marshal(struct {
-			Error ApplicationError `json:"error"`
+			Error ResponseError `json:"error"`
 		}{
-			Error: ApplicationError{
+			Error: ResponseError{
 				Code:    400,
 				Message: "update failed",
 				Details: []ErrorDetail{
@@ -302,9 +302,9 @@ func TestApplications_Delete(t *testing.T) {
 	t.Run("validate the API request - error", func(t *testing.T) {
 
 		resErr, _ := json.Marshal(struct {
-			Error ApplicationError `json:"error"`
+			Error ResponseError `json:"error"`
 		}{
-			Error: ApplicationError{
+			Error: ResponseError{
 				Code:    400,
 				Message: "delete failed",
 				Details: []ErrorDetail{

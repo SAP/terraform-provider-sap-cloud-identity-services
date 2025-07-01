@@ -57,11 +57,11 @@ resource "sci_schema" "basic_schema" {
 
 Required:
 
-- `mutability` (String) Control the Read or Write access of the attribute. Acceptable values are : `readOnly`, `readWrite`, `writeOnly`, `immutable`.
+- `mutability` (String) Control the Read or Write access of the attribute. Acceptable values are : `readOnly`, `readWrite`, `writeOnly`, `immutable`
 - `name` (String) The attribute name. Only alphanumeric characters and underscores are allowed.
-- `returned` (String) Configure how the attribute's value must be returned. Acceptable values are : `always`, `never`, `default`, `request`.
-- `type` (String) The attribute data type. Acceptable values are : `string`, `boolean`, `decimal`, `integer`, `dateTime`, `binary`, `reference`, `complex`.
-- `uniqueness` (String) Define the context in which the attribute must be unique. Acceptable values are : `none`, `server`, `global`.
+- `returned` (String) Configure how the attribute's value must be returned. Acceptable values are : `always`, `never`, `default`, `request`
+- `type` (String) The attribute data type. Acceptable values are : `string`, `boolean`, `decimal`, `integer`, `dateTime`, `binary`, `reference`, `complex`
+- `uniqueness` (String) Define the context in which the attribute must be unique. Acceptable values are : `none`, `server`, `global`
 
 Optional:
 

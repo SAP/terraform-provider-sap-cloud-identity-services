@@ -57,7 +57,7 @@ func TestSchemas_Create(t *testing.T) {
 
 	t.Run("validate the API request - error", func(t *testing.T) {
 
-		resErr, _ := json.Marshal(ScimError{
+		resErr, _ := json.Marshal(ScimResponseError{
 			Detail: "create failed",
 			Status: "400",
 		})
@@ -109,7 +109,7 @@ func TestSchemas_Get(t *testing.T) {
 
 	t.Run("validate the API request - error", func(t *testing.T) {
 
-		resErr, _ := json.Marshal(ScimError{
+		resErr, _ := json.Marshal(ScimResponseError{
 			Detail: "get failed",
 			Status: "400",
 		})
@@ -154,7 +154,7 @@ func TestSchemas_GetBySchemaId(t *testing.T) {
 
 	t.Run("validate the API request - error", func(t *testing.T) {
 
-		resErr, _ := json.Marshal(ScimError{
+		resErr, _ := json.Marshal(ScimResponseError{
 			Detail: "get failed",
 			Status: "400",
 		})
@@ -194,7 +194,7 @@ func TestSchemas_Delete(t *testing.T) {
 
 	t.Run("validate the API request - error", func(t *testing.T) {
 
-		resErr, _ := json.Marshal(ScimError{
+		resErr, _ := json.Marshal(ScimResponseError{
 			Detail: "delete failed",
 			Status: "400",
 		})

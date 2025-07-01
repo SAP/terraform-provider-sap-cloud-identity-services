@@ -1,0 +1,186 @@
+package provider
+
+import (
+	"context"
+
+	corporateidps "github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/corporateIdps"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+)
+
+type oidcConfigData struct {
+	DiscoveryUrl             types.String `tfsdk:"discovery_url"`
+	ClientId                 types.String `tfsdk:"client_id"`
+	ClientSecret             types.String `tfsdk:"client_secret"`
+	SubjectNameIdentifier    types.String `tfsdk:"subject_name_identifier"`
+	TokenEndpointAuthMethod  types.String `tfsdk:"token_endpoint_auth_method"`
+	Scopes                   types.Set    `tfsdk:"scopes"`
+	PkceEnabled              types.Bool   `tfsdk:"enable_pkce"`
+	AdditionalConfig         types.Object `tfsdk:"additional_config"`
+	Issuer                   types.String `tfsdk:"issuer"`
+	JwksUri                  types.String `tfsdk:"jwks_uri"`
+	Jwks                     types.String `tfsdk:"jwks"`
+	TokenEndpoint            types.String `tfsdk:"token_endpoint"`
+	AuthorizationEndpoint    types.String `tfsdk:"authorization_endpoint"`
+	LogoutEndpoint           types.String `tfsdk:"logout_endpoint"`
+	UserInfoEndpoint         types.String `tfsdk:"user_info_endpoint"`
+	IsClientSecretConfigured types.Bool   `tfsdk:"is_client_secret_configured"`
+}
+
+type loginHintConfigData struct {
+	LoginHintType types.String `tfsdk:"login_hint_type"`
+	SendMethod    types.String `tfsdk:"send_method"`
+}
+
+type identityFederationData struct {
+	UseLocalUserStore        types.Bool `tfsdk:"use_local_user_store"`
+	AllowLocalUsersOnly      types.Bool `tfsdk:"allow_local_users_only"`
+	ApplyLocalIdPAuthnChecks types.Bool `tfsdk:"apply_local_idp_auth_and_checks"`
+	RequiredGroups           types.Set  `tfsdk:"required_groups"`
+}
+
+type corporateIdPData struct {
+	Id                    types.String `tfsdk:"id"`
+	Name                  types.String `tfsdk:"name"`
+	DisplayName           types.String `tfsdk:"display_name"`
+	Type                  types.String `tfsdk:"type"`
+	LogoutUrl             types.String `tfsdk:"logout_url"`
+	ForwardAllSsoRequests types.Bool   `tfsdk:"forward_all_sso_requests"`
+	IdentityFederation    types.Object `tfsdk:"identity_federation"`
+	LoginHintConfig       types.Object `tfsdk:"login_hint_config"`
+	OidcConfig            types.Object `tfsdk:"oidc_config"`
+}
+
+func corporateIdPValueFrom(ctx context.Context, c corporateidps.IdentityProvider) (corporateIdPData, diag.Diagnostics) {
+
+	var diags, diagnostics diag.Diagnostics
+
+	corporateIdP := corporateIdPData{
+		Id:                    types.StringValue(c.Id),
+		DisplayName:           types.StringValue(c.DisplayName),
+		Type:                  types.StringValue(c.Type),
+		ForwardAllSsoRequests: types.BoolValue(c.ForwardAllSsoRequests),
+	}
+
+	// Identity Federation
+	var idf identityFederationData
+	idf.UseLocalUserStore = types.BoolValue(c.IdentityFederation.UseLocalUserStore)
+	idf.AllowLocalUsersOnly = types.BoolValue(c.IdentityFederation.AllowLocalUsersOnly)
+	idf.ApplyLocalIdPAuthnChecks = types.BoolValue(c.IdentityFederation.ApplyLocalIdPAuthnChecks)
+
+	if len(c.IdentityFederation.RequiredGroups) > 0 {
+		idf.RequiredGroups, diags = types.SetValueFrom(ctx, types.StringType, c.IdentityFederation.RequiredGroups)
+		diagnostics.Append(diags...)
+
+		if diagnostics.HasError() {
+			return corporateIdP, diagnostics
+		}
+
+	} else {
+		idf.RequiredGroups = types.SetNull(types.StringType)
+	}
+
+	corporateIdP.IdentityFederation, diags = types.ObjectValueFrom(ctx, identityFederationObjType.AttrTypes, idf)
+	diagnostics.Append(diags...)
+
+	if diagnostics.HasError() {
+		return corporateIdP, diagnostics
+	}
+
+	// Login Hint Configuration
+	var loginHintConfig loginHintConfigData
+	loginHintConfig.LoginHintType = types.StringValue(c.LoginHintConfiguration.LoginHintType)
+	loginHintConfig.SendMethod = types.StringValue(c.LoginHintConfiguration.SendMethod)
+
+	corporateIdP.LoginHintConfig, diags = types.ObjectValueFrom(ctx, loginHintConfigObjType.AttrTypes, loginHintConfig)
+	diagnostics.Append(diags...)
+
+	if diagnostics.HasError() {
+		return corporateIdP, diagnostics
+	}
+
+	if len(c.LogoutUrl) > 0 {
+		corporateIdP.LogoutUrl = types.StringValue(c.LogoutUrl)
+	}
+
+	if len(c.Name) > 0 {
+		corporateIdP.Name = types.StringValue(c.Name)
+	}
+
+	// OIDC Configuration
+	if c.Type == idpTypeValues[3] {
+
+		oidcConfig := &oidcConfigData{
+			DiscoveryUrl:             types.StringValue(c.OidcConfiguration.DiscoveryUrl),
+			ClientId:                 types.StringValue(c.OidcConfiguration.ClientId),
+			SubjectNameIdentifier:    types.StringValue(c.OidcConfiguration.SubjectNameIdentifier),
+			TokenEndpointAuthMethod:  types.StringValue(c.OidcConfiguration.TokenEndpointAuthMethod),
+			PkceEnabled:              types.BoolValue(c.OidcConfiguration.PkceEnabled),
+			Issuer:                   types.StringValue(c.OidcConfiguration.Issuer),
+			JwksUri:                  types.StringValue(c.OidcConfiguration.JwksUri),
+			Jwks:                     types.StringValue(c.OidcConfiguration.JwkSetPlain),
+			IsClientSecretConfigured: types.BoolValue(c.OidcConfiguration.IsClientSecretConfigured),
+		}
+
+		// OIDC Scopes
+		scopes, diags := types.SetValueFrom(ctx, types.StringType, c.OidcConfiguration.Scopes)
+		diagnostics.Append(diags...)
+
+		if diagnostics.HasError() {
+			return corporateIdP, diagnostics
+		}
+
+		oidcConfig.Scopes = scopes
+
+		//OIDC Additional Config
+		if c.OidcConfiguration.AdditionalConfig != nil {
+
+			additionalConfig, diags := types.ObjectValueFrom(ctx, OidcCAdditionalConfigObjType.AttrTypes, c.OidcConfiguration.AdditionalConfig)
+			diagnostics.Append(diags...)
+
+			if diagnostics.HasError() {
+				return corporateIdP, diagnostics
+			}
+
+			oidcConfig.AdditionalConfig = additionalConfig
+		} else {
+			oidcConfig.AdditionalConfig = types.ObjectNull(OidcCAdditionalConfigObjType.AttrTypes)
+		}
+
+		//OIDC Endpoints
+		if len(c.OidcConfiguration.TokenEndpoint) > 0 {
+			oidcConfig.TokenEndpoint = types.StringValue(c.OidcConfiguration.TokenEndpoint)
+		}
+
+		if len(c.OidcConfiguration.AuthorizationEndpoint) > 0 {
+			oidcConfig.AuthorizationEndpoint = types.StringValue(c.OidcConfiguration.AuthorizationEndpoint)
+		}
+
+		if len(c.OidcConfiguration.EndSessionEndpoint) > 0 {
+			oidcConfig.LogoutEndpoint = types.StringValue(c.OidcConfiguration.EndSessionEndpoint)
+		}
+
+		if len(c.OidcConfiguration.UserInfoEndpoint) > 0 {
+			oidcConfig.UserInfoEndpoint = types.StringValue(c.OidcConfiguration.UserInfoEndpoint)
+		}
+
+		corporateIdP.OidcConfig, diags = types.ObjectValueFrom(ctx, oidcConfigObjType.AttrTypes, oidcConfig)
+		diagnostics.Append(diags...)
+	} else {
+		corporateIdP.OidcConfig = types.ObjectNull(oidcConfigObjType.AttrTypes)
+	}
+
+	return corporateIdP, diagnostics
+}
+
+func corporateIdPsValueFrom(ctx context.Context, c corporateidps.IdentityProvidersResponse) []corporateIdPData {
+
+	idps := []corporateIdPData{}
+
+	for _, res := range c.IdentityProviders {
+		idp, _ := corporateIdPValueFrom(ctx, res)
+		idps = append(idps, idp)
+	}
+
+	return idps
+}
