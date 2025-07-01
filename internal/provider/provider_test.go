@@ -95,7 +95,7 @@ func requestMatcher(t *testing.T) cassette.MatcherFunc {
 			t.Fatal("Unable to read request body")
 		}
     
-		requestBody := string(bytes)
+		requestBody := string(body)
 		return requestBody == i.Body
 	}
 }
