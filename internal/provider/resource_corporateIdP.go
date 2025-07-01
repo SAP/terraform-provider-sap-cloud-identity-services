@@ -9,10 +9,8 @@ import (
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/objectvalidator"
-	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -20,7 +18,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setplanmodifier"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -36,8 +33,6 @@ var (
 	nameIdFormatValues             = []string{"default", "none", "unspecified", "email"}
 	allowCreateValues              = []string{"default", "none", "true", "false"}
 	endpointBindingValues          = []string{"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST", "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect", "urn:oasis:names:tc:SAML:2.0:bindings:SOAP", "urn:oasis:names:tc:SAML:2.0:bindings:URI"}
-	idpSubjectNameIdentifierValues = []string{"none", "email"}
-	tokenEndpointAuthMethodValues  = []string{"clientSecretPost", "clientSecretBasic", "privateKeyJwt", "privateKeyJwtRfc7523"}
 )
 
 func newCorporateIdPResource() resource.Resource {
@@ -414,170 +409,6 @@ func (r *corporateIdPResource) Schema(_ context.Context, _ resource.SchemaReques
 					},
 				},
 			},
-			"oidc_config": schema.SingleNestedAttribute{
-				MarkdownDescription: "Configure trust with an identity provider by providing the necessary metadata for web-based authentication.",
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Validators: []validator.Object{
-					objectvalidator.AlsoRequires(
-						path.MatchRoot("type"),
-						path.MatchRoot("name"),
-						path.MatchRoot("oidc_config").AtName("discovery_url"),
-						path.MatchRoot("oidc_config").AtName("client_id"),
-					),
-					// The API does not validate the type of the corporate IdP depending on the configuration provided.
-					// When the oidc configuration is provided but the type of the IdP is set to one of ["sapSSO", "microsoftADFS", "saml2"] , the IdP listed on the Admin Console is of type SAML2.
-					// Although the provided oidc configurationd details are returned in the GET call, this validator ensures the consistency of the type and config provided
-					objectvalidator.All(
-						utils.ValidType(
-							path.MatchRoot("type"),
-							idpTypeValues[3:],
-						),
-					),
-
-					// TODO add a check for client_secret and tokenAuthMethod
-				},
-				Attributes: map[string]schema.Attribute{
-					"discovery_url": schema.StringAttribute{
-						MarkdownDescription: "Specify the Issuer or Metadata URL",
-						Optional:            true,
-						Validators: []validator.String{
-							utils.ValidUrl(),
-						},
-					},
-					"client_id": schema.StringAttribute{
-						MarkdownDescription: "Configure the Client ID for Client Authentication.",
-						Optional:            true,
-					},
-					"client_secret": schema.StringAttribute{
-						MarkdownDescription: "Configure the Client Secret for Client Authentication.",
-						Optional:            true,
-						Validators: []validator.String{
-							utils.CheckClientAuthMethod(
-								path.MatchRoot("oidc_config").AtName("token_endpoint_auth_method"),
-								tokenEndpointAuthMethodValues[:2],
-							),
-						},
-					},
-					"token_endpoint_auth_method": schema.StringAttribute{
-						MarkdownDescription: "Configure the Client Authentication Method. " + utils.ValidValuesString(tokenEndpointAuthMethodValues),
-						Optional:            true,
-						Computed:            true,
-						Validators: []validator.String{
-							stringvalidator.OneOf(tokenEndpointAuthMethodValues...),
-						},
-						PlanModifiers: []planmodifier.String{
-							stringplanmodifier.UseStateForUnknown(),
-						},
-					},
-					"subject_name_identifier": schema.StringAttribute{
-						MarkdownDescription: "Define the claim which is used as subject name identifier. The Subject Name Identifier configuration defines with which value the identity provider user will be searched in the Identity Authentication user store. " + utils.ValidValuesString(idpSubjectNameIdentifierValues),
-						Optional:            true,
-						Computed:            true,
-						Validators: []validator.String{
-							stringvalidator.OneOf(idpSubjectNameIdentifierValues...),
-						},
-						PlanModifiers: []planmodifier.String{
-							stringplanmodifier.UseStateForUnknown(),
-						},
-					},
-					"scopes": schema.SetAttribute{
-						MarkdownDescription: "Configure additional scopes required by the Identity Provider. By default, the \"openid\" scope is added.",
-						Optional:            true,
-						Computed:            true,
-						ElementType:         types.StringType,
-						Validators: []validator.Set{
-							setvalidator.SizeAtLeast(1),
-							setvalidator.SizeAtMost(20),
-							// openid is always a default scope
-							// hence the parameter scopes must be configured with the value openid
-							utils.DefaultValuesChecker([]attr.Value{
-								types.StringValue("openid"),
-							}),
-						},
-						PlanModifiers: []planmodifier.Set{
-							setplanmodifier.UseStateForUnknown(),
-						},
-					},
-					"enable_pkce": schema.BoolAttribute{
-						MarkdownDescription: "Configure Proof Key for Code Exchange (PKCE) for the corporate IdP. This is an enhancement of the authorization code flow to prevent the interception of authorization code. This feature is recommended only if the corporate IdP supports PKCE and you have public applications that aren't capable of keeping client secrets.",
-						Optional:            true,
-						Computed:            true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
-					},
-					"additional_config": schema.SingleNestedAttribute{
-						MarkdownDescription: "Configure additional settings of the corporate IdP.",
-						Optional:            true,
-						Computed:            true,
-						PlanModifiers: []planmodifier.Object{
-							objectplanmodifier.UseStateForUnknown(),
-						},
-						Attributes: map[string]schema.Attribute{
-							"enforce_nonce": schema.BoolAttribute{
-								MarkdownDescription: "Configure if the authenticating application is required to send nonces to the corporate IdP. A nonce is a string associated with a client session and is used to mitigate replay attacks. If supplied by an application, Identity Authentication forwards the nonce with requests to the corporate IdP.",
-								Optional:            true,
-								Computed:            true,
-								PlanModifiers: []planmodifier.Bool{
-									boolplanmodifier.UseStateForUnknown(),
-								},
-							},
-							"enforce_issuer_check": schema.BoolAttribute{
-								MarkdownDescription: "Configure if Identity Authentication should enforce Issuer Validation. If set to true, responses from the corporate IdP which don't provide the iss attribute are rejected.",
-								Optional:            true,
-								Computed:            true,
-								PlanModifiers: []planmodifier.Bool{
-									boolplanmodifier.UseStateForUnknown(),
-								},
-							},
-							"disable_logout_id_token_hint": schema.BoolAttribute{
-								MarkdownDescription: "Configure if the Identity Authentication should not include the ID token in the id_token_hint URL parameter.",
-								Optional:            true,
-								Computed:            true,
-								PlanModifiers: []planmodifier.Bool{
-									boolplanmodifier.UseStateForUnknown(),
-								},
-							},
-						},
-					},
-					"issuer": schema.StringAttribute{
-						MarkdownDescription: "The unique field that identifies the IdP.",
-						Computed:            true,
-					},
-					"jwks_uri": schema.StringAttribute{
-						MarkdownDescription: "The endpoint called to request JSON Web Keys for JWT validation.",
-						Computed:            true,
-					},
-					"jwks": schema.StringAttribute{
-						MarkdownDescription: "The JSON Web Keys used for the JSON Web Token Validation.",
-						Computed:            true,
-					},
-					"token_endpoint": schema.StringAttribute{
-						MarkdownDescription: "The endpoint called to request the ID token for SSO.",
-						Computed:            true,
-					},
-					"authorization_endpoint": schema.StringAttribute{
-						MarkdownDescription: "The endpoint to which SSO requests are forwarded to, in order to retrieve an authorization code.",
-						Computed:            true,
-					},
-					"logout_endpoint": schema.StringAttribute{
-						MarkdownDescription: "The endpoint called to log out the current user session.",
-						Computed:            true,
-					},
-					"user_info_endpoint": schema.StringAttribute{
-						MarkdownDescription: "The endpoint called to get information about a user.",
-						Computed:            true,
-					},
-					"is_client_secret_configured": schema.BoolAttribute{
-						MarkdownDescription: "Indicates if a client secret is configured or not.",
-						Computed:            true,
-					},
-				},
-			},
 		},
 	}
 }
@@ -608,12 +439,6 @@ func (r *corporateIdPResource) Create(ctx context.Context, req resource.CreateRe
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
-	}
-
-	if !plan.OidcConfig.IsNull() && !plan.OidcConfig.IsUnknown() {
-		// The client secret must be read from the plan as the GET call on the IdP does not return the configured secret
-		diags = mapOidcClientSecret(ctx, plan, &state)
-		resp.Diagnostics.Append(diags...)
 	}
 
 	if resp.Diagnostics.HasError() {
@@ -650,12 +475,6 @@ func (r *corporateIdPResource) Read(ctx context.Context, req resource.ReadReques
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
-	}
-
-	if !config.OidcConfig.IsNull() && !config.OidcConfig.IsUnknown() {
-		// The client secret must be read from the plan as the GET call on the IdP does not return the configured secret
-		diags = mapOidcClientSecret(ctx, config, &state)
-		resp.Diagnostics.Append(diags...)
 	}
 
 	if resp.Diagnostics.HasError() {
@@ -756,54 +575,5 @@ func (r *corporateIdPResource) getCorporateIdPRequest(ctx context.Context, plan 
 		corporateIdP.Saml2Configuration = &saml2Config
 	}
 
-	if !plan.OidcConfig.IsNull() && !plan.OidcConfig.IsUnknown() {
-
-		var oidcConfig corporateidps.OIDCConfiguration
-		diags = plan.OidcConfig.As(ctx, &oidcConfig, basetypes.ObjectAsOptions{
-			UnhandledNullAsEmpty:    true,
-			UnhandledUnknownAsEmpty: true,
-		})
-		diagnostics.Append(diags...)
-
-		if diagnostics.HasError() {
-			return nil, diagnostics
-		}
-
-		corporateIdP.OidcConfiguration = &oidcConfig
-	}
-
 	return corporateIdP, diagnostics
-}
-
-func mapOidcClientSecret(ctx context.Context, plan corporateIdPData, state *corporateIdPData) diag.Diagnostics {
-
-	var oidcPlan oidcConfigData
-	diags := plan.OidcConfig.As(ctx, &oidcPlan, basetypes.ObjectAsOptions{
-		UnhandledNullAsEmpty:    true,
-		UnhandledUnknownAsEmpty: true,
-	})
-	if diags.HasError() {
-		return diags
-	}
-
-	if !oidcPlan.ClientSecret.IsNull() && !oidcPlan.ClientSecret.IsUnknown() {
-
-		var oidcState oidcConfigData
-		diags = state.OidcConfig.As(ctx, &oidcState, basetypes.ObjectAsOptions{
-			UnhandledNullAsEmpty:    true,
-			UnhandledUnknownAsEmpty: true,
-		})
-		if diags.HasError() {
-			return diags
-		}
-
-		oidcState.ClientSecret = oidcPlan.ClientSecret
-
-		state.OidcConfig, diags = types.ObjectValueFrom(ctx, oidcConfigObjType.AttrTypes, oidcState)
-		if diags.HasError() {
-			return diags
-		}
-	}
-
-	return nil
 }

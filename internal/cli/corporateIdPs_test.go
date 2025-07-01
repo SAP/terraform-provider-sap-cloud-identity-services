@@ -71,37 +71,13 @@ var (
 		},
 	}
 
-	oidcConfigBody = corporateidps.OIDCConfiguration{
-		DiscoveryUrl:            "https://test.com",
-		ClientId:                "test-client-id",
-		ClientSecret:            "test-client-secret",
-		SubjectNameIdentifier:   "email",
-		TokenEndpointAuthMethod: "clientSecretBasic",
-		Scopes: []string{
-			"test-value-1",
-			"openid",
-		},
-		PkceEnabled: true,
-		AdditionalConfig: &corporateidps.OIDCAdditionalConfig{
-			OmitIDTokenHintForLogout: true,
-			EnforceIssuerCheck:       true,
-			EnforceNonce:             true,
-		},
-	}
-
 	saml2IdP corporateidps.IdentityProvider
-
-	oidcIdP corporateidps.IdentityProvider
 )
 
 func TestCorporateIdPs_Create(t *testing.T) {
 
 	saml2IdP = corporateIdPsBody
 	saml2IdP.Saml2Configuration = &saml2ConfigBody
-
-	oidcIdP = corporateIdPsBody
-	oidcIdP.OidcConfiguration = &oidcConfigBody
-
 	t.Run("validate the API request - saml2 IdP", func(t *testing.T) {
 
 		saml2IdPResponse, _ := json.Marshal(saml2IdP)
@@ -124,27 +100,6 @@ func TestCorporateIdPs_Create(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	t.Run("validate the API request - oidc IdP", func(t *testing.T) {
-
-		oidcIdPResponse, _ := json.Marshal(oidcIdP)
-
-		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Add("location", corporateIdPsPath+"valid-idp-uuid")
-			_, err := w.Write(oidcIdPResponse)
-			assert.NoError(t, err, "Failed to write response")
-
-			if r.Method != "GET" {
-				assertCall[corporateidps.IdentityProvider](t, r, corporateIdPsPath, "POST", oidcIdP)
-			}
-
-		}))
-
-		defer srv.Close()
-
-		_, _, err := client.CorporateIdP.Create(context.TODO(), &oidcIdP)
-
-		assert.NoError(t, err)
-	})
 
 	t.Run("validate the API request - error", func(t *testing.T) {
 
@@ -186,7 +141,6 @@ func TestCorporateIdPs_Get(t *testing.T) {
 
 	allCorporateIdPs := []corporateidps.IdentityProvider{
 		saml2IdP,
-		oidcIdP,
 	}
 
 	t.Run("validate the API request", func(t *testing.T) {
@@ -249,32 +203,12 @@ func TestCorporateIdPs_GetByIdPId(t *testing.T) {
 	saml2IdP = corporateIdPsBody
 	saml2IdP.Saml2Configuration = &saml2ConfigBody
 
-	oidcIdP = corporateIdPsBody
-	oidcIdP.OidcConfiguration = &oidcConfigBody
-
 	t.Run("validate the API request - saml2 IdP", func(t *testing.T) {
 
 		saml2IdPResponse, _ := json.Marshal(saml2IdP)
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			_, err := w.Write(saml2IdPResponse)
-			assert.NoError(t, err, "Failed to write response")
-
-			assertCall[corporateidps.IdentityProvider](t, r, fmt.Sprintf("%s%s", corporateIdPsPath, "valid-idp-id"), "GET", nil)
-		}))
-
-		defer srv.Close()
-
-		_, _, err := client.CorporateIdP.GetByIdPId(context.TODO(), "valid-idp-id")
-		assert.NoError(t, err)
-	})
-
-	t.Run("validate the API request - oidc IdP", func(t *testing.T) {
-
-		oidcIdPResponse, _ := json.Marshal(oidcIdP)
-
-		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			_, err := w.Write(oidcIdPResponse)
 			assert.NoError(t, err, "Failed to write response")
 
 			assertCall[corporateidps.IdentityProvider](t, r, fmt.Sprintf("%s%s", corporateIdPsPath, "valid-idp-id"), "GET", nil)

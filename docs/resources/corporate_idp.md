@@ -27,7 +27,6 @@ Creates a Corporate Identity Provider in the SAP Cloud Identity Services.
 					 If the corporate IdP supports the login hint parameter, then it requests only the user credentials. (see [below for nested schema](#nestedatt--login_hint_config))
 - `logout_url` (String) URL to redirect users after successful logout.
 - `name` (String) Unique name of the Corporate Identity Provider
-- `oidc_config` (Attributes) Configure trust with an identity provider by providing the necessary metadata for web-based authentication. (see [below for nested schema](#nestedatt--oidc_config))
 - `saml2_config` (Attributes) Configure trust with an identity provider by providing the necessary metadata for web-based authentication. (see [below for nested schema](#nestedatt--saml2_config))
 - `type` (String) Type of the Corporate Identity Provider. Acceptable values are : `sapSSO`, `microsoftADFS`, `saml2`, `openIdConnect`
 
@@ -56,42 +55,6 @@ Optional:
 
 - `login_hint_type` (String) The value of the parameter sent. Acceptable values are : `none`, `userInput`, `mail`, `loginName`
 - `send_method` (String) Configure how this parameter is sent to the corporate IdP. Acceptable values are : `urlParam`, `authRequest`
-
-
-<a id="nestedatt--oidc_config"></a>
-### Nested Schema for `oidc_config`
-
-Optional:
-
-- `additional_config` (Attributes) Configure additional settings of the corporate IdP. (see [below for nested schema](#nestedatt--oidc_config--additional_config))
-- `client_id` (String) Configure the Client ID for Client Authentication.
-- `client_secret` (String) Configure the Client Secret for Client Authentication.
-- `discovery_url` (String) Specify the Issuer or Metadata URL
-- `enable_pkce` (Boolean) Configure Proof Key for Code Exchange (PKCE) for the corporate IdP. This is an enhancement of the authorization code flow to prevent the interception of authorization code. This feature is recommended only if the corporate IdP supports PKCE and you have public applications that aren't capable of keeping client secrets.
-- `scopes` (Set of String) Configure additional scopes required by the Identity Provider. By default, the "openid" scope is added.
-- `subject_name_identifier` (String) Define the claim which is used as subject name identifier. The Subject Name Identifier configuration defines with which value the identity provider user will be searched in the Identity Authentication user store. Acceptable values are : `none`, `email`
-- `token_endpoint_auth_method` (String) Configure the Client Authentication Method. Acceptable values are : `clientSecretPost`, `clientSecretBasic`, `privateKeyJwt`, `privateKeyJwtRfc7523`
-
-Read-Only:
-
-- `authorization_endpoint` (String) The endpoint to which SSO requests are forwarded to, in order to retrieve an authorization code.
-- `is_client_secret_configured` (Boolean) Indicates if a client secret is configured or not.
-- `issuer` (String) The unique field that identifies the IdP.
-- `jwks` (String) The JSON Web Keys used for the JSON Web Token Validation.
-- `jwks_uri` (String) The endpoint called to request JSON Web Keys for JWT validation.
-- `logout_endpoint` (String) The endpoint called to log out the current user session.
-- `token_endpoint` (String) The endpoint called to request the ID token for SSO.
-- `user_info_endpoint` (String) The endpoint called to get information about a user.
-
-<a id="nestedatt--oidc_config--additional_config"></a>
-### Nested Schema for `oidc_config.additional_config`
-
-Optional:
-
-- `disable_logout_id_token_hint` (Boolean) Configure if the Identity Authentication should not include the ID token in the id_token_hint URL parameter.
-- `enforce_issuer_check` (Boolean) Configure if Identity Authentication should enforce Issuer Validation. If set to true, responses from the corporate IdP which don't provide the iss attribute are rejected.
-- `enforce_nonce` (Boolean) Configure if the authenticating application is required to send nonces to the corporate IdP. A nonce is a string associated with a client session and is used to mitigate replay attacks. If supplied by an application, Identity Authentication forwards the nonce with requests to the corporate IdP.
-
 
 
 <a id="nestedatt--saml2_config"></a>
