@@ -168,6 +168,8 @@ func TestSciProvider_AllDataSources(t *testing.T) {
 		"sci_groups",
 		"sci_schema",
 		"sci_schemas",
+		"sci_corporate_idp",
+		"sci_corporate_idps",
 	}
 
 	ctx := context.Background()
