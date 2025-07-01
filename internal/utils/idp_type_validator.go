@@ -2,12 +2,12 @@ package utils
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/helpers/validatordiag"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
+	"slices"
 )
 
 // checks that when OIDC is configured for the corporate IDP, the type of the IDP is "openIdConnect"
@@ -41,15 +41,9 @@ func (v typeValidator) ValidateObject(ctx context.Context, request validator.Obj
 	}
 
 	val := typeVal.String()
-	validValFound := false
+	val = val[1 : len(val)-1] // remove the quotes from the value
 
-	// check that the value of type is "openIdConnect"
-	for _, validVal := range v.validValues {
-		if val == fmt.Sprintf("\"%s\"", validVal) {
-			validValFound = true
-			break
-		}
-	}
+	validValFound := slices.Contains(v.validValues, val)
 
 	if !validValFound {
 		response.Diagnostics.Append(validatordiag.InvalidAttributeValueDiagnostic(

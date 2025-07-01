@@ -9,7 +9,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
-  
+
 	"strconv"
 	"testing"
 
@@ -94,7 +94,7 @@ func requestMatcher(t *testing.T) cassette.MatcherFunc {
 		if err != nil {
 			t.Fatal("Unable to read request body")
 		}
-    
+
 		requestBody := string(body)
 		return requestBody == i.Body
 	}
@@ -121,7 +121,7 @@ func redactCredentials() recorder.HookFunc {
 			reBindingSecret := regexp.MustCompile(`"base64Certificate":"(.*?)"`)
 			i.Request.Body = reBindingSecret.ReplaceAllString(i.Request.Body, `"base64Certificate":"-----BEGIN CERTIFICATE-----\nredacted\n-----END CERTIFICATE-----"`)
 		}
-    
+
 		return nil
 	}
 }

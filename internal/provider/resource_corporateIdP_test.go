@@ -231,7 +231,7 @@ func TestResourceCorporateIdP(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceCorporateIdPConfigTypeMismtach("testIdP", "Test IDP", "openIdConnect", "saml2_config = {}"),
-					ExpectError: regexp.MustCompile("Attribute saml2_config : value of attribute \"type\" must be modified to match\nthe IDP configuration provided. Acceptable values are : `sapSSO`,\n`microsoftADFS`, `saml2`, got: \"openIdConnect\""),
+					ExpectError: regexp.MustCompile("Attribute saml2_config : value of attribute \"type\" must be modified to match\nthe IDP configuration provided. Acceptable values are : `sapSSO`,\n`microsoftADFS`, `saml2`, got: openIdConnect"),
 				},
 			},
 		})
@@ -602,10 +602,11 @@ func ResourceCorporateIdPConfigTypeMismtach(resourceName string, idpName string,
 	return fmt.Sprintf(`
 	resource "sci_corporate_idp" "%s" {
 		display_name = "%s"
+		name = "%s"
 		type = "%s"
 		%s
 	}
-	`, resourceName, idpName, idpType, idpConfig)
+	`, resourceName, idpName, idpName, idpType, idpConfig)
 }
 
 func ResourceSaml2CorporateIdPWithAssertionAttributes(resourceName string, idpName string, saml2Attribute string) string {
