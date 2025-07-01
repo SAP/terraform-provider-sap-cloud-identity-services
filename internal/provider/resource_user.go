@@ -241,6 +241,11 @@ func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, r
 	// the initial password is not returned in the response, hence it must be read from the plan
 	state.InitialPassword = plan.InitialPassword
 
+	// if the custom schemas are not configured, set the value to null to prevent in place updates
+	if plan.CustomSchemas.IsNull() {
+		state.CustomSchemas = types.StringNull()
+	}
+
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 }
@@ -268,6 +273,11 @@ func (r *userResource) Read(ctx context.Context, req resource.ReadRequest, resp 
 
 	// the initial password is not returned in the response, hence it must be read from the state
 	state.InitialPassword = config.InitialPassword
+
+	// if the custom schemas are not configured, set the value to null to prevent in place updates
+	if config.CustomSchemas.IsNull() {
+		state.CustomSchemas = types.StringNull()
+	}
 
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -316,6 +326,11 @@ func (r *userResource) Update(ctx context.Context, req resource.UpdateRequest, r
 
 	// the initial password is not returned in the response, hence it must be read from the plan
 	updatedState.InitialPassword = plan.InitialPassword
+
+	// if the custom schemas are not configured, set the value to null to prevent in place updates
+	if plan.CustomSchemas.IsNull() {
+		updatedState.CustomSchemas = types.StringNull()
+	}
 
 	diags = resp.State.Set(ctx, &updatedState)
 	resp.Diagnostics.Append(diags...)
