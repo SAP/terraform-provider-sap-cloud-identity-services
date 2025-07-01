@@ -2,7 +2,7 @@ package utils
 
 import (
 	"context"
-	"fmt"
+	"slices"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/helpers/validatordiag"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -41,15 +41,12 @@ func (v typeValidator) ValidateObject(ctx context.Context, request validator.Obj
 	}
 
 	val := typeVal.String()
+	val = val[1 : len(val)-1] // remove the quotes around the value
+
 	validValFound := false
 
-	// check that the value of type is "openIdConnect"
-	for _, validVal := range v.validValues {
-		if val == fmt.Sprintf("\"%s\"", validVal) {
-			validValFound = true
-			break
-		}
-	}
+	// check value of type is one of the valid values
+	validValFound = slices.Contains(v.validValues, val)
 
 	if !validValFound {
 		response.Diagnostics.Append(validatordiag.InvalidAttributeValueDiagnostic(
