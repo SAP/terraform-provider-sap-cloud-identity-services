@@ -23,6 +23,62 @@ type corporateIdPsData struct {
 	Values types.List `tfsdk:"values"`
 }
 
+var saml2SloEndpointObjType = types.ObjectType{
+	AttrTypes: map[string]attr.Type{
+		"binding_name":      types.StringType,
+		"location":          types.StringType,
+		"response_location": types.StringType,
+		"default":           types.BoolType,
+	},
+}
+
+var saml2SsoEndpointObjType = types.ObjectType{
+	AttrTypes: map[string]attr.Type{
+		"binding_name": types.StringType,
+		"location":     types.StringType,
+		"default":      types.BoolType,
+	},
+}
+
+var saml2SigningCertificateObjType = types.ObjectType{
+	AttrTypes: map[string]attr.Type{
+		"base64_certificate": types.StringType,
+		"dn":                 types.StringType,
+		"default":            types.BoolType,
+		"valid_from":         types.StringType,
+		"valid_to":           types.StringType,
+	},
+}
+
+var saml2AssertionAttributeObjType = types.ObjectType{
+	AttrTypes: map[string]attr.Type{
+		"name":  types.StringType,
+		"value": types.StringType,
+	},
+}
+
+var saml2ConfigObjType = types.ObjectType{
+	AttrTypes: map[string]attr.Type{
+		"saml_metadata_url": types.StringType,
+		"assertion_attributes": types.ListType{
+			ElemType: saml2AssertionAttributeObjType,
+		},
+		"digest_algorithm": types.StringType,
+		"include_scoping":  types.BoolType,
+		"name_id_format":   types.StringType,
+		"allow_create":     types.StringType,
+		"signing_certificates": types.ListType{
+			ElemType: saml2SigningCertificateObjType,
+		},
+		"sso_endpoints": types.ListType{
+			ElemType: saml2SsoEndpointObjType,
+		},
+		"slo_endpoints": types.ListType{
+			ElemType: saml2SloEndpointObjType,
+		},
+	},
+}
+
 var OidcCAdditionalConfigObjType = types.ObjectType{
 	AttrTypes: map[string]attr.Type{
 		"enforce_nonce":                types.BoolType,
@@ -82,6 +138,7 @@ var corporateIdPObjType = types.ObjectType{
 		"forward_all_sso_requests": types.BoolType,
 		"identity_federation":      identityFederationObjType,
 		"login_hint_config":        loginHintConfigObjType,
+		"saml2_config":             saml2ConfigObjType,
 		"oidc_config":              oidcConfigObjType,
 	},
 }
@@ -167,6 +224,120 @@ func (d *corporateIdPsDataSource) Schema(_ context.Context, _ datasource.SchemaR
 								},
 								"send_method": schema.StringAttribute{
 									MarkdownDescription: "Configure how this parameter is sent to the corporate IdP.",
+									Computed:            true,
+								},
+							},
+						},
+						"saml2_config": schema.SingleNestedAttribute{
+							MarkdownDescription: "Configure trust with an identity provider by providing the necessary metadata for web-based authentication.",
+							Computed:            true,
+							Attributes: map[string]schema.Attribute{
+								"saml_metadata_url": schema.StringAttribute{
+									MarkdownDescription: "The URL with identity provider metadata.",
+									Computed:            true,
+								},
+								"assertion_attributes": schema.ListNestedAttribute{
+									MarkdownDescription: "Enrich the assertion attributes coming from the corporate IdP.",
+									Computed:            true,
+									NestedObject: schema.NestedAttributeObject{
+										Attributes: map[string]schema.Attribute{
+											"name": schema.StringAttribute{
+												MarkdownDescription: "Set the name of the attribute.",
+												Computed:            true,
+											},
+											"value": schema.StringAttribute{
+												MarkdownDescription: "Set the value of the attribute.",
+												Computed:            true,
+											},
+										},
+									},
+								},
+								"signing_certificates": schema.ListNestedAttribute{
+									MarkdownDescription: "Base64-encoded certificates used by the service provider to sign digitally, SAML protocol messages sent to Identity Authentication. A maximum of 2 certificates are allowed.",
+									Computed:            true,
+									NestedObject: schema.NestedAttributeObject{
+										Attributes: map[string]schema.Attribute{
+											"base64_certificate": schema.StringAttribute{
+												MarkdownDescription: "The content of the Base64 certificate. The certificate must be in PEM format.",
+												Computed:            true,
+											},
+											"dn": schema.StringAttribute{
+												MarkdownDescription: "A unique identifier for the certificate.",
+												Computed:            true,
+											},
+											"default": schema.BoolAttribute{
+												MarkdownDescription: "Configure if the certificate is the default one to be used.",
+												Computed:            true,
+											},
+											"valid_from": schema.StringAttribute{
+												MarkdownDescription: "Set the date from which the certificate is valid.",
+												Computed:            true,
+											},
+											"valid_to": schema.StringAttribute{
+												MarkdownDescription: "Set the date uptil which the certificate is valid.",
+												Computed:            true,
+											},
+										},
+									},
+								},
+								"sso_endpoints": schema.ListNestedAttribute{
+									MarkdownDescription: "Configure the URLs of the identity provider single sign-on endpoint that receive authentication requests.",
+									Computed:            true,
+									NestedObject: schema.NestedAttributeObject{
+										Attributes: map[string]schema.Attribute{
+											"binding_name": schema.StringAttribute{
+												MarkdownDescription: "Specify the SAML binding for the endpoint.",
+												Computed:            true,
+											},
+											"location": schema.StringAttribute{
+												MarkdownDescription: "The value of the URL or endpoint to be called.",
+												Computed:            true,
+											},
+											"default": schema.BoolAttribute{
+												MarkdownDescription: "Configure if the endpoint is the default one to be used.",
+												Computed:            true,
+											},
+										},
+									},
+								},
+								"slo_endpoints": schema.ListNestedAttribute{
+									MarkdownDescription: "Configure the URLs of the identity provider single logout endpoint that receive logout messages.",
+									Computed:            true,
+									NestedObject: schema.NestedAttributeObject{
+										Attributes: map[string]schema.Attribute{
+											"binding_name": schema.StringAttribute{
+												MarkdownDescription: "Specify the SAML binding for the endpoint.",
+												Computed:            true,
+											},
+											"location": schema.StringAttribute{
+												MarkdownDescription: "The value of the URL or endpoint to be called.",
+												Computed:            true,
+											},
+											"response_location": schema.StringAttribute{
+												MarkdownDescription: "The URL or endpoint to which logout response messages are sent.",
+												Computed:            true,
+											},
+											"default": schema.BoolAttribute{
+												MarkdownDescription: "Configure if the endpoint is the default one to be used",
+												Computed:            true,
+											},
+										},
+									},
+								},
+								"digest_algorithm": schema.StringAttribute{
+									MarkdownDescription: "Configure the Signing Algorithm.",
+									Computed:            true,
+								},
+								"include_scoping": schema.BoolAttribute{
+									MarkdownDescription: "Configure whether to include or exclude the Scoping element in the SAML 2.0 request.",
+									Computed:            true,
+								},
+								"name_id_format": schema.StringAttribute{
+									MarkdownDescription: "Configure preferred Name ID format. The attribute is sent to the corporate identity provider as name ID format to the Identity Provider.",
+									Computed:            true,
+								},
+								"allow_create": schema.StringAttribute{
+									MarkdownDescription: "Configure if the `AllowCreate` attribute sent by the Service Provider is forwarded to the Corporate IdP or not.",
 									Computed:            true,
 								},
 							},

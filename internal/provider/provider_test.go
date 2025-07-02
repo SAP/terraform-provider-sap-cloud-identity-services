@@ -8,8 +8,9 @@ import (
 	"net/http"
 	"os"
 	"regexp"
-	"strconv"
 	"strings"
+
+	"strconv"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"

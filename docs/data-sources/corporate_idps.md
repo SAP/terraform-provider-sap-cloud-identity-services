@@ -33,6 +33,7 @@ Read-Only:
 - `logout_url` (String) URL to redirect users after successful logout.
 - `name` (String) Unique name of the Corporate Identity Provider
 - `oidc_config` (Attributes) Configure trust with an identity provider by providing the necessary metadata for web-based authentication. (see [below for nested schema](#nestedatt--values--oidc_config))
+- `saml2_config` (Attributes) Configure trust with an identity provider by providing the necessary metadata for web-based authentication. (see [below for nested schema](#nestedatt--values--saml2_config))
 - `type` (String) Type of the Corporate Identity Provider.
 
 <a id="nestedatt--values--identity_federation"></a>
@@ -88,3 +89,61 @@ Read-Only:
 - `disable_logout_id_token_hint` (Boolean) Configure if the Identity Authentication should not include the ID token in the id_token_hint URL parameter.
 - `enforce_issuer_check` (Boolean) Configure if Identity Authentication should enforce Issuer Validation. If set to true, responses from the corporate IdP which don't provide the iss attribute are rejected.
 - `enforce_nonce` (Boolean) Configure if the authenticating application is required to send nonces to the corporate IdP. A nonce is a string associated with a client session and is used to mitigate replay attacks. If supplied by an application, Identity Authentication forwards the nonce with requests to the corporate IdP.
+
+
+
+<a id="nestedatt--values--saml2_config"></a>
+### Nested Schema for `values.saml2_config`
+
+Read-Only:
+
+- `allow_create` (String) Configure if the `AllowCreate` attribute sent by the Service Provider is forwarded to the Corporate IdP or not.
+- `assertion_attributes` (Attributes List) Enrich the assertion attributes coming from the corporate IdP. (see [below for nested schema](#nestedatt--values--saml2_config--assertion_attributes))
+- `digest_algorithm` (String) Configure the Signing Algorithm.
+- `include_scoping` (Boolean) Configure whether to include or exclude the Scoping element in the SAML 2.0 request.
+- `name_id_format` (String) Configure preferred Name ID format. The attribute is sent to the corporate identity provider as name ID format to the Identity Provider.
+- `saml_metadata_url` (String) The URL with identity provider metadata.
+- `signing_certificates` (Attributes List) Base64-encoded certificates used by the service provider to sign digitally, SAML protocol messages sent to Identity Authentication. A maximum of 2 certificates are allowed. (see [below for nested schema](#nestedatt--values--saml2_config--signing_certificates))
+- `slo_endpoints` (Attributes List) Configure the URLs of the identity provider single logout endpoint that receive logout messages. (see [below for nested schema](#nestedatt--values--saml2_config--slo_endpoints))
+- `sso_endpoints` (Attributes List) Configure the URLs of the identity provider single sign-on endpoint that receive authentication requests. (see [below for nested schema](#nestedatt--values--saml2_config--sso_endpoints))
+
+<a id="nestedatt--values--saml2_config--assertion_attributes"></a>
+### Nested Schema for `values.saml2_config.assertion_attributes`
+
+Read-Only:
+
+- `name` (String) Set the name of the attribute.
+- `value` (String) Set the value of the attribute.
+
+
+<a id="nestedatt--values--saml2_config--signing_certificates"></a>
+### Nested Schema for `values.saml2_config.signing_certificates`
+
+Read-Only:
+
+- `base64_certificate` (String) The content of the Base64 certificate. The certificate must be in PEM format.
+- `default` (Boolean) Configure if the certificate is the default one to be used.
+- `dn` (String) A unique identifier for the certificate.
+- `valid_from` (String) Set the date from which the certificate is valid.
+- `valid_to` (String) Set the date uptil which the certificate is valid.
+
+
+<a id="nestedatt--values--saml2_config--slo_endpoints"></a>
+### Nested Schema for `values.saml2_config.slo_endpoints`
+
+Read-Only:
+
+- `binding_name` (String) Specify the SAML binding for the endpoint.
+- `default` (Boolean) Configure if the endpoint is the default one to be used
+- `location` (String) The value of the URL or endpoint to be called.
+- `response_location` (String) The URL or endpoint to which logout response messages are sent.
+
+
+<a id="nestedatt--values--saml2_config--sso_endpoints"></a>
+### Nested Schema for `values.saml2_config.sso_endpoints`
+
+Read-Only:
+
+- `binding_name` (String) Specify the SAML binding for the endpoint.
+- `default` (Boolean) Configure if the endpoint is the default one to be used.
+- `location` (String) The value of the URL or endpoint to be called.

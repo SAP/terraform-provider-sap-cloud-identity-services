@@ -12,6 +12,51 @@ func TestDataSourceCorporateIdP(t *testing.T) {
 
 	t.Parallel()
 
+	t.Run("happy path - saml2 corporate idp", func(t *testing.T) {
+
+		testEndpoint := "https://test.com"
+
+		rec, user := setupVCR(t, "fixtures/datasource_saml2_corporate_idp")
+		defer stopQuietly(rec)
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+			Steps: []resource.TestStep{
+				{
+					Config: providerConfig("", user) + DataSourceCorporateIdP("testIdP", "Terraform - SAML2"),
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestMatchResourceAttr("data.sci_corporate_idp.testIdP", "id", regexpUUID),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "display_name", "Terraform - SAML2"),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "name", "Saml2 - Test"),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "type", "saml2"),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "logout_url", testEndpoint),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "forward_all_sso_requests", fmt.Sprintf("%t", true)),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "identity_federation.use_local_user_store", fmt.Sprintf("%t", true)),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "identity_federation.allow_local_users_only", fmt.Sprintf("%t", true)),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "identity_federation.apply_local_idp_auth_and_checks", fmt.Sprintf("%t", false)),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "identity_federation.required_groups.0", "Test Group"),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "login_hint_config.login_hint_type", "userInput"),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "login_hint_config.send_method", "authRequest"),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "saml2_config.allow_create", "none"),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "saml2_config.assertion_attributes.0.name", "test_attr"),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "saml2_config.assertion_attributes.0.value", "test_value"),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "saml2_config.digest_algorithm", "sha256"),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "saml2_config.include_scoping", fmt.Sprintf("%t", true)),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "saml2_config.name_id_format", "default"),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "saml2_config.signing_certificates.#", "1"),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "saml2_config.slo_endpoints.0.binding_name", "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "saml2_config.slo_endpoints.0.default", fmt.Sprintf("%t", true)),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "saml2_config.slo_endpoints.0.location", testEndpoint),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "saml2_config.sso_endpoints.0.binding_name", "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "saml2_config.sso_endpoints.0.default", fmt.Sprintf("%t", true)),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "saml2_config.sso_endpoints.0.location", testEndpoint),
+					),
+				},
+			},
+		})
+	})
+
 	t.Run("happy path - oidc corporate idp", func(t *testing.T) {
 
 		issuer := "https://token.actions.githubusercontent.com"

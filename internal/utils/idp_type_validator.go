@@ -47,7 +47,6 @@ func (v typeValidator) ValidateObject(ctx context.Context, request validator.Obj
 	}
 	rawVal := val.ValueString() // safely extract the raw string value
 
-
 	validValFound := false
 
 	// check value of type is one of the valid values
