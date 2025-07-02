@@ -30,7 +30,7 @@ func (s DefaultValuesValidator) ValidateSet(ctx context.Context, req validator.S
 		return
 	}
 
-	// add an error if not all deafault values are present
+	// add an error if not all default values are present
 	if !containsAllDefaultValues {
 		resp.Diagnostics.AddAttributeError(
 			req.Path,

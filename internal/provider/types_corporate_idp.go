@@ -35,6 +35,25 @@ type saml2ConfigData struct {
 	SloEndpoints        types.List   `tfsdk:"slo_endpoints"`
 }
 
+type oidcConfigData struct {
+	DiscoveryUrl             types.String `tfsdk:"discovery_url"`
+	ClientId                 types.String `tfsdk:"client_id"`
+	ClientSecret             types.String `tfsdk:"client_secret"`
+	SubjectNameIdentifier    types.String `tfsdk:"subject_name_identifier"`
+	TokenEndpointAuthMethod  types.String `tfsdk:"token_endpoint_auth_method"`
+	Scopes                   types.Set    `tfsdk:"scopes"`
+	PkceEnabled              types.Bool   `tfsdk:"enable_pkce"`
+	AdditionalConfig         types.Object `tfsdk:"additional_config"`
+	Issuer                   types.String `tfsdk:"issuer"`
+	JwksUri                  types.String `tfsdk:"jwks_uri"`
+	Jwks                     types.String `tfsdk:"jwks"`
+	TokenEndpoint            types.String `tfsdk:"token_endpoint"`
+	AuthorizationEndpoint    types.String `tfsdk:"authorization_endpoint"`
+	LogoutEndpoint           types.String `tfsdk:"logout_endpoint"`
+	UserInfoEndpoint         types.String `tfsdk:"user_info_endpoint"`
+	IsClientSecretConfigured types.Bool   `tfsdk:"is_client_secret_configured"`
+}
+
 type loginHintConfigData struct {
 	LoginHintType types.String `tfsdk:"login_hint_type"`
 	SendMethod    types.String `tfsdk:"send_method"`
@@ -57,6 +76,7 @@ type corporateIdPData struct {
 	IdentityFederation    types.Object `tfsdk:"identity_federation"`
 	LoginHintConfig       types.Object `tfsdk:"login_hint_config"`
 	Saml2Config           types.Object `tfsdk:"saml2_config"`
+	OidcConfig            types.Object `tfsdk:"oidc_config"`
 }
 
 func corporateIdPValueFrom(ctx context.Context, c corporateidps.IdentityProvider) (corporateIdPData, diag.Diagnostics) {
@@ -177,7 +197,6 @@ func corporateIdPValueFrom(ctx context.Context, c corporateidps.IdentityProvider
 			if diagnostics.HasError() {
 				return corporateIdP, diagnostics
 			}
-
 			saml2Config.SigningCertificates = certificates
 		} else {
 			saml2Config.SigningCertificates = types.ListNull(saml2SigningCertificateObjType)
@@ -236,6 +255,69 @@ func corporateIdPValueFrom(ctx context.Context, c corporateidps.IdentityProvider
 		diagnostics.Append(diags...)
 	} else {
 		corporateIdP.Saml2Config = types.ObjectNull(saml2ConfigObjType.AttrTypes)
+	}
+
+	// OIDC Configuration
+	if c.Type == idpTypeValues[3] {
+
+		oidcConfig := &oidcConfigData{
+			DiscoveryUrl:             types.StringValue(c.OidcConfiguration.DiscoveryUrl),
+			ClientId:                 types.StringValue(c.OidcConfiguration.ClientId),
+			SubjectNameIdentifier:    types.StringValue(c.OidcConfiguration.SubjectNameIdentifier),
+			TokenEndpointAuthMethod:  types.StringValue(c.OidcConfiguration.TokenEndpointAuthMethod),
+			PkceEnabled:              types.BoolValue(c.OidcConfiguration.PkceEnabled),
+			Issuer:                   types.StringValue(c.OidcConfiguration.Issuer),
+			JwksUri:                  types.StringValue(c.OidcConfiguration.JwksUri),
+			Jwks:                     types.StringValue(c.OidcConfiguration.JwkSetPlain),
+			IsClientSecretConfigured: types.BoolValue(c.OidcConfiguration.IsClientSecretConfigured),
+		}
+
+		// OIDC Scopes
+		scopes, diags := types.SetValueFrom(ctx, types.StringType, c.OidcConfiguration.Scopes)
+		diagnostics.Append(diags...)
+
+		if diagnostics.HasError() {
+			return corporateIdP, diagnostics
+		}
+
+		oidcConfig.Scopes = scopes
+
+		//OIDC Additional Config
+		if c.OidcConfiguration.AdditionalConfig != nil {
+
+			additionalConfig, diags := types.ObjectValueFrom(ctx, OidcCAdditionalConfigObjType.AttrTypes, c.OidcConfiguration.AdditionalConfig)
+			diagnostics.Append(diags...)
+
+			if diagnostics.HasError() {
+				return corporateIdP, diagnostics
+			}
+
+			oidcConfig.AdditionalConfig = additionalConfig
+		} else {
+			oidcConfig.AdditionalConfig = types.ObjectNull(OidcCAdditionalConfigObjType.AttrTypes)
+		}
+
+		//OIDC Endpoints
+		if len(c.OidcConfiguration.TokenEndpoint) > 0 {
+			oidcConfig.TokenEndpoint = types.StringValue(c.OidcConfiguration.TokenEndpoint)
+		}
+
+		if len(c.OidcConfiguration.AuthorizationEndpoint) > 0 {
+			oidcConfig.AuthorizationEndpoint = types.StringValue(c.OidcConfiguration.AuthorizationEndpoint)
+		}
+
+		if len(c.OidcConfiguration.EndSessionEndpoint) > 0 {
+			oidcConfig.LogoutEndpoint = types.StringValue(c.OidcConfiguration.EndSessionEndpoint)
+		}
+
+		if len(c.OidcConfiguration.UserInfoEndpoint) > 0 {
+			oidcConfig.UserInfoEndpoint = types.StringValue(c.OidcConfiguration.UserInfoEndpoint)
+		}
+
+		corporateIdP.OidcConfig, diags = types.ObjectValueFrom(ctx, oidcConfigObjType.AttrTypes, oidcConfig)
+		diagnostics.Append(diags...)
+	} else {
+		corporateIdP.OidcConfig = types.ObjectNull(oidcConfigObjType.AttrTypes)
 	}
 
 	return corporateIdP, diagnostics

@@ -79,6 +79,37 @@ var saml2ConfigObjType = types.ObjectType{
 	},
 }
 
+var OidcCAdditionalConfigObjType = types.ObjectType{
+	AttrTypes: map[string]attr.Type{
+		"enforce_nonce":                types.BoolType,
+		"enforce_issuer_check":         types.BoolType,
+		"disable_logout_id_token_hint": types.BoolType,
+	},
+}
+
+var oidcConfigObjType = types.ObjectType{
+	AttrTypes: map[string]attr.Type{
+		"discovery_url":              types.StringType,
+		"client_id":                  types.StringType,
+		"client_secret":              types.StringType,
+		"subject_name_identifier":    types.StringType,
+		"token_endpoint_auth_method": types.StringType,
+		"scopes": types.SetType{
+			ElemType: types.StringType,
+		},
+		"enable_pkce":                 types.BoolType,
+		"additional_config":           OidcCAdditionalConfigObjType,
+		"issuer":                      types.StringType,
+		"jwks_uri":                    types.StringType,
+		"jwks":                        types.StringType,
+		"token_endpoint":              types.StringType,
+		"authorization_endpoint":      types.StringType,
+		"logout_endpoint":             types.StringType,
+		"user_info_endpoint":          types.StringType,
+		"is_client_secret_configured": types.BoolType,
+	},
+}
+
 var loginHintConfigObjType = types.ObjectType{
 	AttrTypes: map[string]attr.Type{
 		"login_hint_type": types.StringType,
@@ -108,6 +139,7 @@ var corporateIdPObjType = types.ObjectType{
 		"identity_federation":      identityFederationObjType,
 		"login_hint_config":        loginHintConfigObjType,
 		"saml2_config":             saml2ConfigObjType,
+		"oidc_config":              oidcConfigObjType,
 	},
 }
 
@@ -306,6 +338,91 @@ func (d *corporateIdPsDataSource) Schema(_ context.Context, _ datasource.SchemaR
 								},
 								"allow_create": schema.StringAttribute{
 									MarkdownDescription: "Configure if the `AllowCreate` attribute sent by the Service Provider is forwarded to the Corporate IdP or not.",
+									Computed:            true,
+								},
+							},
+						},
+						"oidc_config": schema.SingleNestedAttribute{
+							MarkdownDescription: "Configure trust with an identity provider by providing the necessary metadata for web-based authentication.",
+							Computed:            true,
+							Attributes: map[string]schema.Attribute{
+								"discovery_url": schema.StringAttribute{
+									MarkdownDescription: "Specify the Issuer or Metadata URL",
+									Computed:            true,
+								},
+								"client_id": schema.StringAttribute{
+									MarkdownDescription: "Configure the Client ID for Client Authentication.",
+									Computed:            true,
+								},
+								"client_secret": schema.StringAttribute{
+									MarkdownDescription: "Configure the Client Secret for Client Authentication.",
+									Computed:            true,
+								},
+								"token_endpoint_auth_method": schema.StringAttribute{
+									MarkdownDescription: "Configure the Client Authentication Method.",
+									Computed:            true,
+								},
+								"subject_name_identifier": schema.StringAttribute{
+									MarkdownDescription: "Define the claim which is used as subject name identifier. The Subject Name Identifier configuration defines with which value the identity provider user will be searched in the Identity Authentication user store.",
+									Computed:            true,
+								},
+								"scopes": schema.SetAttribute{
+									MarkdownDescription: "Configure additional scopes required by the Identity Provider. By default, the \"openid\" scope is added.",
+									Computed:            true,
+									ElementType:         types.StringType,
+								},
+								"enable_pkce": schema.BoolAttribute{
+									MarkdownDescription: "Configure Proof Key for Code Exchange (PKCE) for the corporate IdP. This is an enhancement of the authorization code flow to prevent the interception of authorization code. This feature is recommended only if the corporate IdP supports PKCE and you have public applications that aren't capable of keeping client secrets.",
+									Computed:            true,
+								},
+								"additional_config": schema.SingleNestedAttribute{
+									MarkdownDescription: "Configure additional settings of the corporate IdP.",
+									Computed:            true,
+									Attributes: map[string]schema.Attribute{
+										"enforce_nonce": schema.BoolAttribute{
+											MarkdownDescription: "Configure if the authenticating application is required to send nonces to the corporate IdP. A nonce is a string associated with a client session and is used to mitigate replay attacks. If supplied by an application, Identity Authentication forwards the nonce with requests to the corporate IdP.",
+											Computed:            true,
+										},
+										"enforce_issuer_check": schema.BoolAttribute{
+											MarkdownDescription: "Configure if Identity Authentication should enforce Issuer Validation. If set to true, responses from the corporate IdP which don't provide the iss attribute are rejected.",
+											Computed:            true,
+										},
+										"disable_logout_id_token_hint": schema.BoolAttribute{
+											MarkdownDescription: "Configure if the Identity Authentication should not include the ID token in the id_token_hint URL parameter.",
+											Computed:            true,
+										},
+									},
+								},
+								"issuer": schema.StringAttribute{
+									MarkdownDescription: "The unique field that identifies the IdP.",
+									Computed:            true,
+								},
+								"jwks_uri": schema.StringAttribute{
+									MarkdownDescription: "The endpoint called to request JSON Web Keys for JWT validation.",
+									Computed:            true,
+								},
+								"jwks": schema.StringAttribute{
+									MarkdownDescription: "The JSON Web Keys used for the JSON Web Token Validation.",
+									Computed:            true,
+								},
+								"token_endpoint": schema.StringAttribute{
+									MarkdownDescription: "The endpoint called to request the ID token for SSO.",
+									Computed:            true,
+								},
+								"authorization_endpoint": schema.StringAttribute{
+									MarkdownDescription: "The endpoint to which SSO requests are forwarded to, in order to retrieve an authorization code.",
+									Computed:            true,
+								},
+								"logout_endpoint": schema.StringAttribute{
+									MarkdownDescription: "The endpoint called to log out the current user session.",
+									Computed:            true,
+								},
+								"user_info_endpoint": schema.StringAttribute{
+									MarkdownDescription: "The endpoint called to get information about a user.",
+									Computed:            true,
+								},
+								"is_client_secret_configured": schema.BoolAttribute{
+									MarkdownDescription: "Indicates if a client secret is configured or not.",
 									Computed:            true,
 								},
 							},
