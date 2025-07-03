@@ -21,7 +21,7 @@ func TestResourceUser(t *testing.T) {
 				Primary: true,
 			},
 		},
-		Name: users.Name{
+		Name: &users.Name{
 			FamilyName:      "Doe",
 			GivenName:       "Joe",
 			HonorificPrefix: "Mr.",
@@ -29,7 +29,7 @@ func TestResourceUser(t *testing.T) {
 		DisplayName: "Joe Doe",
 		UserType:    "employee",
 		Active:      true,
-		SAPExtension: users.SAPExtension{
+		SAPExtension: &users.SAPExtension{
 			SendMail:     false,
 			MailVerified: true,
 			Status:       "active",
@@ -87,7 +87,7 @@ func TestResourceUser(t *testing.T) {
 					Primary: false,
 				},
 			},
-			Name: users.Name{
+			Name: &users.Name{
 				FamilyName:      "Doe S",
 				GivenName:       "Joe",
 				HonorificPrefix: "Mr.",
@@ -95,7 +95,7 @@ func TestResourceUser(t *testing.T) {
 			DisplayName: "Joe Doe S",
 			UserType:    "customer",
 			Active:      true,
-			SAPExtension: users.SAPExtension{
+			SAPExtension: &users.SAPExtension{
 				SendMail:     false,
 				MailVerified: false,
 				Status:       "active",

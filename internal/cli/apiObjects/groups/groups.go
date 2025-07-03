@@ -15,12 +15,12 @@ type GroupMember struct {
 }
 
 type Group struct {
-	Id             string         `json:"id,omitempty"`
-	Meta           users.Meta     `json:"meta,omitempty"`
-	Schemas        []string       `json:"schemas,omitempty"`
-	DisplayName    string         `json:"displayName,omitempty"`
-	GroupMembers   []GroupMember  `json:"members,omitempty"`
-	GroupExtension GroupExtension `json:"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group,omitempty"`
+	Id             string          `json:"id,omitempty"`
+	Meta           users.Meta      `json:"meta,omitempty"`
+	Schemas        []string        `json:"schemas,omitempty"`
+	DisplayName    string          `json:"displayName,omitempty"`
+	GroupMembers   []GroupMember   `json:"members,omitempty"`
+	GroupExtension *GroupExtension `json:"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group,omitempty"`
 }
 
 type GroupsResponse struct {
