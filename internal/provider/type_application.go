@@ -81,6 +81,8 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 	}
 
 	// reading attribute of the Authentication Schema : subject_name_identifier
+	// mapping is done manually to handle the inconsistency between the structure of the API response body and the schema
+	// the schema defines the parameter subject_name_identitifier as an object whereas the response body returns it as a string
 	subjectNameIdentifier := subjectNameIdentifierData{}
 
 	if re.MatchString(a.AuthenticationSchema.SubjectNameIdentifier) {
@@ -117,6 +119,8 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 	authenticationSchema.AssertionAttributes = attributes
 
 	// reading attributes of the Authentication Schema : advanced_assertion_attributes
+	// mapping is done manually to handle the inconsistency between the structure of the API response body and the schema
+	// the schema defines the parameter advanced_assertion_attributes with an additional parameter source which is not returned by the response
 	if len(a.AuthenticationSchema.AdvancedAssertionAttributes) > 0 {
 
 		advancedAttributes := []advancedAssertionAttributesData{}
@@ -154,6 +158,7 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 	}
 
 	// reading attributes of the Authentication Schema : conditional_authentication
+	// the mapping is done in order to handle the null values
 	if len(a.AuthenticationSchema.ConditionalAuthentication) > 0 {
 
 		authRules := []authenticationRulesData{}

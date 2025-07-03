@@ -512,6 +512,7 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 				return nil, diagnostics
 			}
 
+			// the mapping is done manually, in order to handle the parameter value when the source is set to "Corporate Identity Provider"
 			if subjectNameIdentifier.Source.ValueString() == sourceValues[0] || subjectNameIdentifier.Source.ValueString() == sourceValues[2] {
 				args.AuthenticationSchema.SubjectNameIdentifier = subjectNameIdentifier.Value.ValueString()
 			} else {
@@ -553,6 +554,7 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 					AttributeName: attribute.AttributeName.ValueString(),
 				}
 
+				// the mapping is done manually, in order to handle the parameter attribute_value when the source is set to "Corporate Identity Provider"
 				if attribute.Source == types.StringValue(sourceValues[1]) {
 					assertionAttribute.AttributeValue = "${corporateIdP." + attribute.AttributeValue.ValueString() + "}"
 				} else {

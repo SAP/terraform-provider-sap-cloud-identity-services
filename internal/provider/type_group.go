@@ -39,33 +39,46 @@ func groupValueFrom(ctx context.Context, g groups.Group) (groupData, diag.Diagno
 		DisplayName: types.StringValue(g.DisplayName),
 	}
 
-	group.Schemas, diags = types.SetValueFrom(ctx, types.StringType, g.Schemas)
+	//Schemas
+	schemas, diags := types.SetValueFrom(ctx, types.StringType, g.Schemas)
 	diagnostics.Append(diags...)
+	if diagnostics.HasError() {
+		return group, diagnostics
+	}
 
+	group.Schemas = schemas
+
+	// Group Extension
 	groupExtension := groupExtensionData{
 		Name: types.StringValue(g.GroupExtension.Name),
 	}
 
+	// mapping is done manually to handle null values
 	if len(g.GroupExtension.Description) > 0 {
 		groupExtension.Description = types.StringValue(g.GroupExtension.Description)
 	}
 
-	group.GroupExtension, diags = types.ObjectValueFrom(ctx, groupExtensionObjType, groupExtension)
+	groupExtensionData, diags := types.ObjectValueFrom(ctx, groupExtensionObjType, groupExtension)
 	diagnostics.Append(diags...)
-
-	groupMembers := []memberData{}
-	for _, memberRes := range g.GroupMembers {
-
-		member := memberData{
-			Value: types.StringValue(memberRes.Value),
-			Type:  types.StringValue(memberRes.Type),
-		}
-
-		groupMembers = append(groupMembers, member)
+	if diagnostics.HasError() {
+		return group, diagnostics
 	}
 
-	if len(groupMembers) > 0 {
-		group.GroupMembers, diags = types.SetValueFrom(ctx, membersObjType, groupMembers)
+	group.GroupExtension = groupExtensionData
+
+
+	// Group Members
+	if len(g.GroupMembers) > 0 {
+		
+		groupMembers, diags := types.SetValueFrom(ctx, membersObjType, g.GroupMembers)
+		diagnostics.Append(diags...)
+
+		if diagnostics.HasError() {
+			return group, diagnostics
+		}
+				
+		group.GroupMembers = groupMembers
+		
 	} else {
 		group.GroupMembers = types.SetNull(membersObjType)
 	}

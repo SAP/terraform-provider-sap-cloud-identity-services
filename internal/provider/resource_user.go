@@ -421,7 +421,10 @@ func getUserRequest(ctx context.Context, plan userData) (*users.User, string, di
 	if !plan.SapExtensionUser.IsNull() && !plan.SapExtensionUser.IsUnknown() {
 
 		var sapExtensionUser users.SAPExtension
-		diags = plan.SapExtensionUser.As(ctx, &sapExtensionUser, basetypes.ObjectAsOptions{})
+		diags = plan.SapExtensionUser.As(ctx, &sapExtensionUser, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty: true,
+			UnhandledUnknownAsEmpty: true,
+		})
 		diagnostics.Append(diags...)
 		if diagnostics.HasError() {
 			return nil, "", diagnostics

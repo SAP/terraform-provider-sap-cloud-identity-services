@@ -58,6 +58,7 @@ func userValueFrom(ctx context.Context, u users.User, cS string) (userData, diag
 	user.Emails = userEmails
 
 	// Name
+	// mapping is done manually to handle null values
 	if u.Name != nil {
 		name := nameData{}
 

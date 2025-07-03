@@ -3,14 +3,14 @@ package groups
 import "github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/users"
 
 type GroupExtension struct {
-	AdditionalId string `json:"additionalId,omitempty"`
-	Name         string `json:"name,omitempty"`
-	Description  string `json:"description,omitempty"`
+	// AdditionalId string `json:"additionalId,omitempty"`
+	Name         string `json:"name,omitempty" tfsdk:"name"`
+	Description  string `json:"description,omitempty" tfsdk:"description"`
 }
 
 type GroupMember struct {
-	Value string `json:"value,omitempty"`
-	Type  string `json:"type,omitempty"`
+	Value string `json:"value,omitempty" tfsdk:"value"`
+	Type  string `json:"type,omitempty" tfsdk:"type"`
 	//ref
 }
 
