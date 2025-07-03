@@ -321,7 +321,7 @@ func (r *groupResource) GetGroupRequest(ctx context.Context, plan groupData) (*g
 
 		var groupExtension groups.GroupExtension
 		diags = plan.GroupExtension.As(ctx, &groupExtension, basetypes.ObjectAsOptions{
-			UnhandledNullAsEmpty: true,
+			UnhandledNullAsEmpty:    true,
 			UnhandledUnknownAsEmpty: true,
 		})
 		diagnostics.Append(diags...)

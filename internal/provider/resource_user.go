@@ -422,7 +422,7 @@ func getUserRequest(ctx context.Context, plan userData) (*users.User, string, di
 
 		var sapExtensionUser users.SAPExtension
 		diags = plan.SapExtensionUser.As(ctx, &sapExtensionUser, basetypes.ObjectAsOptions{
-			UnhandledNullAsEmpty: true,
+			UnhandledNullAsEmpty:    true,
 			UnhandledUnknownAsEmpty: true,
 		})
 		diagnostics.Append(diags...)

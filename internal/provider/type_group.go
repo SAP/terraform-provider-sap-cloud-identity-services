@@ -66,19 +66,18 @@ func groupValueFrom(ctx context.Context, g groups.Group) (groupData, diag.Diagno
 
 	group.GroupExtension = groupExtensionData
 
-
 	// Group Members
 	if len(g.GroupMembers) > 0 {
-		
+
 		groupMembers, diags := types.SetValueFrom(ctx, membersObjType, g.GroupMembers)
 		diagnostics.Append(diags...)
 
 		if diagnostics.HasError() {
 			return group, diagnostics
 		}
-				
+
 		group.GroupMembers = groupMembers
-		
+
 	} else {
 		group.GroupMembers = types.SetNull(membersObjType)
 	}

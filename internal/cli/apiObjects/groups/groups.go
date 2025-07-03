@@ -4,8 +4,8 @@ import "github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/c
 
 type GroupExtension struct {
 	// AdditionalId string `json:"additionalId,omitempty"`
-	Name         string `json:"name,omitempty" tfsdk:"name"`
-	Description  string `json:"description,omitempty" tfsdk:"description"`
+	Name        string `json:"name,omitempty" tfsdk:"name"`
+	Description string `json:"description,omitempty" tfsdk:"description"`
 }
 
 type GroupMember struct {
