@@ -17,7 +17,7 @@ func TestResourceApplication(t *testing.T) {
 	application := applications.Application{
 		Name:        "basic-test-app",
 		Description: "application for testing purposes",
-		AuthenticationSchema: applications.AuthenticationSchema{
+		AuthenticationSchema: &applications.AuthenticationSchema{
 			SsoType:                       "openIdConnect",
 			SubjectNameIdentifier:         "mail",
 			SubjectNameIdentifierFunction: "lowerCase",
@@ -103,7 +103,7 @@ func TestResourceApplication(t *testing.T) {
 		updatedApplication := applications.Application{
 			Name:        "test-app-updated",
 			Description: "application for testing purposes",
-			AuthenticationSchema: applications.AuthenticationSchema{
+			AuthenticationSchema: &applications.AuthenticationSchema{
 				SsoType:                       "saml2",
 				SubjectNameIdentifier:         "userUuid",
 				SubjectNameIdentifierFunction: "upperCase",

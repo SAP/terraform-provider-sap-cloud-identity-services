@@ -292,6 +292,7 @@ func (r *groupResource) GetGroupRequest(ctx context.Context, plan groupData) (*g
 			return nil, diagnostics
 		}
 
+		// the mapping is done manually in order to carry out the member validation
 		for _, member := range members {
 
 			// validate the member as a valid user or group as the API does not handle this
@@ -318,20 +319,17 @@ func (r *groupResource) GetGroupRequest(ctx context.Context, plan groupData) (*g
 
 	if !plan.GroupExtension.IsNull() && !plan.GroupExtension.IsUnknown() {
 
-		var groupExtension groupExtensionData
-		diags = plan.GroupExtension.As(ctx, &groupExtension, basetypes.ObjectAsOptions{})
+		var groupExtension groups.GroupExtension
+		diags = plan.GroupExtension.As(ctx, &groupExtension, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty:    true,
+			UnhandledUnknownAsEmpty: true,
+		})
 		diagnostics.Append(diags...)
 		if diagnostics.HasError() {
 			return nil, diagnostics
 		}
 
-		if !groupExtension.Name.IsNull() {
-			args.GroupExtension.Name = groupExtension.Name.ValueString()
-		}
-
-		if !groupExtension.Description.IsNull() {
-			args.GroupExtension.Description = groupExtension.Description.ValueString()
-		}
+		args.GroupExtension = &groupExtension
 	}
 
 	return args, diagnostics

@@ -5,9 +5,9 @@ type CorporateGroup struct {
 }
 
 type SAPExtension struct {
-	SendMail     bool   `json:"sendMail,omitempty"`
-	MailVerified bool   `json:"mailVerified,omitempty"`
-	Status       string `json:"status,omitempty"`
+	SendMail     bool   `json:"sendMail,omitempty" tfsdk:"send_mail"`
+	MailVerified bool   `json:"mailVerified,omitempty" tfsdk:"mail_verified"`
+	Status       string `json:"status,omitempty" tfsdk:"status"`
 	// TargetUrl    string `json:"targetUrl,omitempty"`
 	// TotpEnabled         bool             `json:"totpEnabled"`
 	// WebAuthEnabled      bool             `json:"webAuthEnabled"`
@@ -48,9 +48,9 @@ type EnterpriseUser struct {
 }
 
 type Name struct {
-	FamilyName      string `json:"familyName,omitempty"`
-	GivenName       string `json:"givenName,omitempty"`
-	HonorificPrefix string `json:"honorificPrefix,omitempty"`
+	FamilyName      string `json:"familyName,omitempty" tfsdk:"family_name"`
+	GivenName       string `json:"givenName,omitempty" tfsdk:"given_name"`
+	HonorificPrefix string `json:"honorificPrefix,omitempty" tfsdk:"honorific_prefix"`
 	// Formatted     string `json:"formatted,omitempty"`
 	// MiddleName    string `json:"middleName,omitempty"`
 	// HonorificSuffix string `json:"honorificSuffix,omitempty"`
@@ -115,7 +115,7 @@ type User struct {
 	Schemas           []string       `json:"schemas"`
 	UserName          string         `json:"userName"`
 	Password          string         `json:"password,omitempty"`
-	Name              Name           `json:"name,omitempty"`
+	Name              *Name          `json:"name,omitempty"`
 	DisplayName       string         `json:"displayName,omitempty"`
 	NickName          string         `json:"nickName,omitempty"`
 	ProfileUrl        string         `json:"profileUrl,omitempty"`
@@ -130,7 +130,7 @@ type User struct {
 	Addresses         []Address      `json:"addresses,omitempty"`
 	Entitlements      []Enititlement `json:"entitlements,omitempty"`
 	Roles             []Role         `json:"roles,omitempty"`
-	SAPExtension      SAPExtension   `json:"urn:ietf:params:scim:schemas:extension:sap:2.0:User,omitempty"`
+	SAPExtension      *SAPExtension  `json:"urn:ietf:params:scim:schemas:extension:sap:2.0:User,omitempty"`
 	// Title             string         `json:"title,omitempty"`
 	// EnterpriseUser    	EnterpriseUser 	`json:"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User,omitempty"`
 }

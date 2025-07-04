@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/applications"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
@@ -12,6 +13,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 
@@ -22,8 +25,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-
-	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 )
@@ -468,28 +469,64 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 		args.ParentApplicationId = plan.ParentApplicationId.ValueString()
 	}
 
-	if plan.AuthenticationSchema != nil {
+	// mapping of the plan data to the API request body must be done manually
+	// this is to ensure the proper handling of attributes where the API request body structure differs from that of the schema
+	// these attributes are : subject_name_identifier and advanced_assertion_attributes
+	// the schema defines them as objects with sub-attributes source and value, but the API request body expects them to be strings
+	if !plan.AuthenticationSchema.IsNull() && !plan.AuthenticationSchema.IsUnknown() {
 
-		authenticationSchema := plan.AuthenticationSchema
+		args.AuthenticationSchema = &applications.AuthenticationSchema{}
 
-		if !authenticationSchema.SsoType.IsNull() {
+		var authenticationSchema authenticationSchemaData
+		diags = plan.AuthenticationSchema.As(ctx, &authenticationSchema, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty:    true,
+			UnhandledUnknownAsEmpty: true,
+		})
+
+		diagnostics.Append(diags...)
+		if diagnostics.HasError() {
+			return nil, diagnostics
+		}
+
+		//SSO_TYPE
+		if !authenticationSchema.SsoType.IsNull() && !authenticationSchema.SsoType.IsUnknown() {
 			args.AuthenticationSchema.SsoType = authenticationSchema.SsoType.ValueString()
 		}
 
-		if authenticationSchema.SubjectNameIdentifier != nil && !authenticationSchema.SubjectNameIdentifier.Source.IsNull() {
+		//DEFAULT_AUTHENTICATING_IDP
+		if !authenticationSchema.DefaultAuthenticatingIdpId.IsNull() && !authenticationSchema.DefaultAuthenticatingIdpId.IsUnknown() {
+			args.AuthenticationSchema.DefaultAuthenticatingIdpId = authenticationSchema.DefaultAuthenticatingIdpId.ValueString()
+		}
 
-			if authenticationSchema.SubjectNameIdentifier.Source.ValueString() == sourceValues[0] || authenticationSchema.SubjectNameIdentifier.Source.ValueString() == sourceValues[2] {
-				args.AuthenticationSchema.SubjectNameIdentifier = authenticationSchema.SubjectNameIdentifier.Value.ValueString()
+		//SUBJECT_NAME_IDENTIFIER
+		if !authenticationSchema.SubjectNameIdentifier.IsNull() && !authenticationSchema.SubjectNameIdentifier.IsUnknown() {
+
+			var subjectNameIdentifier subjectNameIdentifierData
+			diags = authenticationSchema.SubjectNameIdentifier.As(ctx, &subjectNameIdentifier, basetypes.ObjectAsOptions{
+				UnhandledNullAsEmpty:    true,
+				UnhandledUnknownAsEmpty: true,
+			})
+
+			diagnostics.Append(diags...)
+			if diagnostics.HasError() {
+				return nil, diagnostics
+			}
+
+			// the mapping is done manually, in order to handle the parameter value when the source is set to "Corporate Identity Provider"
+			if subjectNameIdentifier.Source.ValueString() == sourceValues[0] || subjectNameIdentifier.Source.ValueString() == sourceValues[2] {
+				args.AuthenticationSchema.SubjectNameIdentifier = subjectNameIdentifier.Value.ValueString()
 			} else {
-				args.AuthenticationSchema.SubjectNameIdentifier = "${corporateIdP." + authenticationSchema.SubjectNameIdentifier.Value.ValueString() + "}"
+				args.AuthenticationSchema.SubjectNameIdentifier = "${corporateIdP." + subjectNameIdentifier.Value.ValueString() + "}"
 			}
 		}
 
-		if !authenticationSchema.SubjectNameIdentifierFunction.IsNull() {
+		//SUBJECT_NAME_IDENTIFIER_FUNCTION
+		if !authenticationSchema.SubjectNameIdentifierFunction.IsNull() && !authenticationSchema.SubjectNameIdentifierFunction.IsUnknown() {
 			args.AuthenticationSchema.SubjectNameIdentifierFunction = authenticationSchema.SubjectNameIdentifierFunction.ValueString()
 		}
 
-		if !authenticationSchema.AssertionAttributes.IsNull() {
+		//ASSERTION_ATTRIBUTES
+		if !authenticationSchema.AssertionAttributes.IsNull() && !authenticationSchema.AssertionAttributes.IsUnknown() {
 
 			var attributes []applications.AssertionAttribute
 			diags := authenticationSchema.AssertionAttributes.ElementsAs(ctx, &attributes, true)
@@ -500,7 +537,9 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 
 			args.AuthenticationSchema.AssertionAttributes = attributes
 		}
-		if !authenticationSchema.AdvancedAssertionAttributes.IsNull() {
+
+		//ADVANCED_ASSERTION_ATTRIBUTES
+		if !authenticationSchema.AdvancedAssertionAttributes.IsNull() && !authenticationSchema.AdvancedAssertionAttributes.IsUnknown() {
 
 			var advancedAssertionAttributes []advancedAssertionAttributesData
 			diags := authenticationSchema.AdvancedAssertionAttributes.ElementsAs(ctx, &advancedAssertionAttributes, true)
@@ -515,6 +554,7 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 					AttributeName: attribute.AttributeName.ValueString(),
 				}
 
+				// the mapping is done manually, in order to handle the parameter attribute_value when the source is set to "Corporate Identity Provider"
 				if attribute.Source == types.StringValue(sourceValues[1]) {
 					assertionAttribute.AttributeValue = "${corporateIdP." + attribute.AttributeValue.ValueString() + "}"
 				} else {
@@ -525,6 +565,7 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 			}
 		}
 
+		//AUTHENTICATION_RULES
 		if !authenticationSchema.AuthenticationRules.IsNull() {
 
 			var authrules []applications.AuthenicationRule
@@ -536,6 +577,7 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 
 			args.AuthenticationSchema.ConditionalAuthentication = authrules
 		}
+
 	}
 
 	return args, diagnostics

@@ -6,19 +6,19 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 445
+        content_length: 388
         transfer_encoding: []
         trailer: {}
         host: iasprovidertestblr.accounts400.ondemand.com
         remote_addr: ""
         request_uri: ""
-        body: '{"meta":{},"schemas":["urn:ietf:params:scim:schemas:core:2.0:User","urn:ietf:params:scim:schemas:extension:sap:2.0:User","urn:test:terraform:1.0:User"],"userName":"jdoe","name":{"familyName":"Doe","givenName":"Joe"},"emails":[{"value":"joe.doe@test.com","type":"work","primary":true}],"urn:ietf:params:scim:schemas:extension:sap:2.0:User":{},"urn:test:terraform:1.0:User":{"test1":"testValue","test2":false,"test3":{"test3a":12.33,"test3b":12}}}'
+        body: '{"meta":{},"schemas":["urn:ietf:params:scim:schemas:core:2.0:User","urn:ietf:params:scim:schemas:extension:sap:2.0:User","urn:test:terraform:1.0:User"],"userName":"jdoe","name":{"familyName":"Doe","givenName":"Joe"},"emails":[{"value":"joe.doe@test.com","type":"work","primary":true}],"urn:test:terraform:1.0:User":{"test1":"testValue","test2":false,"test3":{"test3a":12.33,"test3b":12}}}'
         form: {}
         headers:
             Accept:
                 - '*/*'
             Authorization:
-                - redacted
+                - REDACTED
             Content-Type:
                 - application/scim+json
             Dataserviceversion:
@@ -33,20 +33,22 @@ interactions:
         trailer: {}
         content_length: 956
         uncompressed: false
-        body: '{"id":"8fb2ba53-b252-4fcc-bdce-7b42180556c0","meta":{"created":"2025-05-14T09:47:08Z","lastModified":"2025-05-14T09:47:08Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/8fb2ba53-b252-4fcc-bdce-7b42180556c0","version":"18f11ff0-273a-4a87-9042-7e97ffc7d64d","resourceType":"User"},"schemas":["urn:test:terraform:1.0:User","urn:ietf:params:scim:schemas:core:2.0:User","urn:ietf:params:scim:schemas:extension:sap:2.0:User"],"userName":"jdoe","name":{"familyName":"Doe","givenName":"Joe"},"userType":"public","active":false,"emails":[{"value":"joe.doe@test.com","primary":true,"type":"work"}],"urn:test:terraform:1.0:User":{"test2":false,"test3":{"test3a":12.33,"test3b":12},"test1":"testValue"},"urn:ietf:params:scim:schemas:extension:sap:2.0:User":{"emails":[{"type":"work","value":"joe.doe@test.com","primary":true}],"userUuid":"8fb2ba53-b252-4fcc-bdce-7b42180556c0","mailVerified":false,"userId":"P000258","status":"inactive"}}'
+        body: '{"id":"b11adb1f-2b53-4145-804e-9e9d7985d399","meta":{"created":"2025-07-03T07:27:32Z","lastModified":"2025-07-03T07:27:32Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/b11adb1f-2b53-4145-804e-9e9d7985d399","version":"15020bcb-84bf-4ac8-909b-866fd0bf0418","resourceType":"User"},"schemas":["urn:test:terraform:1.0:User","urn:ietf:params:scim:schemas:core:2.0:User","urn:ietf:params:scim:schemas:extension:sap:2.0:User"],"userName":"jdoe","name":{"familyName":"Doe","givenName":"Joe"},"userType":"public","active":false,"emails":[{"value":"joe.doe@test.com","primary":true,"type":"work"}],"urn:test:terraform:1.0:User":{"test2":false,"test3":{"test3a":12.33,"test3b":12},"test1":"testValue"},"urn:ietf:params:scim:schemas:extension:sap:2.0:User":{"emails":[{"type":"work","value":"joe.doe@test.com","primary":true}],"userUuid":"b11adb1f-2b53-4145-804e-9e9d7985d399","mailVerified":false,"userId":"P000304","status":"inactive"}}'
         headers:
             Cache-Control:
                 - private,no-cache,no-store
             Content-Length:
                 - "956"
+            Content-Security-Policy:
+                - script-src 'none';
             Content-Type:
                 - application/scim+json
             Date:
-                - Wed, 14 May 2025 09:47:07 GMT
+                - Thu, 03 Jul 2025 07:27:32 GMT
             Etag:
-                - '"18f11ff0-273a-4a87-9042-7e97ffc7d64d"'
+                - '"15020bcb-84bf-4ac8-909b-866fd0bf0418"'
             Location:
-                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/8fb2ba53-b252-4fcc-bdce-7b42180556c0
+                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/b11adb1f-2b53-4145-804e-9e9d7985d399
             Referrer-Policy:
                 - origin
             Server:
@@ -58,13 +60,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - 95240716-8D7D-4E43-888A-56C2A74A6C61
+                - 5620FF06-629D-44CD-8D64-FB918788B62E
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-hqppk
+                - http-fjzhx
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -73,7 +75,7 @@ interactions:
                 - none
         status: '201 '
         code: 201
-        duration: 206.625292ms
+        duration: 272.373674ms
     - id: 1
       request:
         proto: HTTP/1.1
@@ -91,12 +93,12 @@ interactions:
             Accept:
                 - '*/*'
             Authorization:
-                - redacted
+                - REDACTED
             Content-Type:
                 - application/scim+json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/8fb2ba53-b252-4fcc-bdce-7b42180556c0
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/b11adb1f-2b53-4145-804e-9e9d7985d399
         method: GET
       response:
         proto: HTTP/1.1
@@ -106,18 +108,20 @@ interactions:
         trailer: {}
         content_length: -1
         uncompressed: true
-        body: '{"id":"8fb2ba53-b252-4fcc-bdce-7b42180556c0","meta":{"created":"2025-05-14T09:47:08Z","lastModified":"2025-05-14T09:47:08Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/8fb2ba53-b252-4fcc-bdce-7b42180556c0","version":"18f11ff0-273a-4a87-9042-7e97ffc7d64d","resourceType":"User"},"schemas":["urn:test:terraform:1.0:User","urn:ietf:params:scim:schemas:core:2.0:User","urn:ietf:params:scim:schemas:extension:sap:2.0:User"],"userName":"jdoe","name":{"familyName":"Doe","givenName":"Joe"},"userType":"public","active":false,"emails":[{"value":"joe.doe@test.com","primary":true,"type":"work"}],"urn:test:terraform:1.0:User":{"test2":false,"test3":{"test3a":12.33,"test3b":12},"test1":"testValue"},"urn:ietf:params:scim:schemas:extension:sap:2.0:User":{"emails":[{"type":"work","value":"joe.doe@test.com","primary":true}],"userUuid":"8fb2ba53-b252-4fcc-bdce-7b42180556c0","mailVerified":false,"userId":"P000258","status":"inactive"}}'
+        body: '{"id":"b11adb1f-2b53-4145-804e-9e9d7985d399","meta":{"created":"2025-07-03T07:27:32Z","lastModified":"2025-07-03T07:27:32Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/b11adb1f-2b53-4145-804e-9e9d7985d399","version":"15020bcb-84bf-4ac8-909b-866fd0bf0418","resourceType":"User"},"schemas":["urn:test:terraform:1.0:User","urn:ietf:params:scim:schemas:core:2.0:User","urn:ietf:params:scim:schemas:extension:sap:2.0:User"],"userName":"jdoe","name":{"familyName":"Doe","givenName":"Joe"},"userType":"public","active":false,"emails":[{"value":"joe.doe@test.com","primary":true,"type":"work"}],"urn:test:terraform:1.0:User":{"test2":false,"test3":{"test3a":12.33,"test3b":12},"test1":"testValue"},"urn:ietf:params:scim:schemas:extension:sap:2.0:User":{"emails":[{"type":"work","value":"joe.doe@test.com","primary":true}],"userUuid":"b11adb1f-2b53-4145-804e-9e9d7985d399","mailVerified":false,"userId":"P000304","status":"inactive"}}'
         headers:
             Cache-Control:
                 - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
             Content-Type:
                 - application/scim+json
             Date:
-                - Wed, 14 May 2025 09:47:07 GMT
+                - Thu, 03 Jul 2025 07:27:32 GMT
             Etag:
-                - '"18f11ff0-273a-4a87-9042-7e97ffc7d64d-gzip"'
+                - '"15020bcb-84bf-4ac8-909b-866fd0bf0418-gzip"'
             Location:
-                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/8fb2ba53-b252-4fcc-bdce-7b42180556c0
+                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/b11adb1f-2b53-4145-804e-9e9d7985d399
             Referrer-Policy:
                 - origin
             Server:
@@ -129,13 +133,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - EDD92CBE-2240-4B17-ADC3-D0E6D8CF8E83
+                - A0E5D3A9-B745-4039-A349-18008706926E
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-hqppk
+                - http-fjzhx
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -144,7 +148,7 @@ interactions:
                 - none
         status: '200 '
         code: 200
-        duration: 201.623711ms
+        duration: 254.425578ms
     - id: 2
       request:
         proto: HTTP/1.1
@@ -162,12 +166,12 @@ interactions:
             Accept:
                 - '*/*'
             Authorization:
-                - redacted
+                - REDACTED
             Content-Type:
                 - application/scim+json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/8fb2ba53-b252-4fcc-bdce-7b42180556c0
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/b11adb1f-2b53-4145-804e-9e9d7985d399
         method: GET
       response:
         proto: HTTP/1.1
@@ -177,18 +181,20 @@ interactions:
         trailer: {}
         content_length: -1
         uncompressed: true
-        body: '{"id":"8fb2ba53-b252-4fcc-bdce-7b42180556c0","meta":{"created":"2025-05-14T09:47:08Z","lastModified":"2025-05-14T09:47:08Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/8fb2ba53-b252-4fcc-bdce-7b42180556c0","version":"18f11ff0-273a-4a87-9042-7e97ffc7d64d","resourceType":"User"},"schemas":["urn:test:terraform:1.0:User","urn:ietf:params:scim:schemas:core:2.0:User","urn:ietf:params:scim:schemas:extension:sap:2.0:User"],"userName":"jdoe","name":{"familyName":"Doe","givenName":"Joe"},"userType":"public","active":false,"emails":[{"value":"joe.doe@test.com","primary":true,"type":"work"}],"urn:test:terraform:1.0:User":{"test2":false,"test3":{"test3a":12.33,"test3b":12},"test1":"testValue"},"urn:ietf:params:scim:schemas:extension:sap:2.0:User":{"emails":[{"type":"work","value":"joe.doe@test.com","primary":true}],"userUuid":"8fb2ba53-b252-4fcc-bdce-7b42180556c0","mailVerified":false,"userId":"P000258","status":"inactive"}}'
+        body: '{"id":"b11adb1f-2b53-4145-804e-9e9d7985d399","meta":{"created":"2025-07-03T07:27:32Z","lastModified":"2025-07-03T07:27:32Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/b11adb1f-2b53-4145-804e-9e9d7985d399","version":"15020bcb-84bf-4ac8-909b-866fd0bf0418","resourceType":"User"},"schemas":["urn:test:terraform:1.0:User","urn:ietf:params:scim:schemas:core:2.0:User","urn:ietf:params:scim:schemas:extension:sap:2.0:User"],"userName":"jdoe","name":{"familyName":"Doe","givenName":"Joe"},"userType":"public","active":false,"emails":[{"value":"joe.doe@test.com","primary":true,"type":"work"}],"urn:test:terraform:1.0:User":{"test2":false,"test3":{"test3a":12.33,"test3b":12},"test1":"testValue"},"urn:ietf:params:scim:schemas:extension:sap:2.0:User":{"emails":[{"type":"work","value":"joe.doe@test.com","primary":true}],"userUuid":"b11adb1f-2b53-4145-804e-9e9d7985d399","mailVerified":false,"userId":"P000304","status":"inactive"}}'
         headers:
             Cache-Control:
                 - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
             Content-Type:
                 - application/scim+json
             Date:
-                - Wed, 14 May 2025 09:47:08 GMT
+                - Thu, 03 Jul 2025 07:27:32 GMT
             Etag:
-                - '"18f11ff0-273a-4a87-9042-7e97ffc7d64d-gzip"'
+                - '"15020bcb-84bf-4ac8-909b-866fd0bf0418-gzip"'
             Location:
-                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/8fb2ba53-b252-4fcc-bdce-7b42180556c0
+                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/b11adb1f-2b53-4145-804e-9e9d7985d399
             Referrer-Policy:
                 - origin
             Server:
@@ -200,13 +206,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - B8AF2D29-271F-4E74-9D9C-D12F6E6ECB90
+                - 681817A8-F996-4DC1-8F56-FBB850776C8A
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-hqppk
+                - http-fjzhx
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -215,7 +221,7 @@ interactions:
                 - none
         status: '200 '
         code: 200
-        duration: 210.227445ms
+        duration: 250.083906ms
     - id: 3
       request:
         proto: HTTP/1.1
@@ -227,18 +233,18 @@ interactions:
         host: iasprovidertestblr.accounts400.ondemand.com
         remote_addr: ""
         request_uri: ""
-        body: '{"id":"8fb2ba53-b252-4fcc-bdce-7b42180556c0","meta":{},"schemas":["urn:ietf:params:scim:schemas:core:2.0:User","urn:ietf:params:scim:schemas:extension:sap:2.0:User","urn:test:terraform:1.0:User"],"userName":"jdoe","name":{"familyName":"Doe","givenName":"Joe"},"userType":"public","emails":[{"value":"joe.doe@test.com","type":"work","primary":true}],"urn:ietf:params:scim:schemas:extension:sap:2.0:User":{"status":"inactive"},"urn:test:terraform:1.0:User":{"test1":"newTestValue","test2":true}}'
+        body: '{"id":"b11adb1f-2b53-4145-804e-9e9d7985d399","meta":{},"schemas":["urn:ietf:params:scim:schemas:core:2.0:User","urn:ietf:params:scim:schemas:extension:sap:2.0:User","urn:test:terraform:1.0:User"],"userName":"jdoe","name":{"familyName":"Doe","givenName":"Joe"},"userType":"public","emails":[{"value":"joe.doe@test.com","type":"work","primary":true}],"urn:ietf:params:scim:schemas:extension:sap:2.0:User":{"status":"inactive"},"urn:test:terraform:1.0:User":{"test1":"newTestValue","test2":true}}'
         form: {}
         headers:
             Accept:
                 - '*/*'
             Authorization:
-                - redacted
+                - REDACTED
             Content-Type:
                 - application/scim+json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/8fb2ba53-b252-4fcc-bdce-7b42180556c0
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/b11adb1f-2b53-4145-804e-9e9d7985d399
         method: PUT
       response:
         proto: HTTP/1.1
@@ -248,18 +254,20 @@ interactions:
         trailer: {}
         content_length: -1
         uncompressed: true
-        body: '{"id":"8fb2ba53-b252-4fcc-bdce-7b42180556c0","meta":{"created":"2025-05-14T09:47:08Z","lastModified":"2025-05-14T09:47:09Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/8fb2ba53-b252-4fcc-bdce-7b42180556c0","version":"fab14fc6-cc90-4eef-842f-a3bba63d927c","resourceType":"User"},"schemas":["urn:test:terraform:1.0:User","urn:ietf:params:scim:schemas:core:2.0:User","urn:ietf:params:scim:schemas:extension:sap:2.0:User"],"userName":"jdoe","name":{"familyName":"Doe","givenName":"Joe"},"userType":"public","active":false,"emails":[{"value":"joe.doe@test.com","primary":true,"type":"work"}],"urn:test:terraform:1.0:User":{"test1":"newTestValue","test2":true},"urn:ietf:params:scim:schemas:extension:sap:2.0:User":{"emails":[{"type":"work","value":"joe.doe@test.com","primary":true}],"userUuid":"8fb2ba53-b252-4fcc-bdce-7b42180556c0","mailVerified":false,"userId":"P000258","status":"inactive"}}'
+        body: '{"id":"b11adb1f-2b53-4145-804e-9e9d7985d399","meta":{"created":"2025-07-03T07:27:32Z","lastModified":"2025-07-03T07:27:33Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/b11adb1f-2b53-4145-804e-9e9d7985d399","version":"1803c58e-f7f8-4609-926c-d2373ac872ae","resourceType":"User"},"schemas":["urn:test:terraform:1.0:User","urn:ietf:params:scim:schemas:core:2.0:User","urn:ietf:params:scim:schemas:extension:sap:2.0:User"],"userName":"jdoe","name":{"familyName":"Doe","givenName":"Joe"},"userType":"public","active":false,"emails":[{"value":"joe.doe@test.com","primary":true,"type":"work"}],"urn:test:terraform:1.0:User":{"test1":"newTestValue","test2":true},"urn:ietf:params:scim:schemas:extension:sap:2.0:User":{"emails":[{"type":"work","value":"joe.doe@test.com","primary":true}],"userUuid":"b11adb1f-2b53-4145-804e-9e9d7985d399","mailVerified":false,"userId":"P000304","status":"inactive"}}'
         headers:
             Cache-Control:
                 - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
             Content-Type:
                 - application/scim+json
             Date:
-                - Wed, 14 May 2025 09:47:08 GMT
+                - Thu, 03 Jul 2025 07:27:32 GMT
             Etag:
-                - '"fab14fc6-cc90-4eef-842f-a3bba63d927c-gzip"'
+                - '"1803c58e-f7f8-4609-926c-d2373ac872ae-gzip"'
             Location:
-                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/8fb2ba53-b252-4fcc-bdce-7b42180556c0
+                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/b11adb1f-2b53-4145-804e-9e9d7985d399
             Referrer-Policy:
                 - origin
             Server:
@@ -271,13 +279,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - E669DE3B-4C17-42F0-AAB4-1B700E6033BA
+                - A1D7E3A8-461A-4F4B-8A13-BDE2827D0D91
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-hqppk
+                - http-fjzhx
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -286,7 +294,7 @@ interactions:
                 - none
         status: '200 '
         code: 200
-        duration: 209.895429ms
+        duration: 254.56281ms
     - id: 4
       request:
         proto: HTTP/1.1
@@ -304,12 +312,12 @@ interactions:
             Accept:
                 - '*/*'
             Authorization:
-                - redacted
+                - REDACTED
             Content-Type:
                 - application/scim+json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/8fb2ba53-b252-4fcc-bdce-7b42180556c0
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/b11adb1f-2b53-4145-804e-9e9d7985d399
         method: GET
       response:
         proto: HTTP/1.1
@@ -319,18 +327,20 @@ interactions:
         trailer: {}
         content_length: -1
         uncompressed: true
-        body: '{"id":"8fb2ba53-b252-4fcc-bdce-7b42180556c0","meta":{"created":"2025-05-14T09:47:08Z","lastModified":"2025-05-14T09:47:09Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/8fb2ba53-b252-4fcc-bdce-7b42180556c0","version":"fab14fc6-cc90-4eef-842f-a3bba63d927c","resourceType":"User"},"schemas":["urn:test:terraform:1.0:User","urn:ietf:params:scim:schemas:core:2.0:User","urn:ietf:params:scim:schemas:extension:sap:2.0:User"],"userName":"jdoe","name":{"familyName":"Doe","givenName":"Joe"},"userType":"public","active":false,"emails":[{"value":"joe.doe@test.com","primary":true,"type":"work"}],"urn:test:terraform:1.0:User":{"test1":"newTestValue","test2":true},"urn:ietf:params:scim:schemas:extension:sap:2.0:User":{"emails":[{"type":"work","value":"joe.doe@test.com","primary":true}],"userUuid":"8fb2ba53-b252-4fcc-bdce-7b42180556c0","mailVerified":false,"userId":"P000258","status":"inactive"}}'
+        body: '{"id":"b11adb1f-2b53-4145-804e-9e9d7985d399","meta":{"created":"2025-07-03T07:27:32Z","lastModified":"2025-07-03T07:27:33Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/b11adb1f-2b53-4145-804e-9e9d7985d399","version":"1803c58e-f7f8-4609-926c-d2373ac872ae","resourceType":"User"},"schemas":["urn:test:terraform:1.0:User","urn:ietf:params:scim:schemas:core:2.0:User","urn:ietf:params:scim:schemas:extension:sap:2.0:User"],"userName":"jdoe","name":{"familyName":"Doe","givenName":"Joe"},"userType":"public","active":false,"emails":[{"value":"joe.doe@test.com","primary":true,"type":"work"}],"urn:test:terraform:1.0:User":{"test1":"newTestValue","test2":true},"urn:ietf:params:scim:schemas:extension:sap:2.0:User":{"emails":[{"type":"work","value":"joe.doe@test.com","primary":true}],"userUuid":"b11adb1f-2b53-4145-804e-9e9d7985d399","mailVerified":false,"userId":"P000304","status":"inactive"}}'
         headers:
             Cache-Control:
                 - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
             Content-Type:
                 - application/scim+json
             Date:
-                - Wed, 14 May 2025 09:47:09 GMT
+                - Thu, 03 Jul 2025 07:27:33 GMT
             Etag:
-                - '"fab14fc6-cc90-4eef-842f-a3bba63d927c-gzip"'
+                - '"1803c58e-f7f8-4609-926c-d2373ac872ae-gzip"'
             Location:
-                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/8fb2ba53-b252-4fcc-bdce-7b42180556c0
+                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/b11adb1f-2b53-4145-804e-9e9d7985d399
             Referrer-Policy:
                 - origin
             Server:
@@ -342,13 +352,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - 1114B2E6-9C38-4DBF-93B3-87C993C60C83
+                - 5F996D2C-F6BE-4D8A-8D62-B8325D2E9458
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-hqppk
+                - http-fjzhx
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -357,7 +367,7 @@ interactions:
                 - none
         status: '200 '
         code: 200
-        duration: 218.20827ms
+        duration: 254.519826ms
     - id: 5
       request:
         proto: HTTP/1.1
@@ -375,12 +385,12 @@ interactions:
             Accept:
                 - '*/*'
             Authorization:
-                - redacted
+                - REDACTED
             Content-Type:
                 - application/scim+json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/8fb2ba53-b252-4fcc-bdce-7b42180556c0
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/b11adb1f-2b53-4145-804e-9e9d7985d399
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -394,8 +404,10 @@ interactions:
         headers:
             Cache-Control:
                 - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
             Date:
-                - Wed, 14 May 2025 09:47:09 GMT
+                - Thu, 03 Jul 2025 07:27:34 GMT
             Referrer-Policy:
                 - origin
             Server:
@@ -407,13 +419,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - EBF59B2F-E184-4F91-91B6-350AA2B75F72
+                - D7307B30-3F50-4DE9-B3FA-03CE41610768
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-hqppk
+                - http-fjzhx
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -422,4 +434,4 @@ interactions:
                 - none
         status: '204 '
         code: 204
-        duration: 221.975488ms
+        duration: 253.359186ms

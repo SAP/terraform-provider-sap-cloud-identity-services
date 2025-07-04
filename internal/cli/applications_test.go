@@ -16,7 +16,7 @@ var applicationsPath = "/Applications/v1/"
 var applicationsBody = applications.Application{
 	Name:        "Test Application",
 	Description: "test app",
-	AuthenticationSchema: applications.AuthenticationSchema{
+	AuthenticationSchema: &applications.AuthenticationSchema{
 		SsoType:               "saml",
 		SubjectNameIdentifier: "mail",
 		AssertionAttributes: []applications.AssertionAttribute{

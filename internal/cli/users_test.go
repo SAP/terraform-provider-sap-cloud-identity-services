@@ -15,7 +15,7 @@ import (
 var usersPath = "/scim/Users/"
 var usersBody = users.User{
 	UserName: "user_for_testing",
-	Name: users.Name{
+	Name: &users.Name{
 		GivenName:  "Testing",
 		FamilyName: "User",
 	},

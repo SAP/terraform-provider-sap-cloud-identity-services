@@ -9,18 +9,6 @@ import (
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/users"
 )
 
-type sapExtensionUserData struct {
-	SendMail     types.Bool   `tfsdk:"send_mail"`
-	MailVerified types.Bool   `tfsdk:"mail_verified"`
-	Status       types.String `tfsdk:"status"`
-}
-
-type emailData struct {
-	Value   types.String `tfsdk:"value"`
-	Type    types.String `tfsdk:"type"`
-	Primary types.Bool   `tfsdk:"primary"`
-}
-
 type nameData struct {
 	FamilyName      types.String `tfsdk:"family_name"`
 	GivenName       types.String `tfsdk:"given_name"`
@@ -31,7 +19,7 @@ type userData struct {
 	Id               types.String `tfsdk:"id"`
 	Schemas          types.Set    `tfsdk:"schemas"`
 	UserName         types.String `tfsdk:"user_name"`
-	Name             *nameData    `tfsdk:"name"`
+	Name             types.Object `tfsdk:"name"`
 	DisplayName      types.String `tfsdk:"display_name"`
 	Emails           types.Set    `tfsdk:"emails"`
 	InitialPassword  types.String `tfsdk:"initial_password"`
@@ -51,52 +39,62 @@ func userValueFrom(ctx context.Context, u users.User, cS string) (userData, diag
 		Active:   types.BoolValue(u.Active),
 	}
 
+	// Display Name
 	if len(u.DisplayName) > 0 {
 		user.DisplayName = types.StringValue(u.DisplayName)
 	}
 
+	// Schemas
 	user.Schemas, diags = types.SetValueFrom(ctx, types.StringType, u.Schemas)
 	diagnostics.Append(diags...)
 
-	name := nameData{}
-
-	if len(u.Name.FamilyName) > 0 {
-		name.FamilyName = types.StringValue(u.Name.FamilyName)
-	}
-	if len(u.Name.GivenName) > 0 {
-		name.GivenName = types.StringValue(u.Name.GivenName)
-	}
-	if len(u.Name.HonorificPrefix) > 0 {
-		name.HonorificPrefix = types.StringValue(u.Name.HonorificPrefix)
+	// Emails
+	userEmails, diags := types.SetValueFrom(ctx, emailObjType, u.Emails)
+	diagnostics.Append(diags...)
+	if diagnostics.HasError() {
+		return user, diagnostics
 	}
 
-	if name == (nameData{}) {
-		user.Name = nil
-	} else {
-		user.Name = &name
-	}
+	user.Emails = userEmails
 
-	userEmails := []emailData{}
-	for _, emailRes := range u.Emails {
-		userEmail := emailData{
-			Value:   types.StringValue(emailRes.Value),
-			Type:    types.StringValue(emailRes.Type),
-			Primary: types.BoolValue(emailRes.Primary),
+	// Name
+	// mapping is done manually to handle null values
+	if u.Name != nil {
+		name := nameData{}
+
+		if len(u.Name.FamilyName) > 0 {
+			name.FamilyName = types.StringValue(u.Name.FamilyName)
 		}
-		userEmails = append(userEmails, userEmail)
+		if len(u.Name.GivenName) > 0 {
+			name.GivenName = types.StringValue(u.Name.GivenName)
+		}
+		if len(u.Name.HonorificPrefix) > 0 {
+			name.HonorificPrefix = types.StringValue(u.Name.HonorificPrefix)
+		}
+
+		if name == (nameData{}) {
+			user.Name = types.ObjectNull(nameObjType)
+		} else {
+			userData, diags := types.ObjectValueFrom(ctx, nameObjType, name)
+			diagnostics.Append(diags...)
+			if diagnostics.HasError() {
+				return user, diagnostics
+			}
+
+			user.Name = userData
+		}
+	} else {
+		user.Name = types.ObjectNull(nameObjType)
 	}
 
-	user.Emails, diags = types.SetValueFrom(ctx, emailObjType, userEmails)
+	// SAP Extension User
+	sapExtensionUser, diags := types.ObjectValueFrom(ctx, sapExtensionUserObjType, u.SAPExtension)
 	diagnostics.Append(diags...)
-
-	sapExtensionUser := sapExtensionUserData{
-		SendMail:     types.BoolValue(u.SAPExtension.SendMail),
-		MailVerified: types.BoolValue(u.SAPExtension.MailVerified),
-		Status:       types.StringValue(u.SAPExtension.Status),
+	if diagnostics.HasError() {
+		return user, diagnostics
 	}
 
-	user.SapExtensionUser, diags = types.ObjectValueFrom(ctx, sapExtensionUserObjType, sapExtensionUser)
-	diagnostics.Append(diags...)
+	user.SapExtensionUser = sapExtensionUser
 
 	if len(cS) > 0 {
 		user.CustomSchemas = types.StringValue(cS)

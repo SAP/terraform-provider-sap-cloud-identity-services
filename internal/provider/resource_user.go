@@ -390,18 +390,20 @@ func getUserRequest(ctx context.Context, plan userData) (*users.User, string, di
 		args.DisplayName = plan.DisplayName.ValueString()
 	}
 
-	if plan.Name != nil {
-		name := plan.Name
+	if !plan.Name.IsNull() && !plan.Name.IsUnknown() {
+		var name users.Name
+		diags = plan.Name.As(ctx, &name, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty:    true,
+			UnhandledUnknownAsEmpty: true,
+		})
 
-		if !name.FamilyName.IsNull() {
-			args.Name.FamilyName = name.FamilyName.ValueString()
+		diagnostics.Append(diags...)
+
+		if diagnostics.HasError() {
+			return nil, "", diagnostics
 		}
-		if !name.GivenName.IsNull() {
-			args.Name.GivenName = name.GivenName.ValueString()
-		}
-		if !name.HonorificPrefix.IsNull() {
-			args.Name.HonorificPrefix = name.HonorificPrefix.ValueString()
-		}
+
+		args.Name = &name
 	}
 
 	if !plan.InitialPassword.IsNull() {
@@ -418,25 +420,17 @@ func getUserRequest(ctx context.Context, plan userData) (*users.User, string, di
 
 	if !plan.SapExtensionUser.IsNull() && !plan.SapExtensionUser.IsUnknown() {
 
-		var sapExtensionUser sapExtensionUserData
-		diags = plan.SapExtensionUser.As(ctx, &sapExtensionUser, basetypes.ObjectAsOptions{})
+		var sapExtensionUser users.SAPExtension
+		diags = plan.SapExtensionUser.As(ctx, &sapExtensionUser, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty:    true,
+			UnhandledUnknownAsEmpty: true,
+		})
 		diagnostics.Append(diags...)
 		if diagnostics.HasError() {
 			return nil, "", diagnostics
 		}
 
-		if !sapExtensionUser.SendMail.IsNull() && !sapExtensionUser.SendMail.IsUnknown() {
-			args.SAPExtension.SendMail = sapExtensionUser.SendMail.ValueBool()
-		}
-
-		if !sapExtensionUser.MailVerified.IsNull() && !sapExtensionUser.MailVerified.IsUnknown() {
-			args.SAPExtension.MailVerified = sapExtensionUser.MailVerified.ValueBool()
-		}
-
-		if !sapExtensionUser.Status.IsNull() && !sapExtensionUser.Status.IsUnknown() {
-			args.SAPExtension.Status = sapExtensionUser.Status.ValueString()
-		}
-
+		args.SAPExtension = &sapExtensionUser
 	}
 
 	var customSchemas string

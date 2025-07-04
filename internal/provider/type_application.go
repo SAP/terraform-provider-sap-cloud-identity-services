@@ -11,31 +11,13 @@ import (
 )
 
 type authenticationSchemaData struct {
-	SsoType                       types.String               `tfsdk:"sso_type"`
-	SubjectNameIdentifier         *subjectNameIdentifierData `tfsdk:"subject_name_identifier"`
-	SubjectNameIdentifierFunction types.String               `tfsdk:"subject_name_identifier_function"`
-	AssertionAttributes           types.List                 `tfsdk:"assertion_attributes"`
-	AdvancedAssertionAttributes   types.List                 `tfsdk:"advanced_assertion_attributes"`
-	DefaultAuthenticatingIdpId    types.String               `tfsdk:"default_authenticating_idp"`
-	AuthenticationRules           types.List                 `tfsdk:"conditional_authentication"`
-}
-
-type advancedAssertionAttributesData struct {
-	Source         types.String `tfsdk:"source"`
-	AttributeName  types.String `tfsdk:"attribute_name"`
-	AttributeValue types.String `tfsdk:"attribute_value"`
-	Inherited      types.Bool   `tfsdk:"inherited"`
-}
-
-type assertionAttributesData struct {
-	AttributeName  types.String `tfsdk:"attribute_name"`
-	AttributeValue types.String `tfsdk:"attribute_value"`
-	Inherited      types.Bool   `tfsdk:"inherited"`
-}
-
-type subjectNameIdentifierData struct {
-	Source types.String `tfsdk:"source"`
-	Value  types.String `tfsdk:"value"`
+	SsoType                       types.String `tfsdk:"sso_type"`
+	SubjectNameIdentifier         types.Object `tfsdk:"subject_name_identifier"`
+	SubjectNameIdentifierFunction types.String `tfsdk:"subject_name_identifier_function"`
+	AssertionAttributes           types.List   `tfsdk:"assertion_attributes"`
+	AdvancedAssertionAttributes   types.List   `tfsdk:"advanced_assertion_attributes"`
+	DefaultAuthenticatingIdpId    types.String `tfsdk:"default_authenticating_idp"`
+	AuthenticationRules           types.List   `tfsdk:"conditional_authentication"`
 }
 
 type authenticationRulesData struct {
@@ -46,15 +28,27 @@ type authenticationRulesData struct {
 	IpNetworkRange     types.String `tfsdk:"ip_network_range"`
 }
 
+type advancedAssertionAttributesData struct {
+	Source         types.String `tfsdk:"source"`
+	AttributeName  types.String `tfsdk:"attribute_name"`
+	AttributeValue types.String `tfsdk:"attribute_value"`
+	Inherited      types.Bool   `tfsdk:"inherited"`
+}
+
+type subjectNameIdentifierData struct {
+	Source types.String `tfsdk:"source"`
+	Value  types.String `tfsdk:"value"`
+}
+
 type applicationData struct {
 	//INPUT
 	Id types.String `tfsdk:"id"`
 	//OUTPUT
-	Name                 types.String              `tfsdk:"name"`
-	Description          types.String              `tfsdk:"description"`
-	ParentApplicationId  types.String              `tfsdk:"parent_application_id"`
-	MultiTenantApp       types.Bool                `tfsdk:"multi_tenant_app"`
-	AuthenticationSchema *authenticationSchemaData `tfsdk:"authentication_schema"`
+	Name                 types.String `tfsdk:"name"`
+	Description          types.String `tfsdk:"description"`
+	ParentApplicationId  types.String `tfsdk:"parent_application_id"`
+	MultiTenantApp       types.Bool   `tfsdk:"multi_tenant_app"`
+	AuthenticationSchema types.Object `tfsdk:"authentication_schema"`
 }
 
 func applicationValueFrom(ctx context.Context, a applications.Application) (applicationData, diag.Diagnostics) {
@@ -80,23 +74,34 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 		application.ParentApplicationId = types.StringValue(a.ParentApplicationId)
 	}
 
-	authenticationSchema := authenticationSchemaData{}
-
 	// reading attributes of the Authentication Schema : sso_type, default_authenticating_idp
-	authenticationSchema.SsoType = types.StringValue(a.AuthenticationSchema.SsoType)
-	authenticationSchema.DefaultAuthenticatingIdpId = types.StringValue(a.AuthenticationSchema.DefaultAuthenticatingIdpId)
+	authenticationSchema := authenticationSchemaData{
+		SsoType:                    types.StringValue(a.AuthenticationSchema.SsoType),
+		DefaultAuthenticatingIdpId: types.StringValue(a.AuthenticationSchema.DefaultAuthenticatingIdpId),
+	}
 
 	// reading attribute of the Authentication Schema : subject_name_identifier
-	authenticationSchema.SubjectNameIdentifier = &subjectNameIdentifierData{}
+	// mapping is done manually to handle the inconsistency between the structure of the API response body and the schema
+	// the schema defines the parameter subject_name_identitifier as an object whereas the response body returns it as a string
+	subjectNameIdentifier := subjectNameIdentifierData{}
 
 	if re.MatchString(a.AuthenticationSchema.SubjectNameIdentifier) {
 		match := re.FindStringSubmatch(a.AuthenticationSchema.SubjectNameIdentifier)
-		authenticationSchema.SubjectNameIdentifier.Value = types.StringValue(match[1])
-		authenticationSchema.SubjectNameIdentifier.Source = types.StringValue(sourceValues[1])
+		subjectNameIdentifier.Value = types.StringValue(match[1])
+		subjectNameIdentifier.Source = types.StringValue(sourceValues[1])
 	} else {
-		authenticationSchema.SubjectNameIdentifier.Value = types.StringValue(a.AuthenticationSchema.SubjectNameIdentifier)
-		authenticationSchema.SubjectNameIdentifier.Source = types.StringValue(sourceValues[0])
+		subjectNameIdentifier.Value = types.StringValue(a.AuthenticationSchema.SubjectNameIdentifier)
+		subjectNameIdentifier.Source = types.StringValue(sourceValues[0])
 	}
+
+	subjectNameIdentifierData, diags := types.ObjectValueFrom(ctx, subjectNameIdentitfierObjType, subjectNameIdentifier)
+	diagnostics.Append(diags...)
+
+	if diagnostics.HasError() {
+		return application, diagnostics
+	}
+
+	authenticationSchema.SubjectNameIdentifier = subjectNameIdentifierData
 
 	// reading attributes of the Authentication Schema : subject_name_identifier_function
 	if len(a.AuthenticationSchema.SubjectNameIdentifierFunction) > 0 {
@@ -104,84 +109,101 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 	}
 
 	// reading attributes of the Authentication Schema : assertion_attributes
-	attributes := []assertionAttributesData{}
-	for _, attributeRes := range a.AuthenticationSchema.AssertionAttributes {
-
-		attribute := assertionAttributesData{
-			AttributeName:  types.StringValue(attributeRes.AssertionAttributeName),
-			AttributeValue: types.StringValue(attributeRes.UserAttributeName),
-			Inherited:      types.BoolValue(attributeRes.Inherited),
-		}
-
-		attributes = append(attributes, attribute)
-	}
-
-	authenticationSchema.AssertionAttributes, diags = types.ListValueFrom(ctx, assertionAttributesObjType, attributes)
-
+	attributes, diags := types.ListValueFrom(ctx, assertionAttributesObjType, a.AuthenticationSchema.AssertionAttributes)
 	diagnostics.Append(diags...)
 
-	// reading attributes of the Authentication Schema : advanced_assertion_attributes
-	advancedAttributes := []advancedAssertionAttributesData{}
-	for _, attributeRes := range a.AuthenticationSchema.AdvancedAssertionAttributes {
-
-		attribute := advancedAssertionAttributesData{
-			AttributeName: types.StringValue(attributeRes.AttributeName),
-			Inherited:     types.BoolValue(attributeRes.Inherited),
-		}
-
-		if re.MatchString(attributeRes.AttributeValue) {
-			attribute.Source = types.StringValue(sourceValues[1])
-			match := re.FindStringSubmatch(attributeRes.AttributeValue)
-			attribute.AttributeValue = types.StringValue(match[1])
-
-		} else {
-			attribute.Source = types.StringValue(sourceValues[2])
-			attribute.AttributeValue = types.StringValue(attributeRes.AttributeValue)
-		}
-
-		advancedAttributes = append(advancedAttributes, attribute)
+	if diagnostics.HasError() {
+		return application, diagnostics
 	}
 
-	if len(advancedAttributes) > 0 {
-		authenticationSchema.AdvancedAssertionAttributes, diags = types.ListValueFrom(ctx, advancedAssertionAttributesObjType, advancedAttributes)
+	authenticationSchema.AssertionAttributes = attributes
+
+	// reading attributes of the Authentication Schema : advanced_assertion_attributes
+	// mapping is done manually to handle the inconsistency between the structure of the API response body and the schema
+	// the schema defines the parameter advanced_assertion_attributes with an additional parameter source which is not returned by the response
+	if len(a.AuthenticationSchema.AdvancedAssertionAttributes) > 0 {
+
+		advancedAttributes := []advancedAssertionAttributesData{}
+		for _, attributeRes := range a.AuthenticationSchema.AdvancedAssertionAttributes {
+
+			attribute := advancedAssertionAttributesData{
+				AttributeName: types.StringValue(attributeRes.AttributeName),
+				Inherited:     types.BoolValue(attributeRes.Inherited),
+			}
+
+			if re.MatchString(attributeRes.AttributeValue) {
+				attribute.Source = types.StringValue(sourceValues[1])
+				match := re.FindStringSubmatch(attributeRes.AttributeValue)
+				attribute.AttributeValue = types.StringValue(match[1])
+
+			} else {
+				attribute.Source = types.StringValue(sourceValues[2])
+				attribute.AttributeValue = types.StringValue(attributeRes.AttributeValue)
+			}
+
+			advancedAttributes = append(advancedAttributes, attribute)
+		}
+
+		advancedAttributesData, diags := types.ListValueFrom(ctx, advancedAssertionAttributesObjType, advancedAttributes)
+
+		diagnostics.Append(diags...)
+
+		if diagnostics.HasError() {
+			return application, diagnostics
+		}
+
+		authenticationSchema.AdvancedAssertionAttributes = advancedAttributesData
 	} else {
 		authenticationSchema.AdvancedAssertionAttributes = types.ListNull(advancedAssertionAttributesObjType)
 	}
-	diagnostics.Append(diags...)
 
 	// reading attributes of the Authentication Schema : conditional_authentication
-	authRules := []authenticationRulesData{}
-	for _, authRulesRes := range a.AuthenticationSchema.ConditionalAuthentication {
+	// the mapping is done in order to handle the null values
+	if len(a.AuthenticationSchema.ConditionalAuthentication) > 0 {
 
-		rule := authenticationRulesData{}
+		authRules := []authenticationRulesData{}
 
-		if len(authRulesRes.UserType) > 0 {
-			rule.UserType = types.StringValue(authRulesRes.UserType)
-		}
-		if len(authRulesRes.UserGroup) > 0 {
-			rule.UserGroup = types.StringValue(authRulesRes.UserGroup)
-		}
-		if len(authRulesRes.UserEmailDomain) > 0 {
-			rule.UserEmailDomain = types.StringValue(authRulesRes.UserEmailDomain)
-		}
-		if len(authRulesRes.IdentityProviderId) > 0 {
-			rule.IdentityProviderId = types.StringValue(authRulesRes.IdentityProviderId)
-		}
-		if len(authRulesRes.IpNetworkRange) > 0 {
-			rule.IpNetworkRange = types.StringValue(authRulesRes.IpNetworkRange)
+		for _, rule := range a.AuthenticationSchema.ConditionalAuthentication {
+
+			authRule := authenticationRulesData{}
+
+			if len(rule.UserType) > 0 {
+				authRule.UserType = types.StringValue(rule.UserType)
+			}
+
+			if len(rule.UserGroup) > 0 {
+				authRule.UserGroup = types.StringValue(rule.UserGroup)
+			}
+
+			if len(rule.UserEmailDomain) > 0 {
+				authRule.UserEmailDomain = types.StringValue(rule.UserEmailDomain)
+			}
+
+			if len(rule.IdentityProviderId) > 0 {
+				authRule.IdentityProviderId = types.StringValue(rule.IdentityProviderId)
+			}
+
+			if len(rule.IpNetworkRange) > 0 {
+				authRule.IpNetworkRange = types.StringValue(rule.IpNetworkRange)
+			}
+
+			authRules = append(authRules, authRule)
 		}
 
-		authRules = append(authRules, rule)
-	}
+		authRulesData, diags := types.ListValueFrom(ctx, authenticationRulesObjType, authRules)
+		diagnostics.Append(diags...)
+		if diagnostics.HasError() {
+			return application, diagnostics
+		}
 
-	if len(authRules) > 0 {
-		authenticationSchema.AuthenticationRules, diags = types.ListValueFrom(ctx, authenticationRulesObjType, authRules)
+		authenticationSchema.AuthenticationRules = authRulesData
 	} else {
 		authenticationSchema.AuthenticationRules = types.ListNull(authenticationRulesObjType)
 	}
-	diagnostics.Append(diags...)
 
-	application.AuthenticationSchema = &authenticationSchema
+	application.AuthenticationSchema, diags = types.ObjectValueFrom(ctx, authenticationSchemaObjType, authenticationSchema)
+
+	diagnostics.Append(diags...)
 
 	return application, diagnostics
 }

@@ -116,13 +116,13 @@ type ConsumedApi struct {
 }
 
 type AuthenticationSchema struct {
-	SsoType                       string                       `json:"ssoType,omitempty"`
-	SubjectNameIdentifier         string                       `json:"subjectNameIdentifier,omitempty"`
-	SubjectNameIdentifierFunction string                       `json:"subjectNameIdentifierFunction,omitempty"`
-	AssertionAttributes           []AssertionAttribute         `json:"assertionAttributes"`
-	AdvancedAssertionAttributes   []AdvancedAssertionAttribute `json:"advancedAssertionAttributes,omitempty"`
-	DefaultAuthenticatingIdpId    string                       `json:"defaultAuthenticatingIdpId,omitempty"`
-	ConditionalAuthentication     []AuthenicationRule          `json:"conditionalAuthentication,omitempty"`
+	SsoType                       string                       `json:"ssoType,omitempty" tfsdk:"sso_type"`
+	SubjectNameIdentifier         string                       `json:"subjectNameIdentifier,omitempty" tfsdk:"subject_name_identifier"`
+	SubjectNameIdentifierFunction string                       `json:"subjectNameIdentifierFunction,omitempty" tfsdk:"subject_name_identifier_function"`
+	AssertionAttributes           []AssertionAttribute         `json:"assertionAttributes" tfsdk:"assertion_attributes"`
+	AdvancedAssertionAttributes   []AdvancedAssertionAttribute `json:"advancedAssertionAttributes,omitempty" tfsdk:"advanced_assertion_attributes"`
+	DefaultAuthenticatingIdpId    string                       `json:"defaultAuthenticatingIdpId,omitempty" tfsdk:"default_authenticating_idp"`
+	ConditionalAuthentication     []AuthenicationRule          `json:"conditionalAuthentication,omitempty" tfsdk:"conditional_authentication"`
 	// RiskBasedAuthentication       RBAConfiguration            `json:"riskBasedAuthentication"`
 	// HomeUrl								string 							`json:"homeUrl"`
 	// FallbackSubjectNameIdentifier		string 							`json:"fallbackSubjectNameIdentifier,omitempty"`
@@ -154,13 +154,13 @@ type AuthenticationSchema struct {
 }
 
 type Application struct {
-	Id                   string               `json:"id"`
-	Name                 string               `json:"name"`
-	Description          string               `json:"description,omitempty"`
-	ParentApplicationId  string               `json:"parentApplicationId,omitempty"`
-	MultiTenantApp       bool                 `json:"multiTenantApp,omitempty"` //only for SAP internal use
-	Schemas              []string             `json:"schemas,omitempty"`
-	AuthenticationSchema AuthenticationSchema `json:"urn:sap:identity:application:schemas:extension:sci:1.0:Authentication"`
+	Id                   string                `json:"id"`
+	Name                 string                `json:"name"`
+	Description          string                `json:"description,omitempty"`
+	ParentApplicationId  string                `json:"parentApplicationId,omitempty"`
+	MultiTenantApp       bool                  `json:"multiTenantApp,omitempty"` //only for SAP internal use
+	Schemas              []string              `json:"schemas,omitempty"`
+	AuthenticationSchema *AuthenticationSchema `json:"urn:sap:identity:application:schemas:extension:sci:1.0:Authentication"`
 	// GlobalAccount        string               `json:"globalAccount,omitempty"`
 	// Meta 					Meta 					`json:"meta,omitempty"`
 	// PrivacyPolicy 			string 					`json:"privacyPolicy,omitempty"`

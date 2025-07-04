@@ -6,20 +6,20 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 825
+        content_length: 881
         transfer_encoding: []
         trailer: {}
         host: iasprovidertestblr.accounts400.ondemand.com
         remote_addr: ""
         request_uri: ""
         body: |
-            {"id":"","name":"basic-test-app","description":"application for testing purposes","urn:sap:identity:application:schemas:extension:sci:1.0:Authentication":{"ssoType":"openIdConnect","subjectNameIdentifier":"mail","subjectNameIdentifierFunction":"lowerCase","assertionAttributes":[{"assertionAttributeName":"param1","userAttributeName":"firstName","inherited":false},{"assertionAttributeName":"param2","userAttributeName":"mail","inherited":false}],"advancedAssertionAttributes":[{"attributeName":"adv_param1","attributeValue":"${corporateIdP.value1}","inherited":false},{"attributeName":"adv_param2","attributeValue":"${corporateIdP.value2}","inherited":false}],"conditionalAuthentication":[{"userType":"employee","userEmailDomain":"gmail.com","identityProviderId":"664c660e25cff252c5c202dc","ipNetworkRange":"10.0.0.1/8"}]}}
+            {"id":"","name":"basic-test-app","description":"application for testing purposes","urn:sap:identity:application:schemas:extension:sci:1.0:Authentication":{"ssoType":"openIdConnect","subjectNameIdentifier":"mail","subjectNameIdentifierFunction":"lowerCase","assertionAttributes":[{"assertionAttributeName":"param1","userAttributeName":"firstName","inherited":false},{"assertionAttributeName":"param2","userAttributeName":"mail","inherited":false}],"advancedAssertionAttributes":[{"attributeName":"adv_param1","attributeValue":"${corporateIdP.value1}","inherited":false},{"attributeName":"adv_param2","attributeValue":"${corporateIdP.value2}","inherited":false}],"defaultAuthenticatingIdpId":"664c660e25cff252c5c202dc","conditionalAuthentication":[{"userType":"employee","userEmailDomain":"gmail.com","identityProviderId":"664c660e25cff252c5c202dc","ipNetworkRange":"10.0.0.1/8"}]}}
         form: {}
         headers:
             Accept:
                 - '*/*'
             Authorization:
-                - redacted
+                - REDACTED
             Content-Type:
                 - application/json
             Dataserviceversion:
@@ -40,14 +40,16 @@ interactions:
                 - private,no-cache,no-store
             Content-Length:
                 - "0"
+            Content-Security-Policy:
+                - script-src 'none';
             Critical-Origin-Trial:
                 - Tpcd
             Date:
-                - Sat, 10 May 2025 21:42:26 GMT
+                - Thu, 03 Jul 2025 05:55:30 GMT
             Expires:
                 - "0"
             Location:
-                - /Applications/v1/1dff3b20-a0bf-4839-93fe-a2f7717cce83
+                - /Applications/v1/e5ad3d29-0146-4aa2-9102-a4dfee4ea2e3
             Origin-Trial:
                 - Avu6rn7emV5gK8gvyGHlX8TMqM9uo1FacP2j/RWTq+8j+yKnqcTO0TQh0bXJ/7QntxD4/JzXv8aXoqxxZQuqXgYAAABdeyJvcmlnaW4iOiJodHRwczovL29uZGVtYW5kLmNvbTo0NDMiLCJmZWF0dXJlIjoiVHBjZCIsImV4cGlyeSI6MTczNTM0Mzk5OSwiaXNTdWJkb21haW4iOnRydWV9
             Pragma:
@@ -63,13 +65,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - B3FA4842-8562-427A-9606-EB434FA4B968
+                - 9AAD46AF-7806-4C52-BB3C-40A90359624C
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-skfr4
+                - http-swdvm
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -80,7 +82,7 @@ interactions:
                 - 1; mode=block
         status: '201 '
         code: 201
-        duration: 1.062879795s
+        duration: 1.059474766s
     - id: 1
       request:
         proto: HTTP/1.1
@@ -98,12 +100,12 @@ interactions:
             Accept:
                 - '*/*'
             Authorization:
-                - redacted
+                - REDACTED
             Content-Type:
                 - application/json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/1dff3b20-a0bf-4839-93fe-a2f7717cce83
+        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/e5ad3d29-0146-4aa2-9102-a4dfee4ea2e3
         method: GET
       response:
         proto: HTTP/1.1
@@ -116,13 +118,13 @@ interactions:
         uncompressed: true
         body: |-
             {
-              "id" : "1dff3b20-a0bf-4839-93fe-a2f7717cce83",
+              "id" : "e5ad3d29-0146-4aa2-9102-a4dfee4ea2e3",
               "meta" : {
-                "created" : "2025-05-10T21:42:27.016Z",
+                "created" : "2025-07-03T05:55:30.085Z",
                 "createdBy" : "P000003",
-                "lastModified" : "2025-05-10T21:42:27.016Z",
+                "lastModified" : "2025-07-03T05:55:30.085Z",
                 "modifiedBy" : "P000003",
-                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/1dff3b20-a0bf-4839-93fe-a2f7717cce83",
+                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/e5ad3d29-0146-4aa2-9102-a4dfee4ea2e3",
                 "type" : "charged",
                 "version" : "1"
               },
@@ -130,7 +132,7 @@ interactions:
               "description" : "application for testing purposes",
               "multiTenantApp" : false,
               "globalAccount" : "unknown",
-              "schemas" : [ "urn:sap:identity:application:schemas:core:1.0", "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication", "urn:sap:identity:application:schemas:extension:sci:1.0:Provisioning" ],
+              "schemas" : [ "urn:sap:identity:application:schemas:core:1.0", "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication", "urn:sap:identity:application:schemas:extension:sci:1.0:Authorization", "urn:sap:identity:application:schemas:extension:sci:1.0:Provisioning" ],
               "branding" : {
                 "showDisplayNameOnLogonScreen" : true,
                 "rememberMeVisible" : true,
@@ -161,7 +163,7 @@ interactions:
                   } ]
                 },
                 "companyId" : "global",
-                "clientId" : "f364445c-91ae-4ceb-a340-60ac7bd1a643",
+                "clientId" : "3f2224fc-0532-4e6a-8b7a-38221bff091e",
                 "assertionAttributes" : [ {
                   "assertionAttributeName" : "param1",
                   "userAttributeName" : "firstName",
@@ -219,7 +221,7 @@ interactions:
                     "refreshTokenRotationScenario" : "off",
                     "accessTokenFormat" : "default"
                   },
-                  "restrictedGrantTypes" : [ "refreshToken", "clientCredentials", "jwtBearer", "password", "authorizationCode" ]
+                  "restrictedGrantTypes" : [ "refreshToken", "password", "jwtBearer", "authorizationCode", "clientCredentials" ]
                 },
                 "restApiAuthentication" : {
                   "allowPublicClientFlows" : false,
@@ -230,17 +232,20 @@ interactions:
               },
               "urn:sap:identity:application:schemas:extension:sci:1.0:Provisioning" : {
                 "centralStoreProvisioningEnabled" : false
-              }
+              },
+              "urn:sap:identity:application:schemas:extension:sci:1.0:Authorization" : { }
             }
         headers:
             Cache-Control:
                 - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
             Content-Type:
                 - application/json;charset=UTF-8
             Critical-Origin-Trial:
                 - Tpcd
             Date:
-                - Sat, 10 May 2025 21:42:26 GMT
+                - Thu, 03 Jul 2025 05:55:30 GMT
             Expires:
                 - "0"
             Origin-Trial:
@@ -258,13 +263,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - 64B153BC-347E-4071-B31C-3D082806EACA
+                - 2784D771-DF87-4F50-8EC9-B6AE74830BB5
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-skfr4
+                - http-swdvm
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -275,7 +280,7 @@ interactions:
                 - 1; mode=block
         status: '200 '
         code: 200
-        duration: 200.091109ms
+        duration: 230.416864ms
     - id: 2
       request:
         proto: HTTP/1.1
@@ -293,12 +298,12 @@ interactions:
             Accept:
                 - '*/*'
             Authorization:
-                - redacted
+                - REDACTED
             Content-Type:
                 - application/json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/1dff3b20-a0bf-4839-93fe-a2f7717cce83
+        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/e5ad3d29-0146-4aa2-9102-a4dfee4ea2e3
         method: GET
       response:
         proto: HTTP/1.1
@@ -311,13 +316,13 @@ interactions:
         uncompressed: true
         body: |-
             {
-              "id" : "1dff3b20-a0bf-4839-93fe-a2f7717cce83",
+              "id" : "e5ad3d29-0146-4aa2-9102-a4dfee4ea2e3",
               "meta" : {
-                "created" : "2025-05-10T21:42:27.016Z",
+                "created" : "2025-07-03T05:55:30.085Z",
                 "createdBy" : "P000003",
-                "lastModified" : "2025-05-10T21:42:27.016Z",
+                "lastModified" : "2025-07-03T05:55:30.085Z",
                 "modifiedBy" : "P000003",
-                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/1dff3b20-a0bf-4839-93fe-a2f7717cce83",
+                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/e5ad3d29-0146-4aa2-9102-a4dfee4ea2e3",
                 "type" : "charged",
                 "version" : "1"
               },
@@ -325,7 +330,7 @@ interactions:
               "description" : "application for testing purposes",
               "multiTenantApp" : false,
               "globalAccount" : "unknown",
-              "schemas" : [ "urn:sap:identity:application:schemas:core:1.0", "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication", "urn:sap:identity:application:schemas:extension:sci:1.0:Provisioning" ],
+              "schemas" : [ "urn:sap:identity:application:schemas:core:1.0", "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication", "urn:sap:identity:application:schemas:extension:sci:1.0:Authorization", "urn:sap:identity:application:schemas:extension:sci:1.0:Provisioning" ],
               "branding" : {
                 "showDisplayNameOnLogonScreen" : true,
                 "rememberMeVisible" : true,
@@ -356,7 +361,7 @@ interactions:
                   } ]
                 },
                 "companyId" : "global",
-                "clientId" : "f364445c-91ae-4ceb-a340-60ac7bd1a643",
+                "clientId" : "3f2224fc-0532-4e6a-8b7a-38221bff091e",
                 "assertionAttributes" : [ {
                   "assertionAttributeName" : "param1",
                   "userAttributeName" : "firstName",
@@ -414,7 +419,7 @@ interactions:
                     "refreshTokenRotationScenario" : "off",
                     "accessTokenFormat" : "default"
                   },
-                  "restrictedGrantTypes" : [ "jwtBearer", "authorizationCode", "refreshToken", "clientCredentials", "password" ]
+                  "restrictedGrantTypes" : [ "refreshToken", "password", "jwtBearer", "authorizationCode", "clientCredentials" ]
                 },
                 "restApiAuthentication" : {
                   "allowPublicClientFlows" : false,
@@ -425,17 +430,20 @@ interactions:
               },
               "urn:sap:identity:application:schemas:extension:sci:1.0:Provisioning" : {
                 "centralStoreProvisioningEnabled" : false
-              }
+              },
+              "urn:sap:identity:application:schemas:extension:sci:1.0:Authorization" : { }
             }
         headers:
             Cache-Control:
                 - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
             Content-Type:
                 - application/json;charset=UTF-8
             Critical-Origin-Trial:
                 - Tpcd
             Date:
-                - Sat, 10 May 2025 21:42:27 GMT
+                - Thu, 03 Jul 2025 05:55:30 GMT
             Expires:
                 - "0"
             Origin-Trial:
@@ -453,13 +461,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - D6D86991-8733-4431-8308-AA627E6A077F
+                - BE097524-8BE5-4833-B695-3ED0F5198600
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-skfr4
+                - http-swdvm
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -470,7 +478,7 @@ interactions:
                 - 1; mode=block
         status: '200 '
         code: 200
-        duration: 179.428389ms
+        duration: 242.330955ms
     - id: 3
       request:
         proto: HTTP/1.1
@@ -488,12 +496,12 @@ interactions:
             Accept:
                 - '*/*'
             Authorization:
-                - redacted
+                - REDACTED
             Content-Type:
                 - application/json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/1dff3b20-a0bf-4839-93fe-a2f7717cce83
+        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/e5ad3d29-0146-4aa2-9102-a4dfee4ea2e3
         method: GET
       response:
         proto: HTTP/1.1
@@ -506,13 +514,13 @@ interactions:
         uncompressed: true
         body: |-
             {
-              "id" : "1dff3b20-a0bf-4839-93fe-a2f7717cce83",
+              "id" : "e5ad3d29-0146-4aa2-9102-a4dfee4ea2e3",
               "meta" : {
-                "created" : "2025-05-10T21:42:27.016Z",
+                "created" : "2025-07-03T05:55:30.085Z",
                 "createdBy" : "P000003",
-                "lastModified" : "2025-05-10T21:42:27.016Z",
+                "lastModified" : "2025-07-03T05:55:30.085Z",
                 "modifiedBy" : "P000003",
-                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/1dff3b20-a0bf-4839-93fe-a2f7717cce83",
+                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/e5ad3d29-0146-4aa2-9102-a4dfee4ea2e3",
                 "type" : "charged",
                 "version" : "1"
               },
@@ -520,7 +528,7 @@ interactions:
               "description" : "application for testing purposes",
               "multiTenantApp" : false,
               "globalAccount" : "unknown",
-              "schemas" : [ "urn:sap:identity:application:schemas:core:1.0", "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication", "urn:sap:identity:application:schemas:extension:sci:1.0:Provisioning" ],
+              "schemas" : [ "urn:sap:identity:application:schemas:core:1.0", "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication", "urn:sap:identity:application:schemas:extension:sci:1.0:Authorization", "urn:sap:identity:application:schemas:extension:sci:1.0:Provisioning" ],
               "branding" : {
                 "showDisplayNameOnLogonScreen" : true,
                 "rememberMeVisible" : true,
@@ -551,7 +559,7 @@ interactions:
                   } ]
                 },
                 "companyId" : "global",
-                "clientId" : "f364445c-91ae-4ceb-a340-60ac7bd1a643",
+                "clientId" : "3f2224fc-0532-4e6a-8b7a-38221bff091e",
                 "assertionAttributes" : [ {
                   "assertionAttributeName" : "param1",
                   "userAttributeName" : "firstName",
@@ -609,7 +617,7 @@ interactions:
                     "refreshTokenRotationScenario" : "off",
                     "accessTokenFormat" : "default"
                   },
-                  "restrictedGrantTypes" : [ "refreshToken", "clientCredentials", "jwtBearer", "password", "authorizationCode" ]
+                  "restrictedGrantTypes" : [ "refreshToken", "clientCredentials", "jwtBearer", "authorizationCode", "password" ]
                 },
                 "restApiAuthentication" : {
                   "allowPublicClientFlows" : false,
@@ -620,17 +628,20 @@ interactions:
               },
               "urn:sap:identity:application:schemas:extension:sci:1.0:Provisioning" : {
                 "centralStoreProvisioningEnabled" : false
-              }
+              },
+              "urn:sap:identity:application:schemas:extension:sci:1.0:Authorization" : { }
             }
         headers:
             Cache-Control:
                 - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
             Content-Type:
                 - application/json;charset=UTF-8
             Critical-Origin-Trial:
                 - Tpcd
             Date:
-                - Sat, 10 May 2025 21:42:27 GMT
+                - Thu, 03 Jul 2025 05:55:31 GMT
             Expires:
                 - "0"
             Origin-Trial:
@@ -648,13 +659,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - 292769A2-E36B-44A2-8F44-D0CD9E779F2B
+                - 80D4991A-C1C8-4CA9-93B4-676A87858DFB
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-skfr4
+                - http-swdvm
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -665,7 +676,7 @@ interactions:
                 - 1; mode=block
         status: '200 '
         code: 200
-        duration: 169.107163ms
+        duration: 235.560465ms
     - id: 4
       request:
         proto: HTTP/1.1
@@ -683,12 +694,12 @@ interactions:
             Accept:
                 - '*/*'
             Authorization:
-                - redacted
+                - REDACTED
             Content-Type:
                 - application/json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/1dff3b20-a0bf-4839-93fe-a2f7717cce83
+        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/e5ad3d29-0146-4aa2-9102-a4dfee4ea2e3
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -704,10 +715,12 @@ interactions:
                 - private,no-cache,no-store
             Content-Length:
                 - "0"
+            Content-Security-Policy:
+                - script-src 'none';
             Critical-Origin-Trial:
                 - Tpcd
             Date:
-                - Sat, 10 May 2025 21:42:27 GMT
+                - Thu, 03 Jul 2025 05:55:31 GMT
             Expires:
                 - "0"
             Origin-Trial:
@@ -725,13 +738,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - 3FE2E9D5-18E3-405A-818C-508D4FFCDAC6
+                - 91281069-77CC-4642-A8EB-D3798312B503
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-skfr4
+                - http-swdvm
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -742,4 +755,4 @@ interactions:
                 - 1; mode=block
         status: '200 '
         code: 200
-        duration: 166.957205ms
+        duration: 264.778685ms
