@@ -539,7 +539,7 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 		}
 
 		//ADVANCED_ASSERTION_ATTRIBUTES
-		if !authenticationSchema.AdvancedAssertionAttributes.IsNull() {
+		if !authenticationSchema.AdvancedAssertionAttributes.IsNull() && !authenticationSchema.AdvancedAssertionAttributes.IsUnknown() {
 
 			var advancedAssertionAttributes []advancedAssertionAttributesData
 			diags := authenticationSchema.AdvancedAssertionAttributes.ElementsAs(ctx, &advancedAssertionAttributes, true)
