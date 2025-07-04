@@ -10,45 +10,14 @@ To follow along with this tutorial, ensure you have access to a [SAP Cloud Ident
 
 ## Authentication
 
-In order to run the scripts, you need the credentials of an [admin](https://help.sap.com/docs/cloud-identity-services/cloud-identity-services/activate-your-account?locale=en-US) on the tenant. Terraform Provider for SAP Cloud Identity Services supports username/password based authentication only, at the moment.
+In order to run the scripts, you need the credentials of an [admin](https://help.sap.com/docs/cloud-identity-services/cloud-identity-services/activate-your-account?locale=en-US) on the tenant. Terraform Provider for SAP Cloud Identity Services supports the following authentication methods:
 
-#### Windows
+1. [Basic Authentication](./basic_auth.md) 
+2. [X.509 Certificate Authentication](cert_auth.md)
+3. [OAuth2 Client Authentication](./secret_auth.md)
 
-For Windows you have two options to export the environment variables:
+Refer to the link corresponding to the chosen authentication method.
 
-If you use Windows CMD, do the export via the following commands:
-
-```Shell
-set SCI_USERNAME=<your_username>
-set SCI_PASSWORD=<your_password>
-```
-
-If you use Powershell, do the export via the following commands:
-
-```Shell
-$Env:SCI_USERNAME = '<your_username>'
-$Env:SCI_PASSWORD = '<your_password>'
-```
-
-#### Mac
-
-For Mac OS export the environment variables via:
-
-```Shell
-export SCI_USERNAME=<your_username>
-export SCI_PASSWORD=<your_password>
-```
-
-#### Linux
-
-For Linux export the environment variables via:
-
-```Shell
-export SCI_USERNAME=<your_username>
-export SCI_PASSWORD=<your_password>
-```
-
-Replace `<your_username>` and `<your_password>` with your admin username and password.
 
 ## Documentation
 
