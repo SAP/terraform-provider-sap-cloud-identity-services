@@ -2,7 +2,7 @@
 
 You would require a valid **username** and **password** of a [User Administrator](https://help.sap.com/docs/cloud-identity-services/cloud-identity-services/add-administrators?version=Cloud#add-user-as-administrator) to get authenticated.
  
-There's multiple ways to configure your credentials.
+There are multiple ways to configure your credentials.
 
 1. You can configure them as part of the provider configuration as shown below:
 
@@ -17,7 +17,7 @@ There's multiple ways to configure your credentials.
 2. You can export them as environment variables as shown below:
 
     #### Windows 
-    
+
     If you use Windows CMD, do the export via the following commands:
 
     ```Shell

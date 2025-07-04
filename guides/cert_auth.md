@@ -1,4 +1,4 @@
-### <u> Certificate Based Authentication </u>
+### <u> X.509 Certificate Authentication </u>
 
 You would require a valid **p12 certificate** and the corresponding **password** of a [System Administrator](https://help.sap.com/docs/cloud-identity-services/cloud-identity-services/add-administrators?version=Cloud#add-system-as-administrator) to get authenticated.
  
@@ -14,6 +14,6 @@ provider "sci" {
 }
 ```
 
-Ensure to paste the ***content*** of your p12 certificate rather than the the ***file path***.
+Ensure to paste the ***content*** of your p12 certificate rather than the ***file path***.
 You can even use the function `filebase64("path_to_certificate.p12")` to load the file content. 
 

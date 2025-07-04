@@ -1,10 +1,10 @@
-### <u> Secret Based Authentication </u>
+### <u> OAuth2 Client Authentication </u>
 
 You would require a valid **Client ID** and the corresponding **Client Secret** of a [System Administrator](https://help.sap.com/docs/cloud-identity-services/cloud-identity-services/add-administrators?version=Cloud#add-system-as-administrator) to get authenticated.
 
 ```NOTE: Refer to step 6 in the documentation linked above, section Secrets to fetch the required credentials. ```
  
-There's multiple ways to configure your credentials.
+There are multiple ways to configure your credentials.
 
 1. You can configure them as part of the provider configuration as shown below:
 
