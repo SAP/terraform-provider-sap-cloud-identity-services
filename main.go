@@ -6,8 +6,9 @@ package main
 import (
 	"context"
 	"flag"
-	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/provider"
 	"log"
+
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/sci/provider"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 )
