@@ -18,6 +18,7 @@ type authenticationSchemaData struct {
 	AdvancedAssertionAttributes   types.List   `tfsdk:"advanced_assertion_attributes"`
 	DefaultAuthenticatingIdpId    types.String `tfsdk:"default_authenticating_idp"`
 	AuthenticationRules           types.List   `tfsdk:"conditional_authentication"`
+	OpenIdConnectConfiguration    types.Object `tfsdk:"openid_connect_configuration"`
 }
 
 type authenticationRulesData struct {
@@ -49,6 +50,29 @@ type applicationData struct {
 	ParentApplicationId  types.String `tfsdk:"parent_application_id"`
 	MultiTenantApp       types.Bool   `tfsdk:"multi_tenant_app"`
 	AuthenticationSchema types.Object `tfsdk:"authentication_schema"`
+}
+
+type openIdConnectConfigurationData struct {
+	RedirectUris 			types.Set 		`tfsdk:redirect_uris`
+	PostLogoutRedirectUris 	types.Set		`tfsdk:post_logout_redirect_uris`
+	FrontChannelLogoutUris	types.Set		`tfsdk:front_channel_logout_uris`
+	BackChannelLogoutUris	types.Set		`tfsdk:back_channel_logout_uris`
+	TokenPolicy				types.Object	`tfsdk:token_policy`
+	RestrictedGrantTypes	types.Set		`tfsdk:restricted_grant_types`
+	ProxyConfig				types.Object	`tfsdk:proxy_config`
+}
+
+type tokenPolicy struct{
+	JwtValidity						types.Int32		`tfsdk:jwt_validity`
+	RefreshValidity					types.Int32		`tfsdk:refresh_validity`
+	RefreshParallel					types.Int32		`tfsdk:refresh_parallel`
+	MaxExchangePeriod				types.String	`tfsdk:max_refresh_period`
+	RefreshTokenRotationScenario	types.String	`tfsdk:refresh_token_rotation_scenario`
+	AccessTokenFormat				types.String	`tfsdk:access_token_format`
+}
+
+type proxyConfig struct{
+	Acrs	types.Set	`tfsdk:acrs`
 }
 
 func applicationValueFrom(ctx context.Context, a applications.Application) (applicationData, diag.Diagnostics) {

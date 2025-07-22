@@ -41,6 +41,9 @@ var authenticationSchemaObjType = map[string]attr.Type{
 	"conditional_authentication": types.ListType{
 		ElemType: authenticationRulesObjType,
 	},
+	"openid_connect_configuration": types.ObjectType{
+		AttrTypes: openIdConnectConfigurationObjType,
+	},
 }
 
 var subjectNameIdentitfierObjType = map[string]attr.Type{
@@ -74,6 +77,12 @@ var authenticationRulesObjType = types.ObjectType{
 		"ip_network_range":     types.StringType,
 	},
 }
+
+// var openIdConnectConfigurationObjType = types.ObjectType{
+// 	AttrTypes: map[string]attr.Type{
+// 		"redirect_uris":	types.SetType,
+// 	},
+// }
 
 var appObjType = types.ObjectType{
 	AttrTypes: map[string]attr.Type{

@@ -8,8 +8,10 @@ import (
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/applications"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/int32validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/objectvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -34,6 +36,10 @@ var (
 	ssoValues                           = []string{"openIdConnect", "saml2"}
 	usersTypeValues                     = []string{"public", "employee", "customer", "partner", "external", "onboardee"}
 	subjectNameIdentifierFunctionValues = []string{"none", "upperCase", "lowerCase"}
+	maxExchangePeriodValues				= []string{"unlimited","maxSessionValidity","initialRefreshTokenValidity"}
+	refreshTokenRotationScenarioValues	= []string{"off","online","mobile"}	
+	accessTokenFormatValues				= []string{"default","jwt","opaque"}
+	restrictedGrantTypesValues			= []string{"clientCredentials", "authorizationCode", "refreshToken", "password", "implicit", "jwtBearer", "authorizationCodePkceS256", "tokenExchange"}
 )
 
 func newApplicationResource() resource.Resource {
@@ -315,6 +321,121 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 							},
 						},
 					},
+					"openIdConnectConfiguration":schema.SingleNestedAttribute{
+						MarkdownDescription: "oidc",
+						Optional: true,
+						Validators: []validator.Object{
+							objectvalidator.AlsoRequires(
+								path.MatchRoot("openIdConnectConfiguration").AtAnySetValue().AtName("redirectUris")),
+						},
+						Attributes: map[string]schema.Attribute{
+							"redirectUris" : schema.SetAttribute{
+								MarkdownDescription: "redirect uri",
+								ElementType: types.StringType,
+								Optional: true,
+								Validators: []validator.Set{
+									setvalidator.SizeBetween(1,20),
+									//setvalidator.ValueStringsAre(utils.ValidUrl()),
+								},
+							},
+							"postLogoutRedirectUris" : schema.SetAttribute{
+								MarkdownDescription: "post logout redirect uri",
+								ElementType: types.StringType,
+								Optional: true,
+								Validators: []validator.Set{
+									setvalidator.SizeBetween(1,20),
+									//setvalidator.ValueStringsAre(utils.ValidUrl()),
+								},
+							},
+							"frontChannelLogoutUris" : schema.SetAttribute{
+								MarkdownDescription: "front channel logout uri",
+								ElementType: types.StringType,
+								Optional: true,
+								Validators: []validator.Set{
+									setvalidator.SizeBetween(1,20),
+									setvalidator.ValueStringsAre(utils.ValidUrl()),
+								},
+							},
+							"backChannelLogoutUris" : schema.SetAttribute{
+								MarkdownDescription: "back channel logout uri",
+								ElementType: types.StringType,
+								Optional: true,
+								Validators: []validator.Set{
+									setvalidator.SizeBetween(1,20),
+									setvalidator.ValueStringsAre(utils.ValidUrl()),
+								},
+							},
+							"tokenPolicy":schema.SingleNestedAttribute{
+								MarkdownDescription: "token policy options",
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"jwtValidity":schema.Int32Attribute{
+										MarkdownDescription: "jwtvalidity",
+										Optional: true,
+										Validators: []validator.Int32{
+											int32validator.Between(60,43200),
+										},
+									},
+									"refreshValidity":schema.Int32Attribute{
+										MarkdownDescription: "refreshvalidity",
+										Optional: true,
+										Validators: []validator.Int32{
+											int32validator.Between(0,15552000),
+										},
+									},
+									"refreshParallel":schema.Int32Attribute{
+										MarkdownDescription: "refreshvalidity",
+										Optional: true,
+										Validators: []validator.Int32{
+											int32validator.Between(1,10),
+										},
+									},
+									"maxExchangePeriod":schema.StringAttribute{
+										MarkdownDescription: "maxExchangePeriod",
+										Optional: true,
+										Validators: []validator.String{
+											stringvalidator.OneOf(maxExchangePeriodValues...),
+										},
+									},
+									"refreshTokenRotationScenario":schema.StringAttribute{
+										MarkdownDescription: "refreshTokenRotationScenario",
+										Optional: true,
+										Validators: []validator.String{
+											stringvalidator.OneOf(refreshTokenRotationScenarioValues...),
+										},
+									},
+									"accessTokenFormat":schema.StringAttribute{
+										MarkdownDescription: "accessTokenFormat",
+										Optional: true,
+										Validators: []validator.String{
+											stringvalidator.OneOf(accessTokenFormatValues...),
+										},
+									},
+								},
+							},
+							"restrictedGrantTypes":schema.SetAttribute{
+								MarkdownDescription: "restricted grant types",
+								Optional: true,
+								Validators: []validator.Set{
+									setvalidator.ValueStringsAre(stringvalidator.OneOf(restrictedGrantTypesValues...)),
+								},
+							},
+							"proxyConfig" :schema.SingleNestedAttribute{
+								MarkdownDescription: "proxyConfig",
+								Optional: true,
+								Attributes: map[string]schema.Attribute{
+									"acrs":schema.SetAttribute{
+										MarkdownDescription: "acrs",
+										Optional: true,
+										Validators: []validator.Set{
+											setvalidator.SizeAtMost(20),
+											setvalidator.ValueStringsAre(stringvalidator.LengthBetween(1,99)),
+										},
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 		},
@@ -576,6 +697,11 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 			}
 
 			args.AuthenticationSchema.ConditionalAuthentication = authrules
+		}
+
+		//OPEN_ID_CONNECT_CONFIGURATION
+		if !authenticationSchema.OpenIdConnectConfiguration.IsNull(){
+			
 		}
 
 	}
