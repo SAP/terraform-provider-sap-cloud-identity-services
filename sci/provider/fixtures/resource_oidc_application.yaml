@@ -6,14 +6,14 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 881
+        content_length: 752
         transfer_encoding: []
         trailer: {}
         host: iasprovidertestblr.accounts400.ondemand.com
         remote_addr: ""
         request_uri: ""
         body: |
-            {"id":"","name":"basic-test-app","description":"application for testing purposes","urn:sap:identity:application:schemas:extension:sci:1.0:Authentication":{"ssoType":"openIdConnect","subjectNameIdentifier":"mail","subjectNameIdentifierFunction":"lowerCase","assertionAttributes":[{"assertionAttributeName":"param1","userAttributeName":"firstName","inherited":false},{"assertionAttributeName":"param2","userAttributeName":"mail","inherited":false}],"advancedAssertionAttributes":[{"attributeName":"adv_param1","attributeValue":"${corporateIdP.value1}","inherited":false},{"attributeName":"adv_param2","attributeValue":"${corporateIdP.value2}","inherited":false}],"defaultAuthenticatingIdpId":"664c660e25cff252c5c202dc","conditionalAuthentication":[{"userType":"employee","userEmailDomain":"gmail.com","identityProviderId":"664c660e25cff252c5c202dc","ipNetworkRange":"10.0.0.1/8"}]}}
+            {"id":"","name":"OIDC-test-app","description":"application for testing purposes","urn:sap:identity:application:schemas:extension:sci:1.0:Authentication":{"ssoType":"openIdConnect","assertionAttributes":null,"openIdConnectConfiguration":{"redirectUris":["https://redirectUris.com"],"postLogoutRedirectUris":["https://postLogoutRedirectUris.com"],"frontChannelLogoutUris":["https://frontChannelLogoutUris.com"],"backChannelLogoutUris":["https://backChannelLogoutUris.com"],"tokenPolicy":{"jwtValidity":41000,"refreshValidity":1500000,"refreshParallel":5,"maxExchangePeriod":"unlimited","refreshTokenRotationScenario":"off","accessTokenFormat":"default"},"restrictedGrantTypes":["authorizationCode","clientCredentials"],"proxyConfig":{"acrs":["acrs"]}}}}
         form: {}
         headers:
             Accept:
@@ -45,11 +45,11 @@ interactions:
             Critical-Origin-Trial:
                 - Tpcd
             Date:
-                - Mon, 04 Aug 2025 09:33:46 GMT
+                - Mon, 04 Aug 2025 09:32:33 GMT
             Expires:
                 - "0"
             Location:
-                - /Applications/v1/0d09da7f-b8dc-4f05-82b0-c3d51a0f692b
+                - /Applications/v1/e1c1bd2e-6a56-452b-8ec7-9cf4209e3e70
             Origin-Trial:
                 - Avu6rn7emV5gK8gvyGHlX8TMqM9uo1FacP2j/RWTq+8j+yKnqcTO0TQh0bXJ/7QntxD4/JzXv8aXoqxxZQuqXgYAAABdeyJvcmlnaW4iOiJodHRwczovL29uZGVtYW5kLmNvbTo0NDMiLCJmZWF0dXJlIjoiVHBjZCIsImV4cGlyeSI6MTczNTM0Mzk5OSwiaXNTdWJkb21haW4iOnRydWV9
             Pragma:
@@ -65,7 +65,7 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - 5EB9733A-A7B9-43EF-923C-12189A0A00EA
+                - 5AE68C2D-E24C-40FC-8A3D-E337B97750B6
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
@@ -84,7 +84,7 @@ interactions:
                 - 1; mode=block
         status: '201 '
         code: 201
-        duration: 740.488417ms
+        duration: 725.397834ms
     - id: 1
       request:
         proto: HTTP/1.1
@@ -107,7 +107,7 @@ interactions:
                 - application/json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/0d09da7f-b8dc-4f05-82b0-c3d51a0f692b
+        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/e1c1bd2e-6a56-452b-8ec7-9cf4209e3e70
         method: GET
       response:
         proto: HTTP/1.1
@@ -120,17 +120,17 @@ interactions:
         uncompressed: true
         body: |-
             {
-              "id" : "0d09da7f-b8dc-4f05-82b0-c3d51a0f692b",
+              "id" : "e1c1bd2e-6a56-452b-8ec7-9cf4209e3e70",
               "meta" : {
-                "created" : "2025-08-04T09:33:46.035Z",
+                "created" : "2025-08-04T09:32:33.839Z",
                 "createdBy" : "P000315",
-                "lastModified" : "2025-08-04T09:33:46.035Z",
+                "lastModified" : "2025-08-04T09:32:33.839Z",
                 "modifiedBy" : "P000315",
-                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/0d09da7f-b8dc-4f05-82b0-c3d51a0f692b",
+                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/e1c1bd2e-6a56-452b-8ec7-9cf4209e3e70",
                 "type" : "charged",
                 "version" : "1"
               },
-              "name" : "basic-test-app",
+              "name" : "OIDC-test-app",
               "description" : "application for testing purposes",
               "multiTenantApp" : false,
               "globalAccount" : "unknown",
@@ -147,8 +147,7 @@ interactions:
               },
               "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication" : {
                 "ssoType" : "openIdConnect",
-                "subjectNameIdentifier" : "mail",
-                "subjectNameIdentifierFunction" : "lowerCase",
+                "subjectNameIdentifier" : "uid",
                 "rememberMeExpirationTimeInMonths" : 3,
                 "passwordPolicy" : "https://accounts.sap.com/policy/passwords/sap/web/1.1",
                 "userAccess" : {
@@ -165,23 +164,26 @@ interactions:
                   } ]
                 },
                 "companyId" : "global",
-                "clientId" : "d9bea1f0-02f0-47a6-9454-81dbceead653",
+                "clientId" : "5d6440ca-c9b1-4d31-8e6a-719d7b498016",
                 "assertionAttributes" : [ {
-                  "assertionAttributeName" : "param1",
+                  "assertionAttributeName" : "first_name",
                   "userAttributeName" : "firstName",
                   "inherited" : false
                 }, {
-                  "assertionAttributeName" : "param2",
-                  "userAttributeName" : "mail",
-                  "inherited" : false
-                } ],
-                "advancedAssertionAttributes" : [ {
-                  "attributeName" : "adv_param1",
-                  "attributeValue" : "${corporateIdP.value1}",
+                  "assertionAttributeName" : "last_name",
+                  "userAttributeName" : "lastName",
                   "inherited" : false
                 }, {
-                  "attributeName" : "adv_param2",
-                  "attributeValue" : "${corporateIdP.value2}",
+                  "assertionAttributeName" : "mail",
+                  "userAttributeName" : "mail",
+                  "inherited" : false
+                }, {
+                  "assertionAttributeName" : "user_uuid",
+                  "userAttributeName" : "userUuid",
+                  "inherited" : false
+                }, {
+                  "assertionAttributeName" : "locale",
+                  "userAttributeName" : "language",
                   "inherited" : false
                 } ],
                 "disabledInheritedProperties" : { },
@@ -192,12 +194,6 @@ interactions:
                 "trustAllCorporateIdentityProviders" : false,
                 "allowIasUsers" : false,
                 "defaultAuthenticatingIdpId" : "664c660e25cff252c5c202dc",
-                "conditionalAuthentication" : [ {
-                  "userType" : "employee",
-                  "userEmailDomain" : "gmail.com",
-                  "identityProviderId" : "664c660e25cff252c5c202dc",
-                  "ipNetworkRange" : "10.0.0.1/8"
-                } ],
                 "riskBasedAuthentication" : {
                   "defaultAction" : [ "allow" ]
                 },
@@ -215,15 +211,22 @@ interactions:
                   }
                 },
                 "openIdConnectConfiguration" : {
+                  "redirectUris" : [ "https://redirectUris.com" ],
+                  "postLogoutRedirectUris" : [ "https://postLogoutRedirectUris.com" ],
+                  "frontChannelLogoutUris" : [ "https://frontChannelLogoutUris.com" ],
+                  "backChannelLogoutUris" : [ "https://backChannelLogoutUris.com" ],
                   "tokenPolicy" : {
-                    "jwtValidity" : 3600,
-                    "refreshValidity" : 43200,
-                    "refreshParallel" : 1,
+                    "jwtValidity" : 41000,
+                    "refreshValidity" : 1500000,
+                    "refreshParallel" : 5,
                     "maxExchangePeriod" : "unlimited",
                     "refreshTokenRotationScenario" : "off",
                     "accessTokenFormat" : "default"
                   },
-                  "restrictedGrantTypes" : [ "jwtBearer", "password", "clientCredentials", "authorizationCode", "refreshToken" ]
+                  "restrictedGrantTypes" : [ "authorizationCode", "clientCredentials" ],
+                  "proxyConfig" : {
+                    "acrs" : [ "acrs" ]
+                  }
                 },
                 "restApiAuthentication" : {
                   "allowPublicClientFlows" : false,
@@ -247,7 +250,7 @@ interactions:
             Critical-Origin-Trial:
                 - Tpcd
             Date:
-                - Mon, 04 Aug 2025 09:33:46 GMT
+                - Mon, 04 Aug 2025 09:32:34 GMT
             Expires:
                 - "0"
             Origin-Trial:
@@ -265,7 +268,7 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - FDC84452-DCF4-4815-A554-514DF01DDD43
+                - C82552E7-51B4-4343-9D91-D9C15A91E7F5
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
@@ -284,7 +287,7 @@ interactions:
                 - 1; mode=block
         status: '200 '
         code: 200
-        duration: 189.869083ms
+        duration: 192.225541ms
     - id: 2
       request:
         proto: HTTP/1.1
@@ -307,7 +310,7 @@ interactions:
                 - application/json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/0d09da7f-b8dc-4f05-82b0-c3d51a0f692b
+        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/e1c1bd2e-6a56-452b-8ec7-9cf4209e3e70
         method: GET
       response:
         proto: HTTP/1.1
@@ -320,17 +323,17 @@ interactions:
         uncompressed: true
         body: |-
             {
-              "id" : "0d09da7f-b8dc-4f05-82b0-c3d51a0f692b",
+              "id" : "e1c1bd2e-6a56-452b-8ec7-9cf4209e3e70",
               "meta" : {
-                "created" : "2025-08-04T09:33:46.035Z",
+                "created" : "2025-08-04T09:32:33.839Z",
                 "createdBy" : "P000315",
-                "lastModified" : "2025-08-04T09:33:46.035Z",
+                "lastModified" : "2025-08-04T09:32:33.839Z",
                 "modifiedBy" : "P000315",
-                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/0d09da7f-b8dc-4f05-82b0-c3d51a0f692b",
+                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/e1c1bd2e-6a56-452b-8ec7-9cf4209e3e70",
                 "type" : "charged",
                 "version" : "1"
               },
-              "name" : "basic-test-app",
+              "name" : "OIDC-test-app",
               "description" : "application for testing purposes",
               "multiTenantApp" : false,
               "globalAccount" : "unknown",
@@ -347,8 +350,7 @@ interactions:
               },
               "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication" : {
                 "ssoType" : "openIdConnect",
-                "subjectNameIdentifier" : "mail",
-                "subjectNameIdentifierFunction" : "lowerCase",
+                "subjectNameIdentifier" : "uid",
                 "rememberMeExpirationTimeInMonths" : 3,
                 "passwordPolicy" : "https://accounts.sap.com/policy/passwords/sap/web/1.1",
                 "userAccess" : {
@@ -365,23 +367,26 @@ interactions:
                   } ]
                 },
                 "companyId" : "global",
-                "clientId" : "d9bea1f0-02f0-47a6-9454-81dbceead653",
+                "clientId" : "5d6440ca-c9b1-4d31-8e6a-719d7b498016",
                 "assertionAttributes" : [ {
-                  "assertionAttributeName" : "param1",
+                  "assertionAttributeName" : "first_name",
                   "userAttributeName" : "firstName",
                   "inherited" : false
                 }, {
-                  "assertionAttributeName" : "param2",
-                  "userAttributeName" : "mail",
-                  "inherited" : false
-                } ],
-                "advancedAssertionAttributes" : [ {
-                  "attributeName" : "adv_param1",
-                  "attributeValue" : "${corporateIdP.value1}",
+                  "assertionAttributeName" : "last_name",
+                  "userAttributeName" : "lastName",
                   "inherited" : false
                 }, {
-                  "attributeName" : "adv_param2",
-                  "attributeValue" : "${corporateIdP.value2}",
+                  "assertionAttributeName" : "mail",
+                  "userAttributeName" : "mail",
+                  "inherited" : false
+                }, {
+                  "assertionAttributeName" : "user_uuid",
+                  "userAttributeName" : "userUuid",
+                  "inherited" : false
+                }, {
+                  "assertionAttributeName" : "locale",
+                  "userAttributeName" : "language",
                   "inherited" : false
                 } ],
                 "disabledInheritedProperties" : { },
@@ -392,12 +397,6 @@ interactions:
                 "trustAllCorporateIdentityProviders" : false,
                 "allowIasUsers" : false,
                 "defaultAuthenticatingIdpId" : "664c660e25cff252c5c202dc",
-                "conditionalAuthentication" : [ {
-                  "userType" : "employee",
-                  "userEmailDomain" : "gmail.com",
-                  "identityProviderId" : "664c660e25cff252c5c202dc",
-                  "ipNetworkRange" : "10.0.0.1/8"
-                } ],
                 "riskBasedAuthentication" : {
                   "defaultAction" : [ "allow" ]
                 },
@@ -415,15 +414,22 @@ interactions:
                   }
                 },
                 "openIdConnectConfiguration" : {
+                  "redirectUris" : [ "https://redirectUris.com" ],
+                  "postLogoutRedirectUris" : [ "https://postLogoutRedirectUris.com" ],
+                  "frontChannelLogoutUris" : [ "https://frontChannelLogoutUris.com" ],
+                  "backChannelLogoutUris" : [ "https://backChannelLogoutUris.com" ],
                   "tokenPolicy" : {
-                    "jwtValidity" : 3600,
-                    "refreshValidity" : 43200,
-                    "refreshParallel" : 1,
+                    "jwtValidity" : 41000,
+                    "refreshValidity" : 1500000,
+                    "refreshParallel" : 5,
                     "maxExchangePeriod" : "unlimited",
                     "refreshTokenRotationScenario" : "off",
                     "accessTokenFormat" : "default"
                   },
-                  "restrictedGrantTypes" : [ "jwtBearer", "password", "clientCredentials", "authorizationCode", "refreshToken" ]
+                  "restrictedGrantTypes" : [ "authorizationCode", "clientCredentials" ],
+                  "proxyConfig" : {
+                    "acrs" : [ "acrs" ]
+                  }
                 },
                 "restApiAuthentication" : {
                   "allowPublicClientFlows" : false,
@@ -447,7 +453,7 @@ interactions:
             Critical-Origin-Trial:
                 - Tpcd
             Date:
-                - Mon, 04 Aug 2025 09:33:46 GMT
+                - Mon, 04 Aug 2025 09:32:34 GMT
             Expires:
                 - "0"
             Origin-Trial:
@@ -465,7 +471,7 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - D8A20443-E72F-45D4-9001-DB0B617EA2F1
+                - 9D835787-81FB-4F86-8D98-3F4A756CF9A3
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
@@ -484,7 +490,7 @@ interactions:
                 - 1; mode=block
         status: '200 '
         code: 200
-        duration: 186.516333ms
+        duration: 190.792458ms
     - id: 3
       request:
         proto: HTTP/1.1
@@ -507,207 +513,7 @@ interactions:
                 - application/json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/0d09da7f-b8dc-4f05-82b0-c3d51a0f692b
-        method: GET
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding:
-            - chunked
-        trailer: {}
-        content_length: -1
-        uncompressed: true
-        body: |-
-            {
-              "id" : "0d09da7f-b8dc-4f05-82b0-c3d51a0f692b",
-              "meta" : {
-                "created" : "2025-08-04T09:33:46.035Z",
-                "createdBy" : "P000315",
-                "lastModified" : "2025-08-04T09:33:46.035Z",
-                "modifiedBy" : "P000315",
-                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/0d09da7f-b8dc-4f05-82b0-c3d51a0f692b",
-                "type" : "charged",
-                "version" : "1"
-              },
-              "name" : "basic-test-app",
-              "description" : "application for testing purposes",
-              "multiTenantApp" : false,
-              "globalAccount" : "unknown",
-              "schemas" : [ "urn:sap:identity:application:schemas:core:1.0", "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication", "urn:sap:identity:application:schemas:extension:sci:1.0:Authorization", "urn:sap:identity:application:schemas:extension:sci:1.0:Provisioning" ],
-              "branding" : {
-                "showDisplayNameOnLogonScreen" : true,
-                "rememberMeVisible" : true,
-                "rememberMeChecked" : false,
-                "refreshParent" : true,
-                "tokenUrlEmbedCharacter" : ";",
-                "theme" : {
-                  "type" : "horizon"
-                }
-              },
-              "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication" : {
-                "ssoType" : "openIdConnect",
-                "subjectNameIdentifier" : "mail",
-                "subjectNameIdentifierFunction" : "lowerCase",
-                "rememberMeExpirationTimeInMonths" : 3,
-                "passwordPolicy" : "https://accounts.sap.com/policy/passwords/sap/web/1.1",
-                "userAccess" : {
-                  "type" : "internal",
-                  "userAttributesForAccess" : [ {
-                    "userAttributeName" : "firstName",
-                    "isRequired" : false
-                  }, {
-                    "userAttributeName" : "lastName",
-                    "isRequired" : true
-                  }, {
-                    "userAttributeName" : "mail",
-                    "isRequired" : true
-                  } ]
-                },
-                "companyId" : "global",
-                "clientId" : "d9bea1f0-02f0-47a6-9454-81dbceead653",
-                "assertionAttributes" : [ {
-                  "assertionAttributeName" : "param1",
-                  "userAttributeName" : "firstName",
-                  "inherited" : false
-                }, {
-                  "assertionAttributeName" : "param2",
-                  "userAttributeName" : "mail",
-                  "inherited" : false
-                } ],
-                "advancedAssertionAttributes" : [ {
-                  "attributeName" : "adv_param1",
-                  "attributeValue" : "${corporateIdP.value1}",
-                  "inherited" : false
-                }, {
-                  "attributeName" : "adv_param2",
-                  "attributeValue" : "${corporateIdP.value2}",
-                  "inherited" : false
-                } ],
-                "disabledInheritedProperties" : { },
-                "spnegoEnabled" : false,
-                "biometricAuthenticationEnabled" : false,
-                "verifyMail" : true,
-                "forceAuthentication" : false,
-                "trustAllCorporateIdentityProviders" : false,
-                "allowIasUsers" : false,
-                "defaultAuthenticatingIdpId" : "664c660e25cff252c5c202dc",
-                "conditionalAuthentication" : [ {
-                  "userType" : "employee",
-                  "userEmailDomain" : "gmail.com",
-                  "identityProviderId" : "664c660e25cff252c5c202dc",
-                  "ipNetworkRange" : "10.0.0.1/8"
-                } ],
-                "riskBasedAuthentication" : {
-                  "defaultAction" : [ "allow" ]
-                },
-                "saml2Configuration" : {
-                  "defaultNameIdFormat" : "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
-                  "signSLOMessages" : true,
-                  "requireSignedSLOMessages" : true,
-                  "requireSignedAuthnRequest" : false,
-                  "signAssertions" : true,
-                  "signAuthnResponses" : false,
-                  "responseElementsToEncrypt" : "none",
-                  "digestAlgorithm" : "sha256",
-                  "proxyAuthnRequest" : {
-                    "authenticationContext" : "none"
-                  }
-                },
-                "openIdConnectConfiguration" : {
-                  "tokenPolicy" : {
-                    "jwtValidity" : 3600,
-                    "refreshValidity" : 43200,
-                    "refreshParallel" : 1,
-                    "maxExchangePeriod" : "unlimited",
-                    "refreshTokenRotationScenario" : "off",
-                    "accessTokenFormat" : "default"
-                  },
-                  "restrictedGrantTypes" : [ "authorizationCode", "refreshToken", "clientCredentials", "jwtBearer", "password" ]
-                },
-                "restApiAuthentication" : {
-                  "allowPublicClientFlows" : false,
-                  "allApisAccess" : false,
-                  "allowLocking" : true,
-                  "failedLoginAttempts" : 0
-                }
-              },
-              "urn:sap:identity:application:schemas:extension:sci:1.0:Provisioning" : {
-                "centralStoreProvisioningEnabled" : false
-              },
-              "urn:sap:identity:application:schemas:extension:sci:1.0:Authorization" : { }
-            }
-        headers:
-            Cache-Control:
-                - private,no-cache,no-store
-            Content-Security-Policy:
-                - script-src 'none';
-            Content-Type:
-                - application/json;charset=UTF-8
-            Critical-Origin-Trial:
-                - Tpcd
-            Date:
-                - Mon, 04 Aug 2025 09:33:46 GMT
-            Expires:
-                - "0"
-            Origin-Trial:
-                - Avu6rn7emV5gK8gvyGHlX8TMqM9uo1FacP2j/RWTq+8j+yKnqcTO0TQh0bXJ/7QntxD4/JzXv8aXoqxxZQuqXgYAAABdeyJvcmlnaW4iOiJodHRwczovL29uZGVtYW5kLmNvbTo0NDMiLCJmZWF0dXJlIjoiVHBjZCIsImV4cGlyeSI6MTczNTM0Mzk5OSwiaXNTdWJkb21haW4iOnRydWV9
-            Pragma:
-                - no-cache
-            Referrer-Policy:
-                - origin
-            Server:
-                - SAP
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains; preload
-            Vary:
-                - accept-encoding,X-CSP-STRIP
-            X-Content-Type-Options:
-                - nosniff
-            X-Ids-Id:
-                - 8F6F066D-6D25-4D91-ACFB-2404DBA934C6
-            X-Ids-Landscape:
-                - cc3-eu-de-2-a1
-            X-Ids-Namespace:
-                - ias
-            X-Ids-Node:
-                - http-wvhkn
-            X-Ids-Pool:
-                - a1
-            X-Ids-Project:
-                - qa
-            X-Ids-Region:
-                - eu-de-1
-            X-Robots-Tag:
-                - none
-            X-Xss-Protection:
-                - 1; mode=block
-        status: '200 '
-        code: 200
-        duration: 188.846458ms
-    - id: 4
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: iasprovidertestblr.accounts400.ondemand.com
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers:
-            Accept:
-                - '*/*'
-            Authorization:
-                - REDACTED
-            Content-Type:
-                - application/json
-            Dataserviceversion:
-                - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/0d09da7f-b8dc-4f05-82b0-c3d51a0f692b
+        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/e1c1bd2e-6a56-452b-8ec7-9cf4209e3e70
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -728,7 +534,7 @@ interactions:
             Critical-Origin-Trial:
                 - Tpcd
             Date:
-                - Mon, 04 Aug 2025 09:33:47 GMT
+                - Mon, 04 Aug 2025 09:32:34 GMT
             Expires:
                 - "0"
             Origin-Trial:
@@ -746,7 +552,7 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - FE4DEC63-CF00-412E-BEE5-01F9B9BFDB71
+                - FA5EABFC-177F-46AF-8AE6-B40945DB47B1
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
@@ -765,4 +571,4 @@ interactions:
                 - 1; mode=block
         status: '200 '
         code: 200
-        duration: 196.746875ms
+        duration: 204.006042ms

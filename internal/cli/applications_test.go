@@ -50,6 +50,39 @@ var applicationsBody = applications.Application{
 				UserEmailDomain: "test.com",
 			},
 		},
+		OpenIdConnectConfiguration: &applications.OidcConfiguration{
+			RedirectUris: []string{
+				"https:redirectUris.com",
+			},
+			PostLogoutRedirectUris: []string{
+				"https:postlogoutRedirectUris.com",
+			},
+			FrontChannelLogoutUris: []string{
+				"https:frontChannelLogoutUris.com",
+			},
+			BackChannelLogoutUris: []string{
+				"https:backChannelLogoutUris.com",
+			},
+			TokenPolicy: &applications.TokenPolicy{
+				JwtValidity:                  3600,
+				RefreshValidity:              43200,
+				RefreshParallel:              1,
+				MaxExchangePeriod:            "unlimited",
+				RefreshTokenRotationScenario: "off",
+				AccessTokenFormat:            "default",
+			},
+			RestrictedGrantTypes: []applications.GrantType{
+				"clientCredentials",
+				"authorizationCode",
+				"password",
+				"jwtBearer",
+			},
+			ProxyConfig: &applications.OidcProxyConfig{
+				Acrs: []string{
+					"acrs-1",
+				},
+			},
+		},
 	},
 }
 

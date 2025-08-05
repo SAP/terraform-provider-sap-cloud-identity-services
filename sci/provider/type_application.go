@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/applications"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
 
 type authenticationSchemaData struct {
@@ -53,26 +54,26 @@ type applicationData struct {
 }
 
 type openIdConnectConfigurationData struct {
-	RedirectUris 			types.Set 		`tfsdk:redirect_uris`
-	PostLogoutRedirectUris 	types.Set		`tfsdk:post_logout_redirect_uris`
-	FrontChannelLogoutUris	types.Set		`tfsdk:front_channel_logout_uris`
-	BackChannelLogoutUris	types.Set		`tfsdk:back_channel_logout_uris`
-	TokenPolicy				types.Object	`tfsdk:token_policy`
-	RestrictedGrantTypes	types.Set		`tfsdk:restricted_grant_types`
-	ProxyConfig				types.Object	`tfsdk:proxy_config`
+	RedirectUris           types.Set    `tfsdk:"redirect_uris"`
+	PostLogoutRedirectUris types.Set    `tfsdk:"post_logout_redirect_uris"`
+	FrontChannelLogoutUris types.Set    `tfsdk:"front_channel_logout_uris"`
+	BackChannelLogoutUris  types.Set    `tfsdk:"back_channel_logout_uris"`
+	TokenPolicy            types.Object `tfsdk:"token_policy"`
+	RestrictedGrantTypes   types.Set    `tfsdk:"restricted_grant_types"`
+	ProxyConfig            types.Object `tfsdk:"proxy_config"`
 }
 
-type tokenPolicy struct{
-	JwtValidity						types.Int32		`tfsdk:jwt_validity`
-	RefreshValidity					types.Int32		`tfsdk:refresh_validity`
-	RefreshParallel					types.Int32		`tfsdk:refresh_parallel`
-	MaxExchangePeriod				types.String	`tfsdk:max_refresh_period`
-	RefreshTokenRotationScenario	types.String	`tfsdk:refresh_token_rotation_scenario`
-	AccessTokenFormat				types.String	`tfsdk:access_token_format`
+type tokenPolicyData struct {
+	JwtValidity                  types.Int32  `tfsdk:"jwt_validity"`
+	RefreshValidity              types.Int32  `tfsdk:"refresh_validity"`
+	RefreshParallel              types.Int32  `tfsdk:"refresh_parallel"`
+	MaxExchangePeriod            types.String `tfsdk:"max_exchange_period"`
+	RefreshTokenRotationScenario types.String `tfsdk:"refresh_token_rotation_scenario"`
+	AccessTokenFormat            types.String `tfsdk:"access_token_format"`
 }
 
-type proxyConfig struct{
-	Acrs	types.Set	`tfsdk:acrs`
+type proxyConfigData struct {
+	Acrs types.Set `tfsdk:"acrs"`
 }
 
 func applicationValueFrom(ctx context.Context, a applications.Application) (applicationData, diag.Diagnostics) {
@@ -225,8 +226,61 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 		authenticationSchema.AuthenticationRules = types.ListNull(authenticationRulesObjType)
 	}
 
-	application.AuthenticationSchema, diags = types.ObjectValueFrom(ctx, authenticationSchemaObjType, authenticationSchema)
+	if a.AuthenticationSchema.OpenIdConnectConfiguration != nil {
+		oidc := openIdConnectConfigurationData{}
 
+		oidc.RedirectUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OpenIdConnectConfiguration.RedirectUris)
+		diagnostics.Append(diags...)
+
+		oidc.PostLogoutRedirectUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OpenIdConnectConfiguration.PostLogoutRedirectUris)
+		diagnostics.Append(diags...)
+
+		oidc.FrontChannelLogoutUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OpenIdConnectConfiguration.FrontChannelLogoutUris)
+		diagnostics.Append(diags...)
+
+		oidc.BackChannelLogoutUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OpenIdConnectConfiguration.BackChannelLogoutUris)
+		diagnostics.Append(diags...)
+
+		if a.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy != nil {
+			tokenpolicy := tokenPolicyData{
+				JwtValidity:                  types.Int32Value(a.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.JwtValidity),
+				RefreshValidity:              types.Int32Value(a.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshValidity),
+				RefreshParallel:              types.Int32Value(a.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshParallel),
+				MaxExchangePeriod:            types.StringValue(a.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.MaxExchangePeriod),
+				RefreshTokenRotationScenario: types.StringValue(a.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshTokenRotationScenario),
+				AccessTokenFormat:            types.StringValue(a.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.AccessTokenFormat),
+			}
+			oidc.TokenPolicy, diags = types.ObjectValueFrom(ctx, tokenPolicyObjType, tokenpolicy)
+			diagnostics.Append(diags...)
+		} else {
+			oidc.TokenPolicy = types.ObjectNull(tokenPolicyObjType)
+		}
+		var restrictedGrants []string
+		for _, g := range a.AuthenticationSchema.OpenIdConnectConfiguration.RestrictedGrantTypes {
+			restrictedGrants = append(restrictedGrants, string(g))
+		}
+		oidc.RestrictedGrantTypes, diags = types.SetValueFrom(ctx, types.StringType, restrictedGrants)
+		diagnostics.Append(diags...)
+
+		// Proxy Config
+		if a.AuthenticationSchema.OpenIdConnectConfiguration.ProxyConfig != nil {
+			proxyConfig := proxyConfigData{}
+			proxyConfig.Acrs, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OpenIdConnectConfiguration.ProxyConfig.Acrs)
+			diagnostics.Append(diags...)
+
+			oidc.ProxyConfig, diags = types.ObjectValueFrom(ctx, proxyConfigObjType, proxyConfig)
+			diagnostics.Append(diags...)
+		} else {
+			oidc.ProxyConfig = types.ObjectNull(proxyConfigObjType)
+		}
+
+		authenticationSchema.OpenIdConnectConfiguration, diags = types.ObjectValueFrom(ctx, openIdConnectConfigurationObjType, oidc)
+		diagnostics.Append(diags...)
+	} else {
+		authenticationSchema.OpenIdConnectConfiguration = types.ObjectNull(openIdConnectConfigurationObjType)
+	}
+
+	application.AuthenticationSchema, diags = types.ObjectValueFrom(ctx, authenticationSchemaObjType, authenticationSchema)
 	diagnostics.Append(diags...)
 
 	return application, diagnostics
@@ -243,4 +297,227 @@ func applicationsValueFrom(ctx context.Context, a applications.ApplicationsRespo
 	}
 
 	return apps
+}
+
+func getApplicationRequest(ctx context.Context, plan applicationData) (*applications.Application, diag.Diagnostics) {
+
+	var diagnostics, diags diag.Diagnostics
+
+	args := &applications.Application{
+		Name:           plan.Name.ValueString(),
+		Description:    plan.Description.ValueString(),
+		MultiTenantApp: plan.MultiTenantApp.ValueBool(),
+	}
+
+	if !plan.ParentApplicationId.IsNull() {
+		args.ParentApplicationId = plan.ParentApplicationId.ValueString()
+	}
+
+	// mapping of the plan data to the API request body must be done manually
+	// this is to ensure the proper handling of attributes where the API request body structure differs from that of the schema
+	// these attributes are : subject_name_identifier and advanced_assertion_attributes
+	// the schema defines them as objects with sub-attributes source and value, but the API request body expects them to be strings
+	if !plan.AuthenticationSchema.IsNull() && !plan.AuthenticationSchema.IsUnknown() {
+
+		args.AuthenticationSchema = &applications.AuthenticationSchema{}
+
+		var authenticationSchema authenticationSchemaData
+		diags = plan.AuthenticationSchema.As(ctx, &authenticationSchema, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty:    true,
+			UnhandledUnknownAsEmpty: true,
+		})
+
+		diagnostics.Append(diags...)
+		if diagnostics.HasError() {
+			return nil, diagnostics
+		}
+
+		//SSO_TYPE
+		if !authenticationSchema.SsoType.IsNull() && !authenticationSchema.SsoType.IsUnknown() {
+			args.AuthenticationSchema.SsoType = authenticationSchema.SsoType.ValueString()
+		}
+
+		//DEFAULT_AUTHENTICATING_IDP
+		if !authenticationSchema.DefaultAuthenticatingIdpId.IsNull() && !authenticationSchema.DefaultAuthenticatingIdpId.IsUnknown() {
+			args.AuthenticationSchema.DefaultAuthenticatingIdpId = authenticationSchema.DefaultAuthenticatingIdpId.ValueString()
+		}
+
+		//SUBJECT_NAME_IDENTIFIER
+		if !authenticationSchema.SubjectNameIdentifier.IsNull() && !authenticationSchema.SubjectNameIdentifier.IsUnknown() {
+
+			var subjectNameIdentifier subjectNameIdentifierData
+			diags = authenticationSchema.SubjectNameIdentifier.As(ctx, &subjectNameIdentifier, basetypes.ObjectAsOptions{
+				UnhandledNullAsEmpty:    true,
+				UnhandledUnknownAsEmpty: true,
+			})
+
+			diagnostics.Append(diags...)
+			if diagnostics.HasError() {
+				return nil, diagnostics
+			}
+
+			// the mapping is done manually, in order to handle the parameter value when the source is set to "Corporate Identity Provider"
+			if subjectNameIdentifier.Source.ValueString() == sourceValues[0] || subjectNameIdentifier.Source.ValueString() == sourceValues[2] {
+				args.AuthenticationSchema.SubjectNameIdentifier = subjectNameIdentifier.Value.ValueString()
+			} else {
+				args.AuthenticationSchema.SubjectNameIdentifier = "${corporateIdP." + subjectNameIdentifier.Value.ValueString() + "}"
+			}
+		}
+
+		//SUBJECT_NAME_IDENTIFIER_FUNCTION
+		if !authenticationSchema.SubjectNameIdentifierFunction.IsNull() && !authenticationSchema.SubjectNameIdentifierFunction.IsUnknown() {
+			args.AuthenticationSchema.SubjectNameIdentifierFunction = authenticationSchema.SubjectNameIdentifierFunction.ValueString()
+		}
+
+		//ASSERTION_ATTRIBUTES
+		if !authenticationSchema.AssertionAttributes.IsNull() && !authenticationSchema.AssertionAttributes.IsUnknown() {
+
+			var attributes []applications.AssertionAttribute
+			diags := authenticationSchema.AssertionAttributes.ElementsAs(ctx, &attributes, true)
+			diagnostics.Append(diags...)
+			if diagnostics.HasError() {
+				return nil, diagnostics
+			}
+
+			args.AuthenticationSchema.AssertionAttributes = attributes
+		}
+
+		//ADVANCED_ASSERTION_ATTRIBUTES
+		if !authenticationSchema.AdvancedAssertionAttributes.IsNull() && !authenticationSchema.AdvancedAssertionAttributes.IsUnknown() {
+
+			var advancedAssertionAttributes []advancedAssertionAttributesData
+			diags := authenticationSchema.AdvancedAssertionAttributes.ElementsAs(ctx, &advancedAssertionAttributes, true)
+			diagnostics.Append(diags...)
+			if diagnostics.HasError() {
+				return nil, diagnostics
+			}
+
+			for _, attribute := range advancedAssertionAttributes {
+
+				assertionAttribute := applications.AdvancedAssertionAttribute{
+					AttributeName: attribute.AttributeName.ValueString(),
+				}
+
+				// the mapping is done manually, in order to handle the parameter attribute_value when the source is set to "Corporate Identity Provider"
+				if attribute.Source == types.StringValue(sourceValues[1]) {
+					assertionAttribute.AttributeValue = "${corporateIdP." + attribute.AttributeValue.ValueString() + "}"
+				} else {
+					assertionAttribute.AttributeValue = attribute.AttributeValue.ValueString()
+				}
+
+				args.AuthenticationSchema.AdvancedAssertionAttributes = append(args.AuthenticationSchema.AdvancedAssertionAttributes, assertionAttribute)
+			}
+		}
+
+		//AUTHENTICATION_RULES
+		if !authenticationSchema.AuthenticationRules.IsNull() {
+
+			var authrules []applications.AuthenicationRule
+			diags = authenticationSchema.AuthenticationRules.ElementsAs(ctx, &authrules, true)
+			diagnostics.Append(diags...)
+			if diagnostics.HasError() {
+				return nil, diagnostics
+			}
+
+			args.AuthenticationSchema.ConditionalAuthentication = authrules
+		}
+
+		//OPEN_ID_CONNECT_CONFIGURATION
+		if !authenticationSchema.OpenIdConnectConfiguration.IsNull() && !authenticationSchema.OpenIdConnectConfiguration.IsUnknown() {
+			var openIdConnectConfiguration openIdConnectConfigurationData
+			diags := authenticationSchema.OpenIdConnectConfiguration.As(ctx, &openIdConnectConfiguration, basetypes.ObjectAsOptions{
+				UnhandledNullAsEmpty:    true,
+				UnhandledUnknownAsEmpty: true,
+			})
+			diagnostics.Append(diags...)
+			if diagnostics.HasError() {
+				return nil, diagnostics
+			}
+
+			oidc := &applications.OidcConfiguration{}
+
+			// Redirect URIs
+			if !openIdConnectConfiguration.RedirectUris.IsNull() {
+				diags := openIdConnectConfiguration.RedirectUris.ElementsAs(ctx, &oidc.RedirectUris, true)
+				diagnostics.Append(diags...)
+			}
+
+			// Post Logout Redirect URIs
+			if !openIdConnectConfiguration.PostLogoutRedirectUris.IsNull() {
+				diags := openIdConnectConfiguration.PostLogoutRedirectUris.ElementsAs(ctx, &oidc.PostLogoutRedirectUris, true)
+				diagnostics.Append(diags...)
+			}
+
+			// Front Channel Logout URIs
+			if !openIdConnectConfiguration.FrontChannelLogoutUris.IsNull() {
+				diags := openIdConnectConfiguration.FrontChannelLogoutUris.ElementsAs(ctx, &oidc.FrontChannelLogoutUris, true)
+				diagnostics.Append(diags...)
+			}
+
+			// Back Channel Logout URIs
+			if !openIdConnectConfiguration.BackChannelLogoutUris.IsNull() {
+				diags := openIdConnectConfiguration.BackChannelLogoutUris.ElementsAs(ctx, &oidc.BackChannelLogoutUris, true)
+				diagnostics.Append(diags...)
+			}
+
+			// Restricted Grant Types
+			if !openIdConnectConfiguration.RestrictedGrantTypes.IsNull() {
+				var restrictedGrants []string
+				diags := openIdConnectConfiguration.RestrictedGrantTypes.ElementsAs(ctx, &restrictedGrants, true)
+				diagnostics.Append(diags...)
+
+				// Convert []string to []applications.GrantType
+				for _, g := range restrictedGrants {
+					oidc.RestrictedGrantTypes = append(oidc.RestrictedGrantTypes, applications.GrantType(g))
+				}
+			}
+
+			// Token Policy
+			if !openIdConnectConfiguration.TokenPolicy.IsNull() {
+				var token tokenPolicyData
+				diags := openIdConnectConfiguration.TokenPolicy.As(ctx, &token, basetypes.ObjectAsOptions{
+					UnhandledNullAsEmpty:    true,
+					UnhandledUnknownAsEmpty: true,
+				})
+				diagnostics.Append(diags...)
+				if !diagnostics.HasError() {
+					oidc.TokenPolicy = &applications.TokenPolicy{
+						JwtValidity:                  token.JwtValidity.ValueInt32(),
+						RefreshValidity:              token.RefreshValidity.ValueInt32(),
+						RefreshParallel:              token.RefreshParallel.ValueInt32(),
+						MaxExchangePeriod:            token.MaxExchangePeriod.ValueString(),
+						RefreshTokenRotationScenario: token.RefreshTokenRotationScenario.ValueString(),
+						AccessTokenFormat:            token.AccessTokenFormat.ValueString(),
+					}
+				}
+			}
+
+			// Proxy Config
+			if !openIdConnectConfiguration.ProxyConfig.IsNull() {
+				var proxy proxyConfigData
+				diags := openIdConnectConfiguration.ProxyConfig.As(ctx, &proxy, basetypes.ObjectAsOptions{
+					UnhandledNullAsEmpty:    true,
+					UnhandledUnknownAsEmpty: true,
+				})
+				diagnostics.Append(diags...)
+
+				if !diagnostics.HasError() {
+					var acrs []string
+					if !proxy.Acrs.IsNull() {
+						diags := proxy.Acrs.ElementsAs(ctx, &acrs, true)
+						diagnostics.Append(diags...)
+					}
+					if !diagnostics.HasError() {
+						oidc.ProxyConfig = &applications.OidcProxyConfig{
+							Acrs: acrs,
+						}
+					}
+				}
+			}
+
+			args.AuthenticationSchema.OpenIdConnectConfiguration = oidc
+		}
+	}
+
+	return args, diagnostics
 }
