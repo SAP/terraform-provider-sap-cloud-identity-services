@@ -20,6 +20,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -34,7 +35,10 @@ var (
 	ssoValues                           = []string{"openIdConnect", "saml2"}
 	usersTypeValues                     = []string{"public", "employee", "customer", "partner", "external", "onboardee"}
 	subjectNameIdentifierFunctionValues = []string{"none", "upperCase", "lowerCase"}
+	saml2AppNameIdFormatValues          = []string{"urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified", "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress", "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent", "urn:oasis:names:tc:SAML:2.0:nameid-format:transient"}
+	responseElementsToEncrypt			= []string{"none", "wholeAssertion", "subjectNameId", "attributes", "subjectNameIdAndAttributes"}
 )
+
 
 func newApplicationResource() resource.Resource {
 	return &applicationResource{}
@@ -172,6 +176,9 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 								path.MatchRoot("authentication_schema").AtName("assertion_attributes").AtAnyListIndex().AtName("attribute_name"),
 								path.MatchRoot("authentication_schema").AtName("assertion_attributes").AtAnyListIndex().AtName("attribute_value"),
 							),
+						},
+						PlanModifiers: []planmodifier.List{
+							listplanmodifier.UseStateForUnknown(),
 						},
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
@@ -311,6 +318,266 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 									Validators: []validator.String{
 										utils.ValidIPAddress(),
 									},
+								},
+							},
+						},
+					},
+					"saml2_config": schema.SingleNestedAttribute{
+						MarkdownDescription: "Configure a SAML 2.0 service provider by providing the necessary metadata.",
+						Optional:            true,
+						Computed:            true,
+						Validators: []validator.Object{
+							objectvalidator.AlsoRequires(
+								path.MatchRoot("name"),
+							),
+							// TODO change function name
+							utils.ValidType(
+								path.MatchRoot("authentication_schema").AtName("sso_type"),
+								ssoValues[1:],
+							),
+						},
+						PlanModifiers: []planmodifier.Object{
+							objectplanmodifier.UseStateForUnknown(),
+						},
+						Attributes: map[string]schema.Attribute{
+							"saml_metadata_url": schema.StringAttribute{
+								MarkdownDescription: "The URL with service provider metadata. The metadata URL must not contain a query parameter.",
+								Optional:            true,
+							},
+							"acs_endpoints": schema.ListNestedAttribute{
+								MarkdownDescription: "Configure the allowed domains for browser flows.",
+								Optional:            true,
+								Validators: []validator.List{
+									listvalidator.AlsoRequires(
+										path.MatchRoot("authentication_schema").AtName("saml2_config").AtName("acs_endpoints").AtAnyListIndex().AtName("binding_name"),
+										path.MatchRoot("authentication_schema").AtName("saml2_config").AtName("acs_endpoints").AtAnyListIndex().AtName("location"),
+										path.MatchRoot("authentication_schema").AtName("saml2_config").AtName("acs_endpoints").AtAnyListIndex().AtName("index"),
+									),
+								},
+								NestedObject: schema.NestedAttributeObject{
+									Attributes: map[string]schema.Attribute{
+										"binding_name": schema.StringAttribute{
+											MarkdownDescription: "Specify the SAML binding for the endpoint.",
+											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.OneOf(endpointBindingValues...),
+											},
+										},
+										"location": schema.StringAttribute{
+											MarkdownDescription: "The value of the URL or endpoint to be called.",
+											Optional:            true,
+										},
+										"index": schema.Int32Attribute{
+											MarkdownDescription: "Provide a unique index for the endpoint.",
+											Optional: true,
+										},
+										"default": schema.BoolAttribute{
+											MarkdownDescription: "Configure if the endpoint is the default one to be used.",
+											Optional:            true,
+											Computed:            true,
+											PlanModifiers: []planmodifier.Bool{
+												boolplanmodifier.UseStateForUnknown(),
+											},
+										},
+									},
+								},
+							},
+							"slo_endpoints": schema.ListNestedAttribute{
+								MarkdownDescription: "Configure the URLs of the service provider's single logout endpoints that will receive the logout response or request from Identity Authentication.",
+								Optional:            true,
+								Validators: []validator.List{
+									listvalidator.AlsoRequires(
+										path.MatchRoot("authentication_schema").AtName("saml2_config").AtName("slo_endpoints").AtAnyListIndex().AtName("binding_name"),
+										path.MatchRoot("authentication_schema").AtName("saml2_config").AtName("slo_endpoints").AtAnyListIndex().AtName("location"),
+									),
+								},
+								NestedObject: schema.NestedAttributeObject{
+									Attributes: map[string]schema.Attribute{
+										"binding_name": schema.StringAttribute{
+											MarkdownDescription: "Specify the SAML binding for the endpoint.",
+											Optional:            true,
+											Validators: []validator.String{
+												stringvalidator.OneOf(endpointBindingValues...),
+											},
+										},
+										"location": schema.StringAttribute{
+											MarkdownDescription: "The value of the URL or endpoint to be called.",
+											Optional:            true,
+										},
+										"response_location": schema.StringAttribute{
+											MarkdownDescription: "The URL or endpoint to which logout response messages are sent.",
+											Optional:            true,
+										},
+									},
+								},
+							},
+							"signing_certificates": schema.ListNestedAttribute{
+								MarkdownDescription: "Base64-encoded certificates used by the service provider to sign digitally, SAML protocol messages sent to Identity Authentication. A maximum of 2 certificates are allowed.",
+								Optional:            true,
+								Validators: []validator.List{
+									listvalidator.SizeAtMost(2),
+									listvalidator.AlsoRequires(
+										path.MatchRoot("authentication_schema").AtName("saml2_config").AtName("signing_certificates").AtAnyListIndex().AtName("base64_certificate"),
+										path.MatchRoot("authentication_schema").AtName("saml2_config").AtName("signing_certificates").AtAnyListIndex().AtName("default"),
+									),
+								},
+								NestedObject: schema.NestedAttributeObject{
+									Attributes: map[string]schema.Attribute{
+										"base64_certificate": schema.StringAttribute{
+											MarkdownDescription: "The content of the Base64 certificate. The certificate must be in PEM format.",
+											Optional:            true,
+											// Validator enforces the presence of PEM boundary markers ("-----BEGIN CERTIFICATE-----" / "-----END CERTIFICATE-----").
+											// The API accepts certificates without markers and returns the response by wrapping them
+											// which can result in a difference between the planned value and the state.
+											// Hence the validation maintains consistency of the parameter
+											Validators: []validator.String{
+												utils.ValidCertificate(),
+											},
+										},
+										"default": schema.BoolAttribute{
+											MarkdownDescription: "Configure if the certificate is the default one to be used.",
+											Optional:            true,
+
+										},
+										"dn": schema.StringAttribute{
+											MarkdownDescription: "A unique identifier for the certificate.",
+											Computed:            true,
+											PlanModifiers: []planmodifier.String{
+												stringplanmodifier.UseStateForUnknown(),
+											},
+										},
+										"valid_from": schema.StringAttribute{
+											MarkdownDescription: "Set the date from which the certificate is valid.",
+											Computed:            true,
+											PlanModifiers: []planmodifier.String{
+												stringplanmodifier.UseStateForUnknown(),
+											},
+										},
+										"valid_to": schema.StringAttribute{
+											MarkdownDescription: "Set the date uptil which the certificate is valid.",
+											Computed:            true,
+											PlanModifiers: []planmodifier.String{
+												stringplanmodifier.UseStateForUnknown(),
+											},
+										},
+									},
+								},
+							},
+							"encryption_certificate": schema.SingleNestedAttribute{
+								MarkdownDescription: "The certificate used for encryption of SAML2 requests and responses.",
+								Optional: true,
+								Validators: []validator.Object{
+									objectvalidator.AlsoRequires(
+										path.MatchRoot("authentication_schema").AtName("saml2_config").AtName("encryption_certificate").AtName("base64_certificate"),
+									),
+								},
+								Attributes: map[string]schema.Attribute{
+									"base64_certificate": schema.StringAttribute{
+										MarkdownDescription: "The content of the Base64 certificate. The certificate must be in PEM format.",
+										Optional:            true,
+										// Validator enforces the presence of PEM boundary markers ("-----BEGIN CERTIFICATE-----" / "-----END CERTIFICATE-----").
+										// The API accepts certificates without markers and returns the response by wrapping them
+										// which can result in a difference between the planned value and the state.
+										// Hence the validation maintains consistency of the parameter
+										Validators: []validator.String{
+											utils.ValidCertificate(),
+										},
+									},
+									"dn": schema.StringAttribute{
+										MarkdownDescription: "A unique identifier for the certificate.",
+										Computed:            true,
+										PlanModifiers: []planmodifier.String{
+											stringplanmodifier.UseStateForUnknown(),
+										},
+									},
+									"valid_from": schema.StringAttribute{
+										MarkdownDescription: "Set the date from which the certificate is valid.",
+										Computed:            true,
+										PlanModifiers: []planmodifier.String{
+											stringplanmodifier.UseStateForUnknown(),
+										},
+									},
+									"valid_to": schema.StringAttribute{
+										MarkdownDescription: "Set the date uptil which the certificate is valid.",
+										Computed:            true,
+										PlanModifiers: []planmodifier.String{
+											stringplanmodifier.UseStateForUnknown(),
+										},
+									},
+								},
+							},
+							"response_elements_to_encrypt": schema.StringAttribute{
+								MarkdownDescription: "Specify which SAML response elements should be encrypted. " + utils.ValidValuesString(responseElementsToEncrypt),
+								Optional:            true,
+								Computed:            true,
+								Validators: []validator.String{
+									stringvalidator.OneOf(responseElementsToEncrypt...),
+									stringvalidator.AlsoRequires(path.MatchRoot("authentication_schema").AtName("saml2_config").AtName("encryption_certificate")),
+								},
+								PlanModifiers: []planmodifier.String{
+									stringplanmodifier.UseStateForUnknown(),
+								},
+							},
+							"default_name_id_format": schema.StringAttribute{
+								MarkdownDescription: "Configure the default Name ID format. The attribute is sent as name ID format in SAML 2.0 authentication requests to Identity Provider.",
+								Optional:            true,
+								Computed:            true,
+								PlanModifiers: []planmodifier.String{
+									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.OneOf(saml2AppNameIdFormatValues...),
+								},
+							},
+							"sign_slo_messages": schema.BoolAttribute{
+								MarkdownDescription: "Enable if the single logout messages must be signed or not.",
+								Optional:            true,
+								Computed:            true,
+								PlanModifiers: []planmodifier.Bool{
+									boolplanmodifier.UseStateForUnknown(),
+								},
+							},
+							"require_signed_slo_messages": schema.BoolAttribute{
+								MarkdownDescription: "Enable if the single logout messages must be signed or not.",
+								Optional:            true,
+								Computed:            true,
+								PlanModifiers: []planmodifier.Bool{
+									boolplanmodifier.UseStateForUnknown(),
+								},
+							},
+							"require_signed_auth_requests": schema.BoolAttribute{
+								MarkdownDescription: "Enable if the authentication request must be signed or not.",
+								Optional:            true,
+								Computed:            true,
+								PlanModifiers: []planmodifier.Bool{
+									boolplanmodifier.UseStateForUnknown(),
+								},
+							},
+							"sign_assertions": schema.BoolAttribute{
+								MarkdownDescription: "Enable if the SAML assertions must be signed or not.",
+								Optional:            true,
+								Computed:            true,
+								PlanModifiers: []planmodifier.Bool{
+									boolplanmodifier.UseStateForUnknown(),
+								},
+							},
+							"sign_auth_responses": schema.BoolAttribute{
+								MarkdownDescription: "Enable if the SAML authentication responses must be signed or not.",
+								Optional:            true,
+								Computed:            true,
+								PlanModifiers: []planmodifier.Bool{
+									boolplanmodifier.UseStateForUnknown(),
+								},
+							},
+							"digest_algorithm": schema.StringAttribute{
+								MarkdownDescription: "Configure the algorithm for signing outgoing messages. " + utils.ValidValuesString(digestAlgorithmValues),
+								Optional:            true,
+								Computed:            true,
+								PlanModifiers: []planmodifier.String{
+									stringplanmodifier.UseStateForUnknown(),
+								},
+								Validators: []validator.String{
+									stringvalidator.OneOf(digestAlgorithmValues...),
 								},
 							},
 						},
@@ -576,6 +843,23 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 			}
 
 			args.AuthenticationSchema.ConditionalAuthentication = authrules
+		}
+
+		//SAML2 CONFIGURATION
+		if !authenticationSchema.Saml2Configuration.IsNull() && !authenticationSchema.Saml2Configuration.IsUnknown() {
+
+			var saml2config applications.SamlConfiguration
+			diags := authenticationSchema.Saml2Configuration.As(ctx, &saml2config, basetypes.ObjectAsOptions{
+				UnhandledNullAsEmpty:    true,
+				UnhandledUnknownAsEmpty: true,
+			})
+			diagnostics.Append(diags...)
+
+			if diagnostics.HasError() {
+				return nil, diagnostics
+			}
+
+			args.AuthenticationSchema.Saml2Configuration = &saml2config
 		}
 
 	}

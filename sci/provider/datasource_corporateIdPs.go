@@ -57,7 +57,7 @@ var saml2AssertionAttributeObjType = types.ObjectType{
 	},
 }
 
-var saml2ConfigObjType = types.ObjectType{
+var IdPSaml2ConfigObjType = types.ObjectType{
 	AttrTypes: map[string]attr.Type{
 		"saml_metadata_url": types.StringType,
 		"assertion_attributes": types.ListType{
@@ -138,7 +138,7 @@ var corporateIdPObjType = types.ObjectType{
 		"forward_all_sso_requests": types.BoolType,
 		"identity_federation":      identityFederationObjType,
 		"login_hint_config":        loginHintConfigObjType,
-		"saml2_config":             saml2ConfigObjType,
+		"saml2_config":             IdPSaml2ConfigObjType,
 		"oidc_config":              oidcConfigObjType,
 	},
 }

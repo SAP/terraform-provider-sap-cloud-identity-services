@@ -251,10 +251,10 @@ func corporateIdPValueFrom(ctx context.Context, c corporateidps.IdentityProvider
 			saml2Config.SloEndpoints = types.ListNull(saml2SloEndpointObjType)
 		}
 
-		corporateIdP.Saml2Config, diags = types.ObjectValueFrom(ctx, saml2ConfigObjType.AttrTypes, saml2Config)
+		corporateIdP.Saml2Config, diags = types.ObjectValueFrom(ctx, IdPSaml2ConfigObjType.AttrTypes, saml2Config)
 		diagnostics.Append(diags...)
 	} else {
-		corporateIdP.Saml2Config = types.ObjectNull(saml2ConfigObjType.AttrTypes)
+		corporateIdP.Saml2Config = types.ObjectNull(IdPSaml2ConfigObjType.AttrTypes)
 	}
 
 	// OIDC Configuration

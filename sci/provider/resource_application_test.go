@@ -2,10 +2,12 @@ package provider
 
 import (
 	"fmt"
-	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/applications"
-	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
 	"regexp"
 	"testing"
+
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/applications"
+	corporateidps "github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/corporateIdps"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
@@ -18,7 +20,6 @@ func TestResourceApplication(t *testing.T) {
 		Name:        "basic-test-app",
 		Description: "application for testing purposes",
 		AuthenticationSchema: &applications.AuthenticationSchema{
-			SsoType:                       "openIdConnect",
 			SubjectNameIdentifier:         "mail",
 			SubjectNameIdentifierFunction: "lowerCase",
 			AssertionAttributes: []applications.AssertionAttribute{
@@ -53,9 +54,148 @@ func TestResourceApplication(t *testing.T) {
 		},
 	}
 
+	updatedApplication := applications.Application{
+		Name:        "test-app-updated",
+		Description: "application for testing purposes",
+		AuthenticationSchema: &applications.AuthenticationSchema{
+			SubjectNameIdentifier:         "userUuid",
+			SubjectNameIdentifierFunction: "upperCase",
+			AssertionAttributes: []applications.AssertionAttribute{
+				{
+					AssertionAttributeName: "param1",
+					UserAttributeName:      "lastName",
+				},
+			},
+			AdvancedAssertionAttributes: []applications.AdvancedAssertionAttribute{
+				{
+					AttributeName:  "adv_param1",
+					AttributeValue: "updated_value1",
+				},
+				{
+					AttributeName:  "adv_param2",
+					AttributeValue: "value2",
+				},
+				{
+					AttributeName:  "adv_param3",
+					AttributeValue: "value3",
+				},
+			},
+			DefaultAuthenticatingIdpId: "664c660e25cff252c5c202dc",
+			ConditionalAuthentication: []applications.AuthenicationRule{
+				{
+					UserType:           "customer",
+					UserEmailDomain:    "sap.com",
+					IpNetworkRange:     "192.168.1.1/24",
+					IdentityProviderId: "664c660e25cff252c5c202dc",
+				},
+			},
+		},
+	}
+
+	saml2App := applications.Application{
+		Name: "SAML2 - Test App",
+		AuthenticationSchema: &applications.AuthenticationSchema{
+			SsoType: "saml2",
+			Saml2Configuration: &applications.SamlConfiguration{
+				SamlMetadataUrl: "https://test.com",
+				AcsEndpoints: []applications.Saml2AcsEndpoint{
+					{
+						BindingName: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+						Location:    "https://test.1.com",
+						Index:       1,
+						IsDefault:   true,
+					},
+				},
+				SloEndpoints: []applications.Saml2SLOEndpoint{
+					{
+						BindingName:      "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+						Location:         "https://logout.1.com",
+						ResponseLocation: "https://logout-response.1.com",
+					},
+				},
+				CertificatesForSigning: []corporateidps.SigningCertificateData{
+					{
+						Base64Certificate: "-----BEGIN CERTIFICATE-----\\nredacted\\n-----END CERTIFICATE-----",
+						Dn:                "CN=Test Cert",
+						IsDefault:         true,
+					},
+				},
+				CertificateForEncryption: &applications.EncryptionCertificateData{
+					Base64Certificate: "-----BEGIN CERTIFICATE-----\\nredacted\\n-----END CERTIFICATE-----",
+				},
+				ResponseElementsToEncrypt: "wholeAssertion",
+				DefaultNameIdFormat:       "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
+				SignSLOMessages:           true,
+				RequireSignedSLOMessages:  true,
+				RequireSignedAuthnRequest: true,
+				SignAssertions:            true,
+				SignAuthnResponses:        true,
+				DigestAlgorithm:           "sha1",
+			},
+		},
+	}
+
+	updatedSaml2App := applications.Application{
+		Name: "SAML2 - Updated Test App",
+		AuthenticationSchema: &applications.AuthenticationSchema{
+			SsoType: "saml2",
+			Saml2Configuration: &applications.SamlConfiguration{
+				SamlMetadataUrl: "https://updated.test.com",
+				AcsEndpoints: []applications.Saml2AcsEndpoint{
+					{
+						BindingName: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+						Location:    "https://test.1.com",
+						Index:       1,
+						IsDefault:   false,
+					},
+					{
+						BindingName: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
+						Location:    "https://test.2.com",
+						Index:       2,
+						IsDefault:   true,
+					},
+				},
+				SloEndpoints: []applications.Saml2SLOEndpoint{
+					{
+						BindingName:      "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+						Location:         "https://logout.1.com",
+						ResponseLocation: "https://logout-response.1.com",
+					},
+					{
+						BindingName:      "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
+						Location:         "https://logout.2.com",
+						ResponseLocation: "https://logout-response.2.com",
+					},
+				},
+				CertificatesForSigning: []corporateidps.SigningCertificateData{
+					{
+						Base64Certificate: "-----BEGIN CERTIFICATE-----\\nredacted\\n-----END CERTIFICATE-----",
+						IsDefault:         false,
+					},
+					{
+						Base64Certificate: "-----BEGIN CERTIFICATE-----\\nredacted\\n-----END CERTIFICATE-----",
+						IsDefault:         true,
+					},
+				},
+				CertificateForEncryption: &applications.EncryptionCertificateData{
+					Base64Certificate: "-----BEGIN CERTIFICATE-----\\nredacted\\n-----END CERTIFICATE-----",
+				},
+				ResponseElementsToEncrypt: "subjectNameId",
+				DefaultNameIdFormat:       "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+				SignSLOMessages:           false,
+				RequireSignedSLOMessages:  false,
+				RequireSignedAuthnRequest: false,
+				SignAssertions:            false,
+				SignAuthnResponses:        false,
+				DigestAlgorithm:           "sha256",
+			},
+		},
+	}
+
 	t.Parallel()
 
-	t.Run("happy path", func(t *testing.T) {
+	t.Run("happy path - application", func(t *testing.T) {
+
 		rec, user := setupVCR(t, "fixtures/resource_application")
 		defer stopQuietly(rec)
 
@@ -70,7 +210,6 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestCheckResourceAttr("sci_application.testApp", "name", application.Name),
 						resource.TestCheckResourceAttr("sci_application.testApp", "description", application.Description),
 						resource.TestCheckResourceAttr("sci_application.testApp", "multi_tenant_app", "false"),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sso_type", application.AuthenticationSchema.SsoType),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.subject_name_identifier.value", application.AuthenticationSchema.SubjectNameIdentifier),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.subject_name_identifier_function", application.AuthenticationSchema.SubjectNameIdentifierFunction),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.assertion_attributes.0.attribute_name", application.AuthenticationSchema.AssertionAttributes[0].AssertionAttributeName),
@@ -97,47 +236,9 @@ func TestResourceApplication(t *testing.T) {
 	})
 
 	t.Run("happy path - application update", func(t *testing.T) {
+
 		rec, user := setupVCR(t, "fixtures/resource_application_updated")
 		defer stopQuietly(rec)
-
-		updatedApplication := applications.Application{
-			Name:        "test-app-updated",
-			Description: "application for testing purposes",
-			AuthenticationSchema: &applications.AuthenticationSchema{
-				SsoType:                       "saml2",
-				SubjectNameIdentifier:         "userUuid",
-				SubjectNameIdentifierFunction: "upperCase",
-				AssertionAttributes: []applications.AssertionAttribute{
-					{
-						AssertionAttributeName: "param1",
-						UserAttributeName:      "lastName",
-					},
-				},
-				AdvancedAssertionAttributes: []applications.AdvancedAssertionAttribute{
-					{
-						AttributeName:  "adv_param1",
-						AttributeValue: "updated_value1",
-					},
-					{
-						AttributeName:  "adv_param2",
-						AttributeValue: "value2",
-					},
-					{
-						AttributeName:  "adv_param3",
-						AttributeValue: "value3",
-					},
-				},
-				DefaultAuthenticatingIdpId: "664c660e25cff252c5c202dc",
-				ConditionalAuthentication: []applications.AuthenicationRule{
-					{
-						UserType:           "customer",
-						UserEmailDomain:    "sap.com",
-						IpNetworkRange:     "192.168.1.1/24",
-						IdentityProviderId: "664c660e25cff252c5c202dc",
-					},
-				},
-			},
-		}
 
 		resource.Test(t, resource.TestCase{
 			IsUnitTest:               true,
@@ -150,7 +251,6 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestCheckResourceAttr("sci_application.testApp", "name", application.Name),
 						resource.TestCheckResourceAttr("sci_application.testApp", "description", application.Description),
 						resource.TestCheckResourceAttr("sci_application.testApp", "multi_tenant_app", "false"),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sso_type", application.AuthenticationSchema.SsoType),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.subject_name_identifier.value", application.AuthenticationSchema.SubjectNameIdentifier),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.subject_name_identifier_function", application.AuthenticationSchema.SubjectNameIdentifierFunction),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.assertion_attributes.0.attribute_name", application.AuthenticationSchema.AssertionAttributes[0].AssertionAttributeName),
@@ -174,7 +274,6 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestCheckResourceAttr("sci_application.testApp", "name", updatedApplication.Name),
 						resource.TestCheckResourceAttr("sci_application.testApp", "description", updatedApplication.Description),
 						resource.TestCheckResourceAttr("sci_application.testApp", "multi_tenant_app", "false"),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sso_type", updatedApplication.AuthenticationSchema.SsoType),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.subject_name_identifier.value", updatedApplication.AuthenticationSchema.SubjectNameIdentifier),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.subject_name_identifier_function", updatedApplication.AuthenticationSchema.SubjectNameIdentifierFunction),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.assertion_attributes.0.attribute_name", updatedApplication.AuthenticationSchema.AssertionAttributes[0].AssertionAttributeName),
@@ -194,6 +293,175 @@ func TestResourceApplication(t *testing.T) {
 			},
 		})
 	})
+
+	t.Run("happy path - saml2 application", func(t *testing.T) {
+
+		rec, user := setupVCR(t, "fixtures/resource_application_saml2")
+		defer stopQuietly(rec)
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+			Steps: []resource.TestStep{
+				{
+					Config: providerConfig("", user) + ResourceSaml2Application("testApp", saml2App),
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_application.testApp", "name", saml2App.Name),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.saml_metadata_url", saml2App.AuthenticationSchema.Saml2Configuration.SamlMetadataUrl),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.binding_name", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].BindingName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.location", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Location),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.index", fmt.Sprintf("%d", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Index)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.default", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].IsDefault)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.slo_endpoints.0.binding_name", saml2App.AuthenticationSchema.Saml2Configuration.SloEndpoints[0].BindingName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.slo_endpoints.0.location", saml2App.AuthenticationSchema.Saml2Configuration.SloEndpoints[0].Location),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.slo_endpoints.0.response_location", saml2App.AuthenticationSchema.Saml2Configuration.SloEndpoints[0].ResponseLocation),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.signing_certificates.0.default", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.CertificatesForSigning[0].IsDefault)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.response_elements_to_encrypt", saml2App.AuthenticationSchema.Saml2Configuration.ResponseElementsToEncrypt),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.default_name_id_format", saml2App.AuthenticationSchema.Saml2Configuration.DefaultNameIdFormat),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.sign_slo_messages", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.SignSLOMessages)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.require_signed_slo_messages", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.RequireSignedSLOMessages)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.require_signed_auth_requests", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.RequireSignedAuthnRequest)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.sign_assertions", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.SignAssertions)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.sign_auth_responses", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.SignAuthnResponses)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.digest_algorithm", saml2App.AuthenticationSchema.Saml2Configuration.DigestAlgorithm),
+					),
+				},
+				{
+					ResourceName:      "sci_application.testApp",
+					ImportState:       true,
+					ImportStateVerify: true,
+				},
+			},
+		})
+	})
+
+	t.Run("happy path - saml2 application update", func(t *testing.T) {
+
+		rec, user := setupVCR(t, "fixtures/resource_application_saml2_updated")
+		defer stopQuietly(rec)
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+			Steps: []resource.TestStep{
+				{
+					Config: providerConfig("", user) + ResourceSaml2Application("testApp", saml2App),
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_application.testApp", "name", saml2App.Name),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.saml_metadata_url", saml2App.AuthenticationSchema.Saml2Configuration.SamlMetadataUrl),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.binding_name", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].BindingName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.location", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Location),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.index", fmt.Sprintf("%d", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Index)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.default", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].IsDefault)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.slo_endpoints.0.binding_name", saml2App.AuthenticationSchema.Saml2Configuration.SloEndpoints[0].BindingName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.slo_endpoints.0.location", saml2App.AuthenticationSchema.Saml2Configuration.SloEndpoints[0].Location),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.slo_endpoints.0.response_location", saml2App.AuthenticationSchema.Saml2Configuration.SloEndpoints[0].ResponseLocation),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.signing_certificates.0.default", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.CertificatesForSigning[0].IsDefault)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.response_elements_to_encrypt", saml2App.AuthenticationSchema.Saml2Configuration.ResponseElementsToEncrypt),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.default_name_id_format", saml2App.AuthenticationSchema.Saml2Configuration.DefaultNameIdFormat),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.sign_slo_messages", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.SignSLOMessages)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.require_signed_slo_messages", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.RequireSignedSLOMessages)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.require_signed_auth_requests", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.RequireSignedAuthnRequest)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.sign_assertions", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.SignAssertions)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.sign_auth_responses", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.SignAuthnResponses)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.digest_algorithm", saml2App.AuthenticationSchema.Saml2Configuration.DigestAlgorithm),
+					),
+				},
+				{
+					Config: providerConfig("", user) + ResourceSaml2Application("testApp", updatedSaml2App),
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_application.testApp", "name", updatedSaml2App.Name),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.saml_metadata_url", updatedSaml2App.AuthenticationSchema.Saml2Configuration.SamlMetadataUrl),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.binding_name", updatedSaml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].BindingName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.location", updatedSaml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Location),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.index", fmt.Sprintf("%d", updatedSaml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Index)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.default", fmt.Sprintf("%t", updatedSaml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].IsDefault)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.1.binding_name", updatedSaml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[1].BindingName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.1.location", updatedSaml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[1].Location),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.1.index", fmt.Sprintf("%d", updatedSaml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[1].Index)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.1.default", fmt.Sprintf("%t", updatedSaml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[1].IsDefault)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.slo_endpoints.0.binding_name", updatedSaml2App.AuthenticationSchema.Saml2Configuration.SloEndpoints[0].BindingName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.slo_endpoints.0.location", updatedSaml2App.AuthenticationSchema.Saml2Configuration.SloEndpoints[0].Location),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.slo_endpoints.0.response_location", updatedSaml2App.AuthenticationSchema.Saml2Configuration.SloEndpoints[0].ResponseLocation),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.slo_endpoints.1.binding_name", updatedSaml2App.AuthenticationSchema.Saml2Configuration.SloEndpoints[1].BindingName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.slo_endpoints.1.location", updatedSaml2App.AuthenticationSchema.Saml2Configuration.SloEndpoints[1].Location),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.slo_endpoints.1.response_location", updatedSaml2App.AuthenticationSchema.Saml2Configuration.SloEndpoints[1].ResponseLocation),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.signing_certificates.0.default", fmt.Sprintf("%t", updatedSaml2App.AuthenticationSchema.Saml2Configuration.CertificatesForSigning[0].IsDefault)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.signing_certificates.1.default", fmt.Sprintf("%t", updatedSaml2App.AuthenticationSchema.Saml2Configuration.CertificatesForSigning[1].IsDefault)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.response_elements_to_encrypt", updatedSaml2App.AuthenticationSchema.Saml2Configuration.ResponseElementsToEncrypt),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.default_name_id_format", updatedSaml2App.AuthenticationSchema.Saml2Configuration.DefaultNameIdFormat),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.sign_slo_messages", fmt.Sprintf("%t", updatedSaml2App.AuthenticationSchema.Saml2Configuration.SignSLOMessages)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.require_signed_slo_messages", fmt.Sprintf("%t", updatedSaml2App.AuthenticationSchema.Saml2Configuration.RequireSignedSLOMessages)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.require_signed_auth_requests", fmt.Sprintf("%t", updatedSaml2App.AuthenticationSchema.Saml2Configuration.RequireSignedAuthnRequest)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.sign_assertions", fmt.Sprintf("%t", updatedSaml2App.AuthenticationSchema.Saml2Configuration.SignAssertions)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.sign_auth_responses", fmt.Sprintf("%t", updatedSaml2App.AuthenticationSchema.Saml2Configuration.SignAuthnResponses)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.digest_algorithm", updatedSaml2App.AuthenticationSchema.Saml2Configuration.DigestAlgorithm),
+					),
+				},
+			},
+		})
+	})
+
+	// t.Run("happy path - saml2 application update to oidc application", func(t *testing.T) {
+	// 	rec, user := setupVCR(t, "fixtures/resource_application_saml2_to_oidc")
+	// 	defer stopQuietly(rec)
+
+	// 	resource.Test(t, resource.TestCase{
+	// 		IsUnitTest:               true,
+	// 		ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+	// 		Steps: []resource.TestStep{
+	// 			{
+	// 				Config: providerConfig("", user) + ResourceSaml2Application("testApp", saml2App),
+	// 				Check: resource.ComposeAggregateTestCheckFunc(
+	// 					resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
+	// 					resource.TestCheckResourceAttr("sci_application.testApp", "name", saml2App.Name),
+	// 					resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.saml_metadata_url", saml2App.AuthenticationSchema.Saml2Configuration.SamlMetadataUrl),
+	// 					resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.binding_name", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].BindingName),
+	// 					resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.location", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Location),
+	// 					resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.index", fmt.Sprintf("%d", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Index)),
+	// 					resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.default", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].IsDefault)),
+	// 					resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.slo_endpoints.0.binding_name", saml2App.AuthenticationSchema.Saml2Configuration.SloEndpoints[0].BindingName),
+	// 					resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.slo_endpoints.0.location", saml2App.AuthenticationSchema.Saml2Configuration.SloEndpoints[0].Location),
+	// 					resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.slo_endpoints.0.response_location", saml2App.AuthenticationSchema.Saml2Configuration.SloEndpoints[0].ResponseLocation),
+	// 					resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.signing_certificates.0.default", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.CertificatesForSigning[0].IsDefault)),
+	// 					resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.response_elements_to_encrypt", saml2App.AuthenticationSchema.Saml2Configuration.ResponseElementsToEncrypt),
+	// 					resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.default_name_id_format", saml2App.AuthenticationSchema.Saml2Configuration.DefaultNameIdFormat),
+	// 					resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.sign_slo_messages", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.SignSLOMessages)),
+	// 					resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.require_signed_slo_messages", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.RequireSignedSLOMessages)),
+	// 					resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.require_signed_auth_requests", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.RequireSignedAuthnRequest)),
+	// 					resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.sign_assertions", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.SignAssertions)),
+	// 					resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.sign_auth_responses", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.SignAuthnResponses)),
+	// 					resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.digest_algorithm", saml2App.AuthenticationSchema.Saml2Configuration.DigestAlgorithm),
+	// 				),
+	// 			},
+	// 			{
+	// 				Config: providerConfig("", user) + OidcResourceApplication("testApp", oidcApplication),
+    //                 Check: resource.ComposeAggregateTestCheckFunc(
+    //                     resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
+    //                     resource.TestCheckResourceAttr("sci_application.testApp", "name", oidcApplication.Name),
+    //                     resource.TestCheckResourceAttr("sci_application.testApp", "description", oidcApplication.Description),
+    //                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sso_type", oidcApplication.AuthenticationSchema.SsoType),
+    //                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.redirect_uris.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.RedirectUris[0]),
+    //                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.post_logout_redirect_uris.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.PostLogoutRedirectUris[0]),
+    //                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.front_channel_logout_uris.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.FrontChannelLogoutUris[0]),
+    //                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.back_channel_logout_uris.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.BackChannelLogoutUris[0]),
+    //                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.jwt_validity", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.JwtValidity)),
+    //                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.refresh_validity", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshValidity)),
+    //                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.refresh_parallel", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshParallel)),
+    //                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.max_exchange_period", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.MaxExchangePeriod),
+    //                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.refresh_token_rotation_scenario", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshTokenRotationScenario),
+    //                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.access_token_format", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.AccessTokenFormat),
+    //                     resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.restricted_grant_types.*", "authorizationCode"),
+    //                     resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.restricted_grant_types.*", "clientCredentials"),
+    //                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.proxy_config.acrs.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.ProxyConfig.Acrs[0]),
+    //                 ),
+	// 			},
+	// 		},
+	// 	})
+	// })
 
 	t.Run("error path - app_id not a valid UUID", func(t *testing.T) {
 		resource.Test(t, resource.TestCase{
@@ -240,7 +508,7 @@ func TestResourceApplication(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      ResourceApplicationWithSsoType("testApp", "test-app", "application for testing purposes", "this-is-not-a-valid-sso_type"),
+					Config:      ResourceApplicationWithSsoType("testApp", "test-app", "application for testing purposes", "this-is-not-a-valid-sso_type", ""),
 					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_schema.sso_type value must be one of:\n\\[\"openIdConnect\" \"saml2\"], got: \"%s\"", "this-is-not-a-valid-sso_type")),
 				},
 			},
@@ -392,9 +660,222 @@ func TestResourceApplication(t *testing.T) {
 			},
 		})
 	})
+
+	t.Run("error path - authentication_schema.sso_type must be a valid value when saml2 is configured", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceApplicationWithSsoType("testApp", "test-app", "application for testing purposes", "openIdConnect", "saml2_config = {}"),
+					ExpectError: regexp.MustCompile("Attribute authentication_schema.saml2_config : value of attribute\n\"authentication_schema.sso_type\" must be modified to match the IDP\nconfiguration provided. Acceptable values are : `saml2`, got: openIdConnect"),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - saml2_config.acs_endpoints requires sub-attributes: binding_name, location, index", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					// Missing binding_name
+					Config:      ResourceApplicationWithSaml2AcsEndpoints("testApp", "test-app", "location = \"https://test.1.com\", index = 1"),
+					ExpectError: regexp.MustCompile(`Attribute "authentication_schema.saml2_config.acs_endpoints\[0].binding_name"\nmust be specified when "authentication_schema.saml2_config.acs_endpoints" is\nspecified`),
+				},
+				{
+					// Missing location
+					Config:      ResourceApplicationWithSaml2AcsEndpoints("testApp", "test-app", "binding_name = \"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\", index = 1"),
+					ExpectError: regexp.MustCompile(`Attribute "authentication_schema.saml2_config.acs_endpoints\[0].location" must\nbe specified when "authentication_schema.saml2_config.acs_endpoints" is\nspecified`),
+				},
+				{
+					// Missing index
+					Config:      ResourceApplicationWithSaml2AcsEndpoints("testApp", "test-app", "binding_name = \"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\", location = \"https://test.1.com\""),
+					ExpectError: regexp.MustCompile(`Attribute "authentication_schema.saml2_config.acs_endpoints\[0].index" must be\nspecified when "authentication_schema.saml2_config.acs_endpoints" is\nspecified`),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - saml2_config.acs_endpoints.binding_name must be a valid value", func(t *testing.T) {
+
+		bindingName := "invalid-binding"
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceApplicationWithSaml2AcsEndpoints("testApp", "test-app", fmt.Sprintf(`binding_name = "%s", location = "https://test.1.com", index = 1`, bindingName)),
+					ExpectError: regexp.MustCompile(fmt.Sprintf(`Attribute authentication_schema.saml2_config.acs_endpoints\[0].binding_name\nvalue must be one of: \["urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"\n"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"\n"urn:oasis:names:tc:SAML:2.0:bindings:SOAP"\n"urn:oasis:names:tc:SAML:2.0:bindings:URI"], got: "%s"`, bindingName)),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - saml2_config.slo_endpoints requires sub-attributes: binding_name, location", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					// Missing binding_name
+					Config:      ResourceApplicationWithSaml2SloEndpoints("testApp", "test-app", "location = \"https://test.1.com\""),
+					ExpectError: regexp.MustCompile(`Attribute "authentication_schema.saml2_config.slo_endpoints\[0].binding_name"\nmust be specified when "authentication_schema.saml2_config.slo_endpoints" is\nspecified`),
+				},
+				{
+					// Missing location
+					Config:      ResourceApplicationWithSaml2SloEndpoints("testApp", "test-app", "binding_name = \"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\""),
+					ExpectError: regexp.MustCompile(`Attribute "authentication_schema.saml2_config.slo_endpoints\[0].location" must\nbe specified when "authentication_schema.saml2_config.slo_endpoints" is\nspecified`),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - saml2_config.slo_endpoints.binding_name must be a valid value", func(t *testing.T) {
+
+		bindingName := "invalid-binding"
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceApplicationWithSaml2SloEndpoints("testApp", "test-app", fmt.Sprintf(`binding_name = "%s", location = "https://test.1.com"`, bindingName)),
+					ExpectError: regexp.MustCompile(fmt.Sprintf(`Attribute authentication_schema.saml2_config.slo_endpoints\[0].binding_name\nvalue must be one of: \["urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"\n"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"\n"urn:oasis:names:tc:SAML:2.0:bindings:SOAP"\n"urn:oasis:names:tc:SAML:2.0:bindings:URI"], got: "%s"`, bindingName)),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - saml2_config.signing_certificates requires sub-attribute: base64_certificate and default", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					// Missing base64_certificate
+					Config:      ResourceApplicationWithSaml2SigningCertificates("testApp", "test-app", "default = true"),
+					ExpectError: regexp.MustCompile(`Attribute\n"authentication_schema.saml2_config.signing_certificates\[0].base64_certificate"\nmust be specified when\n"authentication_schema.saml2_config.signing_certificates" is specified`),
+				},
+				{
+					// Missing default
+					Config:      ResourceApplicationWithSaml2SigningCertificates("testApp", "test-app", `base64_certificate = "-----BEGIN CERTIFICATE-----\\nredacted\\n-----END CERTIFICATE-----"`),
+					ExpectError: regexp.MustCompile(`Attribute\n"authentication_schema.saml2_config.signing_certificates\[0].default" must be\nspecified when "authentication_schema.saml2_config.signing_certificates" is\nspecified`),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - saml2_config.signing_certificates.base64_certificate must be a valid value", func(t *testing.T) {
+
+		certificate := "invalid-base64-certificate"
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceApplicationWithSaml2SigningCertificates("testApp", "test-app", fmt.Sprintf(`base64_certificate = "%s", default = true`, certificate)),
+					ExpectError: regexp.MustCompile(fmt.Sprintf(`Attribute\nauthentication_schema\.saml2_config\.signing_certificates\[0\]\.base64_certificate\nvalue must be a valid PEM string in the format -----BEGIN\nCERTIFICATE-----\\n<certificate-content>\\n-----END CERTIFICATE-----, got:\n%s`, certificate)),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - saml2_config.encryption_certificates requires sub-attribute: base64_certificate", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					// Missing base64_certificate
+					Config:      ResourceApplicationWithSaml2EncryptionCertificates("testApp", "test-app", " "),
+					ExpectError: regexp.MustCompile(`Attribute\n"authentication_schema.saml2_config.encryption_certificate.base64_certificate"\nmust be specified when\n"authentication_schema.saml2_config.encryption_certificate" is specified`),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - saml2_config.signing_certificates.base64_certificate must be a valid value", func(t *testing.T) {
+
+		certificate := "invalid-base64-certificate"
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceApplicationWithSaml2EncryptionCertificates("testApp", "test-app", fmt.Sprintf(`base64_certificate = "%s"`, certificate)),
+					ExpectError: regexp.MustCompile(fmt.Sprintf(`Attribute\nauthentication_schema.saml2_config.encryption_certificate.base64_certificate\nvalue must be a valid PEM string in the format -----BEGIN\nCERTIFICATE-----\\n<certificate-content>\\n-----END CERTIFICATE-----, got:\n%s`, certificate)),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - saml2_config.default_name_id_format must be a valid value", func(t *testing.T) {
+		defaultNameIdFormat := "invalid-name-id-format"
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceApplicationWithSaml2DefaultNameIdFormat("testApp", "test-app", defaultNameIdFormat),
+					ExpectError: regexp.MustCompile(fmt.Sprintf(`Attribute authentication_schema.saml2_config.default_name_id_format value\nmust be one of: \["urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"\n"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"\n"urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"\n"urn:oasis:names:tc:SAML:2.0:nameid-format:transient"], got:\n"%s"`, defaultNameIdFormat)),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - saml2_config.response_elements_to_encrypt must be a valid value", func(t *testing.T) {
+		responseElementsToEncrypt := "invalid-response-element"
+		encryptionCertificate := "-----BEGIN CERTIFICATE-----\\nredacted\\n-----END CERTIFICATE-----"
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceApplicationWithSaml2ResponseElementsToEncrypt("testApp", "test-app", fmt.Sprintf("encryption_certificate = {base64_certificate = \"%s\"}", encryptionCertificate), responseElementsToEncrypt),
+					ExpectError: regexp.MustCompile(fmt.Sprintf(`Attribute authentication_schema.saml2_config.response_elements_to_encrypt\nvalue must be one of: \["none" "wholeAssertion" "subjectNameId" "attributes"\n"subjectNameIdAndAttributes"], got: "%s"`, responseElementsToEncrypt)),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - saml2_config.response_elements_to_encrypt requires attribute encryption_certificate", func(t *testing.T) {
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceApplicationWithSaml2ResponseElementsToEncrypt("testApp", "test-app", "", "none"),
+					ExpectError: regexp.MustCompile(`Attribute "authentication_schema.saml2_config.encryption_certificate" must be\nspecified when\n"authentication_schema.saml2_config.response_elements_to_encrypt" is\nspecified`),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - saml2_config.digest_algorithm must be a valid value", func(t *testing.T) {
+		digestAlgorithm := "invalid-digest-algorithm"
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceApplicationWithSaml2DigestAlgorithm("testApp", "test-app", digestAlgorithm),
+					ExpectError: regexp.MustCompile(fmt.Sprintf(`Attribute authentication_schema.saml2_config.digest_algorithm value must be\none of: \["sha1" "sha256" "sha512"], got: "%s"`, digestAlgorithm)),
+				},
+			},
+		})
+	})
 }
 
 func ResourceApplication(resourceName string, app applications.Application) string {
+
+	authSchema := app.AuthenticationSchema
 
 	var assertionAttributes string
 	for _, attribute := range app.AuthenticationSchema.AssertionAttributes {
@@ -426,23 +907,91 @@ func ResourceApplication(resourceName string, app applications.Application) stri
 					},`, rule.UserType, rule.UserEmailDomain, rule.IpNetworkRange, rule.IdentityProviderId)
 	}
 
-	return fmt.Sprintf(
-		`resource "sci_application" "%s" {
+	authSchemaConfig := fmt.Sprintf(`
+		subject_name_identifier = {
+			source = "Identity Directory"
+			value = "%s"
+		}
+		subject_name_identifier_function = "%s"
+		assertion_attributes = [%s]
+		advanced_assertion_attributes = [%s]
+		default_authenticating_idp = "%s"
+		conditional_authentication = [%s]
+	`, authSchema.SubjectNameIdentifier, authSchema.SubjectNameIdentifierFunction, assertionAttributes, advancedAssertionAttributes, authSchema.DefaultAuthenticatingIdpId, authenticationRules)
+
+	application := fmt.Sprintf(`
+	resource "sci_application" "%s" {
 		name = "%s"
 		description = "%s"
 		authentication_schema = {
-			sso_type = "%s"
-			subject_name_identifier = {
-				source = "Identity Directory"
-				value = "%s"
-			}
-			subject_name_identifier_function = "%s"
-			assertion_attributes = [%s]
-			advanced_assertion_attributes = [%s]
-			default_authenticating_idp = "%s"
-			conditional_authentication = [%s]
+			%s
 		}
-	}`, resourceName, app.Name, app.Description, app.AuthenticationSchema.SsoType, app.AuthenticationSchema.SubjectNameIdentifier, app.AuthenticationSchema.SubjectNameIdentifierFunction, assertionAttributes, advancedAssertionAttributes, app.AuthenticationSchema.DefaultAuthenticatingIdpId, authenticationRules)
+	}`, resourceName, app.Name, app.Description, authSchemaConfig)
+
+	return application
+}
+
+func ResourceSaml2Application(resourceName string, app applications.Application) string {
+
+	saml2Config := app.AuthenticationSchema.Saml2Configuration
+
+	var acsEndpoints string
+	for _, endpoint := range saml2Config.AcsEndpoints {
+		acsEndpoints += fmt.Sprintf(`
+				{
+					binding_name = "%s"
+					location = "%s"
+					index = %d
+					default = %t
+				},
+			`, endpoint.BindingName, endpoint.Location, endpoint.Index, endpoint.IsDefault)
+	}
+
+	var sloEndpoints string
+	for _, endpoint := range saml2Config.SloEndpoints {
+		sloEndpoints += fmt.Sprintf(`
+                {
+                    binding_name = "%s"
+                    location = "%s"
+                    response_location = "%s"
+                },
+            `, endpoint.BindingName, endpoint.Location, endpoint.ResponseLocation)
+	}
+
+	var signingCertificates string
+	for _, cert := range saml2Config.CertificatesForSigning {
+		signingCertificates += fmt.Sprintf(`
+                {
+                    base64_certificate = "%s"
+                    default = %t
+                },
+            `, cert.Base64Certificate, cert.IsDefault)
+	}
+
+	encryptionCertificate := fmt.Sprintf(`{ base64_certificate = "%s"}`, saml2Config.CertificateForEncryption.Base64Certificate)
+
+	return fmt.Sprintf(`
+	resource "sci_application" "%s" {
+		name = "%s"
+		authentication_schema = {
+			sso_type = "saml2"
+			saml2_config = {
+				saml_metadata_url = "%s"
+				acs_endpoints = [%s]
+				slo_endpoints = [%s]
+				signing_certificates = [%s]
+				encryption_certificate = %s
+				response_elements_to_encrypt = "%s"
+				default_name_id_format = "%s"
+				sign_slo_messages = %t
+				require_signed_slo_messages = %t
+				require_signed_auth_requests = %t
+				sign_assertions = %t
+				sign_auth_responses = %t
+				digest_algorithm = "%s"
+			}
+		}
+	}`, resourceName, app.Name, saml2Config.SamlMetadataUrl, acsEndpoints, sloEndpoints, signingCertificates, encryptionCertificate, saml2Config.ResponseElementsToEncrypt, saml2Config.DefaultNameIdFormat, saml2Config.SignSLOMessages, saml2Config.RequireSignedSLOMessages, saml2Config.RequireSignedAuthnRequest, saml2Config.SignAssertions, saml2Config.SignAuthnResponses, saml2Config.DigestAlgorithm)
 }
 
 func ResourceApplicationWithParent(resourceName string, appName string, description string, parentAppId string) string {
@@ -526,16 +1075,17 @@ func ResourceApplicationWithAdvancedAssertionAttributes(resourceName string, app
 	`, resourceName, appName, description, subAttribute)
 }
 
-func ResourceApplicationWithSsoType(resourceName string, appName string, description string, ssoType string) string {
+func ResourceApplicationWithSsoType(resourceName string, appName string, description string, ssoType string, config string) string {
 	return fmt.Sprintf(`
 	resource "sci_application" "%s" {
 		name = "%s"
 		description = "%s"
 		authentication_schema = {
 			sso_type = "%s"
+			%s
 		}
 	}
-	`, resourceName, appName, description, ssoType)
+	`, resourceName, appName, description, ssoType, config)
 }
 
 func ResourceApplicationWithAuthenticationRules(resourceName string, appName string, description string, subAttribute string) string {
@@ -552,4 +1102,117 @@ func ResourceApplicationWithAuthenticationRules(resourceName string, appName str
 		}
 	}
 	`, resourceName, appName, description, subAttribute)
+}
+
+func ResourceApplicationWithSaml2AcsEndpoints(resourceName string, appName string, acsEndpoints string) string {
+	return fmt.Sprintf(`
+    resource "sci_application" "%s" {
+        name = "%s"
+        authentication_schema = {
+            sso_type = "saml2"
+            saml2_config = {
+                acs_endpoints = [
+                    {
+						%s
+					}
+                ]
+            }
+        }
+    }
+    `, resourceName, appName, acsEndpoints)
+}
+
+func ResourceApplicationWithSaml2SloEndpoints(resourceName string, appName string, sloEndpoints string) string {
+	return fmt.Sprintf(`
+    resource "sci_application" "%s" {
+        name = "%s"
+        authentication_schema = {
+            sso_type = "saml2"
+            saml2_config = {
+                slo_endpoints = [
+                    {
+						%s
+					}
+                ]
+            }
+        }
+    }
+    `, resourceName, appName, sloEndpoints)
+}
+
+func ResourceApplicationWithSaml2SigningCertificates(resourceName string, appName string, signingCertificate string) string {
+	return fmt.Sprintf(`
+    resource "sci_application" "%s" {
+        name = "%s"
+        authentication_schema = {
+            sso_type = "saml2"
+            saml2_config = {
+                signing_certificates = [
+                    {
+                        %s
+                    }
+                ]
+            }
+        }
+    }
+    `, resourceName, appName, signingCertificate)
+}
+
+func ResourceApplicationWithSaml2EncryptionCertificates(resourceName string, appName string, encryptionCertificate string) string {
+	return fmt.Sprintf(`
+    resource "sci_application" "%s" {
+        name = "%s"
+        authentication_schema = {
+            sso_type = "saml2"
+            saml2_config = {
+                encryption_certificate = {
+					%s
+				}
+            }
+        }
+    }
+    `, resourceName, appName, encryptionCertificate)
+}
+
+func ResourceApplicationWithSaml2DefaultNameIdFormat(resourceName string, appName string, nameIdFormat string) string {
+	return fmt.Sprintf(`
+    resource "sci_application" "%s" {
+        name = "%s"
+        authentication_schema = {
+            sso_type = "saml2"
+            saml2_config = {
+                default_name_id_format = "%s"
+            }
+        }
+    }
+    `, resourceName, appName, nameIdFormat)
+}
+
+func ResourceApplicationWithSaml2ResponseElementsToEncrypt(resourceName string, appName string, encryptionCertificate string, element string) string {
+	return fmt.Sprintf(`
+    resource "sci_application" "%s" {
+        name = "%s"
+        authentication_schema = {
+            sso_type = "saml2"
+            saml2_config = {
+				%s
+                response_elements_to_encrypt = "%s"
+            }
+        }
+    }
+    `, resourceName, appName, encryptionCertificate, element)
+}
+
+func ResourceApplicationWithSaml2DigestAlgorithm(resourceName string, appName string, digestAlgorithm string) string {
+	return fmt.Sprintf(`
+    resource "sci_application" "%s" {
+        name = "%s"
+        authentication_schema = {
+            sso_type = "saml2"
+            saml2_config = {
+				digest_algorithm = "%s"
+            }
+        }
+    }
+    `, resourceName, appName, digestAlgorithm)
 }
