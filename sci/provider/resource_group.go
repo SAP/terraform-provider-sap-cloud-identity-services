@@ -5,13 +5,11 @@ import (
 	"fmt"
 
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli"
-	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/groups"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -21,7 +19,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
 
 var (
@@ -265,74 +262,6 @@ func (r *groupResource) Delete(ctx context.Context, req resource.DeleteRequest, 
 
 func (r *groupResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
-}
-
-func (r *groupResource) GetGroupRequest(ctx context.Context, plan groupData) (*groups.Group, diag.Diagnostics) {
-
-	var diagnostics diag.Diagnostics
-
-	var schemas []string
-	diags := plan.Schemas.ElementsAs(ctx, &schemas, true)
-	diagnostics.Append(diags...)
-	if diagnostics.HasError() {
-		return nil, diagnostics
-	}
-
-	args := &groups.Group{
-		Schemas:     schemas,
-		DisplayName: plan.DisplayName.ValueString(),
-	}
-
-	if !plan.GroupMembers.IsNull() {
-
-		var members []memberData
-		diags = plan.GroupMembers.ElementsAs(ctx, &members, true)
-		diagnostics.Append(diags...)
-		if diagnostics.HasError() {
-			return nil, diagnostics
-		}
-
-		// the mapping is done manually in order to carry out the member validation
-		for _, member := range members {
-
-			// validate the member as a valid user or group as the API does not handle this
-			err := validateMembers(ctx, r.cli, member.Value.ValueString())
-			if err != nil {
-				diagnostics.AddError(
-					fmt.Sprintf("%s", err),
-					"please provide a valid member UUID",
-				)
-				return nil, diagnostics
-			}
-
-			groupMember := groups.GroupMember{
-				Value: member.Value.ValueString(),
-			}
-
-			if !member.Type.IsNull() {
-				groupMember.Type = member.Type.ValueString()
-			}
-
-			args.GroupMembers = append(args.GroupMembers, groupMember)
-		}
-	}
-
-	if !plan.GroupExtension.IsNull() && !plan.GroupExtension.IsUnknown() {
-
-		var groupExtension groups.GroupExtension
-		diags = plan.GroupExtension.As(ctx, &groupExtension, basetypes.ObjectAsOptions{
-			UnhandledNullAsEmpty:    true,
-			UnhandledUnknownAsEmpty: true,
-		})
-		diagnostics.Append(diags...)
-		if diagnostics.HasError() {
-			return nil, diagnostics
-		}
-
-		args.GroupExtension = &groupExtension
-	}
-
-	return args, diagnostics
 }
 
 func validateMembers(ctx context.Context, client *cli.SciClient, member string) error {

@@ -9,7 +9,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -20,9 +19,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-
-	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/users"
 )
 
 var (
@@ -360,83 +356,4 @@ func (r *userResource) Delete(ctx context.Context, req resource.DeleteRequest, r
 
 func (r *userResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
-}
-
-func getUserRequest(ctx context.Context, plan userData) (*users.User, string, diag.Diagnostics) {
-
-	var diagnostics diag.Diagnostics
-
-	var emails []users.Email
-	diags := plan.Emails.ElementsAs(ctx, &emails, true)
-	diagnostics.Append(diags...)
-	if diagnostics.HasError() {
-		return nil, "", diagnostics
-	}
-
-	var schemas []string
-	diags = plan.Schemas.ElementsAs(ctx, &schemas, true)
-	diagnostics.Append(diags...)
-	if diagnostics.HasError() {
-		return nil, "", diagnostics
-	}
-
-	args := &users.User{
-		UserName: plan.UserName.ValueString(),
-		Emails:   emails,
-		Schemas:  schemas,
-	}
-
-	if !plan.DisplayName.IsNull() {
-		args.DisplayName = plan.DisplayName.ValueString()
-	}
-
-	if !plan.Name.IsNull() && !plan.Name.IsUnknown() {
-		var name users.Name
-		diags = plan.Name.As(ctx, &name, basetypes.ObjectAsOptions{
-			UnhandledNullAsEmpty:    true,
-			UnhandledUnknownAsEmpty: true,
-		})
-
-		diagnostics.Append(diags...)
-
-		if diagnostics.HasError() {
-			return nil, "", diagnostics
-		}
-
-		args.Name = &name
-	}
-
-	if !plan.InitialPassword.IsNull() {
-		args.Password = plan.InitialPassword.ValueString()
-	}
-
-	if !plan.UserType.IsNull() && !plan.UserType.IsUnknown() {
-		args.UserType = plan.UserType.ValueString()
-	}
-
-	if !plan.Active.IsNull() && !plan.Active.IsUnknown() {
-		args.Active = plan.Active.ValueBool()
-	}
-
-	if !plan.SapExtensionUser.IsNull() && !plan.SapExtensionUser.IsUnknown() {
-
-		var sapExtensionUser users.SAPExtension
-		diags = plan.SapExtensionUser.As(ctx, &sapExtensionUser, basetypes.ObjectAsOptions{
-			UnhandledNullAsEmpty:    true,
-			UnhandledUnknownAsEmpty: true,
-		})
-		diagnostics.Append(diags...)
-		if diagnostics.HasError() {
-			return nil, "", diagnostics
-		}
-
-		args.SAPExtension = &sapExtensionUser
-	}
-
-	var customSchemas string
-	if !plan.CustomSchemas.IsNull() {
-		customSchemas = plan.CustomSchemas.ValueString()
-	}
-
-	return args, customSchemas, diagnostics
 }

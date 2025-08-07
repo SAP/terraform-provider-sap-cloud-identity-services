@@ -5,14 +5,12 @@ import (
 	"fmt"
 
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli"
-	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/schemas"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
@@ -252,72 +250,4 @@ func (r *schemaResource) Delete(ctx context.Context, req resource.DeleteRequest,
 		resp.Diagnostics.AddError("Error deleting schema", fmt.Sprintf("%s", err))
 		return
 	}
-}
-
-func getSchemaRequest(ctx context.Context, plan schemaData) (*schemas.Schema, diag.Diagnostics) {
-
-	var diagnostics diag.Diagnostics
-
-	var schemaList []string
-	diags := plan.Schemas.ElementsAs(ctx, &schemaList, true)
-	diagnostics.Append(diags...)
-	if diagnostics.HasError() {
-		return nil, diagnostics
-	}
-
-	var attributes []attributesData
-	diags = plan.Attributes.ElementsAs(ctx, &attributes, true)
-	diagnostics.Append(diags...)
-	if diagnostics.HasError() {
-		return nil, diagnostics
-	}
-
-	args := &schemas.Schema{
-		Id:      plan.Id.ValueString(),
-		Name:    plan.Name.ValueString(),
-		Schemas: schemaList,
-	}
-
-	if !plan.Description.IsNull() {
-		args.Description = plan.Description.ValueString()
-	}
-
-	args.Attributes = []schemas.Attribute{}
-	for _, attribute := range attributes {
-		schemaAttribute := schemas.Attribute{
-			Name:       attribute.Name.ValueString(),
-			Type:       attribute.Type.ValueString(),
-			Mutability: attribute.Mutability.ValueString(),
-			Returned:   attribute.Returned.ValueString(),
-			Uniqueness: attribute.Uniqueness.ValueString(),
-		}
-
-		if !attribute.CanonicalValues.IsNull() {
-			diags := attribute.CanonicalValues.ElementsAs(ctx, &schemaAttribute.CanonicalValues, true)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return nil, diagnostics
-			}
-		}
-
-		if !attribute.Multivalued.IsNull() {
-			schemaAttribute.Multivalued = attribute.Multivalued.ValueBool()
-		}
-
-		if !attribute.Description.IsNull() {
-			schemaAttribute.Description = attribute.Description.ValueString()
-		}
-
-		if !attribute.Required.IsNull() {
-			schemaAttribute.Required = attribute.Required.ValueBool()
-		}
-
-		if !attribute.CaseExact.IsNull() {
-			schemaAttribute.CaseExact = attribute.CaseExact.ValueBool()
-		}
-
-		args.Attributes = append(args.Attributes, schemaAttribute)
-	}
-
-	return args, diagnostics
 }

@@ -92,3 +92,71 @@ func schemasValueFrom(ctx context.Context, s schemas.SchemasResponse) ([]schemaD
 
 	return schemas, diagnostics
 }
+
+func getSchemaRequest(ctx context.Context, plan schemaData) (*schemas.Schema, diag.Diagnostics) {
+
+	var diagnostics diag.Diagnostics
+
+	var schemaList []string
+	diags := plan.Schemas.ElementsAs(ctx, &schemaList, true)
+	diagnostics.Append(diags...)
+	if diagnostics.HasError() {
+		return nil, diagnostics
+	}
+
+	var attributes []attributesData
+	diags = plan.Attributes.ElementsAs(ctx, &attributes, true)
+	diagnostics.Append(diags...)
+	if diagnostics.HasError() {
+		return nil, diagnostics
+	}
+
+	args := &schemas.Schema{
+		Id:      plan.Id.ValueString(),
+		Name:    plan.Name.ValueString(),
+		Schemas: schemaList,
+	}
+
+	if !plan.Description.IsNull() {
+		args.Description = plan.Description.ValueString()
+	}
+
+	args.Attributes = []schemas.Attribute{}
+	for _, attribute := range attributes {
+		schemaAttribute := schemas.Attribute{
+			Name:       attribute.Name.ValueString(),
+			Type:       attribute.Type.ValueString(),
+			Mutability: attribute.Mutability.ValueString(),
+			Returned:   attribute.Returned.ValueString(),
+			Uniqueness: attribute.Uniqueness.ValueString(),
+		}
+
+		if !attribute.CanonicalValues.IsNull() {
+			diags := attribute.CanonicalValues.ElementsAs(ctx, &schemaAttribute.CanonicalValues, true)
+			diagnostics.Append(diags...)
+			if diagnostics.HasError() {
+				return nil, diagnostics
+			}
+		}
+
+		if !attribute.Multivalued.IsNull() {
+			schemaAttribute.Multivalued = attribute.Multivalued.ValueBool()
+		}
+
+		if !attribute.Description.IsNull() {
+			schemaAttribute.Description = attribute.Description.ValueString()
+		}
+
+		if !attribute.Required.IsNull() {
+			schemaAttribute.Required = attribute.Required.ValueBool()
+		}
+
+		if !attribute.CaseExact.IsNull() {
+			schemaAttribute.CaseExact = attribute.CaseExact.ValueBool()
+		}
+
+		args.Attributes = append(args.Attributes, schemaAttribute)
+	}
+
+	return args, diagnostics
+}
