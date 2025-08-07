@@ -64,9 +64,12 @@ resource "sci_application" "basic_application" {
 
 - `authentication_schema` (Attributes) Configure attributes particular to the schema "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication" (see [below for nested schema](#nestedatt--authentication_schema))
 - `description` (String) Free text description of the Application
-- `id` (String) Id of the application
 - `multi_tenant_app` (Boolean) Only for Internal Use
 - `parent_application_id` (String) ID of the parent, from which the application will inherit its configurations
+
+### Read-Only
+
+- `id` (String) Id of the application
 
 <a id="nestedatt--authentication_schema"></a>
 ### Nested Schema for `authentication_schema`
