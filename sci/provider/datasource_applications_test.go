@@ -22,8 +22,8 @@ func TestDataSourceApplications(t *testing.T) {
 				{
 					Config: providerConfig("", user) + DataSourceApplications("allApps"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						//fixture needs to re-recorded after cleanup, no. of apps needs to be modified accordingly
-						resource.TestCheckResourceAttr("data.sci_applications.allApps", "values.#", "21"),
+						//fixture needs to be re-recorded after cleanup, no. of apps needs to be modified accordingly
+						resource.TestCheckResourceAttr("data.sci_applications.allApps", "values.#", "4"),
 					),
 				},
 			},

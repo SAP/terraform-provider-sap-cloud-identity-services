@@ -5,28 +5,28 @@ import (
 	"fmt"
 
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli"
-	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/applications"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/int32validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/objectvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 )
 
 var (
@@ -34,6 +34,10 @@ var (
 	ssoValues                           = []string{"openIdConnect", "saml2"}
 	usersTypeValues                     = []string{"public", "employee", "customer", "partner", "external", "onboardee"}
 	subjectNameIdentifierFunctionValues = []string{"none", "upperCase", "lowerCase"}
+	maxExchangePeriodValues             = []string{"unlimited", "maxSessionValidity", "initialRefreshTokenValidity"}
+	refreshTokenRotationScenarioValues  = []string{"off", "online", "mobile"}
+	accessTokenFormatValues             = []string{"default", "jwt", "opaque"}
+	restrictedGrantTypesValues          = []string{"clientCredentials", "authorizationCode", "refreshToken", "password", "implicit", "jwtBearer", "authorizationCodePkceS256", "tokenExchange"}
 )
 
 func newApplicationResource() resource.Resource {
@@ -173,6 +177,9 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 								path.MatchRoot("authentication_schema").AtName("assertion_attributes").AtAnyListIndex().AtName("attribute_value"),
 							),
 						},
+						PlanModifiers: []planmodifier.List{
+							listplanmodifier.UseStateForUnknown(),
+						},
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
 								"attribute_name": schema.StringAttribute{
@@ -280,7 +287,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 									},
 								},
 								"user_type": schema.StringAttribute{
-									MarkdownDescription: "The type of user to be authenticated. Acceptable values are :" + utils.ValidValuesString(usersTypeValues),
+									MarkdownDescription: "The type of user to be authenticated." + utils.ValidValuesString(usersTypeValues),
 									Optional:            true,
 									Validators: []validator.String{
 										stringvalidator.OneOf(usersTypeValues...),
@@ -310,6 +317,144 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 									Optional:            true,
 									Validators: []validator.String{
 										utils.ValidIPAddress(),
+									},
+								},
+							},
+						},
+					},
+					"openid_connect_configuration": schema.SingleNestedAttribute{
+						MarkdownDescription: "OpenID Connect (OIDC) configuration options for this application.",
+						Optional:            true,
+						Computed:            true,
+						PlanModifiers: []planmodifier.Object{
+							objectplanmodifier.UseStateForUnknown(),
+						},
+						Validators: []validator.Object{
+							objectvalidator.AlsoRequires(
+								path.MatchRoot("authentication_schema").AtName("openid_connect_configuration").AtName("redirect_uris"),
+							),
+						},
+						Attributes: map[string]schema.Attribute{
+							"redirect_uris": schema.SetAttribute{
+								MarkdownDescription: "A list of redirect URIs that the OpenID Provider is allowed to redirect to after authentication. Must contain 1 to 20 valid URIs.",
+								ElementType:         types.StringType,
+								Optional:            true,
+								Validators: []validator.Set{
+									setvalidator.SizeBetween(1, 20),
+								},
+							},
+							"post_logout_redirect_uris": schema.SetAttribute{
+								MarkdownDescription: "List of URIs to which the user will be redirected after logging out from the application. Can include up to 20 URIs.",
+								ElementType:         types.StringType,
+								Optional:            true,
+								Validators: []validator.Set{
+									setvalidator.SizeBetween(1, 20),
+								},
+							},
+							"front_channel_logout_uris": schema.SetAttribute{
+								MarkdownDescription: "List of front-channel logout URIs that support browser-based logout. Each must be a valid URL and up to 20 URIs are allowed.",
+								ElementType:         types.StringType,
+								Optional:            true,
+								Validators: []validator.Set{
+									setvalidator.SizeBetween(1, 20),
+									setvalidator.ValueStringsAre(utils.ValidUrl()),
+								},
+							},
+							"back_channel_logout_uris": schema.SetAttribute{
+								MarkdownDescription: "List of back-channel logout URIs that support server-to-server logout notifications. Each must be a valid URL. Up to 20 URIs allowed.",
+								ElementType:         types.StringType,
+								Optional:            true,
+								Validators: []validator.Set{
+									setvalidator.SizeBetween(1, 20),
+									setvalidator.ValueStringsAre(utils.ValidUrl()),
+								},
+							},
+							"token_policy": schema.SingleNestedAttribute{
+								MarkdownDescription: "Defines the token policy for the application.",
+								Optional:            true,
+								Computed:            true,
+								PlanModifiers: []planmodifier.Object{
+									objectplanmodifier.UseStateForUnknown(),
+								},
+								Attributes: map[string]schema.Attribute{
+									"jwt_validity": schema.Int32Attribute{
+										MarkdownDescription: "JWT access token validity in seconds. Must be between 60 seconds (1 minute) and 43200 seconds (12 hours).",
+										Optional:            true,
+										Computed:            true,
+										Validators: []validator.Int32{
+											int32validator.Between(60, 43200),
+										},
+									},
+									"refresh_validity": schema.Int32Attribute{
+										MarkdownDescription: "Refresh token validity in seconds. Can range from 0 to 15552000 seconds (180 days).",
+										Optional:            true,
+										Computed:            true,
+										Validators: []validator.Int32{
+											int32validator.Between(0, 15552000),
+										},
+									},
+									"refresh_parallel": schema.Int32Attribute{
+										MarkdownDescription: "Maximum number of refresh tokens that can be used in parallel. Valid values range from 1 to 10.",
+										Optional:            true,
+										Computed:            true,
+										Validators: []validator.Int32{
+											int32validator.Between(1, 10),
+										},
+									},
+									"max_exchange_period": schema.StringAttribute{
+										MarkdownDescription: "Maximum token exchange period. Must be one of the allowed values.",
+										Optional:            true,
+										Computed:            true,
+										Validators: []validator.String{
+											stringvalidator.OneOf(maxExchangePeriodValues...),
+										},
+									},
+									"refresh_token_rotation_scenario": schema.StringAttribute{
+										MarkdownDescription: "Defines the scenario for refresh token rotation. Must be one of the allowed values.",
+										Optional:            true,
+										Computed:            true,
+										Validators: []validator.String{
+											stringvalidator.OneOf(refreshTokenRotationScenarioValues...),
+										},
+									},
+									"access_token_format": schema.StringAttribute{
+										MarkdownDescription: "The format of the access token issued.",
+										Optional:            true,
+										Computed:            true,
+										Validators: []validator.String{
+											stringvalidator.OneOf(accessTokenFormatValues...),
+										},
+									},
+								},
+							},
+							"restricted_grant_types": schema.SetAttribute{
+								MarkdownDescription: "Set of OAuth 2.0 grant types that are restricted for the application. Must match one of the supported grant types.",
+								Optional:            true,
+								Computed:            true,
+								ElementType:         types.StringType,
+								Validators: []validator.Set{
+									setvalidator.ValueStringsAre(stringvalidator.OneOf(restrictedGrantTypesValues...)),
+								},
+								PlanModifiers: []planmodifier.Set{
+									setplanmodifier.UseStateForUnknown(),
+								},
+							},
+							"proxy_config": schema.SingleNestedAttribute{
+								MarkdownDescription: "Optional proxy configuration including accepted ACR values.",
+								Optional:            true,
+								Computed:            true,
+								PlanModifiers: []planmodifier.Object{
+									objectplanmodifier.UseStateForUnknown(),
+								},
+								Attributes: map[string]schema.Attribute{
+									"acrs": schema.SetAttribute{
+										MarkdownDescription: "Set of accepted ACR (Authentication Context Class Reference) values. Up to 20 values allowed.",
+										Optional:            true,
+										ElementType:         types.StringType,
+										Validators: []validator.Set{
+											setvalidator.SizeAtMost(20),
+											setvalidator.ValueStringsAre(stringvalidator.LengthBetween(1, 99)),
+										},
 									},
 								},
 							},
@@ -455,130 +600,3 @@ func (rs *applicationResource) ImportState(ctx context.Context, req resource.Imp
 }
 
 // retrieve the API Request body from the plan data
-func getApplicationRequest(ctx context.Context, plan applicationData) (*applications.Application, diag.Diagnostics) {
-
-	var diagnostics, diags diag.Diagnostics
-
-	args := &applications.Application{
-		Name:           plan.Name.ValueString(),
-		Description:    plan.Description.ValueString(),
-		MultiTenantApp: plan.MultiTenantApp.ValueBool(),
-	}
-
-	if !plan.ParentApplicationId.IsNull() {
-		args.ParentApplicationId = plan.ParentApplicationId.ValueString()
-	}
-
-	// mapping of the plan data to the API request body must be done manually
-	// this is to ensure the proper handling of attributes where the API request body structure differs from that of the schema
-	// these attributes are : subject_name_identifier and advanced_assertion_attributes
-	// the schema defines them as objects with sub-attributes source and value, but the API request body expects them to be strings
-	if !plan.AuthenticationSchema.IsNull() && !plan.AuthenticationSchema.IsUnknown() {
-
-		args.AuthenticationSchema = &applications.AuthenticationSchema{}
-
-		var authenticationSchema authenticationSchemaData
-		diags = plan.AuthenticationSchema.As(ctx, &authenticationSchema, basetypes.ObjectAsOptions{
-			UnhandledNullAsEmpty:    true,
-			UnhandledUnknownAsEmpty: true,
-		})
-
-		diagnostics.Append(diags...)
-		if diagnostics.HasError() {
-			return nil, diagnostics
-		}
-
-		//SSO_TYPE
-		if !authenticationSchema.SsoType.IsNull() && !authenticationSchema.SsoType.IsUnknown() {
-			args.AuthenticationSchema.SsoType = authenticationSchema.SsoType.ValueString()
-		}
-
-		//DEFAULT_AUTHENTICATING_IDP
-		if !authenticationSchema.DefaultAuthenticatingIdpId.IsNull() && !authenticationSchema.DefaultAuthenticatingIdpId.IsUnknown() {
-			args.AuthenticationSchema.DefaultAuthenticatingIdpId = authenticationSchema.DefaultAuthenticatingIdpId.ValueString()
-		}
-
-		//SUBJECT_NAME_IDENTIFIER
-		if !authenticationSchema.SubjectNameIdentifier.IsNull() && !authenticationSchema.SubjectNameIdentifier.IsUnknown() {
-
-			var subjectNameIdentifier subjectNameIdentifierData
-			diags = authenticationSchema.SubjectNameIdentifier.As(ctx, &subjectNameIdentifier, basetypes.ObjectAsOptions{
-				UnhandledNullAsEmpty:    true,
-				UnhandledUnknownAsEmpty: true,
-			})
-
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return nil, diagnostics
-			}
-
-			// the mapping is done manually, in order to handle the parameter value when the source is set to "Corporate Identity Provider"
-			if subjectNameIdentifier.Source.ValueString() == sourceValues[0] || subjectNameIdentifier.Source.ValueString() == sourceValues[2] {
-				args.AuthenticationSchema.SubjectNameIdentifier = subjectNameIdentifier.Value.ValueString()
-			} else {
-				args.AuthenticationSchema.SubjectNameIdentifier = "${corporateIdP." + subjectNameIdentifier.Value.ValueString() + "}"
-			}
-		}
-
-		//SUBJECT_NAME_IDENTIFIER_FUNCTION
-		if !authenticationSchema.SubjectNameIdentifierFunction.IsNull() && !authenticationSchema.SubjectNameIdentifierFunction.IsUnknown() {
-			args.AuthenticationSchema.SubjectNameIdentifierFunction = authenticationSchema.SubjectNameIdentifierFunction.ValueString()
-		}
-
-		//ASSERTION_ATTRIBUTES
-		if !authenticationSchema.AssertionAttributes.IsNull() && !authenticationSchema.AssertionAttributes.IsUnknown() {
-
-			var attributes []applications.AssertionAttribute
-			diags := authenticationSchema.AssertionAttributes.ElementsAs(ctx, &attributes, true)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return nil, diagnostics
-			}
-
-			args.AuthenticationSchema.AssertionAttributes = attributes
-		}
-
-		//ADVANCED_ASSERTION_ATTRIBUTES
-		if !authenticationSchema.AdvancedAssertionAttributes.IsNull() && !authenticationSchema.AdvancedAssertionAttributes.IsUnknown() {
-
-			var advancedAssertionAttributes []advancedAssertionAttributesData
-			diags := authenticationSchema.AdvancedAssertionAttributes.ElementsAs(ctx, &advancedAssertionAttributes, true)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return nil, diagnostics
-			}
-
-			for _, attribute := range advancedAssertionAttributes {
-
-				assertionAttribute := applications.AdvancedAssertionAttribute{
-					AttributeName: attribute.AttributeName.ValueString(),
-				}
-
-				// the mapping is done manually, in order to handle the parameter attribute_value when the source is set to "Corporate Identity Provider"
-				if attribute.Source == types.StringValue(sourceValues[1]) {
-					assertionAttribute.AttributeValue = "${corporateIdP." + attribute.AttributeValue.ValueString() + "}"
-				} else {
-					assertionAttribute.AttributeValue = attribute.AttributeValue.ValueString()
-				}
-
-				args.AuthenticationSchema.AdvancedAssertionAttributes = append(args.AuthenticationSchema.AdvancedAssertionAttributes, assertionAttribute)
-			}
-		}
-
-		//AUTHENTICATION_RULES
-		if !authenticationSchema.AuthenticationRules.IsNull() {
-
-			var authrules []applications.AuthenicationRule
-			diags = authenticationSchema.AuthenticationRules.ElementsAs(ctx, &authrules, true)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return nil, diagnostics
-			}
-
-			args.AuthenticationSchema.ConditionalAuthentication = authrules
-		}
-
-	}
-
-	return args, diagnostics
-}
