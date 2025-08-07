@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli"
-	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/applications"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
@@ -13,8 +12,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
-	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 
@@ -26,8 +23,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 )
 
 var (
@@ -36,9 +31,8 @@ var (
 	usersTypeValues                     = []string{"public", "employee", "customer", "partner", "external", "onboardee"}
 	subjectNameIdentifierFunctionValues = []string{"none", "upperCase", "lowerCase"}
 	saml2AppNameIdFormatValues          = []string{"urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified", "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress", "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent", "urn:oasis:names:tc:SAML:2.0:nameid-format:transient"}
-	responseElementsToEncrypt			= []string{"none", "wholeAssertion", "subjectNameId", "attributes", "subjectNameIdAndAttributes"}
+	responseElementsToEncrypt           = []string{"none", "wholeAssertion", "subjectNameId", "attributes", "subjectNameIdAndAttributes"}
 )
-
 
 func newApplicationResource() resource.Resource {
 	return &applicationResource{}
@@ -369,7 +363,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 										},
 										"index": schema.Int32Attribute{
 											MarkdownDescription: "Provide a unique index for the endpoint.",
-											Optional: true,
+											Optional:            true,
 										},
 										"default": schema.BoolAttribute{
 											MarkdownDescription: "Configure if the endpoint is the default one to be used.",
@@ -437,7 +431,6 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 										"default": schema.BoolAttribute{
 											MarkdownDescription: "Configure if the certificate is the default one to be used.",
 											Optional:            true,
-
 										},
 										"dn": schema.StringAttribute{
 											MarkdownDescription: "A unique identifier for the certificate.",
@@ -465,7 +458,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 							},
 							"encryption_certificate": schema.SingleNestedAttribute{
 								MarkdownDescription: "The certificate used for encryption of SAML2 requests and responses.",
-								Optional: true,
+								Optional:            true,
 								Validators: []validator.Object{
 									objectvalidator.AlsoRequires(
 										path.MatchRoot("authentication_schema").AtName("saml2_config").AtName("encryption_certificate").AtName("base64_certificate"),
@@ -719,150 +712,4 @@ func (r *applicationResource) Delete(ctx context.Context, req resource.DeleteReq
 
 func (rs *applicationResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
-}
-
-// retrieve the API Request body from the plan data
-func getApplicationRequest(ctx context.Context, plan applicationData) (*applications.Application, diag.Diagnostics) {
-
-	var diagnostics, diags diag.Diagnostics
-
-	args := &applications.Application{
-		Name:           plan.Name.ValueString(),
-		Description:    plan.Description.ValueString(),
-		MultiTenantApp: plan.MultiTenantApp.ValueBool(),
-	}
-
-	if !plan.ParentApplicationId.IsNull() {
-		args.ParentApplicationId = plan.ParentApplicationId.ValueString()
-	}
-
-	// mapping of the plan data to the API request body must be done manually
-	// this is to ensure the proper handling of attributes where the API request body structure differs from that of the schema
-	// these attributes are : subject_name_identifier and advanced_assertion_attributes
-	// the schema defines them as objects with sub-attributes source and value, but the API request body expects them to be strings
-	if !plan.AuthenticationSchema.IsNull() && !plan.AuthenticationSchema.IsUnknown() {
-
-		args.AuthenticationSchema = &applications.AuthenticationSchema{}
-
-		var authenticationSchema authenticationSchemaData
-		diags = plan.AuthenticationSchema.As(ctx, &authenticationSchema, basetypes.ObjectAsOptions{
-			UnhandledNullAsEmpty:    true,
-			UnhandledUnknownAsEmpty: true,
-		})
-
-		diagnostics.Append(diags...)
-		if diagnostics.HasError() {
-			return nil, diagnostics
-		}
-
-		//SSO_TYPE
-		if !authenticationSchema.SsoType.IsNull() && !authenticationSchema.SsoType.IsUnknown() {
-			args.AuthenticationSchema.SsoType = authenticationSchema.SsoType.ValueString()
-		}
-
-		//DEFAULT_AUTHENTICATING_IDP
-		if !authenticationSchema.DefaultAuthenticatingIdpId.IsNull() && !authenticationSchema.DefaultAuthenticatingIdpId.IsUnknown() {
-			args.AuthenticationSchema.DefaultAuthenticatingIdpId = authenticationSchema.DefaultAuthenticatingIdpId.ValueString()
-		}
-
-		//SUBJECT_NAME_IDENTIFIER
-		if !authenticationSchema.SubjectNameIdentifier.IsNull() && !authenticationSchema.SubjectNameIdentifier.IsUnknown() {
-
-			var subjectNameIdentifier subjectNameIdentifierData
-			diags = authenticationSchema.SubjectNameIdentifier.As(ctx, &subjectNameIdentifier, basetypes.ObjectAsOptions{
-				UnhandledNullAsEmpty:    true,
-				UnhandledUnknownAsEmpty: true,
-			})
-
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return nil, diagnostics
-			}
-
-			// the mapping is done manually, in order to handle the parameter value when the source is set to "Corporate Identity Provider"
-			if subjectNameIdentifier.Source.ValueString() == sourceValues[0] || subjectNameIdentifier.Source.ValueString() == sourceValues[2] {
-				args.AuthenticationSchema.SubjectNameIdentifier = subjectNameIdentifier.Value.ValueString()
-			} else {
-				args.AuthenticationSchema.SubjectNameIdentifier = "${corporateIdP." + subjectNameIdentifier.Value.ValueString() + "}"
-			}
-		}
-
-		//SUBJECT_NAME_IDENTIFIER_FUNCTION
-		if !authenticationSchema.SubjectNameIdentifierFunction.IsNull() && !authenticationSchema.SubjectNameIdentifierFunction.IsUnknown() {
-			args.AuthenticationSchema.SubjectNameIdentifierFunction = authenticationSchema.SubjectNameIdentifierFunction.ValueString()
-		}
-
-		//ASSERTION_ATTRIBUTES
-		if !authenticationSchema.AssertionAttributes.IsNull() && !authenticationSchema.AssertionAttributes.IsUnknown() {
-
-			var attributes []applications.AssertionAttribute
-			diags := authenticationSchema.AssertionAttributes.ElementsAs(ctx, &attributes, true)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return nil, diagnostics
-			}
-
-			args.AuthenticationSchema.AssertionAttributes = attributes
-		}
-
-		//ADVANCED_ASSERTION_ATTRIBUTES
-		if !authenticationSchema.AdvancedAssertionAttributes.IsNull() && !authenticationSchema.AdvancedAssertionAttributes.IsUnknown() {
-
-			var advancedAssertionAttributes []advancedAssertionAttributesData
-			diags := authenticationSchema.AdvancedAssertionAttributes.ElementsAs(ctx, &advancedAssertionAttributes, true)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return nil, diagnostics
-			}
-
-			for _, attribute := range advancedAssertionAttributes {
-
-				assertionAttribute := applications.AdvancedAssertionAttribute{
-					AttributeName: attribute.AttributeName.ValueString(),
-				}
-
-				// the mapping is done manually, in order to handle the parameter attribute_value when the source is set to "Corporate Identity Provider"
-				if attribute.Source == types.StringValue(sourceValues[1]) {
-					assertionAttribute.AttributeValue = "${corporateIdP." + attribute.AttributeValue.ValueString() + "}"
-				} else {
-					assertionAttribute.AttributeValue = attribute.AttributeValue.ValueString()
-				}
-
-				args.AuthenticationSchema.AdvancedAssertionAttributes = append(args.AuthenticationSchema.AdvancedAssertionAttributes, assertionAttribute)
-			}
-		}
-
-		//AUTHENTICATION_RULES
-		if !authenticationSchema.AuthenticationRules.IsNull() {
-
-			var authrules []applications.AuthenicationRule
-			diags = authenticationSchema.AuthenticationRules.ElementsAs(ctx, &authrules, true)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return nil, diagnostics
-			}
-
-			args.AuthenticationSchema.ConditionalAuthentication = authrules
-		}
-
-		//SAML2 CONFIGURATION
-		if !authenticationSchema.Saml2Configuration.IsNull() && !authenticationSchema.Saml2Configuration.IsUnknown() {
-
-			var saml2config applications.SamlConfiguration
-			diags := authenticationSchema.Saml2Configuration.As(ctx, &saml2config, basetypes.ObjectAsOptions{
-				UnhandledNullAsEmpty:    true,
-				UnhandledUnknownAsEmpty: true,
-			})
-			diagnostics.Append(diags...)
-
-			if diagnostics.HasError() {
-				return nil, diagnostics
-			}
-
-			args.AuthenticationSchema.Saml2Configuration = &saml2config
-		}
-
-	}
-
-	return args, diagnostics
 }

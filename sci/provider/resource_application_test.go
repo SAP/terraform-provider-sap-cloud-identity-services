@@ -54,44 +54,6 @@ func TestResourceApplication(t *testing.T) {
 		},
 	}
 
-	updatedApplication := applications.Application{
-		Name:        "test-app-updated",
-		Description: "application for testing purposes",
-		AuthenticationSchema: &applications.AuthenticationSchema{
-			SubjectNameIdentifier:         "userUuid",
-			SubjectNameIdentifierFunction: "upperCase",
-			AssertionAttributes: []applications.AssertionAttribute{
-				{
-					AssertionAttributeName: "param1",
-					UserAttributeName:      "lastName",
-				},
-			},
-			AdvancedAssertionAttributes: []applications.AdvancedAssertionAttribute{
-				{
-					AttributeName:  "adv_param1",
-					AttributeValue: "updated_value1",
-				},
-				{
-					AttributeName:  "adv_param2",
-					AttributeValue: "value2",
-				},
-				{
-					AttributeName:  "adv_param3",
-					AttributeValue: "value3",
-				},
-			},
-			DefaultAuthenticatingIdpId: "664c660e25cff252c5c202dc",
-			ConditionalAuthentication: []applications.AuthenicationRule{
-				{
-					UserType:           "customer",
-					UserEmailDomain:    "sap.com",
-					IpNetworkRange:     "192.168.1.1/24",
-					IdentityProviderId: "664c660e25cff252c5c202dc",
-				},
-			},
-		},
-	}
-
 	saml2App := applications.Application{
 		Name: "SAML2 - Test App",
 		AuthenticationSchema: &applications.AuthenticationSchema{
@@ -131,63 +93,6 @@ func TestResourceApplication(t *testing.T) {
 				SignAssertions:            true,
 				SignAuthnResponses:        true,
 				DigestAlgorithm:           "sha1",
-			},
-		},
-	}
-
-	updatedSaml2App := applications.Application{
-		Name: "SAML2 - Updated Test App",
-		AuthenticationSchema: &applications.AuthenticationSchema{
-			SsoType: "saml2",
-			Saml2Configuration: &applications.SamlConfiguration{
-				SamlMetadataUrl: "https://updated.test.com",
-				AcsEndpoints: []applications.Saml2AcsEndpoint{
-					{
-						BindingName: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
-						Location:    "https://test.1.com",
-						Index:       1,
-						IsDefault:   false,
-					},
-					{
-						BindingName: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
-						Location:    "https://test.2.com",
-						Index:       2,
-						IsDefault:   true,
-					},
-				},
-				SloEndpoints: []applications.Saml2SLOEndpoint{
-					{
-						BindingName:      "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
-						Location:         "https://logout.1.com",
-						ResponseLocation: "https://logout-response.1.com",
-					},
-					{
-						BindingName:      "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
-						Location:         "https://logout.2.com",
-						ResponseLocation: "https://logout-response.2.com",
-					},
-				},
-				CertificatesForSigning: []corporateidps.SigningCertificateData{
-					{
-						Base64Certificate: "-----BEGIN CERTIFICATE-----\\nredacted\\n-----END CERTIFICATE-----",
-						IsDefault:         false,
-					},
-					{
-						Base64Certificate: "-----BEGIN CERTIFICATE-----\\nredacted\\n-----END CERTIFICATE-----",
-						IsDefault:         true,
-					},
-				},
-				CertificateForEncryption: &applications.EncryptionCertificateData{
-					Base64Certificate: "-----BEGIN CERTIFICATE-----\\nredacted\\n-----END CERTIFICATE-----",
-				},
-				ResponseElementsToEncrypt: "subjectNameId",
-				DefaultNameIdFormat:       "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
-				SignSLOMessages:           false,
-				RequireSignedSLOMessages:  false,
-				RequireSignedAuthnRequest: false,
-				SignAssertions:            false,
-				SignAuthnResponses:        false,
-				DigestAlgorithm:           "sha256",
 			},
 		},
 	}
@@ -236,6 +141,44 @@ func TestResourceApplication(t *testing.T) {
 	})
 
 	t.Run("happy path - application update", func(t *testing.T) {
+
+		updatedApplication := applications.Application{
+			Name:        "test-app-updated",
+			Description: "application for testing purposes",
+			AuthenticationSchema: &applications.AuthenticationSchema{
+				SubjectNameIdentifier:         "userUuid",
+				SubjectNameIdentifierFunction: "upperCase",
+				AssertionAttributes: []applications.AssertionAttribute{
+					{
+						AssertionAttributeName: "param1",
+						UserAttributeName:      "lastName",
+					},
+				},
+				AdvancedAssertionAttributes: []applications.AdvancedAssertionAttribute{
+					{
+						AttributeName:  "adv_param1",
+						AttributeValue: "updated_value1",
+					},
+					{
+						AttributeName:  "adv_param2",
+						AttributeValue: "value2",
+					},
+					{
+						AttributeName:  "adv_param3",
+						AttributeValue: "value3",
+					},
+				},
+				DefaultAuthenticatingIdpId: "664c660e25cff252c5c202dc",
+				ConditionalAuthentication: []applications.AuthenicationRule{
+					{
+						UserType:           "customer",
+						UserEmailDomain:    "sap.com",
+						IpNetworkRange:     "192.168.1.1/24",
+						IdentityProviderId: "664c660e25cff252c5c202dc",
+					},
+				},
+			},
+		}
 
 		rec, user := setupVCR(t, "fixtures/resource_application_updated")
 		defer stopQuietly(rec)
@@ -308,6 +251,7 @@ func TestResourceApplication(t *testing.T) {
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
 						resource.TestCheckResourceAttr("sci_application.testApp", "name", saml2App.Name),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sso_type", saml2App.AuthenticationSchema.SsoType),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.saml_metadata_url", saml2App.AuthenticationSchema.Saml2Configuration.SamlMetadataUrl),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.binding_name", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].BindingName),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.location", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Location),
@@ -338,6 +282,63 @@ func TestResourceApplication(t *testing.T) {
 
 	t.Run("happy path - saml2 application update", func(t *testing.T) {
 
+		updatedSaml2App := applications.Application{
+			Name: "SAML2 - Updated Test App",
+			AuthenticationSchema: &applications.AuthenticationSchema{
+				SsoType: "saml2",
+				Saml2Configuration: &applications.SamlConfiguration{
+					SamlMetadataUrl: "https://updated.test.com",
+					AcsEndpoints: []applications.Saml2AcsEndpoint{
+						{
+							BindingName: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+							Location:    "https://test.1.com",
+							Index:       1,
+							IsDefault:   false,
+						},
+						{
+							BindingName: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
+							Location:    "https://test.2.com",
+							Index:       2,
+							IsDefault:   true,
+						},
+					},
+					SloEndpoints: []applications.Saml2SLOEndpoint{
+						{
+							BindingName:      "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+							Location:         "https://logout.1.com",
+							ResponseLocation: "https://logout-response.1.com",
+						},
+						{
+							BindingName:      "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
+							Location:         "https://logout.2.com",
+							ResponseLocation: "https://logout-response.2.com",
+						},
+					},
+					CertificatesForSigning: []corporateidps.SigningCertificateData{
+						{
+							Base64Certificate: "-----BEGIN CERTIFICATE-----\\nredacted\\n-----END CERTIFICATE-----",
+							IsDefault:         false,
+						},
+						{
+							Base64Certificate: "-----BEGIN CERTIFICATE-----\\nredacted\\n-----END CERTIFICATE-----",
+							IsDefault:         true,
+						},
+					},
+					CertificateForEncryption: &applications.EncryptionCertificateData{
+						Base64Certificate: "-----BEGIN CERTIFICATE-----\\nredacted\\n-----END CERTIFICATE-----",
+					},
+					ResponseElementsToEncrypt: "subjectNameId",
+					DefaultNameIdFormat:       "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+					SignSLOMessages:           false,
+					RequireSignedSLOMessages:  false,
+					RequireSignedAuthnRequest: false,
+					SignAssertions:            false,
+					SignAuthnResponses:        false,
+					DigestAlgorithm:           "sha256",
+				},
+			},
+		}
+
 		rec, user := setupVCR(t, "fixtures/resource_application_saml2_updated")
 		defer stopQuietly(rec)
 
@@ -350,6 +351,7 @@ func TestResourceApplication(t *testing.T) {
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
 						resource.TestCheckResourceAttr("sci_application.testApp", "name", saml2App.Name),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sso_type", saml2App.AuthenticationSchema.SsoType),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.saml_metadata_url", saml2App.AuthenticationSchema.Saml2Configuration.SamlMetadataUrl),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.binding_name", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].BindingName),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.location", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Location),
@@ -374,6 +376,7 @@ func TestResourceApplication(t *testing.T) {
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
 						resource.TestCheckResourceAttr("sci_application.testApp", "name", updatedSaml2App.Name),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sso_type", saml2App.AuthenticationSchema.SsoType),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.saml_metadata_url", updatedSaml2App.AuthenticationSchema.Saml2Configuration.SamlMetadataUrl),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.binding_name", updatedSaml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].BindingName),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.location", updatedSaml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Location),
@@ -439,25 +442,25 @@ func TestResourceApplication(t *testing.T) {
 	// 			},
 	// 			{
 	// 				Config: providerConfig("", user) + OidcResourceApplication("testApp", oidcApplication),
-    //                 Check: resource.ComposeAggregateTestCheckFunc(
-    //                     resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
-    //                     resource.TestCheckResourceAttr("sci_application.testApp", "name", oidcApplication.Name),
-    //                     resource.TestCheckResourceAttr("sci_application.testApp", "description", oidcApplication.Description),
-    //                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sso_type", oidcApplication.AuthenticationSchema.SsoType),
-    //                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.redirect_uris.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.RedirectUris[0]),
-    //                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.post_logout_redirect_uris.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.PostLogoutRedirectUris[0]),
-    //                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.front_channel_logout_uris.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.FrontChannelLogoutUris[0]),
-    //                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.back_channel_logout_uris.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.BackChannelLogoutUris[0]),
-    //                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.jwt_validity", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.JwtValidity)),
-    //                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.refresh_validity", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshValidity)),
-    //                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.refresh_parallel", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshParallel)),
-    //                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.max_exchange_period", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.MaxExchangePeriod),
-    //                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.refresh_token_rotation_scenario", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshTokenRotationScenario),
-    //                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.access_token_format", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.AccessTokenFormat),
-    //                     resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.restricted_grant_types.*", "authorizationCode"),
-    //                     resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.restricted_grant_types.*", "clientCredentials"),
-    //                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.proxy_config.acrs.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.ProxyConfig.Acrs[0]),
-    //                 ),
+	//                 Check: resource.ComposeAggregateTestCheckFunc(
+	//                     resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
+	//                     resource.TestCheckResourceAttr("sci_application.testApp", "name", oidcApplication.Name),
+	//                     resource.TestCheckResourceAttr("sci_application.testApp", "description", oidcApplication.Description),
+	//                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sso_type", oidcApplication.AuthenticationSchema.SsoType),
+	//                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.redirect_uris.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.RedirectUris[0]),
+	//                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.post_logout_redirect_uris.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.PostLogoutRedirectUris[0]),
+	//                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.front_channel_logout_uris.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.FrontChannelLogoutUris[0]),
+	//                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.back_channel_logout_uris.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.BackChannelLogoutUris[0]),
+	//                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.jwt_validity", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.JwtValidity)),
+	//                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.refresh_validity", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshValidity)),
+	//                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.refresh_parallel", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshParallel)),
+	//                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.max_exchange_period", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.MaxExchangePeriod),
+	//                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.refresh_token_rotation_scenario", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshTokenRotationScenario),
+	//                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.access_token_format", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.AccessTokenFormat),
+	//                     resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.restricted_grant_types.*", "authorizationCode"),
+	//                     resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.restricted_grant_types.*", "clientCredentials"),
+	//                     resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.proxy_config.acrs.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.ProxyConfig.Acrs[0]),
+	//                 ),
 	// 			},
 	// 		},
 	// 	})

@@ -5,6 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/users"
 )
@@ -114,4 +115,83 @@ func usersValueFrom(ctx context.Context, u users.UsersResponse, customSchemas ma
 	}
 
 	return users
+}
+
+func getUserRequest(ctx context.Context, plan userData) (*users.User, string, diag.Diagnostics) {
+
+	var diagnostics diag.Diagnostics
+
+	var emails []users.Email
+	diags := plan.Emails.ElementsAs(ctx, &emails, true)
+	diagnostics.Append(diags...)
+	if diagnostics.HasError() {
+		return nil, "", diagnostics
+	}
+
+	var schemas []string
+	diags = plan.Schemas.ElementsAs(ctx, &schemas, true)
+	diagnostics.Append(diags...)
+	if diagnostics.HasError() {
+		return nil, "", diagnostics
+	}
+
+	args := &users.User{
+		UserName: plan.UserName.ValueString(),
+		Emails:   emails,
+		Schemas:  schemas,
+	}
+
+	if !plan.DisplayName.IsNull() {
+		args.DisplayName = plan.DisplayName.ValueString()
+	}
+
+	if !plan.Name.IsNull() && !plan.Name.IsUnknown() {
+		var name users.Name
+		diags = plan.Name.As(ctx, &name, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty:    true,
+			UnhandledUnknownAsEmpty: true,
+		})
+
+		diagnostics.Append(diags...)
+
+		if diagnostics.HasError() {
+			return nil, "", diagnostics
+		}
+
+		args.Name = &name
+	}
+
+	if !plan.InitialPassword.IsNull() {
+		args.Password = plan.InitialPassword.ValueString()
+	}
+
+	if !plan.UserType.IsNull() && !plan.UserType.IsUnknown() {
+		args.UserType = plan.UserType.ValueString()
+	}
+
+	if !plan.Active.IsNull() && !plan.Active.IsUnknown() {
+		args.Active = plan.Active.ValueBool()
+	}
+
+	if !plan.SapExtensionUser.IsNull() && !plan.SapExtensionUser.IsUnknown() {
+
+		var sapExtensionUser users.SAPExtension
+		diags = plan.SapExtensionUser.As(ctx, &sapExtensionUser, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty:    true,
+			UnhandledUnknownAsEmpty: true,
+		})
+		diagnostics.Append(diags...)
+		if diagnostics.HasError() {
+			return nil, "", diagnostics
+		}
+
+		args.SAPExtension = &sapExtensionUser
+	}
+
+	var customSchemas string
+	if !plan.CustomSchemas.IsNull() {
+		customSchemas = plan.CustomSchemas.ValueString()
+	}
+
+	return args, customSchemas, diagnostics
 }

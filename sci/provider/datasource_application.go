@@ -188,9 +188,8 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 											Computed:            true,
 										},
 										"index": schema.Int32Attribute{
-											// TODO
-											// MarkdownDescription: "",
-											Computed: true,
+											MarkdownDescription: "A unique index for the endpoint.",
+											Computed:            true,
 										},
 										"default": schema.BoolAttribute{
 											MarkdownDescription: "Configure if the endpoint is the default one to be used.",

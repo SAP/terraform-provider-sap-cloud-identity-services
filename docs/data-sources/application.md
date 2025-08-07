@@ -109,7 +109,7 @@ Read-Only:
 
 - `binding_name` (String) Specify the SAML binding for the endpoint.
 - `default` (Boolean) Configure if the endpoint is the default one to be used.
-- `index` (Number)
+- `index` (Number) A unique index for the endpoint.
 - `location` (String) The value of the URL or endpoint to be called.
 
 
