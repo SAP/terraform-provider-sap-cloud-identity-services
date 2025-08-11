@@ -50,7 +50,7 @@ var applicationsBody = applications.Application{
 				UserEmailDomain: "test.com",
 			},
 		},
-		OpenIdConnectConfiguration: &applications.OidcConfiguration{
+		OidcConfig: &applications.OidcConfig{
 			RedirectUris: []string{
 				"https:redirectUris.com",
 			},

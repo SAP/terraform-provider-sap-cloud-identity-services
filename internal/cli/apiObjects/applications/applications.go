@@ -115,7 +115,7 @@ type ConsumedApi struct {
 	Name     string `json:"name"`
 }
 
-type OidcConfiguration struct {
+type OidcConfig struct {
 	RedirectUris           []string         `json:"redirectUris,omitempty"`
 	PostLogoutRedirectUris []string         `json:"postLogoutRedirectUris,omitempty"`
 	FrontChannelLogoutUris []string         `json:"frontChannelLogoutUris,omitempty"`
@@ -159,7 +159,7 @@ type AuthenticationSchema struct {
 	AdvancedAssertionAttributes   []AdvancedAssertionAttribute `json:"advancedAssertionAttributes,omitempty" tfsdk:"advanced_assertion_attributes"`
 	DefaultAuthenticatingIdpId    string                       `json:"defaultAuthenticatingIdpId,omitempty" tfsdk:"default_authenticating_idp"`
 	ConditionalAuthentication     []AuthenicationRule          `json:"conditionalAuthentication,omitempty" tfsdk:"conditional_authentication"`
-	OpenIdConnectConfiguration    *OidcConfiguration           `json:"openIdConnectConfiguration,omitempty"`
+	OidcConfig                    *OidcConfig                  `json:"openIdConnectConfiguration,omitempty"`
 	// RiskBasedAuthentication       RBAConfiguration            `json:"riskBasedAuthentication"`
 	// HomeUrl								string 							`json:"homeUrl"`
 	// FallbackSubjectNameIdentifier		string 							`json:"fallbackSubjectNameIdentifier,omitempty"`

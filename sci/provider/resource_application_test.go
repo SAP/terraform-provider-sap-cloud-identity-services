@@ -57,7 +57,7 @@ func TestResourceApplication(t *testing.T) {
 		Description: "application for testing purposes",
 		AuthenticationSchema: &applications.AuthenticationSchema{
 			SsoType: "openIdConnect",
-			OpenIdConnectConfiguration: &applications.OidcConfiguration{
+			OidcConfig: &applications.OidcConfig{
 				RedirectUris: []string{
 					"https://redirectUris.com",
 				},
@@ -248,19 +248,19 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestCheckResourceAttr("sci_application.testApp", "name", oidcApplication.Name),
 						resource.TestCheckResourceAttr("sci_application.testApp", "description", oidcApplication.Description),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sso_type", oidcApplication.AuthenticationSchema.SsoType),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.redirect_uris.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.RedirectUris[0]),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.post_logout_redirect_uris.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.PostLogoutRedirectUris[0]),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.front_channel_logout_uris.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.FrontChannelLogoutUris[0]),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.back_channel_logout_uris.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.BackChannelLogoutUris[0]),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.jwt_validity", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.JwtValidity)),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.refresh_validity", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshValidity)),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.refresh_parallel", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshParallel)),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.max_exchange_period", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.MaxExchangePeriod),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.refresh_token_rotation_scenario", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshTokenRotationScenario),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.access_token_format", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.AccessTokenFormat),
-						resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.restricted_grant_types.*", "authorizationCode"),
-						resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.restricted_grant_types.*", "clientCredentials"),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.proxy_config.acrs.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.ProxyConfig.Acrs[0]),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.redirect_uris.0", oidcApplication.AuthenticationSchema.OidcConfig.RedirectUris[0]),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.post_logout_redirect_uris.0", oidcApplication.AuthenticationSchema.OidcConfig.PostLogoutRedirectUris[0]),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.front_channel_logout_uris.0", oidcApplication.AuthenticationSchema.OidcConfig.FrontChannelLogoutUris[0]),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.back_channel_logout_uris.0", oidcApplication.AuthenticationSchema.OidcConfig.BackChannelLogoutUris[0]),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.token_policy.jwt_validity", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.OidcConfig.TokenPolicy.JwtValidity)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.token_policy.refresh_validity", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshValidity)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.token_policy.refresh_parallel", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshParallel)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.token_policy.max_exchange_period", oidcApplication.AuthenticationSchema.OidcConfig.TokenPolicy.MaxExchangePeriod),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.token_policy.refresh_token_rotation_scenario", oidcApplication.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshTokenRotationScenario),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.token_policy.access_token_format", oidcApplication.AuthenticationSchema.OidcConfig.TokenPolicy.AccessTokenFormat),
+						resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.oidc_config.restricted_grant_types.*", "authorizationCode"),
+						resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.oidc_config.restricted_grant_types.*", "clientCredentials"),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.proxy_config.acrs.0", oidcApplication.AuthenticationSchema.OidcConfig.ProxyConfig.Acrs[0]),
 					),
 				},
 			},
@@ -276,7 +276,7 @@ func TestResourceApplication(t *testing.T) {
 			Description: "application for testing purposes",
 			AuthenticationSchema: &applications.AuthenticationSchema{
 				SsoType: "openIdConnect",
-				OpenIdConnectConfiguration: &applications.OidcConfiguration{
+				OidcConfig: &applications.OidcConfig{
 					RedirectUris: []string{
 						"https://redirectUris2.com",
 					},
@@ -321,19 +321,19 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestCheckResourceAttr("sci_application.testApp", "name", oidcApplication.Name),
 						resource.TestCheckResourceAttr("sci_application.testApp", "description", oidcApplication.Description),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sso_type", oidcApplication.AuthenticationSchema.SsoType),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.redirect_uris.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.RedirectUris[0]),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.post_logout_redirect_uris.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.PostLogoutRedirectUris[0]),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.front_channel_logout_uris.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.FrontChannelLogoutUris[0]),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.back_channel_logout_uris.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.BackChannelLogoutUris[0]),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.jwt_validity", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.JwtValidity)),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.refresh_validity", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshValidity)),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.refresh_parallel", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshParallel)),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.max_exchange_period", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.MaxExchangePeriod),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.refresh_token_rotation_scenario", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshTokenRotationScenario),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.access_token_format", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.AccessTokenFormat),
-						resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.restricted_grant_types.*", "authorizationCode"),
-						resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.restricted_grant_types.*", "clientCredentials"),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.proxy_config.acrs.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.ProxyConfig.Acrs[0]),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.redirect_uris.0", oidcApplication.AuthenticationSchema.OidcConfig.RedirectUris[0]),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.post_logout_redirect_uris.0", oidcApplication.AuthenticationSchema.OidcConfig.PostLogoutRedirectUris[0]),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.front_channel_logout_uris.0", oidcApplication.AuthenticationSchema.OidcConfig.FrontChannelLogoutUris[0]),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.back_channel_logout_uris.0", oidcApplication.AuthenticationSchema.OidcConfig.BackChannelLogoutUris[0]),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.token_policy.jwt_validity", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.OidcConfig.TokenPolicy.JwtValidity)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.token_policy.refresh_validity", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshValidity)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.token_policy.refresh_parallel", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshParallel)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.token_policy.max_exchange_period", oidcApplication.AuthenticationSchema.OidcConfig.TokenPolicy.MaxExchangePeriod),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.token_policy.refresh_token_rotation_scenario", oidcApplication.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshTokenRotationScenario),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.token_policy.access_token_format", oidcApplication.AuthenticationSchema.OidcConfig.TokenPolicy.AccessTokenFormat),
+						resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.oidc_config.restricted_grant_types.*", "authorizationCode"),
+						resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.oidc_config.restricted_grant_types.*", "clientCredentials"),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.proxy_config.acrs.0", oidcApplication.AuthenticationSchema.OidcConfig.ProxyConfig.Acrs[0]),
 					),
 				},
 				{
@@ -343,19 +343,19 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestCheckResourceAttr("sci_application.testApp", "name", oidcUpdatedApplication.Name),
 						resource.TestCheckResourceAttr("sci_application.testApp", "description", oidcUpdatedApplication.Description),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sso_type", oidcUpdatedApplication.AuthenticationSchema.SsoType),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.redirect_uris.0", oidcUpdatedApplication.AuthenticationSchema.OpenIdConnectConfiguration.RedirectUris[0]),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.post_logout_redirect_uris.0", oidcUpdatedApplication.AuthenticationSchema.OpenIdConnectConfiguration.PostLogoutRedirectUris[0]),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.front_channel_logout_uris.0", oidcUpdatedApplication.AuthenticationSchema.OpenIdConnectConfiguration.FrontChannelLogoutUris[0]),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.back_channel_logout_uris.0", oidcUpdatedApplication.AuthenticationSchema.OpenIdConnectConfiguration.BackChannelLogoutUris[0]),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.jwt_validity", fmt.Sprintf("%d", oidcUpdatedApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.JwtValidity)),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.refresh_validity", fmt.Sprintf("%d", oidcUpdatedApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshValidity)),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.refresh_parallel", fmt.Sprintf("%d", oidcUpdatedApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshParallel)),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.max_exchange_period", oidcUpdatedApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.MaxExchangePeriod),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.refresh_token_rotation_scenario", oidcUpdatedApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshTokenRotationScenario),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.access_token_format", oidcUpdatedApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.AccessTokenFormat),
-						resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.restricted_grant_types.*", "refreshToken"),
-						resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.restricted_grant_types.*", "password"),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.proxy_config.acrs.0", oidcUpdatedApplication.AuthenticationSchema.OpenIdConnectConfiguration.ProxyConfig.Acrs[0]),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.redirect_uris.0", oidcUpdatedApplication.AuthenticationSchema.OidcConfig.RedirectUris[0]),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.post_logout_redirect_uris.0", oidcUpdatedApplication.AuthenticationSchema.OidcConfig.PostLogoutRedirectUris[0]),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.front_channel_logout_uris.0", oidcUpdatedApplication.AuthenticationSchema.OidcConfig.FrontChannelLogoutUris[0]),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.back_channel_logout_uris.0", oidcUpdatedApplication.AuthenticationSchema.OidcConfig.BackChannelLogoutUris[0]),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.token_policy.jwt_validity", fmt.Sprintf("%d", oidcUpdatedApplication.AuthenticationSchema.OidcConfig.TokenPolicy.JwtValidity)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.token_policy.refresh_validity", fmt.Sprintf("%d", oidcUpdatedApplication.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshValidity)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.token_policy.refresh_parallel", fmt.Sprintf("%d", oidcUpdatedApplication.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshParallel)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.token_policy.max_exchange_period", oidcUpdatedApplication.AuthenticationSchema.OidcConfig.TokenPolicy.MaxExchangePeriod),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.token_policy.refresh_token_rotation_scenario", oidcUpdatedApplication.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshTokenRotationScenario),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.token_policy.access_token_format", oidcUpdatedApplication.AuthenticationSchema.OidcConfig.TokenPolicy.AccessTokenFormat),
+						resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.oidc_config.restricted_grant_types.*", "refreshToken"),
+						resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.oidc_config.restricted_grant_types.*", "password"),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.proxy_config.acrs.0", oidcUpdatedApplication.AuthenticationSchema.OidcConfig.ProxyConfig.Acrs[0]),
 					),
 				},
 			},
@@ -377,19 +377,19 @@ func TestResourceApplication(t *testing.T) {
 	   						resource.TestCheckResourceAttr("sci_application.testApp", "name", oidcApplication.Name),
 	   						resource.TestCheckResourceAttr("sci_application.testApp", "description", oidcApplication.Description),
 	   						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sso_type", oidcApplication.AuthenticationSchema.SsoType),
-	   						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.redirect_uris.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.RedirectUris[0]),
-	   						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.post_logout_redirect_uris.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.PostLogoutRedirectUris[0]),
-	   						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.front_channel_logout_uris.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.FrontChannelLogoutUris[0]),
-	   						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.back_channel_logout_uris.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.BackChannelLogoutUris[0]),
-	   						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.jwt_validity", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.JwtValidity)),
-	   						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.refresh_validity", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshValidity)),
-	   						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.refresh_parallel", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshParallel)),
-	   						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.max_exchange_period", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.MaxExchangePeriod),
-	   						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.refresh_token_rotation_scenario", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshTokenRotationScenario),
-	   						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.token_policy.access_token_format", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.AccessTokenFormat),
-	   						resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.restricted_grant_types.*", "authorizationCode"),
-	   						resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.restricted_grant_types.*", "clientCredentials"),
-	   						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.openid_connect_configuration.proxy_config.acrs.0", oidcApplication.AuthenticationSchema.OpenIdConnectConfiguration.ProxyConfig.Acrs[0]),
+	   						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.redirect_uris.0", oidcApplication.AuthenticationSchema.Oidc_config.RedirectUris[0]),
+	   						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.post_logout_redirect_uris.0", oidcApplication.AuthenticationSchema.Oidc_config.PostLogoutRedirectUris[0]),
+	   						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.front_channel_logout_uris.0", oidcApplication.AuthenticationSchema.Oidc_config.FrontChannelLogoutUris[0]),
+	   						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.back_channel_logout_uris.0", oidcApplication.AuthenticationSchema.Oidc_config.BackChannelLogoutUris[0]),
+	   						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.token_policy.jwt_validity", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.Oidc_config.TokenPolicy.JwtValidity)),
+	   						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.token_policy.refresh_validity", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.Oidc_config.TokenPolicy.RefreshValidity)),
+	   						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.token_policy.refresh_parallel", fmt.Sprintf("%d", oidcApplication.AuthenticationSchema.Oidc_config.TokenPolicy.RefreshParallel)),
+	   						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.token_policy.max_exchange_period", oidcApplication.AuthenticationSchema.Oidc_config.TokenPolicy.MaxExchangePeriod),
+	   						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.token_policy.refresh_token_rotation_scenario", oidcApplication.AuthenticationSchema.Oidc_config.TokenPolicy.RefreshTokenRotationScenario),
+	   						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.token_policy.access_token_format", oidcApplication.AuthenticationSchema.Oidc_config.TokenPolicy.AccessTokenFormat),
+	   						resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.oidc_config.restricted_grant_types.*", "authorizationCode"),
+	   						resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.oidc_config.restricted_grant_types.*", "clientCredentials"),
+	   						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.proxy_config.acrs.0", oidcApplication.AuthenticationSchema.Oidc_config.ProxyConfig.Acrs[0]),
 	   					),
 	   				},
 	   				{
@@ -625,7 +625,7 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithoutRedirectUris("testApp", "test-app", "application for testing purposes"),
-					ExpectError: regexp.MustCompile("Attribute \"authentication_schema.openid_connect_configuration.redirect_uris\"\nmust be specified when \"authentication_schema.openid_connect_configuration\"\nis specified"),
+					ExpectError: regexp.MustCompile("Attribute \"authentication_schema.oidc_config.redirect_uris\" must be specified\nwhen \"authentication_schema.oidc_config\" is specified"),
 				},
 			},
 		})
@@ -639,7 +639,7 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithFrontChannelLogoutUris("testApp", "test-app", "application for testing purposes", []string{"https://validUri.com", "this-is-not-a uri"}),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute\nauthentication_schema.openid_connect_configuration.front_channel_logout_uris\\[Value\\(\"this-is-not-a\nuri\"\\)\\] value must be a valid URL, got: %s", "this-is-not-a uri")),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute\nauthentication_schema.oidc_config.front_channel_logout_uris\\[Value\\(\"this-is-not-a\nuri\"\\)\\] value must be a valid URL, got: %s", "this-is-not-a uri")),
 				},
 			},
 		})
@@ -652,7 +652,7 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithBackChannelLogoutUris("testApp", "test-app", "application for testing purposes", []string{"https://validUri.com", "this-is-not-a uri"}),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute\nauthentication_schema.openid_connect_configuration.back_channel_logout_uris\\[Value\\(\"this-is-not-a\nuri\"\\)\\] value must be a valid URL, got: %s", "this-is-not-a uri")),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute\nauthentication_schema.oidc_config.back_channel_logout_uris\\[Value\\(\"this-is-not-a\nuri\"\\)\\] value must be a valid URL, got: %s", "this-is-not-a uri")),
 				},
 			},
 		})
@@ -665,7 +665,7 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithMaxExchangePeriod("testApp", "test-app", "application for testing purposes", "this-is-not-a-valid-max_exchange_period"),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute\nauthentication_schema.openid_connect_configuration.token_policy.max_exchange_period\nvalue must be one of: \\[\"unlimited\" \"maxSessionValidity\"\n\"initialRefreshTokenValidity\"\\], got:\n\"%s\"", "this-is-not-a-valid-max_exchange_period")),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_schema.oidc_config.token_policy.max_exchange_period\nvalue must be one of: \\[\"unlimited\" \"maxSessionValidity\"\n\"initialRefreshTokenValidity\"\\], got:\n\"%s\"", "this-is-not-a-valid-max_exchange_period")),
 				},
 			},
 		})
@@ -678,7 +678,7 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithRefreshTokenRotationScenario("testApp", "test-app", "application for testing purposes", "this-is-not-a-valid-refresh_token_rotation_scenario"),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute\nauthentication_schema.openid_connect_configuration.token_policy.refresh_token_rotation_scenario\nvalue must be one of: \\[\"off\" \"online\" \"mobile\"\\], got:\n\"%s\"", "this-is-not-a-valid-refresh_token_rotation_scenario")),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute\nauthentication_schema.oidc_config.token_policy.refresh_token_rotation_scenario\nvalue must be one of: \\[\"off\" \"online\" \"mobile\"\\], got:\n\"%s\"", "this-is-not-a-valid-refresh_token_rotation_scenario")),
 				},
 			},
 		})
@@ -691,7 +691,7 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithAccessTokenFormat("testApp", "test-app", "application for testing purposes", "this-is-not-a-valid-access_token_format"),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute\nauthentication_schema.openid_connect_configuration.token_policy.access_token_format\nvalue must be one of: \\[\"default\" \"jwt\" \"opaque\"\\], got:\n\"%s\"", "this-is-not-a-valid-access_token_format")),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_schema.oidc_config.token_policy.access_token_format\nvalue must be one of: \\[\"default\" \"jwt\" \"opaque\"\\], got:\n\"%s\"", "this-is-not-a-valid-access_token_format")),
 				},
 			},
 		})
@@ -704,7 +704,7 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithRestrictedGrantTypes("testApp", "test-app", "application for testing purposes", []string{"this-is-not-a-valid-restricted_grant_type"}),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute\nauthentication_schema.openid_connect_configuration.restricted_grant_types\\[Value\\(\"this-is-not-a-valid-restricted_grant_type\"\\)\\]\nvalue must be one of: \\[\"clientCredentials\" \"authorizationCode\" \"refreshToken\"\n\"password\" \"implicit\" \"jwtBearer\" \"authorizationCodePkceS256\"\n\"tokenExchange\"\\], got: \"%s\"", "this-is-not-a-valid-restricted_grant_type")),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute\nauthentication_schema.oidc_config.restricted_grant_types\\[Value\\(\"this-is-not-a-valid-restricted_grant_type\"\\)\\]\nvalue must be one of: \\[\"clientCredentials\" \"authorizationCode\" \"refreshToken\"\n\"password\" \"implicit\" \"jwtBearer\" \"authorizationCodePkceS256\"\n\"tokenExchange\"\\], got: \"%s\"", "this-is-not-a-valid-restricted_grant_type")),
 				},
 			},
 		})
@@ -766,27 +766,27 @@ func ResourceApplication(resourceName string, app applications.Application) stri
 func OidcResourceApplication(resourceName string, app applications.Application) string {
 
 	var redirectUris string
-	for _, uri := range app.AuthenticationSchema.OpenIdConnectConfiguration.RedirectUris {
+	for _, uri := range app.AuthenticationSchema.OidcConfig.RedirectUris {
 		redirectUris += fmt.Sprintf(`"%s",`, uri)
 	}
 	var postLogoutRedirectUris string
-	for _, uri := range app.AuthenticationSchema.OpenIdConnectConfiguration.PostLogoutRedirectUris {
+	for _, uri := range app.AuthenticationSchema.OidcConfig.PostLogoutRedirectUris {
 		postLogoutRedirectUris += fmt.Sprintf(`"%s",`, uri)
 	}
 	var frontChannelLogoutUris string
-	for _, uri := range app.AuthenticationSchema.OpenIdConnectConfiguration.FrontChannelLogoutUris {
+	for _, uri := range app.AuthenticationSchema.OidcConfig.FrontChannelLogoutUris {
 		frontChannelLogoutUris += fmt.Sprintf(`"%s",`, uri)
 	}
 	var backChannelLogoutUris string
-	for _, uri := range app.AuthenticationSchema.OpenIdConnectConfiguration.BackChannelLogoutUris {
+	for _, uri := range app.AuthenticationSchema.OidcConfig.BackChannelLogoutUris {
 		backChannelLogoutUris += fmt.Sprintf(`"%s",`, uri)
 	}
 	var restrictedGrantTypes string
-	for _, grantType := range app.AuthenticationSchema.OpenIdConnectConfiguration.RestrictedGrantTypes {
+	for _, grantType := range app.AuthenticationSchema.OidcConfig.RestrictedGrantTypes {
 		restrictedGrantTypes += fmt.Sprintf(`"%s",`, grantType)
 	}
 	var acrs string
-	for _, acr := range app.AuthenticationSchema.OpenIdConnectConfiguration.ProxyConfig.Acrs {
+	for _, acr := range app.AuthenticationSchema.OidcConfig.ProxyConfig.Acrs {
 		acrs += fmt.Sprintf(`"%s",`, acr)
 	}
 
@@ -796,7 +796,7 @@ func OidcResourceApplication(resourceName string, app applications.Application) 
 		description = "%s"
 		authentication_schema = {
 			sso_type = "%s"
-			openid_connect_configuration = {
+			oidc_config = {
 				redirect_uris=[%s]
 				post_logout_redirect_uris=[%s]
 				front_channel_logout_uris=[%s]
@@ -816,7 +816,7 @@ func OidcResourceApplication(resourceName string, app applications.Application) 
 			}
 			
 		}
-	}`, resourceName, app.Name, app.Description, app.AuthenticationSchema.SsoType, redirectUris, postLogoutRedirectUris, frontChannelLogoutUris, backChannelLogoutUris, app.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.JwtValidity, app.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshValidity, app.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshParallel, app.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.MaxExchangePeriod, app.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshTokenRotationScenario, app.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.AccessTokenFormat, restrictedGrantTypes, acrs)
+	}`, resourceName, app.Name, app.Description, app.AuthenticationSchema.SsoType, redirectUris, postLogoutRedirectUris, frontChannelLogoutUris, backChannelLogoutUris, app.AuthenticationSchema.OidcConfig.TokenPolicy.JwtValidity, app.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshValidity, app.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshParallel, app.AuthenticationSchema.OidcConfig.TokenPolicy.MaxExchangePeriod, app.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshTokenRotationScenario, app.AuthenticationSchema.OidcConfig.TokenPolicy.AccessTokenFormat, restrictedGrantTypes, acrs)
 }
 
 func ResourceApplicationWithParent(resourceName string, appName string, description string, parentAppId string) string {
@@ -941,7 +941,7 @@ func ResourceApplicationWithFrontChannelLogoutUris(resourceName string, appName 
 		name = "%s"
 		description = "%s"
 		authentication_schema = {
-			openid_connect_configuration = {
+			oidc_config = {
 				redirect_uris = ["https://redirecturi.com"]
 				front_channel_logout_uris = [%s]
 			}	
@@ -961,7 +961,7 @@ func ResourceApplicationWithBackChannelLogoutUris(resourceName string, appName s
 		name = "%s"
 		description = "%s"
 		authentication_schema = {
-			openid_connect_configuration = {
+			oidc_config = {
 				redirect_uris = ["https://redirecturi.com"]
 				back_channel_logout_uris = [%s]
 			}	
@@ -976,7 +976,7 @@ func ResourceApplicationWithMaxExchangePeriod(resourceName string, appName strin
 		name = "%s"
 		description = "%s"
 		authentication_schema = {
-			openid_connect_configuration = {
+			oidc_config = {
 				redirect_uris = ["https://redirectUris.com"]
 				token_policy = {
 					max_exchange_period = "%s"
@@ -993,7 +993,7 @@ func ResourceApplicationWithRefreshTokenRotationScenario(resourceName string, ap
 		name = "%s"
 		description = "%s"
 		authentication_schema = {
-			openid_connect_configuration = {
+			oidc_config = {
 				redirect_uris = ["https://redirectUris.com"]
 				token_policy = {
 					refresh_token_rotation_scenario = "%s"
@@ -1010,7 +1010,7 @@ func ResourceApplicationWithAccessTokenFormat(resourceName string, appName strin
 		name = "%s"
 		description = "%s"
 		authentication_schema = {
-			openid_connect_configuration = {
+			oidc_config = {
 				redirect_uris = ["https://redirectUris.com"]
 				token_policy = {
 					access_token_format = "%s"
@@ -1033,7 +1033,7 @@ func ResourceApplicationWithRestrictedGrantTypes(resourceName string, appName st
 		name = "%s"
 		description = "%s"
 		authentication_schema = {
-			openid_connect_configuration = {
+			oidc_config = {
 				redirect_uris = ["https://redirecturi.com"]
 				restricted_grant_types = [%s]
 			}	
@@ -1048,7 +1048,7 @@ func ResourceApplicationWithoutRedirectUris(resourceName string, appName string,
 		name = "%s"
 		description = "%s"
 		authentication_schema = {
-			openid_connect_configuration = {
+			oidc_config = {
 			}
 		}
 	}

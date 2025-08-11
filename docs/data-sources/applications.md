@@ -39,57 +39,19 @@ Read-Only:
 <a id="nestedatt--values--authentication_schema"></a>
 ### Nested Schema for `values.authentication_schema`
 
-Optional:
-
-- `openid_connect_configuration` (Attributes) oidc (see [below for nested schema](#nestedatt--values--authentication_schema--openid_connect_configuration))
-
 Read-Only:
 
 - `advanced_assertion_attributes` (Attributes List) Identical to the assertion attributes, except that the assertion attributes can come from other Sources. (see [below for nested schema](#nestedatt--values--authentication_schema--advanced_assertion_attributes))
 - `assertion_attributes` (Attributes List) User attributes to be sent to the application. The Source of these attributes is always the Identity Directory (see [below for nested schema](#nestedatt--values--authentication_schema--assertion_attributes))
 - `conditional_authentication` (Attributes List) Define rules for authenticating identity provider according to email domain, user type, user group, and IP range. Each rule is evaluated by priority until the criteria of a rule are fulfilled. (see [below for nested schema](#nestedatt--values--authentication_schema--conditional_authentication))
 - `default_authenticating_idp` (String) A default identity provider can be used for users with any user domain, group and type. This identity provider is used when none of the defined authentication rules meets the criteria.
+- `oidc_config` (Attributes) OpenID Connect (OIDC) configuration options for this application. (see [below for nested schema](#nestedatt--values--authentication_schema--oidc_config))
 - `sso_type` (String) The preferred protocol for the application
 - `subject_name_identifier` (Attributes) The attribute by which the application uses to identify the users. Used by the application to uniquely identify the user during logon.
 Identity Authentication sends the attribute to the application as :
 	 - subject in OpenID Connect tokens
 	 - name ID in SAML 2.0 assertions (see [below for nested schema](#nestedatt--values--authentication_schema--subject_name_identifier))
 - `subject_name_identifier_function` (String) Convert the subject name identifier to uppercase or lowercase
-
-<a id="nestedatt--values--authentication_schema--openid_connect_configuration"></a>
-### Nested Schema for `values.authentication_schema.openid_connect_configuration`
-
-Optional:
-
-- `back_channel_logout_uris` (Set of String) List of back-channel logout URIs that support server-to-server logout notifications. Each must be a valid URL. Up to 20 URIs allowed.
-- `front_channel_logout_uris` (Set of String) List of front-channel logout URIs that support browser-based logout. Each must be a valid URL and up to 20 URIs are allowed.
-- `post_logout_redirect_uris` (Set of String) List of URIs to which the user will be redirected after logging out from the application. Can include up to 20 URIs.
-- `proxy_config` (Attributes) Optional proxy configuration including accepted ACR values. (see [below for nested schema](#nestedatt--values--authentication_schema--openid_connect_configuration--proxy_config))
-- `redirect_uris` (Set of String) A list of redirect URIs that the OpenID Provider is allowed to redirect to after authentication. Must contain 1 to 20 valid URIs.
-- `restricted_grant_types` (Set of String) Set of OAuth 2.0 grant types that are restricted for the application. Must match one of the supported grant types.
-- `token_policy` (Attributes) Defines the token policy for the application. (see [below for nested schema](#nestedatt--values--authentication_schema--openid_connect_configuration--token_policy))
-
-<a id="nestedatt--values--authentication_schema--openid_connect_configuration--proxy_config"></a>
-### Nested Schema for `values.authentication_schema.openid_connect_configuration.proxy_config`
-
-Optional:
-
-- `acrs` (Set of String) Set of accepted ACR (Authentication Context Class Reference) values. Up to 20 values allowed.
-
-
-<a id="nestedatt--values--authentication_schema--openid_connect_configuration--token_policy"></a>
-### Nested Schema for `values.authentication_schema.openid_connect_configuration.token_policy`
-
-Optional:
-
-- `access_token_format` (String) The format of the access token issued. Must be one of the allowed values.
-- `jwt_validity` (Number) JWT access token validity in seconds. Must be between 60 seconds (1 minute) and 43200 seconds (12 hours).
-- `max_exchange_period` (String) Maximum token exchange period. Must be one of the allowed values.
-- `refresh_parallel` (Number) Maximum number of refresh tokens that can be used in parallel. Valid values range from 1 to 10.
-- `refresh_token_rotation_scenario` (String) Defines the scenario for refresh token rotation. Must be one of the allowed values.
-- `refresh_validity` (Number) Refresh token validity in seconds. Can range from 0 to 15552000 seconds (180 days).
-
-
 
 <a id="nestedatt--values--authentication_schema--advanced_assertion_attributes"></a>
 ### Nested Schema for `values.authentication_schema.advanced_assertion_attributes`
@@ -122,6 +84,41 @@ Read-Only:
 - `user_email_domain` (String) Valid email domain to be authenticated.
 - `user_group` (String) The user group to be authenticated.
 - `user_type` (String) The type of user to be authenticated.
+
+
+<a id="nestedatt--values--authentication_schema--oidc_config"></a>
+### Nested Schema for `values.authentication_schema.oidc_config`
+
+Read-Only:
+
+- `back_channel_logout_uris` (Set of String) List of back-channel logout URIs that support server-to-server logout notifications. Each must be a valid URL. Up to 20 URIs allowed.
+- `front_channel_logout_uris` (Set of String) List of front-channel logout URIs that support browser-based logout. Each must be a valid URL and up to 20 URIs are allowed.
+- `post_logout_redirect_uris` (Set of String) List of URIs to which the user will be redirected after logging out from the application. Can include up to 20 URIs.
+- `proxy_config` (Attributes) Optional proxy configuration including accepted ACR values. (see [below for nested schema](#nestedatt--values--authentication_schema--oidc_config--proxy_config))
+- `redirect_uris` (Set of String) A list of redirect URIs that the OpenID Provider is allowed to redirect to after authentication. Must contain 1 to 20 valid URIs.
+- `restricted_grant_types` (Set of String) Set of OAuth 2.0 grant types that are restricted for the application.Acceptable values are : `clientCredentials`, `authorizationCode`, `refreshToken`, `password`, `implicit`, `jwtBearer`, `authorizationCodePkceS256`, `tokenExchange`
+- `token_policy` (Attributes) Defines the token policy for the application. (see [below for nested schema](#nestedatt--values--authentication_schema--oidc_config--token_policy))
+
+<a id="nestedatt--values--authentication_schema--oidc_config--proxy_config"></a>
+### Nested Schema for `values.authentication_schema.oidc_config.proxy_config`
+
+Read-Only:
+
+- `acrs` (Set of String) Set of accepted ACR (Authentication Context Class Reference) values. Up to 20 values allowed.
+
+
+<a id="nestedatt--values--authentication_schema--oidc_config--token_policy"></a>
+### Nested Schema for `values.authentication_schema.oidc_config.token_policy`
+
+Read-Only:
+
+- `access_token_format` (String) The format of the access token issued.Acceptable values are : `default`, `jwt`, `opaque`
+- `jwt_validity` (Number) JWT access token validity in seconds. Must be between 60 seconds (1 minute) and 43200 seconds (12 hours).
+- `max_exchange_period` (String) Maximum token exchange period.Acceptable values are : `unlimited`, `maxSessionValidity`, `initialRefreshTokenValidity`
+- `refresh_parallel` (Number) Maximum number of refresh tokens that can be used in parallel. Valid values range from 1 to 10.
+- `refresh_token_rotation_scenario` (String) Defines the scenario for refresh token rotation.Acceptable values are : `off`, `online`, `mobile`
+- `refresh_validity` (Number) Refresh token validity in seconds. Can range from 0 to 15552000 seconds (180 days).
+
 
 
 <a id="nestedatt--values--authentication_schema--subject_name_identifier"></a>

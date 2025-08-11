@@ -322,7 +322,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 							},
 						},
 					},
-					"openid_connect_configuration": schema.SingleNestedAttribute{
+					"oidc_config": schema.SingleNestedAttribute{
 						MarkdownDescription: "OpenID Connect (OIDC) configuration options for this application.",
 						Optional:            true,
 						Computed:            true,
@@ -331,7 +331,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 						},
 						Validators: []validator.Object{
 							objectvalidator.AlsoRequires(
-								path.MatchRoot("authentication_schema").AtName("openid_connect_configuration").AtName("redirect_uris"),
+								path.MatchRoot("authentication_schema").AtName("oidc_config").AtName("redirect_uris"),
 							),
 						},
 						Attributes: map[string]schema.Attribute{
@@ -402,7 +402,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 										},
 									},
 									"max_exchange_period": schema.StringAttribute{
-										MarkdownDescription: "Maximum token exchange period. Must be one of the allowed values.",
+										MarkdownDescription: "Maximum token exchange period. " + utils.ValidValuesString(maxExchangePeriodValues),
 										Optional:            true,
 										Computed:            true,
 										Validators: []validator.String{
@@ -410,7 +410,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 										},
 									},
 									"refresh_token_rotation_scenario": schema.StringAttribute{
-										MarkdownDescription: "Defines the scenario for refresh token rotation. Must be one of the allowed values.",
+										MarkdownDescription: "Defines the scenario for refresh token rotation. " + utils.ValidValuesString(refreshTokenRotationScenarioValues),
 										Optional:            true,
 										Computed:            true,
 										Validators: []validator.String{
@@ -418,7 +418,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 										},
 									},
 									"access_token_format": schema.StringAttribute{
-										MarkdownDescription: "The format of the access token issued.",
+										MarkdownDescription: "The format of the access token issued." + utils.ValidValuesString(accessTokenFormatValues),
 										Optional:            true,
 										Computed:            true,
 										Validators: []validator.String{
@@ -428,7 +428,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 								},
 							},
 							"restricted_grant_types": schema.SetAttribute{
-								MarkdownDescription: "Set of OAuth 2.0 grant types that are restricted for the application. Must match one of the supported grant types.",
+								MarkdownDescription: "Set of OAuth 2.0 grant types that are restricted for the application." + utils.ValidValuesString(restrictedGrantTypesValues),
 								Optional:            true,
 								Computed:            true,
 								ElementType:         types.StringType,

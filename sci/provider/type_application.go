@@ -19,7 +19,7 @@ type authenticationSchemaData struct {
 	AdvancedAssertionAttributes   types.List   `tfsdk:"advanced_assertion_attributes"`
 	DefaultAuthenticatingIdpId    types.String `tfsdk:"default_authenticating_idp"`
 	AuthenticationRules           types.List   `tfsdk:"conditional_authentication"`
-	OpenIdConnectConfiguration    types.Object `tfsdk:"openid_connect_configuration"`
+	OpenIdConnectConfiguration    types.Object `tfsdk:"oidc_config"`
 }
 
 type authenticationRulesData struct {
@@ -226,29 +226,29 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 		authenticationSchema.AuthenticationRules = types.ListNull(authenticationRulesObjType)
 	}
 
-	if a.AuthenticationSchema.OpenIdConnectConfiguration != nil {
+	if a.AuthenticationSchema.OidcConfig != nil {
 		oidc := openIdConnectConfigurationData{}
 
-		oidc.RedirectUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OpenIdConnectConfiguration.RedirectUris)
+		oidc.RedirectUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.RedirectUris)
 		diagnostics.Append(diags...)
 
-		oidc.PostLogoutRedirectUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OpenIdConnectConfiguration.PostLogoutRedirectUris)
+		oidc.PostLogoutRedirectUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.PostLogoutRedirectUris)
 		diagnostics.Append(diags...)
 
-		oidc.FrontChannelLogoutUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OpenIdConnectConfiguration.FrontChannelLogoutUris)
+		oidc.FrontChannelLogoutUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.FrontChannelLogoutUris)
 		diagnostics.Append(diags...)
 
-		oidc.BackChannelLogoutUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OpenIdConnectConfiguration.BackChannelLogoutUris)
+		oidc.BackChannelLogoutUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.BackChannelLogoutUris)
 		diagnostics.Append(diags...)
 
-		if a.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy != nil {
+		if a.AuthenticationSchema.OidcConfig.TokenPolicy != nil {
 			tokenpolicy := tokenPolicyData{
-				JwtValidity:                  types.Int32Value(a.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.JwtValidity),
-				RefreshValidity:              types.Int32Value(a.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshValidity),
-				RefreshParallel:              types.Int32Value(a.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshParallel),
-				MaxExchangePeriod:            types.StringValue(a.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.MaxExchangePeriod),
-				RefreshTokenRotationScenario: types.StringValue(a.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.RefreshTokenRotationScenario),
-				AccessTokenFormat:            types.StringValue(a.AuthenticationSchema.OpenIdConnectConfiguration.TokenPolicy.AccessTokenFormat),
+				JwtValidity:                  types.Int32Value(a.AuthenticationSchema.OidcConfig.TokenPolicy.JwtValidity),
+				RefreshValidity:              types.Int32Value(a.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshValidity),
+				RefreshParallel:              types.Int32Value(a.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshParallel),
+				MaxExchangePeriod:            types.StringValue(a.AuthenticationSchema.OidcConfig.TokenPolicy.MaxExchangePeriod),
+				RefreshTokenRotationScenario: types.StringValue(a.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshTokenRotationScenario),
+				AccessTokenFormat:            types.StringValue(a.AuthenticationSchema.OidcConfig.TokenPolicy.AccessTokenFormat),
 			}
 			oidc.TokenPolicy, diags = types.ObjectValueFrom(ctx, tokenPolicyObjType, tokenpolicy)
 			diagnostics.Append(diags...)
@@ -256,16 +256,16 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 			oidc.TokenPolicy = types.ObjectNull(tokenPolicyObjType)
 		}
 		var restrictedGrants []string
-		for _, g := range a.AuthenticationSchema.OpenIdConnectConfiguration.RestrictedGrantTypes {
+		for _, g := range a.AuthenticationSchema.OidcConfig.RestrictedGrantTypes {
 			restrictedGrants = append(restrictedGrants, string(g))
 		}
 		oidc.RestrictedGrantTypes, diags = types.SetValueFrom(ctx, types.StringType, restrictedGrants)
 		diagnostics.Append(diags...)
 
 		// Proxy Config
-		if a.AuthenticationSchema.OpenIdConnectConfiguration.ProxyConfig != nil {
+		if a.AuthenticationSchema.OidcConfig.ProxyConfig != nil {
 			proxyConfig := proxyConfigData{}
-			proxyConfig.Acrs, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OpenIdConnectConfiguration.ProxyConfig.Acrs)
+			proxyConfig.Acrs, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.ProxyConfig.Acrs)
 			diagnostics.Append(diags...)
 
 			oidc.ProxyConfig, diags = types.ObjectValueFrom(ctx, proxyConfigObjType, proxyConfig)
@@ -434,7 +434,7 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 				return nil, diagnostics
 			}
 
-			oidc := &applications.OidcConfiguration{}
+			oidc := &applications.OidcConfig{}
 
 			// Redirect URIs
 			if !openIdConnectConfiguration.RedirectUris.IsNull() {
@@ -462,14 +462,14 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 
 			// Restricted Grant Types
 			if !openIdConnectConfiguration.RestrictedGrantTypes.IsNull() {
-				var restrictedGrants []string
-				diags := openIdConnectConfiguration.RestrictedGrantTypes.ElementsAs(ctx, &restrictedGrants, true)
+				// var restrictedGrants []applications.GrantType
+				diags := openIdConnectConfiguration.RestrictedGrantTypes.ElementsAs(ctx, &oidc.RestrictedGrantTypes, true)
 				diagnostics.Append(diags...)
 
 				// Convert []string to []applications.GrantType
-				for _, g := range restrictedGrants {
-					oidc.RestrictedGrantTypes = append(oidc.RestrictedGrantTypes, applications.GrantType(g))
-				}
+				// for _, g := range restrictedGrants {
+				// 	oidc.RestrictedGrantTypes = append(oidc.RestrictedGrantTypes, applications.GrantType(g))
+				// }
 			}
 
 			// Token Policy
@@ -515,7 +515,7 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 				}
 			}
 
-			args.AuthenticationSchema.OpenIdConnectConfiguration = oidc
+			args.AuthenticationSchema.OidcConfig = oidc
 		}
 	}
 
