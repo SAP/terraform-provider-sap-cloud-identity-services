@@ -172,7 +172,7 @@ func TestCorporateIdPs_Create(t *testing.T) {
 
 		assert.Zero(t, res)
 		assert.Error(t, err)
-		assert.Equal(t, "application error 400 \ncreate failed : server error", err.Error())
+		assert.Equal(t, "error 400 \ncreate failed : server error", err.Error())
 
 	})
 
@@ -235,7 +235,35 @@ func TestCorporateIdPs_Get(t *testing.T) {
 
 		assert.Zero(t, res)
 		assert.Error(t, err)
-		assert.Equal(t, "application error 400 \nget failed : server error", err.Error())
+		assert.Equal(t, "error 400 \nget failed : server error", err.Error())
+
+	})
+
+	t.Run("validate the API - empty response", func(t *testing.T) {
+
+		resErr, _ := json.Marshal(struct {
+			Error ResponseError `json:"error"`
+		}{
+			Error: ResponseError{
+				Code:    404,
+				Message: "Unable to find identity providers.",
+			},
+		})
+
+		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusBadRequest)
+			_, err := w.Write(resErr)
+			assert.NoError(t, err, "Failed to write response")
+
+			assertCall[corporateidps.IdentityProvider](t, r, corporateIdPsPath, "GET", nil)
+		}))
+
+		defer srv.Close()
+
+		res, _, err := client.CorporateIdP.Get(context.TODO())
+
+		assert.NoError(t, err)
+		assert.Equal(t, corporateidps.IdentityProvidersResponse{}, res)
 
 	})
 }
@@ -313,7 +341,7 @@ func TestCorporateIdPs_GetByIdPId(t *testing.T) {
 
 		assert.Zero(t, res)
 		assert.Error(t, err)
-		assert.Equal(t, "application error 400 \nget failed : server error", err.Error())
+		assert.Equal(t, "error 400 \nget failed : server error", err.Error())
 	})
 }
 
@@ -361,6 +389,6 @@ func TestCorporateIdPs_Delete(t *testing.T) {
 		err := client.CorporateIdP.Delete(context.TODO(), "valid-idp-id")
 
 		assert.Error(t, err)
-		assert.Equal(t, "application error 400 \ndelete failed : server error", err.Error())
+		assert.Equal(t, "error 400 \ndelete failed : server error", err.Error())
 	})
 }

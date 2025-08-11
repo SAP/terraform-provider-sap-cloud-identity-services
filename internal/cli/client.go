@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"io"
@@ -12,7 +13,13 @@ import (
 	"net/http"
 
 	"net/url"
+
+	corporateidps "github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/corporateIdps"
 )
+
+// Error message for cases when the GET call for listing resources fails with a 404
+// This occurs when there are no resources to be listed
+var emptyResponseError, _ = regexp.Compile("Unable to find (.+)")
 
 type ScimResponseError struct {
 	Detail  string   `json:"detail"`
@@ -115,6 +122,8 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 			var responseError ScimResponseError
 
 			if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
+				// For  users and schemas can never be empty, hence no explicit handling is needed
+				// For groups, the GET call does not throw an error in case of an empty resource list, hence no explicit handling is needed
 				err = fmt.Errorf("SCIM error %s \n%s", responseError.Status, responseError.Detail)
 			} else {
 				err = fmt.Errorf("responded with unknown error : %s", responseError.Status)
@@ -125,7 +134,25 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, bo
 				Error ResponseError `json:"error"`
 			}
 			if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
-				err = fmt.Errorf("application error %d \n%s", responseError.Error.Code, responseError.Error.Message)
+
+				// check the error message and status code to handle the situation when
+				// an error is thrown on a GET call for returning an empty list of resources
+				if emptyResponseError.MatchString(responseError.Error.Message) && responseError.Error.Code == 404 {
+
+					// fetch the type of the resource
+					val := emptyResponseError.FindStringSubmatch(responseError.Error.Message)
+
+					// check the resource and return the appropriate empty response object
+					// Applications can never be empty, hence there is no check
+					// TODO add cases for other non-scim resources once part of the provider
+					switch val[1] {
+					case "identity providers.":
+						return corporateidps.IdentityProvidersResponse{}, out, nil
+					}
+
+				}
+
+				err = fmt.Errorf("error %d \n%s", responseError.Error.Code, responseError.Error.Message)
 
 				for _, errMessage := range responseError.Error.Details {
 					err = fmt.Errorf("%v : %s", err, errMessage.Message)
