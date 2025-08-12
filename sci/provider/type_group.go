@@ -2,10 +2,13 @@ package provider
 
 import (
 	"context"
+	"fmt"
+
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/groups"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
 
 type groupExtensionData struct {
@@ -100,4 +103,72 @@ func groupsValueFrom(ctx context.Context, g groups.GroupsResponse) ([]groupData,
 	}
 
 	return groups, diagnostics
+}
+
+func (r *groupResource) GetGroupRequest(ctx context.Context, plan groupData) (*groups.Group, diag.Diagnostics) {
+
+	var diagnostics diag.Diagnostics
+
+	var schemas []string
+	diags := plan.Schemas.ElementsAs(ctx, &schemas, true)
+	diagnostics.Append(diags...)
+	if diagnostics.HasError() {
+		return nil, diagnostics
+	}
+
+	args := &groups.Group{
+		Schemas:     schemas,
+		DisplayName: plan.DisplayName.ValueString(),
+	}
+
+	if !plan.GroupMembers.IsNull() {
+
+		var members []memberData
+		diags = plan.GroupMembers.ElementsAs(ctx, &members, true)
+		diagnostics.Append(diags...)
+		if diagnostics.HasError() {
+			return nil, diagnostics
+		}
+
+		// the mapping is done manually in order to carry out the member validation
+		for _, member := range members {
+
+			// validate the member as a valid user or group as the API does not handle this
+			err := validateMembers(ctx, r.cli, member.Value.ValueString())
+			if err != nil {
+				diagnostics.AddError(
+					fmt.Sprintf("%s", err),
+					"please provide a valid member UUID",
+				)
+				return nil, diagnostics
+			}
+
+			groupMember := groups.GroupMember{
+				Value: member.Value.ValueString(),
+			}
+
+			if !member.Type.IsNull() {
+				groupMember.Type = member.Type.ValueString()
+			}
+
+			args.GroupMembers = append(args.GroupMembers, groupMember)
+		}
+	}
+
+	if !plan.GroupExtension.IsNull() && !plan.GroupExtension.IsUnknown() {
+
+		var groupExtension groups.GroupExtension
+		diags = plan.GroupExtension.As(ctx, &groupExtension, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty:    true,
+			UnhandledUnknownAsEmpty: true,
+		})
+		diagnostics.Append(diags...)
+		if diagnostics.HasError() {
+			return nil, diagnostics
+		}
+
+		args.GroupExtension = &groupExtension
+	}
+
+	return args, diagnostics
 }

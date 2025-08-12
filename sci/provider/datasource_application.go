@@ -238,6 +238,142 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 							},
 						},
 					},
+					"saml2_config": schema.SingleNestedAttribute{
+						MarkdownDescription: "Configure a SAML 2.0 service provider by providing the necessary metadata.",
+						Computed:            true,
+						Attributes: map[string]schema.Attribute{
+							"saml_metadata_url": schema.StringAttribute{
+								MarkdownDescription: "The URL with service provider metadata. The metadata URL must not contain a query parameter.",
+								Computed:            true,
+							},
+							"acs_endpoints": schema.ListNestedAttribute{
+								MarkdownDescription: "Configure the allowed domains for browser flows.",
+								Computed:            true,
+								NestedObject: schema.NestedAttributeObject{
+									Attributes: map[string]schema.Attribute{
+										"binding_name": schema.StringAttribute{
+											MarkdownDescription: "Specify the SAML binding for the endpoint.",
+											Computed:            true,
+										},
+										"location": schema.StringAttribute{
+											MarkdownDescription: "The value of the URL or endpoint to be called.",
+											Computed:            true,
+										},
+										"index": schema.Int32Attribute{
+											MarkdownDescription: "A unique index for the endpoint.",
+											Computed:            true,
+										},
+										"default": schema.BoolAttribute{
+											MarkdownDescription: "Configure if the endpoint is the default one to be used.",
+											Computed:            true,
+										},
+									},
+								},
+							},
+							"slo_endpoints": schema.ListNestedAttribute{
+								MarkdownDescription: "Configure the URLs of the service provider's single logout endpoints that will receive the logout response or request from Identity Authentication.",
+								Computed:            true,
+								NestedObject: schema.NestedAttributeObject{
+									Attributes: map[string]schema.Attribute{
+										"binding_name": schema.StringAttribute{
+											MarkdownDescription: "Specify the SAML binding for the endpoint.",
+											Computed:            true,
+										},
+										"location": schema.StringAttribute{
+											MarkdownDescription: "The value of the URL or endpoint to be called.",
+											Computed:            true,
+										},
+										"response_location": schema.StringAttribute{
+											MarkdownDescription: "The URL or endpoint to which logout response messages are sent.",
+											Computed:            true,
+										},
+									},
+								},
+							},
+							"signing_certificates": schema.ListNestedAttribute{
+								MarkdownDescription: "Base64-encoded certificates used by the service provider to sign digitally, SAML protocol messages sent to Identity Authentication. A maximum of 2 certificates are allowed.",
+								Computed:            true,
+								NestedObject: schema.NestedAttributeObject{
+									Attributes: map[string]schema.Attribute{
+										"base64_certificate": schema.StringAttribute{
+											MarkdownDescription: "The content of the Base64 certificate. The certificate must be in PEM format.",
+											Computed:            true,
+										},
+										"default": schema.BoolAttribute{
+											MarkdownDescription: "Configure if the certificate is the default one to be used.",
+											Computed:            true,
+										},
+										"dn": schema.StringAttribute{
+											MarkdownDescription: "A unique identifier for the certificate.",
+											Computed:            true,
+										},
+										"valid_from": schema.StringAttribute{
+											MarkdownDescription: "Set the date from which the certificate is valid.",
+											Computed:            true,
+										},
+										"valid_to": schema.StringAttribute{
+											MarkdownDescription: "Set the date uptil which the certificate is valid.",
+											Computed:            true,
+										},
+									},
+								},
+							},
+							"encryption_certificate": schema.SingleNestedAttribute{
+								MarkdownDescription: "The certificate used for encryption of SAML2 requests and responses.",
+								Computed:            true,
+								Attributes: map[string]schema.Attribute{
+									"base64_certificate": schema.StringAttribute{
+										MarkdownDescription: "The content of the Base64 certificate. The certificate must be in PEM format.",
+										Computed:            true,
+									},
+									"dn": schema.StringAttribute{
+										MarkdownDescription: "A unique identifier for the certificate.",
+										Computed:            true,
+									},
+									"valid_from": schema.StringAttribute{
+										MarkdownDescription: "Set the date from which the certificate is valid.",
+										Computed:            true,
+									},
+									"valid_to": schema.StringAttribute{
+										MarkdownDescription: "Set the date uptil which the certificate is valid.",
+										Computed:            true,
+									},
+								},
+							},
+							"response_elements_to_encrypt": schema.StringAttribute{
+								MarkdownDescription: "Specify which SAML response elements should be encrypted. " + utils.ValidValuesString(responseElementsToEncrypt),
+								Computed:            true,
+							},
+							"default_name_id_format": schema.StringAttribute{
+								MarkdownDescription: "Configure the default Name ID format. The attribute is sent as name ID format in SAML 2.0 authentication requests to Identity Provider.",
+								Computed:            true,
+							},
+							"sign_slo_messages": schema.BoolAttribute{
+								MarkdownDescription: "Enable if the single logout messages must be signed or not.",
+								Computed:            true,
+							},
+							"require_signed_slo_messages": schema.BoolAttribute{
+								MarkdownDescription: "Enable if the single logout messages must be signed or not.",
+								Computed:            true,
+							},
+							"require_signed_auth_requests": schema.BoolAttribute{
+								MarkdownDescription: "Enable if the authentication request must be signed or not.",
+								Computed:            true,
+							},
+							"sign_assertions": schema.BoolAttribute{
+								MarkdownDescription: "Enable if the SAML assertions must be signed or not.",
+								Computed:            true,
+							},
+							"sign_auth_responses": schema.BoolAttribute{
+								MarkdownDescription: "Enable if the SAML authentication responses must be signed or not.",
+								Computed:            true,
+							},
+							"digest_algorithm": schema.StringAttribute{
+								MarkdownDescription: "Configure the algorithm for signing outgoing messages. " + utils.ValidValuesString(digestAlgorithmValues),
+								Computed:            true,
+							},
+						},
+					},
 				},
 			},
 		},

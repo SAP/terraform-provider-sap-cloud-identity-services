@@ -6,6 +6,7 @@ import (
 	corporateidps "github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/corporateIdps"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
 
 type sloEndpointData struct {
@@ -251,10 +252,10 @@ func corporateIdPValueFrom(ctx context.Context, c corporateidps.IdentityProvider
 			saml2Config.SloEndpoints = types.ListNull(saml2SloEndpointObjType)
 		}
 
-		corporateIdP.Saml2Config, diags = types.ObjectValueFrom(ctx, saml2ConfigObjType.AttrTypes, saml2Config)
+		corporateIdP.Saml2Config, diags = types.ObjectValueFrom(ctx, IdPSaml2ConfigObjType.AttrTypes, saml2Config)
 		diagnostics.Append(diags...)
 	} else {
-		corporateIdP.Saml2Config = types.ObjectNull(saml2ConfigObjType.AttrTypes)
+		corporateIdP.Saml2Config = types.ObjectNull(IdPSaml2ConfigObjType.AttrTypes)
 	}
 
 	// OIDC Configuration
@@ -333,4 +334,123 @@ func corporateIdPsValueFrom(ctx context.Context, c corporateidps.IdentityProvide
 	}
 
 	return idps
+}
+
+func (r *corporateIdPResource) getCorporateIdPRequest(ctx context.Context, plan corporateIdPData) (*corporateidps.IdentityProvider, diag.Diagnostics) {
+	var diags, diagnostics diag.Diagnostics
+
+	corporateIdP := &corporateidps.IdentityProvider{
+		DisplayName: plan.DisplayName.ValueString(),
+	}
+
+	if !plan.Name.IsNull() && !plan.Name.IsUnknown() {
+		corporateIdP.Name = plan.Name.ValueString()
+	}
+
+	if !plan.Type.IsNull() && !plan.Type.IsUnknown() {
+		corporateIdP.Type = plan.Type.ValueString()
+	}
+
+	if !plan.LogoutUrl.IsNull() && !plan.LogoutUrl.IsUnknown() {
+		corporateIdP.LogoutUrl = plan.LogoutUrl.ValueString()
+	}
+
+	if !plan.ForwardAllSsoRequests.IsNull() && !plan.ForwardAllSsoRequests.IsUnknown() {
+		corporateIdP.ForwardAllSsoRequests = plan.ForwardAllSsoRequests.ValueBool()
+	}
+
+	if !plan.IdentityFederation.IsNull() && !plan.IdentityFederation.IsUnknown() {
+
+		var idF corporateidps.IdentityFederation
+		diags = plan.IdentityFederation.As(ctx, &idF, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty:    true,
+			UnhandledUnknownAsEmpty: true,
+		})
+		diagnostics.Append(diags...)
+		if diagnostics.HasError() {
+			return nil, diagnostics
+		}
+
+		corporateIdP.IdentityFederation = &idF
+	}
+
+	if !plan.LoginHintConfig.IsNull() && !plan.LoginHintConfig.IsUnknown() {
+
+		var loginHintConfig corporateidps.LoginHintConfiguration
+		diags = plan.LoginHintConfig.As(ctx, &loginHintConfig, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty:    true,
+			UnhandledUnknownAsEmpty: true,
+		})
+		diagnostics.Append(diags...)
+		if diagnostics.HasError() {
+			return &corporateidps.IdentityProvider{}, diagnostics
+		}
+
+		corporateIdP.LoginHintConfiguration = &loginHintConfig
+
+	}
+
+	if !plan.Saml2Config.IsNull() && !plan.Saml2Config.IsUnknown() {
+
+		var saml2Config corporateidps.SAML2Configuration
+		diags = plan.Saml2Config.As(ctx, &saml2Config, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty:    true,
+			UnhandledUnknownAsEmpty: true,
+		})
+		diagnostics.Append(diags...)
+
+		if diagnostics.HasError() {
+			return nil, diagnostics
+		}
+
+		corporateIdP.Saml2Configuration = &saml2Config
+	}
+
+	if !plan.OidcConfig.IsNull() && !plan.OidcConfig.IsUnknown() {
+
+		var oidcConfig corporateidps.OIDCConfiguration
+		diags = plan.OidcConfig.As(ctx, &oidcConfig, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty:    true,
+			UnhandledUnknownAsEmpty: true,
+		})
+		diagnostics.Append(diags...)
+
+		corporateIdP.OidcConfiguration = &oidcConfig
+
+	}
+
+	return corporateIdP, diagnostics
+}
+
+func mapOidcClientSecret(ctx context.Context, plan corporateIdPData, state *corporateIdPData) diag.Diagnostics {
+
+	var oidcPlan oidcConfigData
+	diags := plan.OidcConfig.As(ctx, &oidcPlan, basetypes.ObjectAsOptions{
+		UnhandledNullAsEmpty:    true,
+		UnhandledUnknownAsEmpty: true,
+	})
+	if diags.HasError() {
+		return diags
+	}
+
+	if !oidcPlan.ClientSecret.IsNull() && !oidcPlan.ClientSecret.IsUnknown() {
+
+		var oidcState oidcConfigData
+		diags = state.OidcConfig.As(ctx, &oidcState, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty:    true,
+			UnhandledUnknownAsEmpty: true,
+		})
+		if diags.HasError() {
+			return diags
+		}
+
+		oidcState.ClientSecret = oidcPlan.ClientSecret
+
+		state.OidcConfig, diags = types.ObjectValueFrom(ctx, oidcConfigObjType.AttrTypes, oidcState)
+		if diags.HasError() {
+			return diags
+		}
+	}
+
+	return nil
 }

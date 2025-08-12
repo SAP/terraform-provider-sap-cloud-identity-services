@@ -146,7 +146,7 @@ interactions:
                       "refreshTokenRotationScenario" : "off",
                       "accessTokenFormat" : "default"
                     },
-                    "restrictedGrantTypes" : [ "password", "refreshToken", "clientCredentials", "authorizationCode", "jwtBearer" ]
+                    "restrictedGrantTypes" : [ "clientCredentials", "jwtBearer", "refreshToken", "password", "authorizationCode" ]
                   },
                   "sapManagedAttributes" : {
                     "appTenantId" : "b75a605d-151c-4485-83f4-64604378e4ec",
@@ -399,7 +399,7 @@ interactions:
                       "refreshTokenRotationScenario" : "off",
                       "accessTokenFormat" : "default"
                     },
-                    "restrictedGrantTypes" : [ "password", "refreshToken", "tokenExchange", "clientCredentials", "authorizationCode", "jwtBearer" ]
+                    "restrictedGrantTypes" : [ "clientCredentials", "jwtBearer", "refreshToken", "password", "authorizationCode", "tokenExchange" ]
                   },
                   "restApiAuthentication" : {
                     "allowPublicClientFlows" : false,
@@ -639,7 +639,7 @@ interactions:
                       "refreshTokenRotationScenario" : "off",
                       "accessTokenFormat" : "default"
                     },
-                    "restrictedGrantTypes" : [ "password", "refreshToken", "clientCredentials", "authorizationCode", "jwtBearer" ]
+                    "restrictedGrantTypes" : [ "clientCredentials", "jwtBearer", "refreshToken", "password", "authorizationCode" ]
                   },
                   "sapManagedAttributes" : {
                     "appTenantId" : "59cd458e-e66e-4b60-b6d8-8f219379f9a5",
@@ -765,7 +765,7 @@ interactions:
                       "refreshTokenRotationScenario" : "off",
                       "accessTokenFormat" : "default"
                     },
-                    "restrictedGrantTypes" : [ "password", "refreshToken", "clientCredentials", "authorizationCode", "jwtBearer" ]
+                    "restrictedGrantTypes" : [ "clientCredentials", "jwtBearer", "refreshToken", "password", "authorizationCode" ]
                   },
                   "restApiAuthentication" : {
                     "allowPublicClientFlows" : false,
@@ -790,7 +790,7 @@ interactions:
             Critical-Origin-Trial:
                 - Tpcd
             Date:
-                - Mon, 11 Aug 2025 06:02:49 GMT
+                - Tue, 12 Aug 2025 10:23:08 GMT
             Expires:
                 - "0"
             Origin-Trial:
@@ -808,13 +808,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - 7DC9851D-8846-4641-ADF7-D9C8D9281EE4
+                - 48354471-4355-4574-9DF8-EF3AA0FF502C
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-7kk8m
+                - http-lxhcz
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -827,7 +827,7 @@ interactions:
                 - 1; mode=block
         status: '200 '
         code: 200
-        duration: 848.504376ms
+        duration: 726.403292ms
     - id: 1
       request:
         proto: HTTP/1.1
@@ -912,7 +912,7 @@ interactions:
                   "id" : "db0ee2db7261beab47b2630d20fe6829bdd2254e1",
                   "dn" : "CN=oac.accounts.sap.com",
                   "allApisAccess" : false,
-                  "authorizationScopes" : [ "manageUsers", "manageApp", "readUserProfile", "oAuth" ]
+                  "authorizationScopes" : [ "readUserProfile", "manageUsers", "manageApp", "oAuth" ]
                 } ],
                 "assertionAttributes" : [ {
                   "assertionAttributeName" : "first_name",
@@ -1000,7 +1000,7 @@ interactions:
                     "refreshTokenRotationScenario" : "off",
                     "accessTokenFormat" : "default"
                   },
-                  "restrictedGrantTypes" : [ "authorizationCode", "jwtBearer", "refreshToken", "tokenExchange", "clientCredentials", "password" ]
+                  "restrictedGrantTypes" : [ "refreshToken", "authorizationCode", "tokenExchange", "clientCredentials", "jwtBearer", "password" ]
                 },
                 "restApiAuthentication" : {
                   "allowPublicClientFlows" : false,
@@ -1024,7 +1024,7 @@ interactions:
             Critical-Origin-Trial:
                 - Tpcd
             Date:
-                - Mon, 11 Aug 2025 06:02:49 GMT
+                - Tue, 12 Aug 2025 10:23:09 GMT
             Expires:
                 - "0"
             Origin-Trial:
@@ -1042,13 +1042,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - F368096D-E5BD-4D35-BD21-A41DF7EA2136
+                - 7C9AEDDA-1DF7-4412-89C0-3897F3212D92
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-7kk8m
+                - http-lxhcz
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -1061,7 +1061,7 @@ interactions:
                 - 1; mode=block
         status: '200 '
         code: 200
-        duration: 204.29275ms
+        duration: 188.884834ms
     - id: 2
       request:
         proto: HTTP/1.1
@@ -1207,7 +1207,7 @@ interactions:
                       "refreshTokenRotationScenario" : "off",
                       "accessTokenFormat" : "default"
                     },
-                    "restrictedGrantTypes" : [ "password", "refreshToken", "clientCredentials", "authorizationCode", "jwtBearer" ]
+                    "restrictedGrantTypes" : [ "clientCredentials", "refreshToken", "jwtBearer", "password", "authorizationCode" ]
                   },
                   "sapManagedAttributes" : {
                     "appTenantId" : "b75a605d-151c-4485-83f4-64604378e4ec",
@@ -1372,7 +1372,7 @@ interactions:
                     "id" : "db0ee2db7261beab47b2630d20fe6829bdd2254e1",
                     "dn" : "CN=oac.accounts.sap.com",
                     "allApisAccess" : false,
-                    "authorizationScopes" : [ "manageUsers", "oAuth", "manageApp", "readUserProfile" ]
+                    "authorizationScopes" : [ "manageApp", "oAuth", "manageUsers", "readUserProfile" ]
                   } ],
                   "assertionAttributes" : [ {
                     "assertionAttributeName" : "first_name",
@@ -1460,7 +1460,7 @@ interactions:
                       "refreshTokenRotationScenario" : "off",
                       "accessTokenFormat" : "default"
                     },
-                    "restrictedGrantTypes" : [ "password", "refreshToken", "tokenExchange", "clientCredentials", "authorizationCode", "jwtBearer" ]
+                    "restrictedGrantTypes" : [ "clientCredentials", "refreshToken", "jwtBearer", "password", "tokenExchange", "authorizationCode" ]
                   },
                   "restApiAuthentication" : {
                     "allowPublicClientFlows" : false,
@@ -1518,7 +1518,7 @@ interactions:
                     "id" : "d3a7b6cdf29d633eef45edd8040ade5b3f4381918",
                     "dn" : "CN=sp.accounts.sap.com,OU=Monsoon Test Service Provider,OU=SAP ID Service,O=SAP Trust Community,C=DE",
                     "allApisAccess" : false,
-                    "authorizationScopes" : [ "manageUsers", "oAuth", "manageApp", "readUserProfile" ]
+                    "authorizationScopes" : [ "manageApp", "manageUsers", "oAuth", "readUserProfile" ]
                   } ],
                   "assertionAttributes" : [ {
                     "assertionAttributeName" : "first_name",
@@ -1700,7 +1700,7 @@ interactions:
                       "refreshTokenRotationScenario" : "off",
                       "accessTokenFormat" : "default"
                     },
-                    "restrictedGrantTypes" : [ "password", "refreshToken", "clientCredentials", "authorizationCode", "jwtBearer" ]
+                    "restrictedGrantTypes" : [ "clientCredentials", "refreshToken", "jwtBearer", "password", "authorizationCode" ]
                   },
                   "sapManagedAttributes" : {
                     "appTenantId" : "59cd458e-e66e-4b60-b6d8-8f219379f9a5",
@@ -1826,7 +1826,7 @@ interactions:
                       "refreshTokenRotationScenario" : "off",
                       "accessTokenFormat" : "default"
                     },
-                    "restrictedGrantTypes" : [ "password", "refreshToken", "clientCredentials", "authorizationCode", "jwtBearer" ]
+                    "restrictedGrantTypes" : [ "clientCredentials", "refreshToken", "jwtBearer", "password", "authorizationCode" ]
                   },
                   "restApiAuthentication" : {
                     "allowPublicClientFlows" : false,
@@ -1851,7 +1851,7 @@ interactions:
             Critical-Origin-Trial:
                 - Tpcd
             Date:
-                - Mon, 11 Aug 2025 06:02:50 GMT
+                - Tue, 12 Aug 2025 10:23:09 GMT
             Expires:
                 - "0"
             Origin-Trial:
@@ -1869,13 +1869,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - 6F158976-7345-43BD-8316-F984DF18FEFC
+                - 2C982A44-E719-4642-B3AE-CA3ACF29A2D9
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-7kk8m
+                - http-lxhcz
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -1888,7 +1888,7 @@ interactions:
                 - 1; mode=block
         status: '200 '
         code: 200
-        duration: 227.669666ms
+        duration: 208.215541ms
     - id: 3
       request:
         proto: HTTP/1.1
@@ -1973,7 +1973,7 @@ interactions:
                   "id" : "db0ee2db7261beab47b2630d20fe6829bdd2254e1",
                   "dn" : "CN=oac.accounts.sap.com",
                   "allApisAccess" : false,
-                  "authorizationScopes" : [ "manageApp", "readUserProfile", "oAuth", "manageUsers" ]
+                  "authorizationScopes" : [ "manageApp", "oAuth", "manageUsers", "readUserProfile" ]
                 } ],
                 "assertionAttributes" : [ {
                   "assertionAttributeName" : "first_name",
@@ -2061,7 +2061,7 @@ interactions:
                     "refreshTokenRotationScenario" : "off",
                     "accessTokenFormat" : "default"
                   },
-                  "restrictedGrantTypes" : [ "tokenExchange", "authorizationCode", "refreshToken", "clientCredentials", "jwtBearer", "password" ]
+                  "restrictedGrantTypes" : [ "clientCredentials", "refreshToken", "jwtBearer", "password", "tokenExchange", "authorizationCode" ]
                 },
                 "restApiAuthentication" : {
                   "allowPublicClientFlows" : false,
@@ -2085,7 +2085,7 @@ interactions:
             Critical-Origin-Trial:
                 - Tpcd
             Date:
-                - Mon, 11 Aug 2025 06:02:50 GMT
+                - Tue, 12 Aug 2025 10:23:09 GMT
             Expires:
                 - "0"
             Origin-Trial:
@@ -2103,13 +2103,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - F3A839C9-BD6E-4915-A417-D90814C222CB
+                - 9BFAC4B5-2DA6-494A-AD6C-2F48CED8B6C2
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-7kk8m
+                - http-lxhcz
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -2122,7 +2122,7 @@ interactions:
                 - 1; mode=block
         status: '200 '
         code: 200
-        duration: 198.590875ms
+        duration: 189.575834ms
     - id: 4
       request:
         proto: HTTP/1.1
@@ -2268,7 +2268,7 @@ interactions:
                       "refreshTokenRotationScenario" : "off",
                       "accessTokenFormat" : "default"
                     },
-                    "restrictedGrantTypes" : [ "password", "refreshToken", "clientCredentials", "authorizationCode", "jwtBearer" ]
+                    "restrictedGrantTypes" : [ "clientCredentials", "refreshToken", "jwtBearer", "password", "authorizationCode" ]
                   },
                   "sapManagedAttributes" : {
                     "appTenantId" : "b75a605d-151c-4485-83f4-64604378e4ec",
@@ -2433,7 +2433,7 @@ interactions:
                     "id" : "db0ee2db7261beab47b2630d20fe6829bdd2254e1",
                     "dn" : "CN=oac.accounts.sap.com",
                     "allApisAccess" : false,
-                    "authorizationScopes" : [ "manageUsers", "oAuth", "manageApp", "readUserProfile" ]
+                    "authorizationScopes" : [ "manageApp", "oAuth", "manageUsers", "readUserProfile" ]
                   } ],
                   "assertionAttributes" : [ {
                     "assertionAttributeName" : "first_name",
@@ -2521,7 +2521,7 @@ interactions:
                       "refreshTokenRotationScenario" : "off",
                       "accessTokenFormat" : "default"
                     },
-                    "restrictedGrantTypes" : [ "password", "refreshToken", "tokenExchange", "clientCredentials", "authorizationCode", "jwtBearer" ]
+                    "restrictedGrantTypes" : [ "clientCredentials", "refreshToken", "jwtBearer", "password", "tokenExchange", "authorizationCode" ]
                   },
                   "restApiAuthentication" : {
                     "allowPublicClientFlows" : false,
@@ -2579,7 +2579,7 @@ interactions:
                     "id" : "d3a7b6cdf29d633eef45edd8040ade5b3f4381918",
                     "dn" : "CN=sp.accounts.sap.com,OU=Monsoon Test Service Provider,OU=SAP ID Service,O=SAP Trust Community,C=DE",
                     "allApisAccess" : false,
-                    "authorizationScopes" : [ "manageUsers", "oAuth", "manageApp", "readUserProfile" ]
+                    "authorizationScopes" : [ "manageApp", "manageUsers", "oAuth", "readUserProfile" ]
                   } ],
                   "assertionAttributes" : [ {
                     "assertionAttributeName" : "first_name",
@@ -2761,7 +2761,7 @@ interactions:
                       "refreshTokenRotationScenario" : "off",
                       "accessTokenFormat" : "default"
                     },
-                    "restrictedGrantTypes" : [ "password", "refreshToken", "clientCredentials", "authorizationCode", "jwtBearer" ]
+                    "restrictedGrantTypes" : [ "clientCredentials", "refreshToken", "jwtBearer", "password", "authorizationCode" ]
                   },
                   "sapManagedAttributes" : {
                     "appTenantId" : "59cd458e-e66e-4b60-b6d8-8f219379f9a5",
@@ -2887,7 +2887,7 @@ interactions:
                       "refreshTokenRotationScenario" : "off",
                       "accessTokenFormat" : "default"
                     },
-                    "restrictedGrantTypes" : [ "password", "refreshToken", "clientCredentials", "authorizationCode", "jwtBearer" ]
+                    "restrictedGrantTypes" : [ "clientCredentials", "refreshToken", "jwtBearer", "password", "authorizationCode" ]
                   },
                   "restApiAuthentication" : {
                     "allowPublicClientFlows" : false,
@@ -2912,7 +2912,7 @@ interactions:
             Critical-Origin-Trial:
                 - Tpcd
             Date:
-                - Mon, 11 Aug 2025 06:02:50 GMT
+                - Tue, 12 Aug 2025 10:23:09 GMT
             Expires:
                 - "0"
             Origin-Trial:
@@ -2930,13 +2930,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - 94B1EBB6-3359-4952-9410-AD1EC5EF9760
+                - AA61397C-B7CD-47D0-9891-FF019BEB5790
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-7kk8m
+                - http-lxhcz
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -2949,7 +2949,7 @@ interactions:
                 - 1; mode=block
         status: '200 '
         code: 200
-        duration: 219.610417ms
+        duration: 203.736958ms
     - id: 5
       request:
         proto: HTTP/1.1
@@ -3034,7 +3034,7 @@ interactions:
                   "id" : "db0ee2db7261beab47b2630d20fe6829bdd2254e1",
                   "dn" : "CN=oac.accounts.sap.com",
                   "allApisAccess" : false,
-                  "authorizationScopes" : [ "manageUsers", "manageApp", "readUserProfile", "oAuth" ]
+                  "authorizationScopes" : [ "manageApp", "readUserProfile", "manageUsers", "oAuth" ]
                 } ],
                 "assertionAttributes" : [ {
                   "assertionAttributeName" : "first_name",
@@ -3122,7 +3122,7 @@ interactions:
                     "refreshTokenRotationScenario" : "off",
                     "accessTokenFormat" : "default"
                   },
-                  "restrictedGrantTypes" : [ "authorizationCode", "jwtBearer", "refreshToken", "tokenExchange", "clientCredentials", "password" ]
+                  "restrictedGrantTypes" : [ "password", "refreshToken", "clientCredentials", "tokenExchange", "jwtBearer", "authorizationCode" ]
                 },
                 "restApiAuthentication" : {
                   "allowPublicClientFlows" : false,
@@ -3146,7 +3146,7 @@ interactions:
             Critical-Origin-Trial:
                 - Tpcd
             Date:
-                - Mon, 11 Aug 2025 06:02:50 GMT
+                - Tue, 12 Aug 2025 10:23:10 GMT
             Expires:
                 - "0"
             Origin-Trial:
@@ -3164,13 +3164,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - 15F8E6DF-DC7A-4E79-A95A-E2286389E747
+                - 5E0381BF-5300-4F74-87A2-D85F3E00891A
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-7kk8m
+                - http-lxhcz
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -3183,4 +3183,4 @@ interactions:
                 - 1; mode=block
         status: '200 '
         code: 200
-        duration: 187.934707ms
+        duration: 184.759041ms
