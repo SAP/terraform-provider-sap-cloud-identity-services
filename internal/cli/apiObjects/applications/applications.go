@@ -3,6 +3,8 @@
 
 package applications
 
+import corporateidps "github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/corporateIdps"
+
 type Meta struct {
 	Created          string `json:"created,omitempty"`
 	CreatedBy        string `json:"createdBy,omitempty"`
@@ -95,6 +97,48 @@ type AuthenicationRule struct {
 	IpNetworkRange     string `json:"ipNetworkRange,omitempty" tfsdk:"ip_network_range"`
 }
 
+type Saml2AcsEndpoint struct {
+	BindingName string `json:"bindingName" tfsdk:"binding_name"`
+	Location    string `json:"location" tfsdk:"location"`
+	Index       int32  `json:"index" tfsdk:"index"`
+	IsDefault   bool   `json:"isDefault,omitempty" tfsdk:"default"`
+}
+
+type Saml2SLOEndpoint struct {
+	BindingName      string `json:"bindingName" tfsdk:"binding_name"`
+	Location         string `json:"location" tfsdk:"location"`
+	ResponseLocation string `json:"responseLocation,omitempty" tfsdk:"response_location"`
+}
+
+type EncryptionCertificateData struct {
+	Dn                string `json:"dn,omitempty" tfsdk:"dn"`
+	Base64Certificate string `json:"base64Certificate" tfsdk:"base64_certificate"`
+	ValidFrom         string `json:"validFrom,omitempty" tfsdk:"valid_from"`
+	ValidTo           string `json:"validTo,omitempty" tfsdk:"valid_to"`
+}
+
+type ProxyAuthnRequest struct {
+	AuthenticationContext string `json:"authenticationContext,omitempty" tfsdk:"auth_context"`
+	IssuerNameSuffix      string `json:"issuerNameSuffix,omitempty" tfsdk:"issuer_name_suffix"`
+}
+
+type SamlConfiguration struct {
+	SamlMetadataUrl           string                                 `json:"samlMetadataUrl,omitempty" tfsdk:"saml_metadata_url"`
+	DefaultNameIdFormat       string                                 `json:"defaultNameIdFormat,omitempty" tfsdk:"default_name_id_format"`
+	AcsEndpoints              []Saml2AcsEndpoint                     `json:"acsEndpoints,omitempty" tfsdk:"acs_endpoints"`
+	SloEndpoints              []Saml2SLOEndpoint                     `json:"sloEndpoints,omitempty" tfsdk:"slo_endpoints"`
+	SignSLOMessages           bool                                   `json:"signSLOMessages" tfsdk:"sign_slo_messages"`
+	RequireSignedSLOMessages  bool                                   `json:"requireSignedSLOMessages" tfsdk:"require_signed_slo_messages"`
+	RequireSignedAuthnRequest bool                                   `json:"requireSignedAuthnRequest" tfsdk:"require_signed_auth_requests"`
+	SignAssertions            bool                                   `json:"signAssertions" tfsdk:"sign_assertions"`
+	SignAuthnResponses        bool                                   `json:"signAuthnResponses" tfsdk:"sign_auth_responses"`
+	ResponseElementsToEncrypt string                                 `json:"responseElementsToEncrypt,omitempty" tfsdk:"response_elements_to_encrypt"`
+	CertificatesForSigning    []corporateidps.SigningCertificateData `json:"certificatesForSigning,omitempty" tfsdk:"signing_certificates"`
+	CertificateForEncryption  *EncryptionCertificateData             `json:"certificateForEncryption,omitempty" tfsdk:"encryption_certificate"`
+	DigestAlgorithm           string                                 `json:"digestAlgorithm,omitempty" tfsdk:"digest_algorithm"`
+	// ProxyAuthnRequest *ProxyAuthnRequest `json:"proxyAuthnRequest,omitempty" tfsdk:"proxy_auth_request"`
+}
+
 type ConsumedService struct {
 	ServiceInstanceId string `json:"serviceInstanceId,omitempty"`
 	AppId             string `json:"appId"`
@@ -123,6 +167,7 @@ type AuthenticationSchema struct {
 	AdvancedAssertionAttributes   []AdvancedAssertionAttribute `json:"advancedAssertionAttributes,omitempty" tfsdk:"advanced_assertion_attributes"`
 	DefaultAuthenticatingIdpId    string                       `json:"defaultAuthenticatingIdpId,omitempty" tfsdk:"default_authenticating_idp"`
 	ConditionalAuthentication     []AuthenicationRule          `json:"conditionalAuthentication,omitempty" tfsdk:"conditional_authentication"`
+	Saml2Configuration            *SamlConfiguration           `json:"saml2Configuration,omitempty" tfsdk:""`
 	// RiskBasedAuthentication       RBAConfiguration            `json:"riskBasedAuthentication"`
 	// HomeUrl								string 							`json:"homeUrl"`
 	// FallbackSubjectNameIdentifier		string 							`json:"fallbackSubjectNameIdentifier,omitempty"`
@@ -146,7 +191,6 @@ type AuthenticationSchema struct {
 	// ConsumedApis						[]ConsumedApi 					`json:"consumedApis,omitempty"`
 	// smsVerificationConfig
 	// captchaConfig
-	// saml2Configuration
 	// openIdConnectConfiguration
 	// sapManagedAttributes
 	// idpCertificateSerialNumber
