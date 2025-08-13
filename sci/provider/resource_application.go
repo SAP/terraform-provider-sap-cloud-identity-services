@@ -470,7 +470,6 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 							objectvalidator.AlsoRequires(
 								path.MatchRoot("name"),
 							),
-							// TODO change function name
 							utils.ValidType(
 								path.MatchRoot("authentication_schema").AtName("sso_type"),
 								ssoValues[1:],

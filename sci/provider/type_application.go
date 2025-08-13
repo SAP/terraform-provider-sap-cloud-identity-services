@@ -408,7 +408,7 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 			return application, diagnostics
 		}
 	} else {
-		authenticationSchema.Saml2Configuration= types.ObjectNull(appSaml2ConfigObjType.AttrTypes)
+		authenticationSchema.Saml2Configuration = types.ObjectNull(appSaml2ConfigObjType.AttrTypes)
 	}
 
 	application.AuthenticationSchema, diags = types.ObjectValueFrom(ctx, authenticationSchemaObjType, authenticationSchema)
@@ -570,10 +570,10 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 
 			args.AuthenticationSchema.Saml2Configuration = &saml2config
 		}
-		
+
 		//OPEN_ID_CONNECT_CONFIGURATION
 		if !authenticationSchema.OpenIdConnectConfiguration.IsNull() && !authenticationSchema.OpenIdConnectConfiguration.IsUnknown() {
-			
+
 			var openIdConnectConfiguration openIdConnectConfigurationData
 			diags := authenticationSchema.OpenIdConnectConfiguration.As(ctx, &openIdConnectConfiguration, basetypes.ObjectAsOptions{
 				UnhandledNullAsEmpty:    true,
@@ -660,7 +660,7 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 				}
 				oidc.ProxyConfig = &applications.OidcProxyConfig{
 					Acrs: acrs,
-				}				
+				}
 			}
 
 			if diagnostics.HasError() {

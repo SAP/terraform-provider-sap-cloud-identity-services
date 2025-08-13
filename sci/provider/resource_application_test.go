@@ -609,27 +609,27 @@ func TestResourceApplication(t *testing.T) {
 				},
 				{
 					Config: providerConfig("", user) + ResourceSaml2Application("testApp", saml2App),
-						Check: resource.ComposeAggregateTestCheckFunc(
-							resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
-							resource.TestCheckResourceAttr("sci_application.testApp", "name", saml2App.Name),
-							resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.saml_metadata_url", saml2App.AuthenticationSchema.Saml2Configuration.SamlMetadataUrl),
-							resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.binding_name", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].BindingName),
-							resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.location", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Location),
-							resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.index", fmt.Sprintf("%d", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Index)),
-							resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.default", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].IsDefault)),
-							resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.slo_endpoints.0.binding_name", saml2App.AuthenticationSchema.Saml2Configuration.SloEndpoints[0].BindingName),
-							resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.slo_endpoints.0.location", saml2App.AuthenticationSchema.Saml2Configuration.SloEndpoints[0].Location),
-							resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.slo_endpoints.0.response_location", saml2App.AuthenticationSchema.Saml2Configuration.SloEndpoints[0].ResponseLocation),
-							resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.signing_certificates.0.default", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.CertificatesForSigning[0].IsDefault)),
-							resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.response_elements_to_encrypt", saml2App.AuthenticationSchema.Saml2Configuration.ResponseElementsToEncrypt),
-							resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.default_name_id_format", saml2App.AuthenticationSchema.Saml2Configuration.DefaultNameIdFormat),
-							resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.sign_slo_messages", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.SignSLOMessages)),
-							resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.require_signed_slo_messages", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.RequireSignedSLOMessages)),
-							resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.require_signed_auth_requests", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.RequireSignedAuthnRequest)),
-							resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.sign_assertions", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.SignAssertions)),
-							resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.sign_auth_responses", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.SignAuthnResponses)),
-							resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.digest_algorithm", saml2App.AuthenticationSchema.Saml2Configuration.DigestAlgorithm),
-						),
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_application.testApp", "name", saml2App.Name),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.saml_metadata_url", saml2App.AuthenticationSchema.Saml2Configuration.SamlMetadataUrl),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.binding_name", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].BindingName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.location", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Location),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.index", fmt.Sprintf("%d", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Index)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.default", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].IsDefault)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.slo_endpoints.0.binding_name", saml2App.AuthenticationSchema.Saml2Configuration.SloEndpoints[0].BindingName),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.slo_endpoints.0.location", saml2App.AuthenticationSchema.Saml2Configuration.SloEndpoints[0].Location),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.slo_endpoints.0.response_location", saml2App.AuthenticationSchema.Saml2Configuration.SloEndpoints[0].ResponseLocation),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.signing_certificates.0.default", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.CertificatesForSigning[0].IsDefault)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.response_elements_to_encrypt", saml2App.AuthenticationSchema.Saml2Configuration.ResponseElementsToEncrypt),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.default_name_id_format", saml2App.AuthenticationSchema.Saml2Configuration.DefaultNameIdFormat),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.sign_slo_messages", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.SignSLOMessages)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.require_signed_slo_messages", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.RequireSignedSLOMessages)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.require_signed_auth_requests", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.RequireSignedAuthnRequest)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.sign_assertions", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.SignAssertions)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.sign_auth_responses", fmt.Sprintf("%t", saml2App.AuthenticationSchema.Saml2Configuration.SignAuthnResponses)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.digest_algorithm", saml2App.AuthenticationSchema.Saml2Configuration.DigestAlgorithm),
+					),
 				},
 			},
 		})
@@ -669,7 +669,7 @@ func TestResourceApplication(t *testing.T) {
 				},
 				{
 					Config: providerConfig("", user) + OidcResourceApplication("testApp", oidcApplication),
-	                Check: resource.ComposeAggregateTestCheckFunc(
+					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
 						resource.TestCheckResourceAttr("sci_application.testApp", "name", oidcApplication.Name),
 						resource.TestCheckResourceAttr("sci_application.testApp", "description", oidcApplication.Description),
@@ -1007,7 +1007,6 @@ func TestResourceApplication(t *testing.T) {
 				{
 					Config:      ResourceApplicationWithSaml2SigningCertificates("testApp", "test-app", fmt.Sprintf(`base64_certificate = "%s", default = true`, certificate)),
 					ExpectError: regexp.MustCompile(fmt.Sprintf(`Attribute\nauthentication_schema\.saml2_config\.signing_certificates\[0\]\.base64_certificate\nvalue must be a valid PEM string in the format -----BEGIN\nCERTIFICATE-----\\n<certificate-content>\\n-----END CERTIFICATE-----, got:\n%s`, certificate)),
-
 				},
 			},
 		})
