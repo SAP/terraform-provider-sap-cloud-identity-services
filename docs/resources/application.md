@@ -77,6 +77,7 @@ Optional:
 - `assertion_attributes` (Attributes List) User attributes to be sent to the application. The Source of these attributes is always the Identity Directory, thus only valid attribute values will be accepted. (see [below for nested schema](#nestedatt--authentication_schema--assertion_attributes))
 - `conditional_authentication` (Attributes List) Define rules for authenticating identity provider according to email domain, user type, user group, and IP range. Each rule is evaluated by priority until the criteria of a rule are fulfilled. (see [below for nested schema](#nestedatt--authentication_schema--conditional_authentication))
 - `default_authenticating_idp` (String) A default identity provider can be used for users with any user domain, group and type. This identity provider is used when none of the defined authentication rules meets the criteria.
+- `oidc_config` (Attributes) OpenID Connect (OIDC) configuration options for this application. (see [below for nested schema](#nestedatt--authentication_schema--oidc_config))
 - `saml2_config` (Attributes) Configure a SAML 2.0 service provider by providing the necessary metadata. (see [below for nested schema](#nestedatt--authentication_schema--saml2_config))
 - `sso_type` (String) The preferred protocol for the application. Acceptable values are : `openIdConnect`, `saml2`
 - `subject_name_identifier` (Attributes) The attribute by which the application uses to identify the users. Used by the application to uniquely identify the user during logon.
@@ -121,7 +122,42 @@ Optional:
 - `ip_network_range` (String) Valid IP range to be authenticated.
 - `user_email_domain` (String) Valid email domain to be authenticated.
 - `user_group` (String) The user group to be authenticated.
-- `user_type` (String) The type of user to be authenticated. Acceptable values are :Acceptable values are : `public`, `employee`, `customer`, `partner`, `external`, `onboardee`
+- `user_type` (String) The type of user to be authenticated.Acceptable values are : `public`, `employee`, `customer`, `partner`, `external`, `onboardee`
+
+
+<a id="nestedatt--authentication_schema--oidc_config"></a>
+### Nested Schema for `authentication_schema.oidc_config`
+
+Optional:
+
+- `back_channel_logout_uris` (Set of String) List of back-channel logout URIs that support server-to-server logout notifications. Each must be a valid URL. Up to 20 URIs allowed.
+- `front_channel_logout_uris` (Set of String) List of front-channel logout URIs that support browser-based logout. Each must be a valid URL and up to 20 URIs are allowed.
+- `post_logout_redirect_uris` (Set of String) List of URIs to which the user will be redirected after logging out from the application. Can include up to 20 URIs.
+- `proxy_config` (Attributes) Optional proxy configuration including accepted ACR values. (see [below for nested schema](#nestedatt--authentication_schema--oidc_config--proxy_config))
+- `redirect_uris` (Set of String) A list of redirect URIs that the OpenID Provider is allowed to redirect to after authentication. Must contain 1 to 20 valid URIs.
+- `restricted_grant_types` (Set of String) Set of OAuth 2.0 grant types that are restricted for the application.Acceptable values are : `clientCredentials`, `authorizationCode`, `refreshToken`, `password`, `implicit`, `jwtBearer`, `authorizationCodePkceS256`, `tokenExchange`
+- `token_policy` (Attributes) Defines the token policy for the application. (see [below for nested schema](#nestedatt--authentication_schema--oidc_config--token_policy))
+
+<a id="nestedatt--authentication_schema--oidc_config--proxy_config"></a>
+### Nested Schema for `authentication_schema.oidc_config.proxy_config`
+
+Optional:
+
+- `acrs` (Set of String) Set of accepted ACR (Authentication Context Class Reference) values. Up to 20 values allowed.
+
+
+<a id="nestedatt--authentication_schema--oidc_config--token_policy"></a>
+### Nested Schema for `authentication_schema.oidc_config.token_policy`
+
+Optional:
+
+- `access_token_format` (String) The format of the access token issued.Acceptable values are : `default`, `jwt`, `opaque`
+- `jwt_validity` (Number) JWT access token validity in seconds. Must be between 60 seconds (1 minute) and 43200 seconds (12 hours).
+- `max_exchange_period` (String) Maximum token exchange period. Acceptable values are : `unlimited`, `maxSessionValidity`, `initialRefreshTokenValidity`
+- `refresh_parallel` (Number) Maximum number of refresh tokens that can be used in parallel. Valid values range from 1 to 10.
+- `refresh_token_rotation_scenario` (String) Defines the scenario for refresh token rotation. Acceptable values are : `off`, `online`, `mobile`
+- `refresh_validity` (Number) Refresh token validity in seconds. Can range from 0 to 15552000 seconds (180 days).
+
 
 
 <a id="nestedatt--authentication_schema--saml2_config"></a>

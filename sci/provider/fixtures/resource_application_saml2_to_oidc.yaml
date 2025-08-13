@@ -6,14 +6,14 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 855
+        content_length: 5784
         transfer_encoding: []
         trailer: {}
         host: iasprovidertestblr.accounts400.ondemand.com
         remote_addr: ""
         request_uri: ""
         body: |
-            {"id":"","name":"basic-test-app","description":"application for testing purposes","urn:sap:identity:application:schemas:extension:sci:1.0:Authentication":{"subjectNameIdentifier":"mail","subjectNameIdentifierFunction":"lowerCase","assertionAttributes":[{"assertionAttributeName":"param1","userAttributeName":"firstName","inherited":false},{"assertionAttributeName":"param2","userAttributeName":"mail","inherited":false}],"advancedAssertionAttributes":[{"attributeName":"adv_param1","attributeValue":"${corporateIdP.value1}","inherited":false},{"attributeName":"adv_param2","attributeValue":"${corporateIdP.value2}","inherited":false}],"defaultAuthenticatingIdpId":"664c660e25cff252c5c202dc","conditionalAuthentication":[{"userType":"employee","userEmailDomain":"gmail.com","identityProviderId":"664c660e25cff252c5c202dc","ipNetworkRange":"10.0.0.1/8"}]}}
+            {"id":"","name":"SAML2 - Test App","urn:sap:identity:application:schemas:extension:sci:1.0:Authentication":{"ssoType":"saml2","assertionAttributes":null,"saml2Configuration":{"samlMetadataUrl":"https://test.com","defaultNameIdFormat":"urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified","acsEndpoints":[{"bindingName":"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST","location":"https://test.1.com","index":1,"isDefault":true}],"sloEndpoints":[{"bindingName":"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST","location":"https://logout.1.com","responseLocation":"https://logout-response.1.com"}],"signSLOMessages":true,"requireSignedSLOMessages":true,"requireSignedAuthnRequest":true,"signAssertions":true,"signAuthnResponses":true,"responseElementsToEncrypt":"wholeAssertion","certificatesForSigning":[{"base64Certificate":"-----BEGIN CERTIFICATE-----\nredacted\n-----END CERTIFICATE-----","isDefault":true}],"certificateForEncryption":{"base64Certificate":"-----BEGIN CERTIFICATE-----\nredacted\n-----END CERTIFICATE-----"},"digestAlgorithm":"sha1"}}}
         form: {}
         headers:
             Accept:
@@ -45,11 +45,11 @@ interactions:
             Critical-Origin-Trial:
                 - Tpcd
             Date:
-                - Tue, 12 Aug 2025 10:22:25 GMT
+                - Tue, 12 Aug 2025 10:29:20 GMT
             Expires:
                 - "0"
             Location:
-                - /Applications/v1/fe1a0128-f1d9-451c-90cf-f284d824ba7b
+                - /Applications/v1/b0b3c1e5-5a4a-4c38-884f-aebb3dcd8a9f
             Origin-Trial:
                 - Avu6rn7emV5gK8gvyGHlX8TMqM9uo1FacP2j/RWTq+8j+yKnqcTO0TQh0bXJ/7QntxD4/JzXv8aXoqxxZQuqXgYAAABdeyJvcmlnaW4iOiJodHRwczovL29uZGVtYW5kLmNvbTo0NDMiLCJmZWF0dXJlIjoiVHBjZCIsImV4cGlyeSI6MTczNTM0Mzk5OSwiaXNTdWJkb21haW4iOnRydWV9
             Pragma:
@@ -65,13 +65,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - 1DB3561B-6D3C-4976-9CF6-D94ADB4CD2FB
+                - 505BDCA4-0B3F-4B3E-8572-AA501955E8A1
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-plglq
+                - http-vnrg7
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -84,7 +84,7 @@ interactions:
                 - 1; mode=block
         status: '201 '
         code: 201
-        duration: 671.579417ms
+        duration: 787.329292ms
     - id: 1
       request:
         proto: HTTP/1.1
@@ -107,7 +107,7 @@ interactions:
                 - application/json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/fe1a0128-f1d9-451c-90cf-f284d824ba7b
+        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/b0b3c1e5-5a4a-4c38-884f-aebb3dcd8a9f
         method: GET
       response:
         proto: HTTP/1.1
@@ -120,18 +120,17 @@ interactions:
         uncompressed: true
         body: |-
             {
-              "id" : "fe1a0128-f1d9-451c-90cf-f284d824ba7b",
+              "id" : "b0b3c1e5-5a4a-4c38-884f-aebb3dcd8a9f",
               "meta" : {
-                "created" : "2025-08-12T10:22:25.44Z",
+                "created" : "2025-08-12T10:29:20.588Z",
                 "createdBy" : "P000315",
-                "lastModified" : "2025-08-12T10:22:25.44Z",
+                "lastModified" : "2025-08-12T10:29:20.588Z",
                 "modifiedBy" : "P000315",
-                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/fe1a0128-f1d9-451c-90cf-f284d824ba7b",
+                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/b0b3c1e5-5a4a-4c38-884f-aebb3dcd8a9f",
                 "type" : "charged",
                 "version" : "1"
               },
-              "name" : "basic-test-app",
-              "description" : "application for testing purposes",
+              "name" : "SAML2 - Test App",
               "multiTenantApp" : false,
               "globalAccount" : "unknown",
               "schemas" : [ "urn:sap:identity:application:schemas:core:1.0", "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication", "urn:sap:identity:application:schemas:extension:sci:1.0:Authorization", "urn:sap:identity:application:schemas:extension:sci:1.0:Provisioning" ],
@@ -147,8 +146,7 @@ interactions:
               },
               "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication" : {
                 "ssoType" : "saml2",
-                "subjectNameIdentifier" : "mail",
-                "subjectNameIdentifierFunction" : "lowerCase",
+                "subjectNameIdentifier" : "uid",
                 "rememberMeExpirationTimeInMonths" : 3,
                 "passwordPolicy" : "https://accounts.sap.com/policy/passwords/sap/web/1.1",
                 "userAccess" : {
@@ -165,23 +163,26 @@ interactions:
                   } ]
                 },
                 "companyId" : "global",
-                "clientId" : "b0af95f9-11db-4152-b6de-87b37f0221b0",
+                "clientId" : "c60586cc-04c6-4409-88f7-db954f1ce480",
                 "assertionAttributes" : [ {
-                  "assertionAttributeName" : "param1",
+                  "assertionAttributeName" : "first_name",
                   "userAttributeName" : "firstName",
                   "inherited" : false
                 }, {
-                  "assertionAttributeName" : "param2",
-                  "userAttributeName" : "mail",
-                  "inherited" : false
-                } ],
-                "advancedAssertionAttributes" : [ {
-                  "attributeName" : "adv_param1",
-                  "attributeValue" : "${corporateIdP.value1}",
+                  "assertionAttributeName" : "last_name",
+                  "userAttributeName" : "lastName",
                   "inherited" : false
                 }, {
-                  "attributeName" : "adv_param2",
-                  "attributeValue" : "${corporateIdP.value2}",
+                  "assertionAttributeName" : "mail",
+                  "userAttributeName" : "mail",
+                  "inherited" : false
+                }, {
+                  "assertionAttributeName" : "user_uuid",
+                  "userAttributeName" : "userUuid",
+                  "inherited" : false
+                }, {
+                  "assertionAttributeName" : "locale",
+                  "userAttributeName" : "language",
                   "inherited" : false
                 } ],
                 "disabledInheritedProperties" : { },
@@ -192,424 +193,43 @@ interactions:
                 "trustAllCorporateIdentityProviders" : false,
                 "allowIasUsers" : false,
                 "defaultAuthenticatingIdpId" : "664c660e25cff252c5c202dc",
-                "conditionalAuthentication" : [ {
-                  "userType" : "employee",
-                  "userEmailDomain" : "gmail.com",
-                  "identityProviderId" : "664c660e25cff252c5c202dc",
-                  "ipNetworkRange" : "10.0.0.1/8"
-                } ],
                 "riskBasedAuthentication" : {
                   "defaultAction" : [ "allow" ]
                 },
                 "saml2Configuration" : {
+                  "samlMetadataUrl" : "https://test.com",
                   "defaultNameIdFormat" : "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
+                  "acsEndpoints" : [ {
+                    "bindingName" : "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+                    "location" : "https://test.1.com",
+                    "index" : 1,
+                    "isDefault" : true
+                  } ],
+                  "sloEndpoints" : [ {
+                    "bindingName" : "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+                    "location" : "https://logout.1.com",
+                    "responseLocation" : "https://logout-response.1.com"
+                  } ],
                   "signSLOMessages" : true,
                   "requireSignedSLOMessages" : true,
-                  "requireSignedAuthnRequest" : false,
+                  "requireSignedAuthnRequest" : true,
                   "signAssertions" : true,
-                  "signAuthnResponses" : false,
-                  "responseElementsToEncrypt" : "none",
-                  "digestAlgorithm" : "sha256",
-                  "proxyAuthnRequest" : {
-                    "authenticationContext" : "none"
-                  }
-                },
-                "openIdConnectConfiguration" : {
-                  "tokenPolicy" : {
-                    "jwtValidity" : 3600,
-                    "refreshValidity" : 43200,
-                    "refreshParallel" : 1,
-                    "maxExchangePeriod" : "unlimited",
-                    "refreshTokenRotationScenario" : "off",
-                    "accessTokenFormat" : "default"
+                  "signAuthnResponses" : true,
+                  "responseElementsToEncrypt" : "wholeAssertion",
+                  "certificatesForSigning" : [ {
+                    "dn" : "CN=test (P000003),L=iasprovidertestblr.accounts400.ondemand.com,OU=8e1affb2-62a1-43cc-a687-2ba75e4b3d84,OU=Canary,OU=SAP Cloud Platform Clients,O=SAP SE,C=DE",
+                    "base64Certificate" : "-----BEGIN CERTIFICATE-----\nredacted\n-----END CERTIFICATE-----",
+                    "validFrom" : "2025-06-10T06:53:33Z",
+                    "validTo" : "2026-06-10T07:53:33Z",
+                    "isDefault" : true
+                  } ],
+                  "certificateForEncryption" : {
+                    "dn" : "CN=test (P000003),L=iasprovidertestblr.accounts400.ondemand.com,OU=8e1affb2-62a1-43cc-a687-2ba75e4b3d84,OU=Canary,OU=SAP Cloud Platform Clients,O=SAP SE,C=DE",
+                    "base64Certificate" : "-----BEGIN CERTIFICATE-----\nredacted\n-----END CERTIFICATE-----",
+                    "validFrom" : "2025-06-10T06:53:33Z",
+                    "validTo" : "2026-06-10T07:53:33Z"
                   },
-                  "restrictedGrantTypes" : [ "clientCredentials", "jwtBearer", "refreshToken", "password", "authorizationCode" ]
-                },
-                "restApiAuthentication" : {
-                  "allowPublicClientFlows" : false,
-                  "allApisAccess" : false,
-                  "allowLocking" : true,
-                  "failedLoginAttempts" : 0
-                }
-              },
-              "urn:sap:identity:application:schemas:extension:sci:1.0:Provisioning" : {
-                "centralStoreProvisioningEnabled" : false
-              },
-              "urn:sap:identity:application:schemas:extension:sci:1.0:Authorization" : { }
-            }
-        headers:
-            Cache-Control:
-                - private,no-cache,no-store
-            Content-Security-Policy:
-                - script-src 'none';
-            Content-Type:
-                - application/json;charset=UTF-8
-            Critical-Origin-Trial:
-                - Tpcd
-            Date:
-                - Tue, 12 Aug 2025 10:22:25 GMT
-            Expires:
-                - "0"
-            Origin-Trial:
-                - Avu6rn7emV5gK8gvyGHlX8TMqM9uo1FacP2j/RWTq+8j+yKnqcTO0TQh0bXJ/7QntxD4/JzXv8aXoqxxZQuqXgYAAABdeyJvcmlnaW4iOiJodHRwczovL29uZGVtYW5kLmNvbTo0NDMiLCJmZWF0dXJlIjoiVHBjZCIsImV4cGlyeSI6MTczNTM0Mzk5OSwiaXNTdWJkb21haW4iOnRydWV9
-            Pragma:
-                - no-cache
-            Referrer-Policy:
-                - origin
-            Server:
-                - SAP
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains; preload
-            Vary:
-                - accept-encoding,X-CSP-STRIP
-            X-Content-Type-Options:
-                - nosniff
-            X-Ids-Id:
-                - DC584935-E576-40AB-B1FA-44E49D29E6F1
-            X-Ids-Landscape:
-                - cc3-eu-de-2-a1
-            X-Ids-Namespace:
-                - ias
-            X-Ids-Node:
-                - http-plglq
-            X-Ids-Pool:
-                - a1
-            X-Ids-Project:
-                - qa
-            X-Ids-Region:
-                - eu-de-1
-            X-Robots-Tag:
-                - none
-            X-Xss-Protection:
-                - 1; mode=block
-        status: '200 '
-        code: 200
-        duration: 187.027416ms
-    - id: 2
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: iasprovidertestblr.accounts400.ondemand.com
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers:
-            Accept:
-                - '*/*'
-            Authorization:
-                - REDACTED
-            Content-Type:
-                - application/json
-            Dataserviceversion:
-                - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/fe1a0128-f1d9-451c-90cf-f284d824ba7b
-        method: GET
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding:
-            - chunked
-        trailer: {}
-        content_length: -1
-        uncompressed: true
-        body: |-
-            {
-              "id" : "fe1a0128-f1d9-451c-90cf-f284d824ba7b",
-              "meta" : {
-                "created" : "2025-08-12T10:22:25.44Z",
-                "createdBy" : "P000315",
-                "lastModified" : "2025-08-12T10:22:25.44Z",
-                "modifiedBy" : "P000315",
-                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/fe1a0128-f1d9-451c-90cf-f284d824ba7b",
-                "type" : "charged",
-                "version" : "1"
-              },
-              "name" : "basic-test-app",
-              "description" : "application for testing purposes",
-              "multiTenantApp" : false,
-              "globalAccount" : "unknown",
-              "schemas" : [ "urn:sap:identity:application:schemas:core:1.0", "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication", "urn:sap:identity:application:schemas:extension:sci:1.0:Authorization", "urn:sap:identity:application:schemas:extension:sci:1.0:Provisioning" ],
-              "branding" : {
-                "showDisplayNameOnLogonScreen" : true,
-                "rememberMeVisible" : true,
-                "rememberMeChecked" : false,
-                "refreshParent" : true,
-                "tokenUrlEmbedCharacter" : ";",
-                "theme" : {
-                  "type" : "horizon"
-                }
-              },
-              "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication" : {
-                "ssoType" : "saml2",
-                "subjectNameIdentifier" : "mail",
-                "subjectNameIdentifierFunction" : "lowerCase",
-                "rememberMeExpirationTimeInMonths" : 3,
-                "passwordPolicy" : "https://accounts.sap.com/policy/passwords/sap/web/1.1",
-                "userAccess" : {
-                  "type" : "internal",
-                  "userAttributesForAccess" : [ {
-                    "userAttributeName" : "firstName",
-                    "isRequired" : false
-                  }, {
-                    "userAttributeName" : "lastName",
-                    "isRequired" : true
-                  }, {
-                    "userAttributeName" : "mail",
-                    "isRequired" : true
-                  } ]
-                },
-                "companyId" : "global",
-                "clientId" : "b0af95f9-11db-4152-b6de-87b37f0221b0",
-                "assertionAttributes" : [ {
-                  "assertionAttributeName" : "param1",
-                  "userAttributeName" : "firstName",
-                  "inherited" : false
-                }, {
-                  "assertionAttributeName" : "param2",
-                  "userAttributeName" : "mail",
-                  "inherited" : false
-                } ],
-                "advancedAssertionAttributes" : [ {
-                  "attributeName" : "adv_param1",
-                  "attributeValue" : "${corporateIdP.value1}",
-                  "inherited" : false
-                }, {
-                  "attributeName" : "adv_param2",
-                  "attributeValue" : "${corporateIdP.value2}",
-                  "inherited" : false
-                } ],
-                "disabledInheritedProperties" : { },
-                "spnegoEnabled" : false,
-                "biometricAuthenticationEnabled" : false,
-                "verifyMail" : true,
-                "forceAuthentication" : false,
-                "trustAllCorporateIdentityProviders" : false,
-                "allowIasUsers" : false,
-                "defaultAuthenticatingIdpId" : "664c660e25cff252c5c202dc",
-                "conditionalAuthentication" : [ {
-                  "userType" : "employee",
-                  "userEmailDomain" : "gmail.com",
-                  "identityProviderId" : "664c660e25cff252c5c202dc",
-                  "ipNetworkRange" : "10.0.0.1/8"
-                } ],
-                "riskBasedAuthentication" : {
-                  "defaultAction" : [ "allow" ]
-                },
-                "saml2Configuration" : {
-                  "defaultNameIdFormat" : "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
-                  "signSLOMessages" : true,
-                  "requireSignedSLOMessages" : true,
-                  "requireSignedAuthnRequest" : false,
-                  "signAssertions" : true,
-                  "signAuthnResponses" : false,
-                  "responseElementsToEncrypt" : "none",
-                  "digestAlgorithm" : "sha256",
-                  "proxyAuthnRequest" : {
-                    "authenticationContext" : "none"
-                  }
-                },
-                "openIdConnectConfiguration" : {
-                  "tokenPolicy" : {
-                    "jwtValidity" : 3600,
-                    "refreshValidity" : 43200,
-                    "refreshParallel" : 1,
-                    "maxExchangePeriod" : "unlimited",
-                    "refreshTokenRotationScenario" : "off",
-                    "accessTokenFormat" : "default"
-                  },
-                  "restrictedGrantTypes" : [ "refreshToken", "authorizationCode", "clientCredentials", "jwtBearer", "password" ]
-                },
-                "restApiAuthentication" : {
-                  "allowPublicClientFlows" : false,
-                  "allApisAccess" : false,
-                  "allowLocking" : true,
-                  "failedLoginAttempts" : 0
-                }
-              },
-              "urn:sap:identity:application:schemas:extension:sci:1.0:Provisioning" : {
-                "centralStoreProvisioningEnabled" : false
-              },
-              "urn:sap:identity:application:schemas:extension:sci:1.0:Authorization" : { }
-            }
-        headers:
-            Cache-Control:
-                - private,no-cache,no-store
-            Content-Security-Policy:
-                - script-src 'none';
-            Content-Type:
-                - application/json;charset=UTF-8
-            Critical-Origin-Trial:
-                - Tpcd
-            Date:
-                - Tue, 12 Aug 2025 10:22:25 GMT
-            Expires:
-                - "0"
-            Origin-Trial:
-                - Avu6rn7emV5gK8gvyGHlX8TMqM9uo1FacP2j/RWTq+8j+yKnqcTO0TQh0bXJ/7QntxD4/JzXv8aXoqxxZQuqXgYAAABdeyJvcmlnaW4iOiJodHRwczovL29uZGVtYW5kLmNvbTo0NDMiLCJmZWF0dXJlIjoiVHBjZCIsImV4cGlyeSI6MTczNTM0Mzk5OSwiaXNTdWJkb21haW4iOnRydWV9
-            Pragma:
-                - no-cache
-            Referrer-Policy:
-                - origin
-            Server:
-                - SAP
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains; preload
-            Vary:
-                - accept-encoding,X-CSP-STRIP
-            X-Content-Type-Options:
-                - nosniff
-            X-Ids-Id:
-                - 41BCDC35-CA60-43B4-8E74-75B0D7EBF8E5
-            X-Ids-Landscape:
-                - cc3-eu-de-2-a1
-            X-Ids-Namespace:
-                - ias
-            X-Ids-Node:
-                - http-plglq
-            X-Ids-Pool:
-                - a1
-            X-Ids-Project:
-                - qa
-            X-Ids-Region:
-                - eu-de-1
-            X-Robots-Tag:
-                - none
-            X-Xss-Protection:
-                - 1; mode=block
-        status: '200 '
-        code: 200
-        duration: 180.034208ms
-    - id: 3
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: iasprovidertestblr.accounts400.ondemand.com
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers:
-            Accept:
-                - '*/*'
-            Authorization:
-                - REDACTED
-            Content-Type:
-                - application/json
-            Dataserviceversion:
-                - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/fe1a0128-f1d9-451c-90cf-f284d824ba7b
-        method: GET
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding:
-            - chunked
-        trailer: {}
-        content_length: -1
-        uncompressed: true
-        body: |-
-            {
-              "id" : "fe1a0128-f1d9-451c-90cf-f284d824ba7b",
-              "meta" : {
-                "created" : "2025-08-12T10:22:25.44Z",
-                "createdBy" : "P000315",
-                "lastModified" : "2025-08-12T10:22:25.44Z",
-                "modifiedBy" : "P000315",
-                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/fe1a0128-f1d9-451c-90cf-f284d824ba7b",
-                "type" : "charged",
-                "version" : "1"
-              },
-              "name" : "basic-test-app",
-              "description" : "application for testing purposes",
-              "multiTenantApp" : false,
-              "globalAccount" : "unknown",
-              "schemas" : [ "urn:sap:identity:application:schemas:core:1.0", "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication", "urn:sap:identity:application:schemas:extension:sci:1.0:Authorization", "urn:sap:identity:application:schemas:extension:sci:1.0:Provisioning" ],
-              "branding" : {
-                "showDisplayNameOnLogonScreen" : true,
-                "rememberMeVisible" : true,
-                "rememberMeChecked" : false,
-                "refreshParent" : true,
-                "tokenUrlEmbedCharacter" : ";",
-                "theme" : {
-                  "type" : "horizon"
-                }
-              },
-              "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication" : {
-                "ssoType" : "saml2",
-                "subjectNameIdentifier" : "mail",
-                "subjectNameIdentifierFunction" : "lowerCase",
-                "rememberMeExpirationTimeInMonths" : 3,
-                "passwordPolicy" : "https://accounts.sap.com/policy/passwords/sap/web/1.1",
-                "userAccess" : {
-                  "type" : "internal",
-                  "userAttributesForAccess" : [ {
-                    "userAttributeName" : "firstName",
-                    "isRequired" : false
-                  }, {
-                    "userAttributeName" : "lastName",
-                    "isRequired" : true
-                  }, {
-                    "userAttributeName" : "mail",
-                    "isRequired" : true
-                  } ]
-                },
-                "companyId" : "global",
-                "clientId" : "b0af95f9-11db-4152-b6de-87b37f0221b0",
-                "assertionAttributes" : [ {
-                  "assertionAttributeName" : "param1",
-                  "userAttributeName" : "firstName",
-                  "inherited" : false
-                }, {
-                  "assertionAttributeName" : "param2",
-                  "userAttributeName" : "mail",
-                  "inherited" : false
-                } ],
-                "advancedAssertionAttributes" : [ {
-                  "attributeName" : "adv_param1",
-                  "attributeValue" : "${corporateIdP.value1}",
-                  "inherited" : false
-                }, {
-                  "attributeName" : "adv_param2",
-                  "attributeValue" : "${corporateIdP.value2}",
-                  "inherited" : false
-                } ],
-                "disabledInheritedProperties" : { },
-                "spnegoEnabled" : false,
-                "biometricAuthenticationEnabled" : false,
-                "verifyMail" : true,
-                "forceAuthentication" : false,
-                "trustAllCorporateIdentityProviders" : false,
-                "allowIasUsers" : false,
-                "defaultAuthenticatingIdpId" : "664c660e25cff252c5c202dc",
-                "conditionalAuthentication" : [ {
-                  "userType" : "employee",
-                  "userEmailDomain" : "gmail.com",
-                  "identityProviderId" : "664c660e25cff252c5c202dc",
-                  "ipNetworkRange" : "10.0.0.1/8"
-                } ],
-                "riskBasedAuthentication" : {
-                  "defaultAction" : [ "allow" ]
-                },
-                "saml2Configuration" : {
-                  "defaultNameIdFormat" : "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
-                  "signSLOMessages" : true,
-                  "requireSignedSLOMessages" : true,
-                  "requireSignedAuthnRequest" : false,
-                  "signAssertions" : true,
-                  "signAuthnResponses" : false,
-                  "responseElementsToEncrypt" : "none",
-                  "digestAlgorithm" : "sha256",
+                  "digestAlgorithm" : "sha1",
                   "proxyAuthnRequest" : {
                     "authenticationContext" : "none"
                   }
@@ -647,7 +267,7 @@ interactions:
             Critical-Origin-Trial:
                 - Tpcd
             Date:
-                - Tue, 12 Aug 2025 10:22:26 GMT
+                - Tue, 12 Aug 2025 10:29:20 GMT
             Expires:
                 - "0"
             Origin-Trial:
@@ -665,13 +285,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - EB27E69A-A1C7-4EEC-988A-0DE273CF5C66
+                - 79EC0E3A-370F-462C-A48F-A9AF04448169
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-plglq
+                - http-vnrg7
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -684,20 +304,19 @@ interactions:
                 - 1; mode=block
         status: '200 '
         code: 200
-        duration: 189.973834ms
-    - id: 4
+        duration: 207.592833ms
+    - id: 2
       request:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 1547
+        content_length: 0
         transfer_encoding: []
         trailer: {}
         host: iasprovidertestblr.accounts400.ondemand.com
         remote_addr: ""
         request_uri: ""
-        body: |
-            {"id":"fe1a0128-f1d9-451c-90cf-f284d824ba7b","name":"test-app-updated","description":"application for testing purposes","urn:sap:identity:application:schemas:extension:sci:1.0:Authentication":{"ssoType":"saml2","subjectNameIdentifier":"userUuid","subjectNameIdentifierFunction":"upperCase","assertionAttributes":[{"assertionAttributeName":"param1","userAttributeName":"lastName","inherited":false}],"advancedAssertionAttributes":[{"attributeName":"adv_param1","attributeValue":"${corporateIdP.updated_value1}","inherited":false},{"attributeName":"adv_param2","attributeValue":"${corporateIdP.value2}","inherited":false},{"attributeName":"adv_param3","attributeValue":"${corporateIdP.value3}","inherited":false}],"defaultAuthenticatingIdpId":"664c660e25cff252c5c202dc","conditionalAuthentication":[{"userType":"customer","userEmailDomain":"sap.com","identityProviderId":"664c660e25cff252c5c202dc","ipNetworkRange":"192.168.1.1/24"}],"openIdConnectConfiguration":{"tokenPolicy":{"jwtValidity":3600,"refreshValidity":43200,"refreshParallel":1,"maxExchangePeriod":"unlimited","refreshTokenRotationScenario":"off","accessTokenFormat":"default"},"restrictedGrantTypes":["authorizationCode","clientCredentials","jwtBearer","password","refreshToken"]},"saml2Configuration":{"defaultNameIdFormat":"urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified","signSLOMessages":true,"requireSignedSLOMessages":true,"requireSignedAuthnRequest":false,"signAssertions":true,"signAuthnResponses":false,"responseElementsToEncrypt":"none","digestAlgorithm":"sha256"}}}
+        body: ""
         form: {}
         headers:
             Accept:
@@ -708,7 +327,448 @@ interactions:
                 - application/json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/fe1a0128-f1d9-451c-90cf-f284d824ba7b
+        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/b0b3c1e5-5a4a-4c38-884f-aebb3dcd8a9f
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: true
+        body: |-
+            {
+              "id" : "b0b3c1e5-5a4a-4c38-884f-aebb3dcd8a9f",
+              "meta" : {
+                "created" : "2025-08-12T10:29:20.588Z",
+                "createdBy" : "P000315",
+                "lastModified" : "2025-08-12T10:29:20.588Z",
+                "modifiedBy" : "P000315",
+                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/b0b3c1e5-5a4a-4c38-884f-aebb3dcd8a9f",
+                "type" : "charged",
+                "version" : "1"
+              },
+              "name" : "SAML2 - Test App",
+              "multiTenantApp" : false,
+              "globalAccount" : "unknown",
+              "schemas" : [ "urn:sap:identity:application:schemas:core:1.0", "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication", "urn:sap:identity:application:schemas:extension:sci:1.0:Authorization", "urn:sap:identity:application:schemas:extension:sci:1.0:Provisioning" ],
+              "branding" : {
+                "showDisplayNameOnLogonScreen" : true,
+                "rememberMeVisible" : true,
+                "rememberMeChecked" : false,
+                "refreshParent" : true,
+                "tokenUrlEmbedCharacter" : ";",
+                "theme" : {
+                  "type" : "horizon"
+                }
+              },
+              "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication" : {
+                "ssoType" : "saml2",
+                "subjectNameIdentifier" : "uid",
+                "rememberMeExpirationTimeInMonths" : 3,
+                "passwordPolicy" : "https://accounts.sap.com/policy/passwords/sap/web/1.1",
+                "userAccess" : {
+                  "type" : "internal",
+                  "userAttributesForAccess" : [ {
+                    "userAttributeName" : "firstName",
+                    "isRequired" : false
+                  }, {
+                    "userAttributeName" : "lastName",
+                    "isRequired" : true
+                  }, {
+                    "userAttributeName" : "mail",
+                    "isRequired" : true
+                  } ]
+                },
+                "companyId" : "global",
+                "clientId" : "c60586cc-04c6-4409-88f7-db954f1ce480",
+                "assertionAttributes" : [ {
+                  "assertionAttributeName" : "first_name",
+                  "userAttributeName" : "firstName",
+                  "inherited" : false
+                }, {
+                  "assertionAttributeName" : "last_name",
+                  "userAttributeName" : "lastName",
+                  "inherited" : false
+                }, {
+                  "assertionAttributeName" : "mail",
+                  "userAttributeName" : "mail",
+                  "inherited" : false
+                }, {
+                  "assertionAttributeName" : "user_uuid",
+                  "userAttributeName" : "userUuid",
+                  "inherited" : false
+                }, {
+                  "assertionAttributeName" : "locale",
+                  "userAttributeName" : "language",
+                  "inherited" : false
+                } ],
+                "disabledInheritedProperties" : { },
+                "spnegoEnabled" : false,
+                "biometricAuthenticationEnabled" : false,
+                "verifyMail" : true,
+                "forceAuthentication" : false,
+                "trustAllCorporateIdentityProviders" : false,
+                "allowIasUsers" : false,
+                "defaultAuthenticatingIdpId" : "664c660e25cff252c5c202dc",
+                "riskBasedAuthentication" : {
+                  "defaultAction" : [ "allow" ]
+                },
+                "saml2Configuration" : {
+                  "samlMetadataUrl" : "https://test.com",
+                  "defaultNameIdFormat" : "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
+                  "acsEndpoints" : [ {
+                    "bindingName" : "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+                    "location" : "https://test.1.com",
+                    "index" : 1,
+                    "isDefault" : true
+                  } ],
+                  "sloEndpoints" : [ {
+                    "bindingName" : "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+                    "location" : "https://logout.1.com",
+                    "responseLocation" : "https://logout-response.1.com"
+                  } ],
+                  "signSLOMessages" : true,
+                  "requireSignedSLOMessages" : true,
+                  "requireSignedAuthnRequest" : true,
+                  "signAssertions" : true,
+                  "signAuthnResponses" : true,
+                  "responseElementsToEncrypt" : "wholeAssertion",
+                  "certificatesForSigning" : [ {
+                    "dn" : "CN=test (P000003),L=iasprovidertestblr.accounts400.ondemand.com,OU=8e1affb2-62a1-43cc-a687-2ba75e4b3d84,OU=Canary,OU=SAP Cloud Platform Clients,O=SAP SE,C=DE",
+                    "base64Certificate" : "-----BEGIN CERTIFICATE-----\nredacted\n-----END CERTIFICATE-----",
+                    "validFrom" : "2025-06-10T06:53:33Z",
+                    "validTo" : "2026-06-10T07:53:33Z",
+                    "isDefault" : true
+                  } ],
+                  "certificateForEncryption" : {
+                    "dn" : "CN=test (P000003),L=iasprovidertestblr.accounts400.ondemand.com,OU=8e1affb2-62a1-43cc-a687-2ba75e4b3d84,OU=Canary,OU=SAP Cloud Platform Clients,O=SAP SE,C=DE",
+                    "base64Certificate" : "-----BEGIN CERTIFICATE-----\nredacted\n-----END CERTIFICATE-----",
+                    "validFrom" : "2025-06-10T06:53:33Z",
+                    "validTo" : "2026-06-10T07:53:33Z"
+                  },
+                  "digestAlgorithm" : "sha1",
+                  "proxyAuthnRequest" : {
+                    "authenticationContext" : "none"
+                  }
+                },
+                "openIdConnectConfiguration" : {
+                  "tokenPolicy" : {
+                    "jwtValidity" : 3600,
+                    "refreshValidity" : 43200,
+                    "refreshParallel" : 1,
+                    "maxExchangePeriod" : "unlimited",
+                    "refreshTokenRotationScenario" : "off",
+                    "accessTokenFormat" : "default"
+                  },
+                  "restrictedGrantTypes" : [ "password", "refreshToken", "clientCredentials", "jwtBearer", "authorizationCode" ]
+                },
+                "restApiAuthentication" : {
+                  "allowPublicClientFlows" : false,
+                  "allApisAccess" : false,
+                  "allowLocking" : true,
+                  "failedLoginAttempts" : 0
+                }
+              },
+              "urn:sap:identity:application:schemas:extension:sci:1.0:Provisioning" : {
+                "centralStoreProvisioningEnabled" : false
+              },
+              "urn:sap:identity:application:schemas:extension:sci:1.0:Authorization" : { }
+            }
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
+            Content-Type:
+                - application/json;charset=UTF-8
+            Critical-Origin-Trial:
+                - Tpcd
+            Date:
+                - Tue, 12 Aug 2025 10:29:21 GMT
+            Expires:
+                - "0"
+            Origin-Trial:
+                - Avu6rn7emV5gK8gvyGHlX8TMqM9uo1FacP2j/RWTq+8j+yKnqcTO0TQh0bXJ/7QntxD4/JzXv8aXoqxxZQuqXgYAAABdeyJvcmlnaW4iOiJodHRwczovL29uZGVtYW5kLmNvbTo0NDMiLCJmZWF0dXJlIjoiVHBjZCIsImV4cGlyeSI6MTczNTM0Mzk5OSwiaXNTdWJkb21haW4iOnRydWV9
+            Pragma:
+                - no-cache
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains; preload
+            Vary:
+                - accept-encoding,X-CSP-STRIP
+            X-Content-Type-Options:
+                - nosniff
+            X-Ids-Id:
+                - ADB03B50-872D-476B-8599-0F1C9C5BD791
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-vnrg7
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Ids-Region:
+                - eu-de-1
+            X-Robots-Tag:
+                - none
+            X-Xss-Protection:
+                - 1; mode=block
+        status: '200 '
+        code: 200
+        duration: 193.929375ms
+    - id: 3
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            Accept:
+                - '*/*'
+            Authorization:
+                - REDACTED
+            Content-Type:
+                - application/json
+            Dataserviceversion:
+                - "2.0"
+        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/b0b3c1e5-5a4a-4c38-884f-aebb3dcd8a9f
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: true
+        body: |-
+            {
+              "id" : "b0b3c1e5-5a4a-4c38-884f-aebb3dcd8a9f",
+              "meta" : {
+                "created" : "2025-08-12T10:29:20.588Z",
+                "createdBy" : "P000315",
+                "lastModified" : "2025-08-12T10:29:20.588Z",
+                "modifiedBy" : "P000315",
+                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/b0b3c1e5-5a4a-4c38-884f-aebb3dcd8a9f",
+                "type" : "charged",
+                "version" : "1"
+              },
+              "name" : "SAML2 - Test App",
+              "multiTenantApp" : false,
+              "globalAccount" : "unknown",
+              "schemas" : [ "urn:sap:identity:application:schemas:core:1.0", "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication", "urn:sap:identity:application:schemas:extension:sci:1.0:Authorization", "urn:sap:identity:application:schemas:extension:sci:1.0:Provisioning" ],
+              "branding" : {
+                "showDisplayNameOnLogonScreen" : true,
+                "rememberMeVisible" : true,
+                "rememberMeChecked" : false,
+                "refreshParent" : true,
+                "tokenUrlEmbedCharacter" : ";",
+                "theme" : {
+                  "type" : "horizon"
+                }
+              },
+              "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication" : {
+                "ssoType" : "saml2",
+                "subjectNameIdentifier" : "uid",
+                "rememberMeExpirationTimeInMonths" : 3,
+                "passwordPolicy" : "https://accounts.sap.com/policy/passwords/sap/web/1.1",
+                "userAccess" : {
+                  "type" : "internal",
+                  "userAttributesForAccess" : [ {
+                    "userAttributeName" : "firstName",
+                    "isRequired" : false
+                  }, {
+                    "userAttributeName" : "lastName",
+                    "isRequired" : true
+                  }, {
+                    "userAttributeName" : "mail",
+                    "isRequired" : true
+                  } ]
+                },
+                "companyId" : "global",
+                "clientId" : "c60586cc-04c6-4409-88f7-db954f1ce480",
+                "assertionAttributes" : [ {
+                  "assertionAttributeName" : "first_name",
+                  "userAttributeName" : "firstName",
+                  "inherited" : false
+                }, {
+                  "assertionAttributeName" : "last_name",
+                  "userAttributeName" : "lastName",
+                  "inherited" : false
+                }, {
+                  "assertionAttributeName" : "mail",
+                  "userAttributeName" : "mail",
+                  "inherited" : false
+                }, {
+                  "assertionAttributeName" : "user_uuid",
+                  "userAttributeName" : "userUuid",
+                  "inherited" : false
+                }, {
+                  "assertionAttributeName" : "locale",
+                  "userAttributeName" : "language",
+                  "inherited" : false
+                } ],
+                "disabledInheritedProperties" : { },
+                "spnegoEnabled" : false,
+                "biometricAuthenticationEnabled" : false,
+                "verifyMail" : true,
+                "forceAuthentication" : false,
+                "trustAllCorporateIdentityProviders" : false,
+                "allowIasUsers" : false,
+                "defaultAuthenticatingIdpId" : "664c660e25cff252c5c202dc",
+                "riskBasedAuthentication" : {
+                  "defaultAction" : [ "allow" ]
+                },
+                "saml2Configuration" : {
+                  "samlMetadataUrl" : "https://test.com",
+                  "defaultNameIdFormat" : "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
+                  "acsEndpoints" : [ {
+                    "bindingName" : "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+                    "location" : "https://test.1.com",
+                    "index" : 1,
+                    "isDefault" : true
+                  } ],
+                  "sloEndpoints" : [ {
+                    "bindingName" : "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+                    "location" : "https://logout.1.com",
+                    "responseLocation" : "https://logout-response.1.com"
+                  } ],
+                  "signSLOMessages" : true,
+                  "requireSignedSLOMessages" : true,
+                  "requireSignedAuthnRequest" : true,
+                  "signAssertions" : true,
+                  "signAuthnResponses" : true,
+                  "responseElementsToEncrypt" : "wholeAssertion",
+                  "certificatesForSigning" : [ {
+                    "dn" : "CN=test (P000003),L=iasprovidertestblr.accounts400.ondemand.com,OU=8e1affb2-62a1-43cc-a687-2ba75e4b3d84,OU=Canary,OU=SAP Cloud Platform Clients,O=SAP SE,C=DE",
+                    "base64Certificate" : "-----BEGIN CERTIFICATE-----\nredacted\n-----END CERTIFICATE-----",
+                    "validFrom" : "2025-06-10T06:53:33Z",
+                    "validTo" : "2026-06-10T07:53:33Z",
+                    "isDefault" : true
+                  } ],
+                  "certificateForEncryption" : {
+                    "dn" : "CN=test (P000003),L=iasprovidertestblr.accounts400.ondemand.com,OU=8e1affb2-62a1-43cc-a687-2ba75e4b3d84,OU=Canary,OU=SAP Cloud Platform Clients,O=SAP SE,C=DE",
+                    "base64Certificate" : "-----BEGIN CERTIFICATE-----\nredacted\n-----END CERTIFICATE-----",
+                    "validFrom" : "2025-06-10T06:53:33Z",
+                    "validTo" : "2026-06-10T07:53:33Z"
+                  },
+                  "digestAlgorithm" : "sha1",
+                  "proxyAuthnRequest" : {
+                    "authenticationContext" : "none"
+                  }
+                },
+                "openIdConnectConfiguration" : {
+                  "tokenPolicy" : {
+                    "jwtValidity" : 3600,
+                    "refreshValidity" : 43200,
+                    "refreshParallel" : 1,
+                    "maxExchangePeriod" : "unlimited",
+                    "refreshTokenRotationScenario" : "off",
+                    "accessTokenFormat" : "default"
+                  },
+                  "restrictedGrantTypes" : [ "password", "refreshToken", "clientCredentials", "jwtBearer", "authorizationCode" ]
+                },
+                "restApiAuthentication" : {
+                  "allowPublicClientFlows" : false,
+                  "allApisAccess" : false,
+                  "allowLocking" : true,
+                  "failedLoginAttempts" : 0
+                }
+              },
+              "urn:sap:identity:application:schemas:extension:sci:1.0:Provisioning" : {
+                "centralStoreProvisioningEnabled" : false
+              },
+              "urn:sap:identity:application:schemas:extension:sci:1.0:Authorization" : { }
+            }
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
+            Content-Type:
+                - application/json;charset=UTF-8
+            Critical-Origin-Trial:
+                - Tpcd
+            Date:
+                - Tue, 12 Aug 2025 10:29:21 GMT
+            Expires:
+                - "0"
+            Origin-Trial:
+                - Avu6rn7emV5gK8gvyGHlX8TMqM9uo1FacP2j/RWTq+8j+yKnqcTO0TQh0bXJ/7QntxD4/JzXv8aXoqxxZQuqXgYAAABdeyJvcmlnaW4iOiJodHRwczovL29uZGVtYW5kLmNvbTo0NDMiLCJmZWF0dXJlIjoiVHBjZCIsImV4cGlyeSI6MTczNTM0Mzk5OSwiaXNTdWJkb21haW4iOnRydWV9
+            Pragma:
+                - no-cache
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains; preload
+            Vary:
+                - accept-encoding,X-CSP-STRIP
+            X-Content-Type-Options:
+                - nosniff
+            X-Ids-Id:
+                - 555AEA1D-6B4F-44B5-B88D-BDE519084F2B
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-vnrg7
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Ids-Region:
+                - eu-de-1
+            X-Robots-Tag:
+                - none
+            X-Xss-Protection:
+                - 1; mode=block
+        status: '200 '
+        code: 200
+        duration: 195.112ms
+    - id: 4
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 7396
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: |
+            {"id":"b0b3c1e5-5a4a-4c38-884f-aebb3dcd8a9f","name":"OIDC-test-app","description":"application for testing purposes","urn:sap:identity:application:schemas:extension:sci:1.0:Authentication":{"ssoType":"openIdConnect","subjectNameIdentifier":"uid","assertionAttributes":[{"assertionAttributeName":"first_name","userAttributeName":"firstName","inherited":false},{"assertionAttributeName":"last_name","userAttributeName":"lastName","inherited":false},{"assertionAttributeName":"mail","userAttributeName":"mail","inherited":false},{"assertionAttributeName":"user_uuid","userAttributeName":"userUuid","inherited":false},{"assertionAttributeName":"locale","userAttributeName":"language","inherited":false}],"defaultAuthenticatingIdpId":"664c660e25cff252c5c202dc","openIdConnectConfiguration":{"redirectUris":["https://redirectUris.com"],"postLogoutRedirectUris":["https://postLogoutRedirectUris.com"],"frontChannelLogoutUris":["https://frontChannelLogoutUris.com"],"backChannelLogoutUris":["https://backChannelLogoutUris.com"],"tokenPolicy":{"jwtValidity":41000,"refreshValidity":1500000,"refreshParallel":5,"maxExchangePeriod":"unlimited","refreshTokenRotationScenario":"off","accessTokenFormat":"default"},"restrictedGrantTypes":["authorizationCode","clientCredentials"],"proxyConfig":{"acrs":["acrs"]}},"saml2Configuration":{"samlMetadataUrl":"https://test.com","defaultNameIdFormat":"urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified","acsEndpoints":[{"bindingName":"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST","location":"https://test.1.com","index":1,"isDefault":true}],"sloEndpoints":[{"bindingName":"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST","location":"https://logout.1.com","responseLocation":"https://logout-response.1.com"}],"signSLOMessages":true,"requireSignedSLOMessages":true,"requireSignedAuthnRequest":true,"signAssertions":true,"signAuthnResponses":true,"responseElementsToEncrypt":"wholeAssertion","certificatesForSigning":[{"base64Certificate":"-----BEGIN CERTIFICATE-----\nredacted\n-----END CERTIFICATE-----","dn":"CN=test (P000003),L=iasprovidertestblr.accounts400.ondemand.com,OU=8e1affb2-62a1-43cc-a687-2ba75e4b3d84,OU=Canary,OU=SAP Cloud Platform Clients,O=SAP SE,C=DE","isDefault":true,"validFrom":"2025-06-10T06:53:33Z","validTo":"2026-06-10T07:53:33Z"}],"certificateForEncryption":{"dn":"CN=test (P000003),L=iasprovidertestblr.accounts400.ondemand.com,OU=8e1affb2-62a1-43cc-a687-2ba75e4b3d84,OU=Canary,OU=SAP Cloud Platform Clients,O=SAP SE,C=DE","base64Certificate":"-----BEGIN CERTIFICATE-----\nredacted\n-----END CERTIFICATE-----","validFrom":"2025-06-10T06:53:33Z","validTo":"2026-06-10T07:53:33Z"},"digestAlgorithm":"sha1"}}}
+        form: {}
+        headers:
+            Accept:
+                - '*/*'
+            Authorization:
+                - REDACTED
+            Content-Type:
+                - application/json
+            Dataserviceversion:
+                - "2.0"
+        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/b0b3c1e5-5a4a-4c38-884f-aebb3dcd8a9f
         method: PUT
       response:
         proto: HTTP/1.1
@@ -729,7 +789,7 @@ interactions:
             Critical-Origin-Trial:
                 - Tpcd
             Date:
-                - Tue, 12 Aug 2025 10:22:26 GMT
+                - Tue, 12 Aug 2025 10:29:21 GMT
             Expires:
                 - "0"
             Origin-Trial:
@@ -747,13 +807,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - D89C8376-1865-465E-9DCA-7A05E56854C3
+                - B335A771-74FE-4796-B6A4-D0263CD8CAF8
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-plglq
+                - http-vnrg7
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -766,7 +826,7 @@ interactions:
                 - 1; mode=block
         status: '200 '
         code: 200
-        duration: 217.88125ms
+        duration: 243.732792ms
     - id: 5
       request:
         proto: HTTP/1.1
@@ -789,7 +849,7 @@ interactions:
                 - application/json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/fe1a0128-f1d9-451c-90cf-f284d824ba7b
+        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/b0b3c1e5-5a4a-4c38-884f-aebb3dcd8a9f
         method: GET
       response:
         proto: HTTP/1.1
@@ -802,17 +862,17 @@ interactions:
         uncompressed: true
         body: |-
             {
-              "id" : "fe1a0128-f1d9-451c-90cf-f284d824ba7b",
+              "id" : "b0b3c1e5-5a4a-4c38-884f-aebb3dcd8a9f",
               "meta" : {
-                "created" : "2025-08-12T10:22:25.44Z",
+                "created" : "2025-08-12T10:29:20.588Z",
                 "createdBy" : "P000315",
-                "lastModified" : "2025-08-12T10:22:26.551Z",
+                "lastModified" : "2025-08-12T10:29:21.76Z",
                 "modifiedBy" : "P000315",
-                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/fe1a0128-f1d9-451c-90cf-f284d824ba7b",
+                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/b0b3c1e5-5a4a-4c38-884f-aebb3dcd8a9f",
                 "type" : "charged",
                 "version" : "1"
               },
-              "name" : "test-app-updated",
+              "name" : "OIDC-test-app",
               "description" : "application for testing purposes",
               "multiTenantApp" : false,
               "globalAccount" : "unknown",
@@ -828,9 +888,8 @@ interactions:
                 }
               },
               "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication" : {
-                "ssoType" : "saml2",
-                "subjectNameIdentifier" : "userUuid",
-                "subjectNameIdentifierFunction" : "upperCase",
+                "ssoType" : "openIdConnect",
+                "subjectNameIdentifier" : "uid",
                 "rememberMeExpirationTimeInMonths" : 3,
                 "passwordPolicy" : "https://accounts.sap.com/policy/passwords/sap/web/1.1",
                 "userAccess" : {
@@ -847,23 +906,26 @@ interactions:
                   } ]
                 },
                 "companyId" : "global",
-                "clientId" : "b0af95f9-11db-4152-b6de-87b37f0221b0",
+                "clientId" : "c60586cc-04c6-4409-88f7-db954f1ce480",
                 "assertionAttributes" : [ {
-                  "assertionAttributeName" : "param1",
+                  "assertionAttributeName" : "first_name",
+                  "userAttributeName" : "firstName",
+                  "inherited" : false
+                }, {
+                  "assertionAttributeName" : "last_name",
                   "userAttributeName" : "lastName",
                   "inherited" : false
-                } ],
-                "advancedAssertionAttributes" : [ {
-                  "attributeName" : "adv_param1",
-                  "attributeValue" : "${corporateIdP.updated_value1}",
+                }, {
+                  "assertionAttributeName" : "mail",
+                  "userAttributeName" : "mail",
                   "inherited" : false
                 }, {
-                  "attributeName" : "adv_param2",
-                  "attributeValue" : "${corporateIdP.value2}",
+                  "assertionAttributeName" : "user_uuid",
+                  "userAttributeName" : "userUuid",
                   "inherited" : false
                 }, {
-                  "attributeName" : "adv_param3",
-                  "attributeValue" : "${corporateIdP.value3}",
+                  "assertionAttributeName" : "locale",
+                  "userAttributeName" : "language",
                   "inherited" : false
                 } ],
                 "disabledInheritedProperties" : { },
@@ -874,38 +936,64 @@ interactions:
                 "trustAllCorporateIdentityProviders" : false,
                 "allowIasUsers" : false,
                 "defaultAuthenticatingIdpId" : "664c660e25cff252c5c202dc",
-                "conditionalAuthentication" : [ {
-                  "userType" : "customer",
-                  "userEmailDomain" : "sap.com",
-                  "identityProviderId" : "664c660e25cff252c5c202dc",
-                  "ipNetworkRange" : "192.168.1.1/24"
-                } ],
                 "riskBasedAuthentication" : {
                   "defaultAction" : [ "allow" ]
                 },
                 "saml2Configuration" : {
+                  "samlMetadataUrl" : "https://test.com",
                   "defaultNameIdFormat" : "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
+                  "acsEndpoints" : [ {
+                    "bindingName" : "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+                    "location" : "https://test.1.com",
+                    "index" : 1,
+                    "isDefault" : true
+                  } ],
+                  "sloEndpoints" : [ {
+                    "bindingName" : "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+                    "location" : "https://logout.1.com",
+                    "responseLocation" : "https://logout-response.1.com"
+                  } ],
                   "signSLOMessages" : true,
                   "requireSignedSLOMessages" : true,
-                  "requireSignedAuthnRequest" : false,
+                  "requireSignedAuthnRequest" : true,
                   "signAssertions" : true,
-                  "signAuthnResponses" : false,
-                  "responseElementsToEncrypt" : "none",
-                  "digestAlgorithm" : "sha256",
+                  "signAuthnResponses" : true,
+                  "responseElementsToEncrypt" : "wholeAssertion",
+                  "certificatesForSigning" : [ {
+                    "dn" : "CN=test (P000003),L=iasprovidertestblr.accounts400.ondemand.com,OU=8e1affb2-62a1-43cc-a687-2ba75e4b3d84,OU=Canary,OU=SAP Cloud Platform Clients,O=SAP SE,C=DE",
+                    "base64Certificate" : "-----BEGIN CERTIFICATE-----\nredacted\n-----END CERTIFICATE-----",
+                    "validFrom" : "2025-06-10T06:53:33Z",
+                    "validTo" : "2026-06-10T07:53:33Z",
+                    "isDefault" : true
+                  } ],
+                  "certificateForEncryption" : {
+                    "dn" : "CN=test (P000003),L=iasprovidertestblr.accounts400.ondemand.com,OU=8e1affb2-62a1-43cc-a687-2ba75e4b3d84,OU=Canary,OU=SAP Cloud Platform Clients,O=SAP SE,C=DE",
+                    "base64Certificate" : "-----BEGIN CERTIFICATE-----\nredacted\n-----END CERTIFICATE-----",
+                    "validFrom" : "2025-06-10T06:53:33Z",
+                    "validTo" : "2026-06-10T07:53:33Z"
+                  },
+                  "digestAlgorithm" : "sha1",
                   "proxyAuthnRequest" : {
                     "authenticationContext" : "none"
                   }
                 },
                 "openIdConnectConfiguration" : {
+                  "redirectUris" : [ "https://redirectUris.com" ],
+                  "postLogoutRedirectUris" : [ "https://postLogoutRedirectUris.com" ],
+                  "frontChannelLogoutUris" : [ "https://frontChannelLogoutUris.com" ],
+                  "backChannelLogoutUris" : [ "https://backChannelLogoutUris.com" ],
                   "tokenPolicy" : {
-                    "jwtValidity" : 3600,
-                    "refreshValidity" : 43200,
-                    "refreshParallel" : 1,
+                    "jwtValidity" : 41000,
+                    "refreshValidity" : 1500000,
+                    "refreshParallel" : 5,
                     "maxExchangePeriod" : "unlimited",
                     "refreshTokenRotationScenario" : "off",
                     "accessTokenFormat" : "default"
                   },
-                  "restrictedGrantTypes" : [ "clientCredentials", "refreshToken", "jwtBearer", "password", "authorizationCode" ]
+                  "restrictedGrantTypes" : [ "clientCredentials", "authorizationCode" ],
+                  "proxyConfig" : {
+                    "acrs" : [ "acrs" ]
+                  }
                 },
                 "restApiAuthentication" : {
                   "allowPublicClientFlows" : false,
@@ -929,7 +1017,7 @@ interactions:
             Critical-Origin-Trial:
                 - Tpcd
             Date:
-                - Tue, 12 Aug 2025 10:22:26 GMT
+                - Tue, 12 Aug 2025 10:29:21 GMT
             Expires:
                 - "0"
             Origin-Trial:
@@ -947,13 +1035,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - 79A9076D-3CA2-4C6E-8B78-4938EA59831A
+                - A9EA828A-E398-4CF7-A2EE-BA823CCE5A5B
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-plglq
+                - http-vnrg7
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -966,7 +1054,7 @@ interactions:
                 - 1; mode=block
         status: '200 '
         code: 200
-        duration: 182.115208ms
+        duration: 195.808ms
     - id: 6
       request:
         proto: HTTP/1.1
@@ -989,7 +1077,7 @@ interactions:
                 - application/json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/fe1a0128-f1d9-451c-90cf-f284d824ba7b
+        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/b0b3c1e5-5a4a-4c38-884f-aebb3dcd8a9f
         method: GET
       response:
         proto: HTTP/1.1
@@ -1002,17 +1090,17 @@ interactions:
         uncompressed: true
         body: |-
             {
-              "id" : "fe1a0128-f1d9-451c-90cf-f284d824ba7b",
+              "id" : "b0b3c1e5-5a4a-4c38-884f-aebb3dcd8a9f",
               "meta" : {
-                "created" : "2025-08-12T10:22:25.44Z",
+                "created" : "2025-08-12T10:29:20.588Z",
                 "createdBy" : "P000315",
-                "lastModified" : "2025-08-12T10:22:26.551Z",
+                "lastModified" : "2025-08-12T10:29:21.76Z",
                 "modifiedBy" : "P000315",
-                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/fe1a0128-f1d9-451c-90cf-f284d824ba7b",
+                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/b0b3c1e5-5a4a-4c38-884f-aebb3dcd8a9f",
                 "type" : "charged",
                 "version" : "1"
               },
-              "name" : "test-app-updated",
+              "name" : "OIDC-test-app",
               "description" : "application for testing purposes",
               "multiTenantApp" : false,
               "globalAccount" : "unknown",
@@ -1028,9 +1116,8 @@ interactions:
                 }
               },
               "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication" : {
-                "ssoType" : "saml2",
-                "subjectNameIdentifier" : "userUuid",
-                "subjectNameIdentifierFunction" : "upperCase",
+                "ssoType" : "openIdConnect",
+                "subjectNameIdentifier" : "uid",
                 "rememberMeExpirationTimeInMonths" : 3,
                 "passwordPolicy" : "https://accounts.sap.com/policy/passwords/sap/web/1.1",
                 "userAccess" : {
@@ -1047,23 +1134,26 @@ interactions:
                   } ]
                 },
                 "companyId" : "global",
-                "clientId" : "b0af95f9-11db-4152-b6de-87b37f0221b0",
+                "clientId" : "c60586cc-04c6-4409-88f7-db954f1ce480",
                 "assertionAttributes" : [ {
-                  "assertionAttributeName" : "param1",
+                  "assertionAttributeName" : "first_name",
+                  "userAttributeName" : "firstName",
+                  "inherited" : false
+                }, {
+                  "assertionAttributeName" : "last_name",
                   "userAttributeName" : "lastName",
                   "inherited" : false
-                } ],
-                "advancedAssertionAttributes" : [ {
-                  "attributeName" : "adv_param1",
-                  "attributeValue" : "${corporateIdP.updated_value1}",
+                }, {
+                  "assertionAttributeName" : "mail",
+                  "userAttributeName" : "mail",
                   "inherited" : false
                 }, {
-                  "attributeName" : "adv_param2",
-                  "attributeValue" : "${corporateIdP.value2}",
+                  "assertionAttributeName" : "user_uuid",
+                  "userAttributeName" : "userUuid",
                   "inherited" : false
                 }, {
-                  "attributeName" : "adv_param3",
-                  "attributeValue" : "${corporateIdP.value3}",
+                  "assertionAttributeName" : "locale",
+                  "userAttributeName" : "language",
                   "inherited" : false
                 } ],
                 "disabledInheritedProperties" : { },
@@ -1074,38 +1164,64 @@ interactions:
                 "trustAllCorporateIdentityProviders" : false,
                 "allowIasUsers" : false,
                 "defaultAuthenticatingIdpId" : "664c660e25cff252c5c202dc",
-                "conditionalAuthentication" : [ {
-                  "userType" : "customer",
-                  "userEmailDomain" : "sap.com",
-                  "identityProviderId" : "664c660e25cff252c5c202dc",
-                  "ipNetworkRange" : "192.168.1.1/24"
-                } ],
                 "riskBasedAuthentication" : {
                   "defaultAction" : [ "allow" ]
                 },
                 "saml2Configuration" : {
+                  "samlMetadataUrl" : "https://test.com",
                   "defaultNameIdFormat" : "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
+                  "acsEndpoints" : [ {
+                    "bindingName" : "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+                    "location" : "https://test.1.com",
+                    "index" : 1,
+                    "isDefault" : true
+                  } ],
+                  "sloEndpoints" : [ {
+                    "bindingName" : "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+                    "location" : "https://logout.1.com",
+                    "responseLocation" : "https://logout-response.1.com"
+                  } ],
                   "signSLOMessages" : true,
                   "requireSignedSLOMessages" : true,
-                  "requireSignedAuthnRequest" : false,
+                  "requireSignedAuthnRequest" : true,
                   "signAssertions" : true,
-                  "signAuthnResponses" : false,
-                  "responseElementsToEncrypt" : "none",
-                  "digestAlgorithm" : "sha256",
+                  "signAuthnResponses" : true,
+                  "responseElementsToEncrypt" : "wholeAssertion",
+                  "certificatesForSigning" : [ {
+                    "dn" : "CN=test (P000003),L=iasprovidertestblr.accounts400.ondemand.com,OU=8e1affb2-62a1-43cc-a687-2ba75e4b3d84,OU=Canary,OU=SAP Cloud Platform Clients,O=SAP SE,C=DE",
+                    "base64Certificate" : "-----BEGIN CERTIFICATE-----\nredacted\n-----END CERTIFICATE-----",
+                    "validFrom" : "2025-06-10T06:53:33Z",
+                    "validTo" : "2026-06-10T07:53:33Z",
+                    "isDefault" : true
+                  } ],
+                  "certificateForEncryption" : {
+                    "dn" : "CN=test (P000003),L=iasprovidertestblr.accounts400.ondemand.com,OU=8e1affb2-62a1-43cc-a687-2ba75e4b3d84,OU=Canary,OU=SAP Cloud Platform Clients,O=SAP SE,C=DE",
+                    "base64Certificate" : "-----BEGIN CERTIFICATE-----\nredacted\n-----END CERTIFICATE-----",
+                    "validFrom" : "2025-06-10T06:53:33Z",
+                    "validTo" : "2026-06-10T07:53:33Z"
+                  },
+                  "digestAlgorithm" : "sha1",
                   "proxyAuthnRequest" : {
                     "authenticationContext" : "none"
                   }
                 },
                 "openIdConnectConfiguration" : {
+                  "redirectUris" : [ "https://redirectUris.com" ],
+                  "postLogoutRedirectUris" : [ "https://postLogoutRedirectUris.com" ],
+                  "frontChannelLogoutUris" : [ "https://frontChannelLogoutUris.com" ],
+                  "backChannelLogoutUris" : [ "https://backChannelLogoutUris.com" ],
                   "tokenPolicy" : {
-                    "jwtValidity" : 3600,
-                    "refreshValidity" : 43200,
-                    "refreshParallel" : 1,
+                    "jwtValidity" : 41000,
+                    "refreshValidity" : 1500000,
+                    "refreshParallel" : 5,
                     "maxExchangePeriod" : "unlimited",
                     "refreshTokenRotationScenario" : "off",
                     "accessTokenFormat" : "default"
                   },
-                  "restrictedGrantTypes" : [ "refreshToken", "authorizationCode", "clientCredentials", "jwtBearer", "password" ]
+                  "restrictedGrantTypes" : [ "clientCredentials", "authorizationCode" ],
+                  "proxyConfig" : {
+                    "acrs" : [ "acrs" ]
+                  }
                 },
                 "restApiAuthentication" : {
                   "allowPublicClientFlows" : false,
@@ -1129,7 +1245,7 @@ interactions:
             Critical-Origin-Trial:
                 - Tpcd
             Date:
-                - Tue, 12 Aug 2025 10:22:27 GMT
+                - Tue, 12 Aug 2025 10:29:22 GMT
             Expires:
                 - "0"
             Origin-Trial:
@@ -1147,13 +1263,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - 378138C9-6C6B-4E95-A0B8-D5418FFDBEF3
+                - EFBF6365-E226-4544-816F-360DC60444E7
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-plglq
+                - http-vnrg7
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -1166,7 +1282,7 @@ interactions:
                 - 1; mode=block
         status: '200 '
         code: 200
-        duration: 195.33025ms
+        duration: 188.710667ms
     - id: 7
       request:
         proto: HTTP/1.1
@@ -1189,7 +1305,7 @@ interactions:
                 - application/json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/fe1a0128-f1d9-451c-90cf-f284d824ba7b
+        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/b0b3c1e5-5a4a-4c38-884f-aebb3dcd8a9f
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -1210,7 +1326,7 @@ interactions:
             Critical-Origin-Trial:
                 - Tpcd
             Date:
-                - Tue, 12 Aug 2025 10:22:27 GMT
+                - Tue, 12 Aug 2025 10:29:22 GMT
             Expires:
                 - "0"
             Origin-Trial:
@@ -1228,13 +1344,13 @@ interactions:
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - 67CDFF44-9673-407A-9FB2-163F666590D1
+                - C04A80F7-C57A-4159-9A61-137F918863E5
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-plglq
+                - http-vnrg7
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -1247,4 +1363,4 @@ interactions:
                 - 1; mode=block
         status: '200 '
         code: 200
-        duration: 212.59625ms
+        duration: 223.226125ms

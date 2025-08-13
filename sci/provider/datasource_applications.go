@@ -6,7 +6,6 @@ import (
 
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
-
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -41,6 +40,9 @@ var authenticationSchemaObjType = map[string]attr.Type{
 	"default_authenticating_idp": types.StringType,
 	"conditional_authentication": types.ListType{
 		ElemType: authenticationRulesObjType,
+	},
+	"oidc_config": types.ObjectType{
+		AttrTypes: openIdConnectConfigurationObjType,
 	},
 	"saml2_config": types.ObjectType{
 		AttrTypes: appSaml2ConfigObjType.AttrTypes,
@@ -126,6 +128,45 @@ var authenticationRulesObjType = types.ObjectType{
 		"user_email_domain":    types.StringType,
 		"identity_provider_id": types.StringType,
 		"ip_network_range":     types.StringType,
+	},
+}
+
+var openIdConnectConfigurationObjType = map[string]attr.Type{
+	"redirect_uris": types.SetType{
+		ElemType: types.StringType,
+	},
+	"post_logout_redirect_uris": types.SetType{
+		ElemType: types.StringType,
+	},
+	"front_channel_logout_uris": types.SetType{
+		ElemType: types.StringType,
+	},
+	"back_channel_logout_uris": types.SetType{
+		ElemType: types.StringType,
+	},
+	"token_policy": types.ObjectType{
+		AttrTypes: tokenPolicyObjType,
+	},
+	"restricted_grant_types": types.SetType{
+		ElemType: types.StringType,
+	},
+	"proxy_config": types.ObjectType{
+		AttrTypes: proxyConfigObjType,
+	},
+}
+
+var tokenPolicyObjType = map[string]attr.Type{
+	"jwt_validity":                    types.Int32Type,
+	"refresh_validity":                types.Int32Type,
+	"refresh_parallel":                types.Int32Type,
+	"max_exchange_period":             types.StringType,
+	"refresh_token_rotation_scenario": types.StringType,
+	"access_token_format":             types.StringType,
+}
+
+var proxyConfigObjType = map[string]attr.Type{
+	"acrs": types.SetType{
+		ElemType: types.StringType,
 	},
 }
 
@@ -288,6 +329,78 @@ func (d *applicationsDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 											"ip_network_range": schema.StringAttribute{
 												MarkdownDescription: "Valid IP range to be authenticated.",
 												Computed:            true,
+											},
+										},
+									},
+								},
+								"oidc_config": schema.SingleNestedAttribute{
+									MarkdownDescription: "OpenID Connect (OIDC) configuration options for this application.",
+									Computed:            true,
+									Attributes: map[string]schema.Attribute{
+										"redirect_uris": schema.SetAttribute{
+											MarkdownDescription: "A list of redirect URIs that the OpenID Provider is allowed to redirect to after authentication. Must contain 1 to 20 valid URIs.",
+											ElementType:         types.StringType,
+											Computed:            true,
+										},
+										"post_logout_redirect_uris": schema.SetAttribute{
+											MarkdownDescription: "List of URIs to which the user will be redirected after logging out from the application. Can include up to 20 URIs.",
+											ElementType:         types.StringType,
+											Computed:            true,
+										},
+										"front_channel_logout_uris": schema.SetAttribute{
+											MarkdownDescription: "List of front-channel logout URIs that support browser-based logout. Each must be a valid URL and up to 20 URIs are allowed.",
+											ElementType:         types.StringType,
+											Computed:            true,
+										},
+										"back_channel_logout_uris": schema.SetAttribute{
+											MarkdownDescription: "List of back-channel logout URIs that support server-to-server logout notifications. Each must be a valid URL. Up to 20 URIs allowed.",
+											ElementType:         types.StringType,
+											Computed:            true,
+										},
+										"token_policy": schema.SingleNestedAttribute{
+											MarkdownDescription: "Defines the token policy for the application.",
+											Computed:            true,
+											Attributes: map[string]schema.Attribute{
+												"jwt_validity": schema.Int32Attribute{
+													MarkdownDescription: "JWT access token validity in seconds. Must be between 60 seconds (1 minute) and 43200 seconds (12 hours).",
+													Computed:            true,
+												},
+												"refresh_validity": schema.Int32Attribute{
+													MarkdownDescription: "Refresh token validity in seconds. Can range from 0 to 15552000 seconds (180 days).",
+													Computed:            true,
+												},
+												"refresh_parallel": schema.Int32Attribute{
+													MarkdownDescription: "Maximum number of refresh tokens that can be used in parallel. Valid values range from 1 to 10.",
+													Computed:            true,
+												},
+												"max_exchange_period": schema.StringAttribute{
+													MarkdownDescription: "Maximum token exchange period." + utils.ValidValuesString(maxExchangePeriodValues),
+													Computed:            true,
+												},
+												"refresh_token_rotation_scenario": schema.StringAttribute{
+													MarkdownDescription: "Defines the scenario for refresh token rotation." + utils.ValidValuesString(refreshTokenRotationScenarioValues),
+													Computed:            true,
+												},
+												"access_token_format": schema.StringAttribute{
+													MarkdownDescription: "The format of the access token issued." + utils.ValidValuesString(accessTokenFormatValues),
+													Computed:            true,
+												},
+											},
+										},
+										"restricted_grant_types": schema.SetAttribute{
+											MarkdownDescription: "Set of OAuth 2.0 grant types that are restricted for the application." + utils.ValidValuesString(restrictedGrantTypesValues),
+											Computed:            true,
+											ElementType:         types.StringType,
+										},
+										"proxy_config": schema.SingleNestedAttribute{
+											MarkdownDescription: "Optional proxy configuration including accepted ACR values.",
+											Computed:            true,
+											Attributes: map[string]schema.Attribute{
+												"acrs": schema.SetAttribute{
+													MarkdownDescription: "Set of accepted ACR (Authentication Context Class Reference) values. Up to 20 values allowed.",
+													ElementType:         types.StringType,
+													Computed:            true,
+												},
 											},
 										},
 									},

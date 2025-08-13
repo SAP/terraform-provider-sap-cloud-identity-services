@@ -19,6 +19,7 @@ type authenticationSchemaData struct {
 	AdvancedAssertionAttributes   types.List   `tfsdk:"advanced_assertion_attributes"`
 	DefaultAuthenticatingIdpId    types.String `tfsdk:"default_authenticating_idp"`
 	AuthenticationRules           types.List   `tfsdk:"conditional_authentication"`
+	OpenIdConnectConfiguration    types.Object `tfsdk:"oidc_config"`
 	Saml2Configuration            types.Object `tfsdk:"saml2_config"`
 }
 
@@ -73,6 +74,29 @@ type applicationData struct {
 	ParentApplicationId  types.String `tfsdk:"parent_application_id"`
 	MultiTenantApp       types.Bool   `tfsdk:"multi_tenant_app"`
 	AuthenticationSchema types.Object `tfsdk:"authentication_schema"`
+}
+
+type openIdConnectConfigurationData struct {
+	RedirectUris           types.Set    `tfsdk:"redirect_uris"`
+	PostLogoutRedirectUris types.Set    `tfsdk:"post_logout_redirect_uris"`
+	FrontChannelLogoutUris types.Set    `tfsdk:"front_channel_logout_uris"`
+	BackChannelLogoutUris  types.Set    `tfsdk:"back_channel_logout_uris"`
+	TokenPolicy            types.Object `tfsdk:"token_policy"`
+	RestrictedGrantTypes   types.Set    `tfsdk:"restricted_grant_types"`
+	ProxyConfig            types.Object `tfsdk:"proxy_config"`
+}
+
+type tokenPolicyData struct {
+	JwtValidity                  types.Int32  `tfsdk:"jwt_validity"`
+	RefreshValidity              types.Int32  `tfsdk:"refresh_validity"`
+	RefreshParallel              types.Int32  `tfsdk:"refresh_parallel"`
+	MaxExchangePeriod            types.String `tfsdk:"max_exchange_period"`
+	RefreshTokenRotationScenario types.String `tfsdk:"refresh_token_rotation_scenario"`
+	AccessTokenFormat            types.String `tfsdk:"access_token_format"`
+}
+
+type proxyConfigData struct {
+	Acrs types.Set `tfsdk:"acrs"`
 }
 
 func applicationValueFrom(ctx context.Context, a applications.Application) (applicationData, diag.Diagnostics) {
@@ -225,106 +249,166 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 		authenticationSchema.AuthenticationRules = types.ListNull(authenticationRulesObjType)
 	}
 
+	// Authentication Schema OIDC
+	// the mapping is done manually in order to handle the null values
+	if a.AuthenticationSchema.OidcConfig != nil {
+		oidc := openIdConnectConfigurationData{}
+
+		oidc.RedirectUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.RedirectUris)
+		diagnostics.Append(diags...)
+
+		oidc.PostLogoutRedirectUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.PostLogoutRedirectUris)
+		diagnostics.Append(diags...)
+
+		oidc.FrontChannelLogoutUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.FrontChannelLogoutUris)
+		diagnostics.Append(diags...)
+
+		oidc.BackChannelLogoutUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.BackChannelLogoutUris)
+		diagnostics.Append(diags...)
+
+		if a.AuthenticationSchema.OidcConfig.TokenPolicy != nil {
+			tokenpolicy := tokenPolicyData{
+				JwtValidity:                  types.Int32Value(a.AuthenticationSchema.OidcConfig.TokenPolicy.JwtValidity),
+				RefreshValidity:              types.Int32Value(a.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshValidity),
+				RefreshParallel:              types.Int32Value(a.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshParallel),
+				MaxExchangePeriod:            types.StringValue(a.AuthenticationSchema.OidcConfig.TokenPolicy.MaxExchangePeriod),
+				RefreshTokenRotationScenario: types.StringValue(a.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshTokenRotationScenario),
+				AccessTokenFormat:            types.StringValue(a.AuthenticationSchema.OidcConfig.TokenPolicy.AccessTokenFormat),
+			}
+			oidc.TokenPolicy, diags = types.ObjectValueFrom(ctx, tokenPolicyObjType, tokenpolicy)
+			diagnostics.Append(diags...)
+		} else {
+			oidc.TokenPolicy = types.ObjectNull(tokenPolicyObjType)
+		}
+		var restrictedGrants []string
+		for _, g := range a.AuthenticationSchema.OidcConfig.RestrictedGrantTypes {
+			restrictedGrants = append(restrictedGrants, string(g))
+		}
+		oidc.RestrictedGrantTypes, diags = types.SetValueFrom(ctx, types.StringType, restrictedGrants)
+		diagnostics.Append(diags...)
+
+		// Proxy Config
+		if a.AuthenticationSchema.OidcConfig.ProxyConfig != nil {
+			proxyConfig := proxyConfigData{}
+			proxyConfig.Acrs, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.ProxyConfig.Acrs)
+			diagnostics.Append(diags...)
+
+			oidc.ProxyConfig, diags = types.ObjectValueFrom(ctx, proxyConfigObjType, proxyConfig)
+			diagnostics.Append(diags...)
+		} else {
+			oidc.ProxyConfig = types.ObjectNull(proxyConfigObjType)
+		}
+
+		authenticationSchema.OpenIdConnectConfiguration, diags = types.ObjectValueFrom(ctx, openIdConnectConfigurationObjType, oidc)
+		diagnostics.Append(diags...)
+	} else {
+		authenticationSchema.OpenIdConnectConfiguration = types.ObjectNull(openIdConnectConfigurationObjType)
+	}
+
 	// Authentication Schema SAML2
 	// the mapping is done manually in order to handle the null values
-	saml2Res := a.AuthenticationSchema.Saml2Configuration
-	saml2Config := AppSaml2ConfigData{
-		ResponseElementsToEncrypt: types.StringValue(saml2Res.ResponseElementsToEncrypt),
-		DefaultNameIdFormat:       types.StringValue(saml2Res.DefaultNameIdFormat),
-		SignSloMessages:           types.BoolValue(saml2Res.SignSLOMessages),
-		RequireSignedSloMessages:  types.BoolValue(saml2Res.RequireSignedSLOMessages),
-		RequireSignedAuthnRequest: types.BoolValue(saml2Res.RequireSignedAuthnRequest),
-		SignAssertions:            types.BoolValue(saml2Res.SignAssertions),
-		SignAuthnResponses:        types.BoolValue(saml2Res.SignAuthnResponses),
-		DigestAlgorithm:           types.StringValue(saml2Res.DigestAlgorithm),
-	}
-
-	// SAML2
-	// Saml Metadata URL
-	if len(saml2Res.SamlMetadataUrl) > 0 {
-		saml2Config.SamlMetadataUrl = types.StringValue(saml2Res.SamlMetadataUrl)
-	}
-
-	// SAML2 ACS Endpoints
-	if len(a.AuthenticationSchema.Saml2Configuration.AcsEndpoints) > 0 {
-		saml2Config.AcsEndpoints, diags = types.ListValueFrom(ctx, acsEndpointsObjType, a.AuthenticationSchema.Saml2Configuration.AcsEndpoints)
-		diagnostics.Append(diags...)
-
-		if diagnostics.HasError() {
-			return application, diagnostics
+	if a.AuthenticationSchema.Saml2Configuration != nil {
+		saml2Res := a.AuthenticationSchema.Saml2Configuration
+		saml2Config := AppSaml2ConfigData{
+			ResponseElementsToEncrypt: types.StringValue(saml2Res.ResponseElementsToEncrypt),
+			DefaultNameIdFormat:       types.StringValue(saml2Res.DefaultNameIdFormat),
+			SignSloMessages:           types.BoolValue(saml2Res.SignSLOMessages),
+			RequireSignedSloMessages:  types.BoolValue(saml2Res.RequireSignedSLOMessages),
+			RequireSignedAuthnRequest: types.BoolValue(saml2Res.RequireSignedAuthnRequest),
+			SignAssertions:            types.BoolValue(saml2Res.SignAssertions),
+			SignAuthnResponses:        types.BoolValue(saml2Res.SignAuthnResponses),
+			DigestAlgorithm:           types.StringValue(saml2Res.DigestAlgorithm),
 		}
-	} else {
-		saml2Config.AcsEndpoints = types.ListNull(acsEndpointsObjType)
-	}
 
-	// SAML2 SLO Endpoints
-	if len(a.AuthenticationSchema.Saml2Configuration.SloEndpoints) > 0 {
+		// SAML2
+		// Saml Metadata URL
+		if len(saml2Res.SamlMetadataUrl) > 0 {
+			saml2Config.SamlMetadataUrl = types.StringValue(saml2Res.SamlMetadataUrl)
+		}
 
-		endpointsData := []AppSloEndpointData{}
+		// SAML2 ACS Endpoints
+		if len(a.AuthenticationSchema.Saml2Configuration.AcsEndpoints) > 0 {
+			saml2Config.AcsEndpoints, diags = types.ListValueFrom(ctx, acsEndpointsObjType, a.AuthenticationSchema.Saml2Configuration.AcsEndpoints)
+			diagnostics.Append(diags...)
 
-		for _, endpoint := range a.AuthenticationSchema.Saml2Configuration.SloEndpoints {
-			endpointData := AppSloEndpointData{
-				BindingName: types.StringValue(endpoint.BindingName),
-				Location:    types.StringValue(endpoint.Location),
+			if diagnostics.HasError() {
+				return application, diagnostics
+			}
+		} else {
+			saml2Config.AcsEndpoints = types.ListNull(acsEndpointsObjType)
+		}
+
+		// SAML2 SLO Endpoints
+		if len(a.AuthenticationSchema.Saml2Configuration.SloEndpoints) > 0 {
+
+			endpointsData := []AppSloEndpointData{}
+
+			for _, endpoint := range a.AuthenticationSchema.Saml2Configuration.SloEndpoints {
+				endpointData := AppSloEndpointData{
+					BindingName: types.StringValue(endpoint.BindingName),
+					Location:    types.StringValue(endpoint.Location),
+				}
+
+				if len(endpoint.ResponseLocation) > 0 {
+					endpointData.ResponseLocation = types.StringValue(endpoint.ResponseLocation)
+				}
+
+				endpointsData = append(endpointsData, endpointData)
 			}
 
-			if len(endpoint.ResponseLocation) > 0 {
-				endpointData.ResponseLocation = types.StringValue(endpoint.ResponseLocation)
+			saml2Endpoints, diags := types.ListValueFrom(ctx, appSaml2SloEndpointObjType, endpointsData)
+			diagnostics.Append(diags...)
+
+			if diagnostics.HasError() {
+				return application, diagnostics
 			}
 
-			endpointsData = append(endpointsData, endpointData)
+			saml2Config.SloEndpoints = saml2Endpoints
+
+		} else {
+			saml2Config.SloEndpoints = types.ListNull(appSaml2SloEndpointObjType)
 		}
 
-		saml2Endpoints, diags := types.ListValueFrom(ctx, appSaml2SloEndpointObjType, endpointsData)
-		diagnostics.Append(diags...)
+		// SAML2 Signing Certificates
+		if len(saml2Res.CertificatesForSigning) > 0 {
+			certificates, diags := types.ListValueFrom(ctx, saml2SigningCertificateObjType, saml2Res.CertificatesForSigning)
+			diagnostics.Append(diags...)
+
+			if diagnostics.HasError() {
+				return application, diagnostics
+			}
+
+			saml2Config.CertificatesForSigning = certificates
+		} else {
+			saml2Config.CertificatesForSigning = types.ListNull(saml2SigningCertificateObjType)
+		}
+
+		//SAML2 Encryption Certificate
+		if saml2Res.CertificateForEncryption != nil {
+			encryptionCertificate, diags := types.ObjectValueFrom(ctx, saml2EncryptionCertificateObjType.AttrTypes, saml2Res.CertificateForEncryption)
+			diagnostics.Append(diags...)
+
+			if diagnostics.HasError() {
+				return application, diagnostics
+			}
+
+			saml2Config.CertificateForEncryption = encryptionCertificate
+		} else {
+			saml2Config.CertificateForEncryption = types.ObjectNull(saml2EncryptionCertificateObjType.AttrTypes)
+		}
 
 		if diagnostics.HasError() {
 			return application, diagnostics
 		}
 
-		saml2Config.SloEndpoints = saml2Endpoints
-
-	} else {
-		saml2Config.SloEndpoints = types.ListNull(appSaml2SloEndpointObjType)
-	}
-
-	// SAML2 Signing Certificates
-	if len(saml2Res.CertificatesForSigning) > 0 {
-		certificates, diags := types.ListValueFrom(ctx, saml2SigningCertificateObjType, saml2Res.CertificatesForSigning)
+		authenticationSchema.Saml2Configuration, diags = types.ObjectValueFrom(ctx, appSaml2ConfigObjType.AttrTypes, saml2Config)
 		diagnostics.Append(diags...)
 
 		if diagnostics.HasError() {
 			return application, diagnostics
 		}
-
-		saml2Config.CertificatesForSigning = certificates
 	} else {
-		saml2Config.CertificatesForSigning = types.ListNull(saml2SigningCertificateObjType)
-	}
-
-	//SAML2 Encryption Certificate
-	if saml2Res.CertificateForEncryption != nil {
-		encryptionCertificate, diags := types.ObjectValueFrom(ctx, saml2EncryptionCertificateObjType.AttrTypes, saml2Res.CertificateForEncryption)
-		diagnostics.Append(diags...)
-
-		if diagnostics.HasError() {
-			return application, diagnostics
-		}
-
-		saml2Config.CertificateForEncryption = encryptionCertificate
-	} else {
-		saml2Config.CertificateForEncryption = types.ObjectNull(saml2EncryptionCertificateObjType.AttrTypes)
-	}
-
-	if diagnostics.HasError() {
-		return application, diagnostics
-	}
-
-	authenticationSchema.Saml2Configuration, diags = types.ObjectValueFrom(ctx, appSaml2ConfigObjType.AttrTypes, saml2Config)
-	diagnostics.Append(diags...)
-
-	if diagnostics.HasError() {
-		return application, diagnostics
+		authenticationSchema.Saml2Configuration = types.ObjectNull(appSaml2ConfigObjType.AttrTypes)
 	}
 
 	application.AuthenticationSchema, diags = types.ObjectValueFrom(ctx, authenticationSchemaObjType, authenticationSchema)
@@ -487,7 +571,103 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 			args.AuthenticationSchema.Saml2Configuration = &saml2config
 		}
 
-	}
+		//OPEN_ID_CONNECT_CONFIGURATION
+		if !authenticationSchema.OpenIdConnectConfiguration.IsNull() && !authenticationSchema.OpenIdConnectConfiguration.IsUnknown() {
 
+			var openIdConnectConfiguration openIdConnectConfigurationData
+			diags := authenticationSchema.OpenIdConnectConfiguration.As(ctx, &openIdConnectConfiguration, basetypes.ObjectAsOptions{
+				UnhandledNullAsEmpty:    true,
+				UnhandledUnknownAsEmpty: true,
+			})
+			diagnostics.Append(diags...)
+
+			oidc := &applications.OidcConfig{}
+
+			// Redirect URIs
+			if !openIdConnectConfiguration.RedirectUris.IsNull() {
+				diags := openIdConnectConfiguration.RedirectUris.ElementsAs(ctx, &oidc.RedirectUris, true)
+				diagnostics.Append(diags...)
+			}
+
+			// Post Logout Redirect URIs
+			if !openIdConnectConfiguration.PostLogoutRedirectUris.IsNull() {
+				diags := openIdConnectConfiguration.PostLogoutRedirectUris.ElementsAs(ctx, &oidc.PostLogoutRedirectUris, true)
+				diagnostics.Append(diags...)
+			}
+
+			// Front Channel Logout URIs
+			if !openIdConnectConfiguration.FrontChannelLogoutUris.IsNull() {
+				diags := openIdConnectConfiguration.FrontChannelLogoutUris.ElementsAs(ctx, &oidc.FrontChannelLogoutUris, true)
+				diagnostics.Append(diags...)
+			}
+
+			// Back Channel Logout URIs
+			if !openIdConnectConfiguration.BackChannelLogoutUris.IsNull() {
+				diags := openIdConnectConfiguration.BackChannelLogoutUris.ElementsAs(ctx, &oidc.BackChannelLogoutUris, true)
+				diagnostics.Append(diags...)
+			}
+
+			// Restricted Grant Types
+			if !openIdConnectConfiguration.RestrictedGrantTypes.IsNull() {
+				diags := openIdConnectConfiguration.RestrictedGrantTypes.ElementsAs(ctx, &oidc.RestrictedGrantTypes, true)
+				diagnostics.Append(diags...)
+			}
+			if diagnostics.HasError() {
+				return nil, diagnostics
+			}
+
+			// Token Policy
+			if !openIdConnectConfiguration.TokenPolicy.IsNull() {
+				var token tokenPolicyData
+				diags := openIdConnectConfiguration.TokenPolicy.As(ctx, &token, basetypes.ObjectAsOptions{
+					UnhandledNullAsEmpty:    true,
+					UnhandledUnknownAsEmpty: true,
+				})
+				diagnostics.Append(diags...)
+				if diagnostics.HasError() {
+					return nil, diagnostics
+				}
+
+				oidc.TokenPolicy = &applications.TokenPolicy{
+					JwtValidity:                  token.JwtValidity.ValueInt32(),
+					RefreshValidity:              token.RefreshValidity.ValueInt32(),
+					RefreshParallel:              token.RefreshParallel.ValueInt32(),
+					MaxExchangePeriod:            token.MaxExchangePeriod.ValueString(),
+					RefreshTokenRotationScenario: token.RefreshTokenRotationScenario.ValueString(),
+					AccessTokenFormat:            token.AccessTokenFormat.ValueString(),
+				}
+			}
+
+			// Proxy Config
+			if !openIdConnectConfiguration.ProxyConfig.IsNull() {
+				var proxy proxyConfigData
+				diags := openIdConnectConfiguration.ProxyConfig.As(ctx, &proxy, basetypes.ObjectAsOptions{
+					UnhandledNullAsEmpty:    true,
+					UnhandledUnknownAsEmpty: true,
+				})
+				diagnostics.Append(diags...)
+				if diagnostics.HasError() {
+					return nil, diagnostics
+				}
+
+				var acrs []string
+				if !proxy.Acrs.IsNull() {
+					diags := proxy.Acrs.ElementsAs(ctx, &acrs, true)
+					diagnostics.Append(diags...)
+				}
+				if diagnostics.HasError() {
+					return nil, diagnostics
+				}
+				oidc.ProxyConfig = &applications.OidcProxyConfig{
+					Acrs: acrs,
+				}
+			}
+
+			if diagnostics.HasError() {
+				return nil, diagnostics
+			}
+			args.AuthenticationSchema.OidcConfig = oidc
+		}
+	}
 	return args, diagnostics
 }

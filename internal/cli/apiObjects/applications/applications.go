@@ -159,6 +159,42 @@ type ConsumedApi struct {
 	Name     string `json:"name"`
 }
 
+type OidcConfig struct {
+	RedirectUris           []string         `json:"redirectUris,omitempty"`
+	PostLogoutRedirectUris []string         `json:"postLogoutRedirectUris,omitempty"`
+	FrontChannelLogoutUris []string         `json:"frontChannelLogoutUris,omitempty"`
+	BackChannelLogoutUris  []string         `json:"backChannelLogoutUris,omitempty"`
+	TokenPolicy            *TokenPolicy     `json:"tokenPolicy,omitempty"`
+	RestrictedGrantTypes   []GrantType      `json:"restrictedGrantTypes,omitempty"`
+	ProxyConfig            *OidcProxyConfig `json:"proxyConfig,omitempty"`
+}
+
+type TokenPolicy struct {
+	JwtValidity                  int32  `json:"jwtValidity,omitempty"`
+	RefreshValidity              int32  `json:"refreshValidity,omitempty"`
+	RefreshParallel              int32  `json:"refreshParallel,omitempty"`
+	MaxExchangePeriod            string `json:"maxExchangePeriod,omitempty"`
+	RefreshTokenRotationScenario string `json:"refreshTokenRotationScenario,omitempty"`
+	AccessTokenFormat            string `json:"accessTokenFormat,omitempty"`
+}
+
+type OidcProxyConfig struct {
+	Acrs []string `json:"acrs,omitempty"`
+}
+type GrantType string
+
+// List of GrantType
+const (
+	CLIENT_CREDENTIALS_GrantType           GrantType = "clientCredentials"
+	AUTHORIZATION_CODE_GrantType           GrantType = "authorizationCode"
+	REFRESH_TOKEN_GrantType                GrantType = "refreshToken"
+	PASSWORD_GrantType                     GrantType = "password"
+	IMPLICIT_GrantType                     GrantType = "implicit"
+	JWT_BEARER_GrantType                   GrantType = "jwtBearer"
+	AUTHORIZATION_CODE_PKCE_S256_GrantType GrantType = "authorizationCodePkceS256"
+	TOKEN_EXCHANGE_GrantType               GrantType = "tokenExchange"
+)
+
 type AuthenticationSchema struct {
 	SsoType                       string                       `json:"ssoType,omitempty" tfsdk:"sso_type"`
 	SubjectNameIdentifier         string                       `json:"subjectNameIdentifier,omitempty" tfsdk:"subject_name_identifier"`
@@ -167,6 +203,7 @@ type AuthenticationSchema struct {
 	AdvancedAssertionAttributes   []AdvancedAssertionAttribute `json:"advancedAssertionAttributes,omitempty" tfsdk:"advanced_assertion_attributes"`
 	DefaultAuthenticatingIdpId    string                       `json:"defaultAuthenticatingIdpId,omitempty" tfsdk:"default_authenticating_idp"`
 	ConditionalAuthentication     []AuthenicationRule          `json:"conditionalAuthentication,omitempty" tfsdk:"conditional_authentication"`
+	OidcConfig                    *OidcConfig                  `json:"openIdConnectConfiguration,omitempty"`
 	Saml2Configuration            *SamlConfiguration           `json:"saml2Configuration,omitempty" tfsdk:""`
 	// RiskBasedAuthentication       RBAConfiguration            `json:"riskBasedAuthentication"`
 	// HomeUrl								string 							`json:"homeUrl"`
