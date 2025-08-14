@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
-
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 func newApplicationDataSource() datasource.DataSource {
@@ -163,6 +163,214 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 									MarkdownDescription: "Valid IP range to be authenticated.",
 									Computed:            true,
 								},
+							},
+						},
+					},
+					"oidc_config": schema.SingleNestedAttribute{
+						MarkdownDescription: "OpenID Connect (OIDC) configuration options for this application.",
+						Computed:            true,
+						Attributes: map[string]schema.Attribute{
+							"redirect_uris": schema.SetAttribute{
+								MarkdownDescription: "A list of redirect URIs that the OpenID Provider is allowed to redirect to after authentication. Must contain 1 to 20 valid URIs.",
+								ElementType:         types.StringType,
+								Computed:            true,
+							},
+							"post_logout_redirect_uris": schema.SetAttribute{
+								MarkdownDescription: "List of URIs to which the user will be redirected after logging out from the application. Can include up to 20 URIs.",
+								ElementType:         types.StringType,
+								Computed:            true,
+							},
+							"front_channel_logout_uris": schema.SetAttribute{
+								MarkdownDescription: "List of front-channel logout URIs that support browser-based logout. Each must be a valid URL and up to 20 URIs are allowed.",
+								ElementType:         types.StringType,
+								Computed:            true,
+							},
+							"back_channel_logout_uris": schema.SetAttribute{
+								MarkdownDescription: "List of back-channel logout URIs that support server-to-server logout notifications. Each must be a valid URL. Up to 20 URIs allowed.",
+								ElementType:         types.StringType,
+								Computed:            true,
+							},
+							"token_policy": schema.SingleNestedAttribute{
+								MarkdownDescription: "Defines the token policy for the application.",
+								Computed:            true,
+								Attributes: map[string]schema.Attribute{
+									"jwt_validity": schema.Int32Attribute{
+										MarkdownDescription: "JWT access token validity in seconds. Must be between 60 seconds (1 minute) and 43200 seconds (12 hours).",
+										Computed:            true,
+									},
+									"refresh_validity": schema.Int32Attribute{
+										MarkdownDescription: "Refresh token validity in seconds. Can range from 0 to 15552000 seconds (180 days).",
+										Computed:            true,
+									},
+									"refresh_parallel": schema.Int32Attribute{
+										MarkdownDescription: "Maximum number of refresh tokens that can be used in parallel. Valid values range from 1 to 10.",
+										Computed:            true,
+									},
+									"max_exchange_period": schema.StringAttribute{
+										MarkdownDescription: "Maximum token exchange period." + utils.ValidValuesString(maxExchangePeriodValues),
+										Computed:            true,
+									},
+									"refresh_token_rotation_scenario": schema.StringAttribute{
+										MarkdownDescription: "Defines the scenario for refresh token rotation." + utils.ValidValuesString(refreshTokenRotationScenarioValues),
+										Computed:            true,
+									},
+									"access_token_format": schema.StringAttribute{
+										MarkdownDescription: "The format of the access token issued." + utils.ValidValuesString(accessTokenFormatValues),
+										Computed:            true,
+									},
+								},
+							},
+							"restricted_grant_types": schema.SetAttribute{
+								MarkdownDescription: "Set of OAuth 2.0 grant types that are restricted for the application." + utils.ValidValuesString(restrictedGrantTypesValues),
+								Computed:            true,
+								ElementType:         types.StringType,
+							},
+							"proxy_config": schema.SingleNestedAttribute{
+								MarkdownDescription: "Optional proxy configuration including accepted ACR values.",
+								Computed:            true,
+								Attributes: map[string]schema.Attribute{
+									"acrs": schema.SetAttribute{
+										MarkdownDescription: "Set of accepted ACR (Authentication Context Class Reference) values. Up to 20 values allowed.",
+										Computed:            true,
+										ElementType:         types.StringType,
+									},
+								},
+							},
+						},
+					},
+					"saml2_config": schema.SingleNestedAttribute{
+						MarkdownDescription: "Configure a SAML 2.0 service provider by providing the necessary metadata.",
+						Computed:            true,
+						Attributes: map[string]schema.Attribute{
+							"saml_metadata_url": schema.StringAttribute{
+								MarkdownDescription: "The URL with service provider metadata. The metadata URL must not contain a query parameter.",
+								Computed:            true,
+							},
+							"acs_endpoints": schema.ListNestedAttribute{
+								MarkdownDescription: "Configure the allowed domains for browser flows.",
+								Computed:            true,
+								NestedObject: schema.NestedAttributeObject{
+									Attributes: map[string]schema.Attribute{
+										"binding_name": schema.StringAttribute{
+											MarkdownDescription: "Specify the SAML binding for the endpoint.",
+											Computed:            true,
+										},
+										"location": schema.StringAttribute{
+											MarkdownDescription: "The value of the URL or endpoint to be called.",
+											Computed:            true,
+										},
+										"index": schema.Int32Attribute{
+											MarkdownDescription: "A unique index for the endpoint.",
+											Computed:            true,
+										},
+										"default": schema.BoolAttribute{
+											MarkdownDescription: "Configure if the endpoint is the default one to be used.",
+											Computed:            true,
+										},
+									},
+								},
+							},
+							"slo_endpoints": schema.ListNestedAttribute{
+								MarkdownDescription: "Configure the URLs of the service provider's single logout endpoints that will receive the logout response or request from Identity Authentication.",
+								Computed:            true,
+								NestedObject: schema.NestedAttributeObject{
+									Attributes: map[string]schema.Attribute{
+										"binding_name": schema.StringAttribute{
+											MarkdownDescription: "Specify the SAML binding for the endpoint.",
+											Computed:            true,
+										},
+										"location": schema.StringAttribute{
+											MarkdownDescription: "The value of the URL or endpoint to be called.",
+											Computed:            true,
+										},
+										"response_location": schema.StringAttribute{
+											MarkdownDescription: "The URL or endpoint to which logout response messages are sent.",
+											Computed:            true,
+										},
+									},
+								},
+							},
+							"signing_certificates": schema.ListNestedAttribute{
+								MarkdownDescription: "Base64-encoded certificates used by the service provider to sign digitally, SAML protocol messages sent to Identity Authentication. A maximum of 2 certificates are allowed.",
+								Computed:            true,
+								NestedObject: schema.NestedAttributeObject{
+									Attributes: map[string]schema.Attribute{
+										"base64_certificate": schema.StringAttribute{
+											MarkdownDescription: "The content of the Base64 certificate. The certificate must be in PEM format.",
+											Computed:            true,
+										},
+										"default": schema.BoolAttribute{
+											MarkdownDescription: "Configure if the certificate is the default one to be used.",
+											Computed:            true,
+										},
+										"dn": schema.StringAttribute{
+											MarkdownDescription: "A unique identifier for the certificate.",
+											Computed:            true,
+										},
+										"valid_from": schema.StringAttribute{
+											MarkdownDescription: "Set the date from which the certificate is valid.",
+											Computed:            true,
+										},
+										"valid_to": schema.StringAttribute{
+											MarkdownDescription: "Set the date uptil which the certificate is valid.",
+											Computed:            true,
+										},
+									},
+								},
+							},
+							"encryption_certificate": schema.SingleNestedAttribute{
+								MarkdownDescription: "The certificate used for encryption of SAML2 requests and responses.",
+								Computed:            true,
+								Attributes: map[string]schema.Attribute{
+									"base64_certificate": schema.StringAttribute{
+										MarkdownDescription: "The content of the Base64 certificate. The certificate must be in PEM format.",
+										Computed:            true,
+									},
+									"dn": schema.StringAttribute{
+										MarkdownDescription: "A unique identifier for the certificate.",
+										Computed:            true,
+									},
+									"valid_from": schema.StringAttribute{
+										MarkdownDescription: "Set the date from which the certificate is valid.",
+										Computed:            true,
+									},
+									"valid_to": schema.StringAttribute{
+										MarkdownDescription: "Set the date uptil which the certificate is valid.",
+										Computed:            true,
+									},
+								},
+							},
+							"response_elements_to_encrypt": schema.StringAttribute{
+								MarkdownDescription: "Specify which SAML response elements should be encrypted. " + utils.ValidValuesString(responseElementsToEncrypt),
+								Computed:            true,
+							},
+							"default_name_id_format": schema.StringAttribute{
+								MarkdownDescription: "Configure the default Name ID format. The attribute is sent as name ID format in SAML 2.0 authentication requests to Identity Provider.",
+								Computed:            true,
+							},
+							"sign_slo_messages": schema.BoolAttribute{
+								MarkdownDescription: "Enable if the single logout messages must be signed or not.",
+								Computed:            true,
+							},
+							"require_signed_slo_messages": schema.BoolAttribute{
+								MarkdownDescription: "Enable if the single logout messages must be signed or not.",
+								Computed:            true,
+							},
+							"require_signed_auth_requests": schema.BoolAttribute{
+								MarkdownDescription: "Enable if the authentication request must be signed or not.",
+								Computed:            true,
+							},
+							"sign_assertions": schema.BoolAttribute{
+								MarkdownDescription: "Enable if the SAML assertions must be signed or not.",
+								Computed:            true,
+							},
+							"sign_auth_responses": schema.BoolAttribute{
+								MarkdownDescription: "Enable if the SAML authentication responses must be signed or not.",
+								Computed:            true,
+							},
+							"digest_algorithm": schema.StringAttribute{
+								MarkdownDescription: "Configure the algorithm for signing outgoing messages. " + utils.ValidValuesString(digestAlgorithmValues),
+								Computed:            true,
 							},
 						},
 					},

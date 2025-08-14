@@ -2,6 +2,7 @@ package utils
 
 import (
 	"context"
+	"fmt"
 	"slices"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/helpers/validatordiag"
@@ -11,7 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-// checks that when OIDC is configured for the corporate IDP, the type of the IDP is "openIdConnect"
+// checks that when OIDC or SAML2 is configured for the applications and corporate IDPs, the type of the app or the IDP matches the configuration
 type typeValidator struct {
 	typeExpr    path.Expression
 	validValues []string
@@ -22,7 +23,7 @@ func (v typeValidator) Description(ctx context.Context) string {
 }
 
 func (v typeValidator) MarkdownDescription(_ context.Context) string {
-	return ": value of attribute \"type\" must be modified to match the IDP configuration provided. " + ValidValuesString(v.validValues)
+	return fmt.Sprintf(": value of attribute \"%s\" must be modified to match the IDP configuration provided. %s", v.typeExpr.String(), ValidValuesString(v.validValues))
 }
 
 func (v typeValidator) ValidateObject(ctx context.Context, request validator.ObjectRequest, response *validator.ObjectResponse) {
