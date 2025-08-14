@@ -68,11 +68,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Id of the application",
-				Optional:            true,
 				Computed:            true,
-				Validators: []validator.String{
-					utils.ValidUUID(),
-				},
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
