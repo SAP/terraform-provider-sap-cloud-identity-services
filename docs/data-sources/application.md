@@ -42,6 +42,8 @@ Read-Only:
 - `assertion_attributes` (Attributes List) User attributes to be sent to the application. The Source of these attributes is always the Identity Directory (see [below for nested schema](#nestedatt--authentication_schema--assertion_attributes))
 - `conditional_authentication` (Attributes List) Define rules for authenticating identity provider according to email domain, user type, user group, and IP range. Each rule is evaluated by priority until the criteria of a rule are fulfilled. (see [below for nested schema](#nestedatt--authentication_schema--conditional_authentication))
 - `default_authenticating_idp` (String) A default identity provider can be used for users with any user domain, group and type. This identity provider is used when none of the defined authentication rules meets the criteria.
+- `oidc_config` (Attributes) OpenID Connect (OIDC) configuration options for this application. (see [below for nested schema](#nestedatt--authentication_schema--oidc_config))
+- `saml2_config` (Attributes) Configure a SAML 2.0 service provider by providing the necessary metadata. (see [below for nested schema](#nestedatt--authentication_schema--saml2_config))
 - `sso_type` (String) The preferred protocol for the application
 - `subject_name_identifier` (Attributes) The attribute by which the application uses to identify the users. Used by the application to uniquely identify the user during logon.
 Identity Authentication sends the attribute to the application as :
@@ -80,6 +82,105 @@ Read-Only:
 - `user_email_domain` (String) Valid email domain to be authenticated.
 - `user_group` (String) The user group to be authenticated.
 - `user_type` (String) The type of user to be authenticated.
+
+
+<a id="nestedatt--authentication_schema--oidc_config"></a>
+### Nested Schema for `authentication_schema.oidc_config`
+
+Read-Only:
+
+- `back_channel_logout_uris` (Set of String) List of back-channel logout URIs that support server-to-server logout notifications. Each must be a valid URL. Up to 20 URIs allowed.
+- `front_channel_logout_uris` (Set of String) List of front-channel logout URIs that support browser-based logout. Each must be a valid URL and up to 20 URIs are allowed.
+- `post_logout_redirect_uris` (Set of String) List of URIs to which the user will be redirected after logging out from the application. Can include up to 20 URIs.
+- `proxy_config` (Attributes) Optional proxy configuration including accepted ACR values. (see [below for nested schema](#nestedatt--authentication_schema--oidc_config--proxy_config))
+- `redirect_uris` (Set of String) A list of redirect URIs that the OpenID Provider is allowed to redirect to after authentication. Must contain 1 to 20 valid URIs.
+- `restricted_grant_types` (Set of String) Set of OAuth 2.0 grant types that are restricted for the application.Acceptable values are : `clientCredentials`, `authorizationCode`, `refreshToken`, `password`, `implicit`, `jwtBearer`, `authorizationCodePkceS256`, `tokenExchange`
+- `token_policy` (Attributes) Defines the token policy for the application. (see [below for nested schema](#nestedatt--authentication_schema--oidc_config--token_policy))
+
+<a id="nestedatt--authentication_schema--oidc_config--proxy_config"></a>
+### Nested Schema for `authentication_schema.oidc_config.proxy_config`
+
+Read-Only:
+
+- `acrs` (Set of String) Set of accepted ACR (Authentication Context Class Reference) values. Up to 20 values allowed.
+
+
+<a id="nestedatt--authentication_schema--oidc_config--token_policy"></a>
+### Nested Schema for `authentication_schema.oidc_config.token_policy`
+
+Read-Only:
+
+- `access_token_format` (String) The format of the access token issued.Acceptable values are : `default`, `jwt`, `opaque`
+- `jwt_validity` (Number) JWT access token validity in seconds. Must be between 60 seconds (1 minute) and 43200 seconds (12 hours).
+- `max_exchange_period` (String) Maximum token exchange period.Acceptable values are : `unlimited`, `maxSessionValidity`, `initialRefreshTokenValidity`
+- `refresh_parallel` (Number) Maximum number of refresh tokens that can be used in parallel. Valid values range from 1 to 10.
+- `refresh_token_rotation_scenario` (String) Defines the scenario for refresh token rotation.Acceptable values are : `off`, `online`, `mobile`
+- `refresh_validity` (Number) Refresh token validity in seconds. Can range from 0 to 15552000 seconds (180 days).
+
+
+
+<a id="nestedatt--authentication_schema--saml2_config"></a>
+### Nested Schema for `authentication_schema.saml2_config`
+
+Read-Only:
+
+- `acs_endpoints` (Attributes List) Configure the allowed domains for browser flows. (see [below for nested schema](#nestedatt--authentication_schema--saml2_config--acs_endpoints))
+- `default_name_id_format` (String) Configure the default Name ID format. The attribute is sent as name ID format in SAML 2.0 authentication requests to Identity Provider.
+- `digest_algorithm` (String) Configure the algorithm for signing outgoing messages. Acceptable values are : `sha1`, `sha256`, `sha512`
+- `encryption_certificate` (Attributes) The certificate used for encryption of SAML2 requests and responses. (see [below for nested schema](#nestedatt--authentication_schema--saml2_config--encryption_certificate))
+- `require_signed_auth_requests` (Boolean) Enable if the authentication request must be signed or not.
+- `require_signed_slo_messages` (Boolean) Enable if the single logout messages must be signed or not.
+- `response_elements_to_encrypt` (String) Specify which SAML response elements should be encrypted. Acceptable values are : `none`, `wholeAssertion`, `subjectNameId`, `attributes`, `subjectNameIdAndAttributes`
+- `saml_metadata_url` (String) The URL with service provider metadata. The metadata URL must not contain a query parameter.
+- `sign_assertions` (Boolean) Enable if the SAML assertions must be signed or not.
+- `sign_auth_responses` (Boolean) Enable if the SAML authentication responses must be signed or not.
+- `sign_slo_messages` (Boolean) Enable if the single logout messages must be signed or not.
+- `signing_certificates` (Attributes List) Base64-encoded certificates used by the service provider to sign digitally, SAML protocol messages sent to Identity Authentication. A maximum of 2 certificates are allowed. (see [below for nested schema](#nestedatt--authentication_schema--saml2_config--signing_certificates))
+- `slo_endpoints` (Attributes List) Configure the URLs of the service provider's single logout endpoints that will receive the logout response or request from Identity Authentication. (see [below for nested schema](#nestedatt--authentication_schema--saml2_config--slo_endpoints))
+
+<a id="nestedatt--authentication_schema--saml2_config--acs_endpoints"></a>
+### Nested Schema for `authentication_schema.saml2_config.acs_endpoints`
+
+Read-Only:
+
+- `binding_name` (String) Specify the SAML binding for the endpoint.
+- `default` (Boolean) Configure if the endpoint is the default one to be used.
+- `index` (Number) A unique index for the endpoint.
+- `location` (String) The value of the URL or endpoint to be called.
+
+
+<a id="nestedatt--authentication_schema--saml2_config--encryption_certificate"></a>
+### Nested Schema for `authentication_schema.saml2_config.encryption_certificate`
+
+Read-Only:
+
+- `base64_certificate` (String) The content of the Base64 certificate. The certificate must be in PEM format.
+- `dn` (String) A unique identifier for the certificate.
+- `valid_from` (String) Set the date from which the certificate is valid.
+- `valid_to` (String) Set the date uptil which the certificate is valid.
+
+
+<a id="nestedatt--authentication_schema--saml2_config--signing_certificates"></a>
+### Nested Schema for `authentication_schema.saml2_config.signing_certificates`
+
+Read-Only:
+
+- `base64_certificate` (String) The content of the Base64 certificate. The certificate must be in PEM format.
+- `default` (Boolean) Configure if the certificate is the default one to be used.
+- `dn` (String) A unique identifier for the certificate.
+- `valid_from` (String) Set the date from which the certificate is valid.
+- `valid_to` (String) Set the date uptil which the certificate is valid.
+
+
+<a id="nestedatt--authentication_schema--saml2_config--slo_endpoints"></a>
+### Nested Schema for `authentication_schema.saml2_config.slo_endpoints`
+
+Read-Only:
+
+- `binding_name` (String) Specify the SAML binding for the endpoint.
+- `location` (String) The value of the URL or endpoint to be called.
+- `response_location` (String) The URL or endpoint to which logout response messages are sent.
+
 
 
 <a id="nestedatt--authentication_schema--subject_name_identifier"></a>
