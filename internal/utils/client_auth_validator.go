@@ -25,7 +25,7 @@ func (v clientAuthMethodValidator) MarkdownDescription(_ context.Context) string
 }
 
 func (v clientAuthMethodValidator) ValidateString(ctx context.Context, request validator.StringRequest, response *validator.StringResponse) {
-	if !request.ConfigValue.IsNull() && !request.ConfigValue.IsUnknown() {
+	if !request.ConfigValue.IsNull() {
 		return
 	}
 
@@ -36,7 +36,7 @@ func (v clientAuthMethodValidator) ValidateString(ctx context.Context, request v
 	var typeVal attr.Value
 	_ = request.Config.GetAttribute(ctx, typePath[0], &typeVal)
 
-	if typeVal.IsNull() || typeVal.IsUnknown() {
+	if typeVal.IsNull() {
 		// We assume token_endpoint_auth_method to take default value "clientSecretPost" for which the client_secret is required
 		response.Diagnostics.Append(validatordiag.InvalidAttributeValueDiagnostic(
 			request.Path,
