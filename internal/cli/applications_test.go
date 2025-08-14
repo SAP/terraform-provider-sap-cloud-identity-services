@@ -180,7 +180,7 @@ func TestApplications_Create(t *testing.T) {
 
 		assert.Zero(t, res)
 		assert.Error(t, err)
-		assert.Equal(t, "application error 400 \ncreate failed : server error", err.Error())
+		assert.Equal(t, "error 400 \ncreate failed : server error", err.Error())
 	})
 }
 
@@ -241,7 +241,7 @@ func TestApplications_Get(t *testing.T) {
 
 		assert.Zero(t, res)
 		assert.Error(t, err)
-		assert.Equal(t, "application error 400 \nget failed : server error", err.Error())
+		assert.Equal(t, "error 400 \nget failed : server error", err.Error())
 	})
 }
 
@@ -294,7 +294,7 @@ func TestApplications_GetByAppId(t *testing.T) {
 
 		assert.Zero(t, res)
 		assert.Error(t, err)
-		assert.Equal(t, "application error 400 \nget failed : server error", err.Error())
+		assert.Equal(t, "error 400 \nget failed : server error", err.Error())
 	})
 }
 
@@ -351,7 +351,7 @@ func TestApplications_Update(t *testing.T) {
 
 		assert.Zero(t, res)
 		assert.Error(t, err)
-		assert.Equal(t, "application error 400 \nupdate failed : server error", err.Error())
+		assert.Equal(t, "error 400 \nupdate failed : server error", err.Error())
 	})
 }
 
@@ -399,6 +399,6 @@ func TestApplications_Delete(t *testing.T) {
 		err := client.Application.Delete(context.TODO(), "valid-app-id")
 
 		assert.Error(t, err)
-		assert.Equal(t, "application error 400 \ndelete failed : server error", err.Error())
+		assert.Equal(t, "error 400 \ndelete failed : server error", err.Error())
 	})
 }
