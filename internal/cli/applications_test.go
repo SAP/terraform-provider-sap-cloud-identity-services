@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 
 	"fmt"
-	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/applications"
 	"net/http"
 	"testing"
+
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/applications"
+	corporateidps "github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/corporateIdps"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -49,6 +51,75 @@ var applicationsBody = applications.Application{
 				UserGroup:       "valid-group-id",
 				UserEmailDomain: "test.com",
 			},
+		},
+		OidcConfig: &applications.OidcConfig{
+			RedirectUris: []string{
+				"https:redirectUris.com",
+			},
+			PostLogoutRedirectUris: []string{
+				"https:postlogoutRedirectUris.com",
+			},
+			FrontChannelLogoutUris: []string{
+				"https:frontChannelLogoutUris.com",
+			},
+			BackChannelLogoutUris: []string{
+				"https:backChannelLogoutUris.com",
+			},
+			TokenPolicy: &applications.TokenPolicy{
+				JwtValidity:                  3600,
+				RefreshValidity:              43200,
+				RefreshParallel:              1,
+				MaxExchangePeriod:            "unlimited",
+				RefreshTokenRotationScenario: "off",
+				AccessTokenFormat:            "default",
+			},
+			RestrictedGrantTypes: []applications.GrantType{
+				"clientCredentials",
+				"authorizationCode",
+				"password",
+				"jwtBearer",
+			},
+			ProxyConfig: &applications.OidcProxyConfig{
+				Acrs: []string{
+					"acrs-1",
+				},
+			},
+		},
+		Saml2Configuration: &applications.SamlConfiguration{
+			SamlMetadataUrl: "https://test.com",
+			AcsEndpoints: []applications.Saml2AcsEndpoint{
+				{
+					BindingName: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+					Location:    "https://test.1.com",
+					Index:       1,
+					IsDefault:   true,
+				},
+			},
+			SloEndpoints: []applications.Saml2SLOEndpoint{
+				{
+					BindingName:      "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+					Location:         "https://logout.1.com",
+					ResponseLocation: "https://logout-response.1.com",
+				},
+			},
+			CertificatesForSigning: []corporateidps.SigningCertificateData{
+				{
+					Base64Certificate: "-----BEGIN CERTIFICATE-----\\n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\\n-----END CERTIFICATE-----",
+					Dn:                "CN=Test Cert",
+					IsDefault:         true,
+				},
+			},
+			CertificateForEncryption: &applications.EncryptionCertificateData{
+				Base64Certificate: "-----BEGIN CERTIFICATE-----\\n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\\n-----END CERTIFICATE-----",
+			},
+			ResponseElementsToEncrypt: "wholeAssertion",
+			DefaultNameIdFormat:       "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
+			SignSLOMessages:           true,
+			RequireSignedSLOMessages:  true,
+			RequireSignedAuthnRequest: true,
+			SignAssertions:            true,
+			SignAuthnResponses:        true,
+			DigestAlgorithm:           "sha1",
 		},
 	},
 }
