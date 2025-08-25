@@ -1,6 +1,6 @@
 module github.com/SAP/terraform-provider-sap-cloud-identity-services
 
-go 1.24
+go 1.25
 
 require (
 	github.com/hashicorp/terraform-plugin-framework v1.15.0
