@@ -108,6 +108,12 @@ type Address struct {
 	Type          string `json:"type"`
 }
 
+type Group struct {
+	Type    string `json:"type,omitempty" tfsdk:"type"`
+	Value   string `json:"value,omitempty" tfsdk:"value"`
+	Display string `json:"display,omitempty" tfsdk:"display"`
+}
+
 type User struct {
 	Id                string         `json:"id,omitempty"`
 	ExternalId        string         `json:"externalId,omitempty"`
@@ -131,6 +137,7 @@ type User struct {
 	Entitlements      []Enititlement `json:"entitlements,omitempty"`
 	Roles             []Role         `json:"roles,omitempty"`
 	SAPExtension      *SAPExtension  `json:"urn:ietf:params:scim:schemas:extension:sap:2.0:User,omitempty"`
+	Groups            []Group        `json:"groups,omitempty"`
 	// Title             string         `json:"title,omitempty"`
 	// EnterpriseUser    	EnterpriseUser 	`json:"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User,omitempty"`
 }

@@ -133,6 +133,26 @@ func (d *userDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 					utils.ValidJSON(),
 				},
 			},
+			"groups": schema.ListNestedAttribute{
+				MarkdownDescription: "The list of Groups that the user belongs to.",
+				Computed:            true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"value": schema.StringAttribute{
+							MarkdownDescription: "The unique UUID of the Group.",
+							Computed:            true,
+						},
+						"display": schema.StringAttribute{
+							MarkdownDescription: "The display name of the Group.",
+							Computed:            true,
+						},
+						"type": schema.StringAttribute{
+							MarkdownDescription: "The type of the Group.",
+							Computed:            true,
+						},
+					},
+				},
+			},
 		},
 	}
 }

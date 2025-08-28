@@ -28,6 +28,7 @@ type userData struct {
 	Active           types.Bool   `tfsdk:"active"`
 	SapExtensionUser types.Object `tfsdk:"sap_extension_user"`
 	CustomSchemas    types.String `tfsdk:"custom_schemas"`
+	Groups           types.List   `tfsdk:"groups"`
 }
 
 func userValueFrom(ctx context.Context, u users.User, cS string) (userData, diag.Diagnostics) {
@@ -99,6 +100,19 @@ func userValueFrom(ctx context.Context, u users.User, cS string) (userData, diag
 
 	if len(cS) > 0 {
 		user.CustomSchemas = types.StringValue(cS)
+	}
+
+	// Groups
+	if len(u.Groups) > 0 {
+		groups, diags := types.ListValueFrom(ctx, groupListObjType, u.Groups)
+		diagnostics.Append(diags...)
+		if diagnostics.HasError() {
+			return user, diagnostics
+		}
+
+		user.Groups = groups
+	} else {
+		user.Groups = types.ListNull(groupListObjType)
 	}
 
 	return user, diagnostics

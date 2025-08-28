@@ -33,6 +33,7 @@ Read-Only:
 - `custom_schemas` (String) Furthur enhance your user with custom schemas.
 - `display_name` (String) The name to be displayed for the user.
 - `emails` (Attributes Set) Emails of the user. (see [below for nested schema](#nestedatt--values--emails))
+- `groups` (Attributes List) The list of Groups that the user belongs to. (see [below for nested schema](#nestedatt--values--groups))
 - `id` (String) ID of the user.
 - `initial_password` (String, Sensitive) The initial password to be configured for the user.
 - `name` (Attributes) Name of the user (see [below for nested schema](#nestedatt--values--name))
@@ -51,6 +52,16 @@ Read-Only:
 - `primary` (Boolean) Set the email to be primary or not.
 - `type` (String) Type of the user's email.
 - `value` (String) Value of the user's email.
+
+
+<a id="nestedatt--values--groups"></a>
+### Nested Schema for `values.groups`
+
+Read-Only:
+
+- `display` (String) The display name of the Group.
+- `type` (String) The type of the Group.
+- `value` (String) The unique UUID of the Group.
 
 
 <a id="nestedatt--values--name"></a>
