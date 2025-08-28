@@ -13,8 +13,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 
@@ -749,6 +751,9 @@ func (r *applicationResource) Create(ctx context.Context, req resource.CreateReq
 		return
 	}
 
+	diags = stateModify(ctx, plan, &state)
+	resp.Diagnostics.Append(diags...)
+
 	diags = resp.State.Set(ctx, &state)
 
 	resp.Diagnostics.Append(diags...)
@@ -775,6 +780,9 @@ func (r *applicationResource) Read(ctx context.Context, req resource.ReadRequest
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	diags = stateModify(ctx, config, &state)
+	resp.Diagnostics.Append(diags...)
 
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -824,6 +832,9 @@ func (r *applicationResource) Update(ctx context.Context, req resource.UpdateReq
 		return
 	}
 
+	diags = stateModify(ctx, plan, &updatedState)
+	resp.Diagnostics.Append(diags...)
+
 	diags = resp.State.Set(ctx, &updatedState)
 	resp.Diagnostics.Append(diags...)
 }
@@ -853,4 +864,42 @@ func (r *applicationResource) Delete(ctx context.Context, req resource.DeleteReq
 
 func (rs *applicationResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+}
+
+func stateModify(ctx context.Context, plan applicationData, state *applicationData) diag.Diagnostics {
+
+	if !plan.AuthenticationSchema.IsNull() && !plan.AuthenticationSchema.IsUnknown() {
+
+		// fetch the plan data
+		var planData authenticationSchemaData
+		diags := plan.AuthenticationSchema.As(ctx, &planData, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty:    true,
+			UnhandledUnknownAsEmpty: true,
+		})
+		if diags.HasError() {
+			return diags
+		}
+
+		// fetch the state data
+		var stateData authenticationSchemaData
+		diags = state.AuthenticationSchema.As(ctx, &stateData, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty:    true,
+			UnhandledUnknownAsEmpty: true,
+		})
+		if diags.HasError() {
+			return diags
+		}
+
+		// modify the state data based on the plan data
+		if !planData.DefaultAuthenticatingIdpId.IsNull() && !planData.DefaultAuthenticatingIdpId.IsUnknown() {
+			stateData.DefaultAuthenticatingIdpId = planData.DefaultAuthenticatingIdpId
+		}
+
+		state.AuthenticationSchema, diags = types.ObjectValueFrom(ctx, authenticationSchemaObjType, stateData)
+		if diags.HasError() {
+			return diags
+		}
+	}
+
+	return nil
 }

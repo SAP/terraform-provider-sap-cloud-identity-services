@@ -41,7 +41,7 @@ Read-Only:
 - `canonical_values` (List of String) A collection of suggested canonical values that may be used
 - `case_exact` (Boolean) Configure if the attribute must be case-sensitive or not.
 - `description` (String) A brief description for the attribute
-- `multivalued` (Boolean) Confgire if the attribute can have more than one value.
+- `multivalued` (Boolean) Configure if the attribute can have more than one value.
 - `mutability` (String) Control the Read or Write access of the attribute
 - `name` (String) The attribute name. Only alphanumeric characters and underscores are allowed.
 - `required` (Boolean) Configure if the attribute must be mandatory or not.

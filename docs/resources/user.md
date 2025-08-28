@@ -86,6 +86,7 @@ resource "sci_user" "new_user" {
 
 ### Read-Only
 
+- `groups` (Attributes List) The list of Groups that the user belongs to. (see [below for nested schema](#nestedatt--groups))
 - `id` (String) ID of the user.
 
 <a id="nestedatt--emails"></a>
@@ -119,6 +120,16 @@ Optional:
 - `mail_verified` (Boolean) The attribute specifies if the e-mail of the newly created user is verified or not. So if the values of the "mail_verified" and "send_mail" attributes are true, the user will receive an e-mail and they will be able to log on. On the other hand, if the "send_mail" is true, but the "mail_verified" is false, the user will receive e-mail and they have to click the verification link in the e-mail. If the attribute "mail_verified" is not configured, the default value is false.
 - `send_mail` (Boolean) Specifies if an activation mail should be sent. The value of the attribute only matters when creating the user.
 - `status` (String) Specifies if the user is created as active, inactive or new. If the attribute "active" is not configured, the default value is inactive. Acceptable values are : `active`, `inactive`, `new`
+
+
+<a id="nestedatt--groups"></a>
+### Nested Schema for `groups`
+
+Read-Only:
+
+- `display` (String) The display name of the Group.
+- `type` (String) The type of the Group.
+- `value` (String) The unique UUID of the Group.
 
 ## Import
 

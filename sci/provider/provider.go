@@ -202,6 +202,7 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 			},
 		}
 		cert = &tlsCert
+
 	} else {
 		httpClient = p.httpClient
 	}
@@ -233,6 +234,7 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 			return
 		}
 		client.AuthorizationToken = "Bearer " + token
+
 	} else if cert == nil {
 		// Fallback to Basic Auth (username + password)
 		var username, password string
@@ -248,7 +250,9 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 			password = config.Password.ValueString()
 		}
 
-		client.AuthorizationToken = "Basic " + base64.StdEncoding.EncodeToString([]byte(username+":"+password))
+		if username != "" && password != "" {
+			client.AuthorizationToken = "Basic " + base64.StdEncoding.EncodeToString([]byte(username+":"+password))
+		}
 	}
 
 	if resp.Diagnostics.HasError() {
