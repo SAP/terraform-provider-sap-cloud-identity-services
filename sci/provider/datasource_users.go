@@ -45,6 +45,14 @@ var emailObjType = types.ObjectType{
 	},
 }
 
+var groupListObjType = types.ObjectType{
+	AttrTypes: map[string]attr.Type{
+		"type":    types.StringType,
+		"value":   types.StringType,
+		"display": types.StringType,
+	},
+}
+
 var userObjType = types.ObjectType{
 	AttrTypes: map[string]attr.Type{
 		"id": types.StringType,
@@ -66,6 +74,9 @@ var userObjType = types.ObjectType{
 			AttrTypes: sapExtensionUserObjType,
 		},
 		"custom_schemas": types.StringType,
+		"groups": types.ListType{
+			ElemType: groupListObjType,
+		},
 	},
 }
 
@@ -184,6 +195,26 @@ func (d *usersDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, 
 							MarkdownDescription: "Furthur enhance your user with custom schemas.",
 							Validators: []validator.String{
 								utils.ValidJSON(),
+							},
+						},
+						"groups": schema.ListNestedAttribute{
+							MarkdownDescription: "The list of Groups that the user belongs to.",
+							Computed:            true,
+							NestedObject: schema.NestedAttributeObject{
+								Attributes: map[string]schema.Attribute{
+									"value": schema.StringAttribute{
+										MarkdownDescription: "The unique UUID of the Group.",
+										Computed:            true,
+									},
+									"display": schema.StringAttribute{
+										MarkdownDescription: "The display name of the Group.",
+										Computed:            true,
+									},
+									"type": schema.StringAttribute{
+										MarkdownDescription: "The type of the Group.",
+										Computed:            true,
+									},
+								},
 							},
 						},
 					},

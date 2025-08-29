@@ -7,11 +7,11 @@ import (
 type Attribute struct {
 	Name            string   `json:"name,omitempty"`
 	Type            string   `json:"type,omitempty"`
-	Multivalued     bool     `json:"multivalued,omitempty"`
+	Multivalued     bool     `json:"multiValued"`
 	Description     string   `json:"description,omitempty"`
-	Required        bool     `json:"required,omitempty"`
+	Required        bool     `json:"required"`
 	CanonicalValues []string `json:"canonicalValues,omitempty"`
-	CaseExact       bool     `json:"caseExact,omitempty"`
+	CaseExact       bool     `json:"caseExact"`
 	Mutability      string   `json:"mutability,omitempty"`
 	Returned        string   `json:"returned,omitempty"`
 	Uniqueness      string   `json:"uniqueness,omitempty"`

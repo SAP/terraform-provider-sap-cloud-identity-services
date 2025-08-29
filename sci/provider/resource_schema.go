@@ -13,8 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 
@@ -107,6 +105,18 @@ func (r *schemaResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 								stringvalidator.OneOf(attributeUniquenessValues...),
 							},
 						},
+						"multivalued": schema.BoolAttribute{
+							Required:            true,
+							MarkdownDescription: "Configure if the attribute can have more than one value.",
+						},
+						"required": schema.BoolAttribute{
+							Required:            true,
+							MarkdownDescription: "Configure if the attribute must be mandatory or not.",
+						},
+						"case_exact": schema.BoolAttribute{
+							Required:            true,
+							MarkdownDescription: "Configure if the attribute must be case-sensitive or not.",
+						},
 						"canonical_values": schema.ListAttribute{
 							ElementType:         types.StringType,
 							Optional:            true,
@@ -115,33 +125,9 @@ func (r *schemaResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 								listvalidator.SizeAtLeast(1),
 							},
 						},
-						"multivalued": schema.BoolAttribute{
-							Optional:            true,
-							Computed:            true,
-							MarkdownDescription: "Confgire if the attribute can have more than one value.",
-							PlanModifiers: []planmodifier.Bool{
-								boolplanmodifier.UseStateForUnknown(),
-							},
-						},
 						"description": schema.StringAttribute{
 							Optional:            true,
 							MarkdownDescription: "A brief description for the attribute",
-						},
-						"required": schema.BoolAttribute{
-							Optional:            true,
-							Computed:            true,
-							MarkdownDescription: "Configure if the attribute must be mandatory or not.",
-							PlanModifiers: []planmodifier.Bool{
-								boolplanmodifier.UseStateForUnknown(),
-							},
-						},
-						"case_exact": schema.BoolAttribute{
-							Optional:            true,
-							Computed:            true,
-							MarkdownDescription: "Configure if the attribute must be case-sensitive or not.",
-							PlanModifiers: []planmodifier.Bool{
-								boolplanmodifier.UseStateForUnknown(),
-							},
 						},
 					},
 				},
