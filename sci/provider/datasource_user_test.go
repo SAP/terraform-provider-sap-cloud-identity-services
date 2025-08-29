@@ -43,6 +43,8 @@ func TestDataSourceUser(t *testing.T) {
 						resource.TestCheckResourceAttr("data.sci_user.testUser", "emails.1.type", "home"),
 						resource.TestCheckResourceAttr("data.sci_user.testUser", "sap_extension_user.status", "inactive"),
 						resource.TestCheckResourceAttr("data.sci_user.testUser", "user_type", "public"),
+						resource.TestMatchResourceAttr("data.sci_user.testUser", "groups.0.value", regexpUUID),
+						resource.TestCheckResourceAttr("data.sci_user.testUser", "groups.0.display", "Terraform Test Group"),
 					),
 				},
 			},

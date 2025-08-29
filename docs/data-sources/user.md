@@ -31,6 +31,7 @@ data "sci_user" "by_id" {
 - `custom_schemas` (String) Furthur enhance your user with custom schemas.
 - `display_name` (String) The name to be displayed for the user.
 - `emails` (Attributes Set) Emails of the user. (see [below for nested schema](#nestedatt--emails))
+- `groups` (Attributes List) The list of Groups that the user belongs to. (see [below for nested schema](#nestedatt--groups))
 - `initial_password` (String, Sensitive) The initial password to be configured for the user.
 - `name` (Attributes) Name of the user (see [below for nested schema](#nestedatt--name))
 - `sap_extension_user` (Attributes) Configure attributes particular to the schema `"urn:ietf:params:scim:schemas:extension:sap:2.0:User"`. (see [below for nested schema](#nestedatt--sap_extension_user))
@@ -48,6 +49,16 @@ Read-Only:
 - `primary` (Boolean) Set the email to be primary or not.
 - `type` (String) Type of the user's email.
 - `value` (String) Value of the user's email.
+
+
+<a id="nestedatt--groups"></a>
+### Nested Schema for `groups`
+
+Read-Only:
+
+- `display` (String) The display name of the Group.
+- `type` (String) The type of the Group.
+- `value` (String) The unique UUID of the Group.
 
 
 <a id="nestedatt--name"></a>
