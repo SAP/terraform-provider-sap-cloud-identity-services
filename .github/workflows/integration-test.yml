@@ -9,6 +9,7 @@ name: Integration Test - Terraform Provider
 
 
 on:
+  pull_request:
   workflow_dispatch:
 
 env:
