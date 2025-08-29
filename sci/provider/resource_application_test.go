@@ -42,13 +42,13 @@ func TestResourceApplication(t *testing.T) {
 					AttributeValue: "value2",
 				},
 			},
-			DefaultAuthenticatingIdpId: "664c660e25cff252c5c202dc",
+			DefaultAuthenticatingIdpId: "c93f6b04-7a0f-42c1-b3c5-3b30d0ad8910",
 			ConditionalAuthentication: []applications.AuthenicationRule{
 				{
 					UserType:           "employee",
 					UserEmailDomain:    "gmail.com",
 					IpNetworkRange:     "10.0.0.1/8",
-					IdentityProviderId: "664c660e25cff252c5c202dc",
+					IdentityProviderId: "c93f6b04-7a0f-42c1-b3c5-3b30d0ad8910",
 				},
 			},
 		},
@@ -166,15 +166,19 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.advanced_assertion_attributes.1.attribute_name", application.AuthenticationSchema.AdvancedAssertionAttributes[1].AttributeName),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.advanced_assertion_attributes.1.attribute_value", application.AuthenticationSchema.AdvancedAssertionAttributes[1].AttributeValue),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.default_authenticating_idp", application.AuthenticationSchema.DefaultAuthenticatingIdpId),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.conditional_authentication.0.identity_provider_id", application.AuthenticationSchema.ConditionalAuthentication[0].IdentityProviderId),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.conditional_authentication.0.user_type", application.AuthenticationSchema.ConditionalAuthentication[0].UserType),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.conditional_authentication.0.user_email_domain", application.AuthenticationSchema.ConditionalAuthentication[0].UserEmailDomain),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.conditional_authentication.0.ip_network_range", application.AuthenticationSchema.ConditionalAuthentication[0].IpNetworkRange),
 					),
 				},
 				{
-					ResourceName:      "sci_application.testApp",
-					ImportState:       true,
-					ImportStateVerify: true,
+					ResourceName:            "sci_application.testApp",
+					ImportState:             true,
+					ImportStateVerify:       true,
+					// Given that the API always returns the internal ID of the IdP, the state verificiation of the attribute can be ignored in this test since it is configured with the UUID as seen above
+					// The mismatch of IDs is expected behaviour and does not indicate an error, as the parameter can be configured with both the UUID and the internal ID of the IdP
+					ImportStateVerifyIgnore: []string{"authentication_schema.default_authenticating_idp"},
 				},
 			},
 		})
@@ -208,13 +212,13 @@ func TestResourceApplication(t *testing.T) {
 						AttributeValue: "value3",
 					},
 				},
-				DefaultAuthenticatingIdpId: "664c660e25cff252c5c202dc",
+				DefaultAuthenticatingIdpId: "7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1",
 				ConditionalAuthentication: []applications.AuthenicationRule{
 					{
 						UserType:           "customer",
 						UserEmailDomain:    "sap.com",
 						IpNetworkRange:     "192.168.1.1/24",
-						IdentityProviderId: "664c660e25cff252c5c202dc",
+						IdentityProviderId: "7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1",
 					},
 				},
 			},
