@@ -176,6 +176,8 @@ func TestResourceApplication(t *testing.T) {
 					ResourceName:            "sci_application.testApp",
 					ImportState:             true,
 					ImportStateVerify:       true,
+					// Given that the API always returns the internal ID of the IdP, the state verificiation of the attribute can be ignored in this test since it is configured with the UUID as seen above
+					// The mismatch of IDs is expected behaviour and does not indicate an error, as the parameter can be configured with both the UUID and the internal ID of the IdP
 					ImportStateVerifyIgnore: []string{"authentication_schema.default_authenticating_idp"},
 				},
 			},
