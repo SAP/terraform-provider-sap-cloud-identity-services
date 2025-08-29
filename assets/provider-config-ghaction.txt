@@ -1,0 +1,7 @@
+provider_installation {
+  dev_overrides {
+    "sap/sap-cloud-identity-services" = "/home/runner/go/bin"
+  }
+
+  direct {}
+}
