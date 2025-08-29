@@ -85,7 +85,7 @@ jobs:
         P12_CERTIFICATE_BASE64_STRING: ${{ secrets.P12_CERTIFICATE_BASE64_STRING }}
       run: |
         echo "$P12_CERTIFICATE_BASE64_STRING" | base64 --decode > cert.p12
-        terraform -chdir=${{ env.PATH_TO_TFSCRIPT }} apply -var tenant_url="${{ secrets.TENANT_URL }}" -var certificate_file_path="cert.p12" -var certificate_file_password="${{ secrets.P12_CERTIFICATE_PASSWORD }}" -var certificate="${{ secrets.BASE64_CERTIFICATE_STRING }}" -auto-approve -no-color
+        terraform -chdir=${{ env.PATH_TO_TFSCRIPT }} apply -var tenant_url="${{ secrets.TENANT_URL }}" -var certificate_file_path="cert.p12" -var certificate_file_password="${{ secrets.P12_CERTIFICATE_PASSWORD }}" -var certificate="-----BEGIN CERTIFICATE-----\n${{ secrets.BASE64_CERTIFICATE_STRING }}\n-----END CERTIFICATE-----" -auto-approve -no-color
     
     - name: Terraform Destroy with local provider
       if: always()
@@ -95,4 +95,4 @@ jobs:
         P12_CERTIFICATE_BASE64_STRING: ${{ secrets.P12_CERTIFICATE_BASE64_STRING }}
       run: |
         echo "$P12_CERTIFICATE_BASE64_STRING" | base64 --decode > cert.p12
-        terraform -chdir=${{ env.PATH_TO_TFSCRIPT }} destroy -var tenant_url="${{ secrets.TENANT_URL }}" -var certificate_file_path="cert.p12" -var certificate_file_password="${{ secrets.P12_CERTIFICATE_PASSWORD }}" -var certificate="${{ secrets.BASE64_CERTIFICATE_STRING }}" -auto-approve -no-color
+        terraform -chdir=${{ env.PATH_TO_TFSCRIPT }} destroy -var tenant_url="${{ secrets.TENANT_URL }}" -var certificate_file_path="cert.p12" -var certificate_file_password="${{ secrets.P12_CERTIFICATE_PASSWORD }}" -var certificate="-----BEGIN CERTIFICATE-----\n${{ secrets.BASE64_CERTIFICATE_STRING }}\n-----END CERTIFICATE-----" -auto-approve -no-color
