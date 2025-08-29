@@ -117,7 +117,7 @@ func (d *schemasDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 									},
 									"multivalued": schema.BoolAttribute{
 										Computed:            true,
-										MarkdownDescription: "Confgire if the attribute can have more than one value.",
+										MarkdownDescription: "Configure if the attribute can have more than one value.",
 									},
 									"description": schema.StringAttribute{
 										Computed:            true,
