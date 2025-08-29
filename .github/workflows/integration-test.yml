@@ -83,7 +83,7 @@ jobs:
       shell: bash
       env:
         P12_CERTIFICATE_BASE64_STRING: ${{ secrets.P12_CERTIFICATE_BASE64_STRING }}
-        BASE64_CERTIFICATE_STRING: -----BEGIN CERTIFICATE-----\n${{ secrets.BASE64_CERTIFICATE_STRING }}\n-----END CERTIFICATE-----
+        BASE64_CERTIFICATE_STRING: -----BEGIN CERTIFICATE-----\\n${{ secrets.BASE64_CERTIFICATE_STRING }}\\n-----END CERTIFICATE-----
       run: |
         echo $BASE64_CERTIFICATE_STRING
         echo "$P12_CERTIFICATE_BASE64_STRING" | base64 --decode > cert.p12
