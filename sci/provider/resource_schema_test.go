@@ -108,7 +108,7 @@ func TestResourceSchema(t *testing.T) {
 		})
 	})
 
-	t.Run("error path - schema attributes has mandatory parameters : name, type, mutability, returned, uniqueness", func(t *testing.T) {
+	t.Run("error path - schema attributes has mandatory parameters : name, type, case_exact, multivalued, required, mutability, returned, uniqueness", func(t *testing.T) {
 
 		resource.Test(t, resource.TestCase{
 			IsUnitTest:               true,
@@ -116,7 +116,7 @@ func TestResourceSchema(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceSchemaWithoutAttributes("testSchema", "urn:ietf:scim:schemas:Terraform", "Terraform"),
-					ExpectError: regexp.MustCompile("Inappropriate value for attribute \"attributes\": element 0: attributes\n\"mutability\", \"name\", \"returned\", \"type\", and \"uniqueness\" are required."),
+					ExpectError: regexp.MustCompile("Inappropriate value for attribute \"attributes\": element 0: attributes\n\"case_exact\", \"multivalued\", \"mutability\", \"name\", \"required\", \"returned\",\n\"type\", and \"uniqueness\" are required."),
 				},
 			},
 		})
