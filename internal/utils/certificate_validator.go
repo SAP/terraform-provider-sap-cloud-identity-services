@@ -28,7 +28,7 @@ func (v certificateValidator) ValidateString(ctx context.Context, request valida
 
 	value := request.ConfigValue.ValueString()
 
-	log.Default().Println("Value of the certificate : %s", value)
+	log.Default().Println("Value of the certificate " + value)
 
 	if decodedString, _ := pem.Decode([]byte(value)); decodedString == nil {
 		response.Diagnostics.Append(validatordiag.InvalidAttributeValueDiagnostic(
