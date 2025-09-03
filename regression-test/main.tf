@@ -30,6 +30,9 @@ locals {
     idp_logout_url = "https://test.com/logout"
     idp_login_type = "userInput"
     idp_send_method = "authRequest"
+
+    cert_pem = replace(var.certificate, "\\n", "\n")
+
 }
 
 resource "sci_schema" "testSchema" {
@@ -134,7 +137,7 @@ resource "sci_corporate_idp" "testSamlIdP" {
         ]
         signing_certificates = [
             {
-                base64_certificate = var.certificate
+                base64_certificate = local.cert_pem
                 dn = local.prefix_unique_name
                 default = true
                 valid_from = "2025-08-25T10:30:00Z"
@@ -271,12 +274,12 @@ resource "sci_application" "testSamlApp" {
             ]
             signing_certificates = [
                 {
-                    base64_certificate = var.certificate
+                    base64_certificate = local.cert_pem
                     default = true
                 }
             ]
             encryption_certificate = {
-                    base64_certificate = var.certificate
+                    base64_certificate = local.cert_pem
             }
             response_elements_to_encrypt = "attributes"
             default_name_id_format = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
