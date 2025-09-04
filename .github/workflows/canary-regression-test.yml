@@ -82,6 +82,7 @@ jobs:
       env:
         P12_CERTIFICATE_BASE64_STRING: ${{ secrets.CANARY_P12_CERTIFICATE_BASE64_STRING }}
       run: |
+        export TF_LOG=DEBUG
         echo "$P12_CERTIFICATE_BASE64_STRING" | base64 --decode > cert.p12
         terraform -chdir=${{ env.PATH_TO_TFSCRIPT }} apply \
         -var tenant_url="${{ secrets.CANARY_TENANT_URL }}" \

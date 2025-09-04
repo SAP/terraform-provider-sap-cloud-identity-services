@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -157,6 +158,8 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		return
 	}
 
+	log.Default().Println("Value of the tenant URL: " + config.TenantUrl.ValueString())
+
 	parsedUrl, err := url.Parse(config.TenantUrl.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("Unable to parse URL", fmt.Sprintf("%s", err))
@@ -207,6 +210,13 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 	}
 
 	client := cli.NewSciClient(cli.NewClient(httpClient, parsedUrl))
+
+	_, err = client.DoRequest(ctx, "GET", "scim/Users", nil, "", "")
+	if err != nil {
+		log.Fatal("authentication failed: ", err)
+	} else {
+		log.Default().Println("Successfully authenticated to the tenant.")
+	}
 
 	// OAuth2 authentication using client_id and client_secret
 	var clientID, clientSecret string
