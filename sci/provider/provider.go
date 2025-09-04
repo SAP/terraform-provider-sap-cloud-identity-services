@@ -211,11 +211,18 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 
 	client := cli.NewSciClient(cli.NewClient(httpClient, parsedUrl))
 
-	_, err = client.DoRequest(ctx, "GET", "scim/Users", nil, "", "")
+	res, err := client.DoRequest(ctx, "GET", "scim/Schemas", nil, "", "")
 	if err != nil {
-		log.Fatal("authentication failed: ", err)
+		log.Fatal("scim authentication failed: ", err)
 	} else {
-		log.Default().Println("Successfully authenticated to the tenant.")
+		log.Default().Printf("Successfully authenticated : scim : %d", res.StatusCode)
+	}
+
+	res, err = client.DoRequest(ctx, "GET", "Applications/v1", nil, "", "")
+	if err != nil {
+		log.Fatal("app authentication failed: ", err)
+	} else {
+		log.Default().Printf("Successfully authenticated : app : %d", res.StatusCode)
 	}
 
 	// OAuth2 authentication using client_id and client_secret
