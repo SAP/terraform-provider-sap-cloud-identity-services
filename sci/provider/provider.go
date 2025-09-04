@@ -252,10 +252,8 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 
 		if username != "" && password != "" {
 			client.AuthorizationToken = "Basic " + base64.StdEncoding.EncodeToString([]byte(username+":"+password))
-		} 
-	} 
-
-
+		}
+	}
 
 	if resp.Diagnostics.HasError() {
 		return
