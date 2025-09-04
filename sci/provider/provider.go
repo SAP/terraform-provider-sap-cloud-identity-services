@@ -221,7 +221,7 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 
 	for _, api := range apis {
 		res, err := client.DoRequest(ctx, "GET", api, nil, "", "")
-		if err != nil {
+		if err == nil {
 			log.Default().Printf("Authentication %s : %d", api, res.StatusCode)
 		} else {
 			log.Fatal("Error while authentication: ", err)
