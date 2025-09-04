@@ -205,6 +205,8 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 			},
 		}
 		cert = &tlsCert
+
+		log.Default().Println("Certificate loaded successfully")
 	} else {
 		httpClient = p.httpClient
 	}
@@ -227,8 +229,6 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 			log.Fatal("Error while authentication: ", err)
 		}
 	}
-	// log.Fatal("Test API call completed")
-
 
 	// OAuth2 authentication using client_id and client_secret
 	var clientID, clientSecret string
