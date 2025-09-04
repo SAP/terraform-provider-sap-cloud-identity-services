@@ -85,7 +85,8 @@ jobs:
       run: |
         export TF_LOG=DEBUG
         echo "$P12_CERTIFICATE_BASE64_STRING" | base64 --decode > cert.p12
-        echo $TENANT_URL 
+        echo $TENANT_URL > tenant_url.txt
+        cat tenant_url.txt
         terraform -chdir=${{ env.PATH_TO_TFSCRIPT }} apply \
         -var tenant_url="${{ secrets.CANARY_TENANT_URL }}" \
         -var certificate_file_path="cert.p12" \
