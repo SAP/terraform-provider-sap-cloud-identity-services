@@ -83,9 +83,10 @@ jobs:
       shell: bash
       env:
         P12_CERTIFICATE_BASE64_STRING: ${{ secrets.P12_CERTIFICATE_BASE64_STRING }}
+        PATH_TO_TFSCRIPT: ${{ env.PATH_TO_TFSCRIPT }}
       run: |
-        echo "$P12_CERTIFICATE_BASE64_STRING" | base64 --decode > cert.p12
-        terraform -chdir=${{ env.PATH_TO_TFSCRIPT }} apply \
+        echo "$P12_CERTIFICATE_BASE64_STRING" | base64 --decode > $PATH_TO_TFSCRIPT/cert.p12
+        terraform -chdir=$PATH_TO_TFSCRIPT apply \
         -var tenant_url="${{ secrets.TENANT_URL }}" \
         -var certificate_file_path="cert.p12" \
         -var certificate_file_password="${{ secrets.P12_CERTIFICATE_PASSWORD }}" \
@@ -98,9 +99,10 @@ jobs:
       shell: bash
       env:
         P12_CERTIFICATE_BASE64_STRING: ${{ secrets.P12_CERTIFICATE_BASE64_STRING }}
+        PATH_TO_TFSCRIPT: ${{ env.PATH_TO_TFSCRIPT }}
       run: |
-        echo "$P12_CERTIFICATE_BASE64_STRING" | base64 --decode > cert.p12
-        terraform -chdir=${{ env.PATH_TO_TFSCRIPT }} destroy \
+        echo "$P12_CERTIFICATE_BASE64_STRING" | base64 --decode > $PATH_TO_TFSCRIPT/cert.p12
+        terraform -chdir=$PATH_TO_TFSCRIPT destroy \
         -var tenant_url="${{ secrets.TENANT_URL }}" \
         -var certificate_file_path="cert.p12" \
         -var certificate_file_password="${{ secrets.P12_CERTIFICATE_PASSWORD }}" \
