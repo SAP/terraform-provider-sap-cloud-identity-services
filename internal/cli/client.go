@@ -82,12 +82,12 @@ func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, 
 
 	completeUrl := c.ServerURL.ResolveReference(parsedUrl)
 
-	log.Default().Printf("Complete Request URL: %s", completeUrl.String())
-
 	req, err := http.NewRequestWithContext(ctx, method, completeUrl.String(), &encodedBody)
 	if err != nil {
 		return nil, err
 	}
+
+	log.Default().Println("Tenant Domain: ", req.Host)
 
 	// Only set Authorization header if it's not empty
 	if c.AuthorizationToken != "" {
