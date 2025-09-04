@@ -12,14 +12,17 @@ variable "password" {
 variable "certificate" {
   description = "The base64 certificate"
   type        = string
+  sensitive = true
 }
 
 variable "certificate_file_path" {
   description = "The path of the file used for authentication"
   type = string
+  default = null
 }
 
 variable "certificate_file_password" {
   description = "The password associated with the p12 certificate file"
   type = string
+  default = null
 }
