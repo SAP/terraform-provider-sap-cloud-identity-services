@@ -400,17 +400,18 @@ data "sci_users" "test" {}
 func TestMissing_Authentication_Credentials(t *testing.T) {
 	config := `
 provider "sci" {
-  tenant_url = "https://iasprovidertestblr.accounts400.ondemand.com/"
+  tenant_url = "https://example.com/"
+}
 
-  data "sci_users" "test" {}
-}`
+data "sci_users" "test" {}
+`
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
 		Steps: []resource.TestStep{
 			{
 				Config:      config,
-				ExpectError: regexp.MustCompile("No valid authentication method provided. Please provide either : \n- client_id and client_secret for OAuth2 Authentication \n- p12_certificate_content and p12_certificate_password for X.509 Authentication \n- username and password for Basic Authentication"),
+				ExpectError: regexp.MustCompile("Please provide either : \n- client_id and client_secret for OAuth2 Authentication \n- p12_certificate_content and p12_certificate_password for X.509\nAuthentication \n- username and password for Basic Authentication"),
 			},
 		},
 	})
