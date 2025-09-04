@@ -223,9 +223,11 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		res, err := client.DoRequest(ctx, "GET", api, nil, "", "")
 		if err != nil {
 			log.Default().Printf("Authentication %s : %d", api, res.StatusCode)
+		} else {
+			log.Fatal("Error while authentication: ", err)
 		}
 	}
-	log.Fatal("Test API call completed")
+	// log.Fatal("Test API call completed")
 
 
 	// OAuth2 authentication using client_id and client_secret
