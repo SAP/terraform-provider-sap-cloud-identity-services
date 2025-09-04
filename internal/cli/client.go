@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"log"
 	"regexp"
 	"strings"
 
@@ -86,8 +85,6 @@ func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, 
 	if err != nil {
 		return nil, err
 	}
-
-	log.Default().Println("Tenant Domain: ", req.Host)
 
 	// Only set Authorization header if it's not empty
 	if c.AuthorizationToken != "" {

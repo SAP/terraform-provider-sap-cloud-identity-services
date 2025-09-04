@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -158,8 +157,6 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		return
 	}
 
-	log.Default().Println("Value of the tenant URL: " + config.TenantUrl.ValueString())
-
 	parsedUrl, err := url.Parse(config.TenantUrl.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("Unable to parse URL", fmt.Sprintf("%s", err))
@@ -206,7 +203,6 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		}
 		cert = &tlsCert
 
-		log.Default().Println("Certificate used")
 	} else {
 		httpClient = p.httpClient
 	}
@@ -239,7 +235,6 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		}
 		client.AuthorizationToken = "Bearer " + token
 
-		log.Default().Println("Secret used")
 	} else if cert == nil {
 		// Fallback to Basic Auth (username + password)
 		var username, password string
@@ -257,34 +252,13 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 
 		if username != "" && password != "" {
 			client.AuthorizationToken = "Basic " + base64.StdEncoding.EncodeToString([]byte(username+":"+password))
-			log.Default().Println("Username used")
-		} else {
-			resp.Diagnostics.AddError("Authentication Failed", "No valid authentication method provided. Please provide either client_id and client_secret for OAuth2 authentication, p12_certificate_content and p12_certificate_password for certificate-based authentication, or username and password for Basic Authentication.")
-			return
-		}
+		} 
 	} 
 
 
 
 	if resp.Diagnostics.HasError() {
 		return
-	}
-
-	apis := []string{
-		"scim/Schemas",
-		"scim/Groups",
-		"scim/Users",
-		"Applications/v1",
-		"IdentityProviders/v1",
-	}
-
-	for _, api := range apis {
-		res, err := client.DoRequest(ctx, "GET", api, nil, "", "")
-		if err == nil {
-			log.Default().Printf("Authentication %s : %d", api, res.StatusCode)
-		} else {
-			log.Fatal("Error while authentication: ", err)
-		}
 	}
 
 	resp.DataSourceData = client

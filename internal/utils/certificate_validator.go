@@ -3,7 +3,6 @@ package utils
 import (
 	"context"
 	"encoding/pem"
-	"log"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/helpers/validatordiag"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -27,8 +26,6 @@ func (v certificateValidator) ValidateString(ctx context.Context, request valida
 	}
 
 	value := request.ConfigValue.ValueString()
-
-	log.Default().Println("Value of the certificate " + value)
 
 	if decodedString, _ := pem.Decode([]byte(value)); decodedString == nil {
 		response.Diagnostics.Append(validatordiag.InvalidAttributeValueDiagnostic(
