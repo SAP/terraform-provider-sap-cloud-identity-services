@@ -213,23 +213,6 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 
 	client := cli.NewSciClient(cli.NewClient(httpClient, parsedUrl))
 
-	apis := []string{
-		"scim/Schemas",
-		"scim/Groups",
-		"scim/Users",
-		"Applications/v1",
-		"IdentityProviders/v1",
-	}
-
-	for _, api := range apis {
-		res, err := client.DoRequest(ctx, "GET", api, nil, "", "")
-		if err == nil {
-			log.Default().Printf("Authentication %s : %d", api, res.StatusCode)
-		} else {
-			log.Fatal("Error while authentication: ", err)
-		}
-	}
-
 	// OAuth2 authentication using client_id and client_secret
 	var clientID, clientSecret string
 	if config.ClientID.IsNull() {
@@ -275,6 +258,23 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 
 	if resp.Diagnostics.HasError() {
 		return
+	}
+
+	apis := []string{
+		"scim/Schemas",
+		"scim/Groups",
+		"scim/Users",
+		"Applications/v1",
+		"IdentityProviders/v1",
+	}
+
+	for _, api := range apis {
+		res, err := client.DoRequest(ctx, "GET", api, nil, "", "")
+		if err == nil {
+			log.Default().Printf("Authentication %s : %d", api, res.StatusCode)
+		} else {
+			log.Fatal("Error while authentication: ", err)
+		}
 	}
 
 	resp.DataSourceData = client
