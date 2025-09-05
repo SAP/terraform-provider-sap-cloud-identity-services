@@ -26,7 +26,7 @@ jobs:
         id: checkout_repo
         uses: actions/checkout@v5
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: 'go.mod'
           cache: false
@@ -50,7 +50,7 @@ jobs:
       uses: actions/checkout@v5
 
     - name: Setup Go
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
         go-version-file: 'go.mod'
         cache: false
@@ -72,7 +72,7 @@ jobs:
       id: set_to_override
       shell: bash
       run: |
-        rm -rf .terraform && rm -rf .terraform.lock.hcl && cp ${{ env.DEV_OVERRIDE }} ~/.terraformrc 
+        rm -rf .terraform && rm -rf .terraform.lock.hcl && cp ${{ env.DEV_OVERRIDE }} ~/.terraformrc
 
     - name: Terraform Apply with local provider
       id: terraform_apply_local
@@ -99,7 +99,7 @@ jobs:
         PATH_TO_TFSCRIPT: ${{ env.PATH_TO_TFSCRIPT }}
       run: |
         echo "$P12_CERTIFICATE_BASE64_STRING" | base64 --decode > $PATH_TO_TFSCRIPT/cert.p12
-        
+
         terraform -chdir=$PATH_TO_TFSCRIPT destroy \
         -var tenant_url="${{ secrets.CANARY_TENANT_URL }}" \
         -var certificate_file_path="cert.p12" \
