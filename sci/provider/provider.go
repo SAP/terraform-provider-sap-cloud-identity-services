@@ -252,6 +252,8 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 
 		if username != "" && password != "" {
 			client.AuthorizationToken = "Basic " + base64.StdEncoding.EncodeToString([]byte(username+":"+password))
+		} else {
+			resp.Diagnostics.AddError("Authentication Details Missing", "Please provide either : \n- client_id and client_secret for OAuth2 Authentication \n- p12_certificate_content and p12_certificate_password for X.509 Authentication \n- username and password for Basic Authentication")
 		}
 	}
 
