@@ -1,0 +1,106 @@
+name: Integration Test - Terraform Provider
+
+# Running tests against the prod tenant
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+env:
+  PATH_TO_TFSCRIPT: 'regression-test'
+  DEV_OVERRIDE: 'assets/provider-config-ghaction.txt'
+  TEMP_PLAN_OUTPUT : 'plan-output.txt'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out Git repository
+        id: checkout_repo
+        uses: actions/checkout@v5
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache: false
+      - run: go mod download
+      - run: go mod tidy
+      - run: go build -v .
+      - name: Run linters
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: latest
+          skip-cache: true
+
+  test:
+    name: Integration Test for Terraform Provider
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out Git repository
+      id: checkout_repo
+      uses: actions/checkout@v5
+
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: 'go.mod'
+        cache: false
+
+    - name: Setup Terraform
+      id : setup_terraform
+      uses: hashicorp/setup-terraform@v3.1.2
+      with:
+        terraform_wrapper: false
+        terraform_version: latest
+
+    - name: Install local Terraform provider
+      id: build_provider
+      shell: bash
+      run: |
+        go mod tidy && make install
+
+    - name: Remove init data and place override
+      id: set_to_override
+      shell: bash
+      run: |
+        rm -rf .terraform && rm -rf .terraform.lock.hcl && cp ${{ env.DEV_OVERRIDE }} ~/.terraformrc
+
+    - name: Terraform Apply with local provider
+      id: terraform_apply_local
+      shell: bash
+      env:
+        P12_CERTIFICATE_BASE64_STRING: ${{ secrets.P12_CERTIFICATE_BASE64_STRING }}
+        PATH_TO_TFSCRIPT: ${{ env.PATH_TO_TFSCRIPT }}
+      run: |
+        echo "$P12_CERTIFICATE_BASE64_STRING" | base64 --decode > $PATH_TO_TFSCRIPT/cert.p12
+
+        terraform -chdir=$PATH_TO_TFSCRIPT apply \
+        -var tenant_url="${{ secrets.TENANT_URL }}" \
+        -var certificate_file_path="cert.p12" \
+        -var certificate_file_password="${{ secrets.P12_CERTIFICATE_PASSWORD }}" \
+        -var certificate="${{ secrets.PEM_CERTIFICATE_STRING }}" \
+        -auto-approve -no-color
+    
+    - name: Terraform Destroy with local provider
+      if: always()
+      id: terraform_destory
+      shell: bash
+      env:
+        P12_CERTIFICATE_BASE64_STRING: ${{ secrets.P12_CERTIFICATE_BASE64_STRING }}
+        PATH_TO_TFSCRIPT: ${{ env.PATH_TO_TFSCRIPT }}
+      run: |
+        echo "$P12_CERTIFICATE_BASE64_STRING" | base64 --decode > $PATH_TO_TFSCRIPT/cert.p12
+        
+        terraform -chdir=$PATH_TO_TFSCRIPT destroy \
+        -var tenant_url="${{ secrets.TENANT_URL }}" \
+        -var certificate_file_path="cert.p12" \
+        -var certificate_file_password="${{ secrets.P12_CERTIFICATE_PASSWORD }}" \
+        -var certificate="${{ secrets.PEM_CERTIFICATE_STRING }}" \
+        -auto-approve -no-color
