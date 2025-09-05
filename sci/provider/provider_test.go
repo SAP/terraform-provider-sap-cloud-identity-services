@@ -28,6 +28,11 @@ type User struct {
 	Password string
 }
 
+var redactedTestUser = User{
+	Username: "test-user",
+	Password: "test-password",
+}
+
 type RoundTripperFunc func(req *http.Request) (*http.Response, error)
 
 func (f RoundTripperFunc) RoundTrip(req *http.Request) (*http.Response, error) {
@@ -67,7 +72,7 @@ func setupVCR(t *testing.T, cassetteName string) (*recorder.Recorder, User) {
 		t.Fatal(err)
 	}
 
-	var testUser User
+	testUser := redactedTestUser
 	if rec.IsRecording() {
 		t.Logf("Recording new interactions in '%s'", cassetteName)
 		testUser.Username = os.Getenv("SCI_USERNAME")
@@ -387,6 +392,26 @@ provider "sci" {
 data "sci_users" "test" {}
 `, invalidP12),
 				ExpectError: regexp.MustCompile("Invalid .p12 certificate"),
+			},
+		},
+	})
+}
+
+func TestMissing_Authentication_Credentials(t *testing.T) {
+	config := `
+provider "sci" {
+  tenant_url = "https://example.com/"
+}
+
+data "sci_users" "test" {}
+`
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
+		Steps: []resource.TestStep{
+			{
+				Config:      config,
+				ExpectError: regexp.MustCompile("Please provide either : \n- client_id and client_secret for OAuth2 Authentication \n- p12_certificate_content and p12_certificate_password for X.509\nAuthentication \n- username and password for Basic Authentication"),
 			},
 		},
 	})
