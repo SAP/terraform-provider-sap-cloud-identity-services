@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httptest"
+	"os/exec"
+
 	"os"
 	"regexp"
 	"strings"
@@ -178,233 +181,32 @@ func TestSciProvider_AllDataSources(t *testing.T) {
 	assert.ElementsMatch(t, expectedDataSources, registeredDataSources)
 }
 
-func TestUnitSciProvider_withOAuth2(t *testing.T) {
-	t.Parallel()
-
-	clientID := os.Getenv("SCI_CLIENT_ID")
-	clientSecret := os.Getenv("SCI_CLIENT_SECRET")
-
-	if clientID == "" || clientSecret == "" {
-		t.Log("SCI_CLIENT_ID and SCI_CLIENT_SECRET not set; skipping test.")
-		return
-	}
-
-	resource.Test(t, resource.TestCase{
-		IsUnitTest:               true,
-		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
-		Steps: []resource.TestStep{{
-			Config: fmt.Sprintf(`
-provider "sci" {
-  tenant_url    = "https://iasprovidertestblr.accounts400.ondemand.com/"
-  client_id     = "%s"
-  client_secret = "%s"
-}
-
-data "sci_groups" "test" {}
-`, clientID, clientSecret),
-			ExpectNonEmptyPlan: false,
-		}},
-	})
-}
-
-func TestUnitSciProvider_withInvalidOAuth2(t *testing.T) {
-	t.Parallel()
-
-	providerFactories := getTestProviders(http.DefaultClient)
-
-	resource.Test(t, resource.TestCase{
-		IsUnitTest:               true,
-		ProtoV6ProviderFactories: providerFactories,
-		Steps: []resource.TestStep{{
-			Config: `
-provider "sci" {
-  tenant_url    = "https://example.accounts.ondemand.com/"
-  client_id     = "invalid-client-id"
-  client_secret = "invalid-client-secret"
-}
-
-data "sci_groups" "test" {}
-`,
-			ExpectError: regexp.MustCompile(`(?i)(authentication|unauthorized|401|invalid client)`),
-		}},
-	})
-}
-
-func TestFetchOAuthToken_Failure(t *testing.T) {
-	httpClient := &http.Client{
-		Transport: RoundTripperFunc(func(req *http.Request) (*http.Response, error) {
-			// Simulate a 401 Unauthorized response
-			return &http.Response{
-				StatusCode: http.StatusUnauthorized,
-				Body:       io.NopCloser(strings.NewReader(`"invalid_client"`)),
-			}, nil
-		}),
-	}
-
-	tenantURL := "https://iasprovidertestblr.accounts400.ondemand.com/"
-	clientID := "invalid-client-id"
-	clientSecret := "invalid-client-secret"
-
-	token, err := fetchOAuthToken(httpClient, tenantURL, clientID, clientSecret)
-
-	assert.Empty(t, token, "Expected token to be empty for invalid credentials")
-	assert.Error(t, err, "Expected error for invalid credentials")
-	assert.Contains(t, err.Error(), "failed to retrieve token")
-	assert.Contains(t, err.Error(), "invalid_client")
-}
-
-func TestProvider_AuthenticationFailure(t *testing.T) {
+func TestProviderConfig_MissingTenantURL(t *testing.T) {
 	config := `
-	provider "sci" {
-	  tenant_url = "https://iasprovidertestblr.accounts400.ondemand.com/"
-	  username   = "invalid-user"
-	  password   = "invalid-password"
-	}
+		provider "sci" {
+			username = "test"
+			password = "test"
+		}
+
+		data "sci_users" "test" {}
 	`
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
 		Steps: []resource.TestStep{{
-			Config:             config,
-			ExpectNonEmptyPlan: false,
+			Config:      config,
+			ExpectError: regexp.MustCompile(`The argument "tenant_url" is required, but no definition was found.`),
 		}},
 	})
 }
 
-func TestProvider_MissingTenantURL(t *testing.T) {
+func TestProviderConfig_MissingAuthCredentials(t *testing.T) {
 	config := `
-	provider "sci" {
-	  username = "test"
-	  password = "test"
-	}
+		provider "sci" {
+			tenant_url = "https://example.com/"
+		}
+
+		data "sci_users" "test" {}
 	`
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
-		Steps: []resource.TestStep{{
-			Config:             config,
-			ExpectNonEmptyPlan: false,
-		}},
-	})
-}
-
-func TestProvider_InvalidTenantURL(t *testing.T) {
-	config := `
-	provider "sci" {
-	  tenant_url = "ht@tp://bad_url"
-	  username   = "test"
-	  password   = "test"
-	}
-	`
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
-		Steps: []resource.TestStep{{
-			Config:             config,
-			ExpectNonEmptyPlan: false,
-		}},
-	})
-}
-
-func TestFetchOAuthToken_HTTPErrorStatus(t *testing.T) {
-	httpClient := &http.Client{
-		Transport: RoundTripperFunc(func(req *http.Request) (*http.Response, error) {
-			return &http.Response{
-				StatusCode: http.StatusUnauthorized,
-				Body:       io.NopCloser(strings.NewReader(`"unauthorized"`)), // just a JSON string
-			}, nil
-		}),
-	}
-
-	token, err := fetchOAuthToken(httpClient, "https://example.com", "id", "secret")
-
-	assert.Error(t, err)
-	assert.Empty(t, token)
-	assert.Contains(t, err.Error(), `failed to retrieve token`)
-	assert.Contains(t, err.Error(), `unauthorized`) // response string is used as-is
-}
-
-func TestFetchOAuthToken_InvalidJSONResponse(t *testing.T) {
-	httpClient := &http.Client{
-		Transport: RoundTripperFunc(func(req *http.Request) (*http.Response, error) {
-			return &http.Response{
-				StatusCode: http.StatusOK,
-				Body:       io.NopCloser(strings.NewReader("not a json")),
-			}, nil
-		}),
-	}
-
-	token, err := fetchOAuthToken(httpClient, "https://example.com", "id", "secret")
-
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "invalid character") // general check for JSON parse error
-	assert.Empty(t, token)
-}
-
-func TestFetchOAuthToken_EmptyAccessToken(t *testing.T) {
-	httpClient := &http.Client{
-		Transport: RoundTripperFunc(func(req *http.Request) (*http.Response, error) {
-			return &http.Response{
-				StatusCode: http.StatusOK,
-				Body:       io.NopCloser(strings.NewReader(`{"token_type":"Bearer"}`)),
-			}, nil
-		}),
-	}
-
-	token, err := fetchOAuthToken(httpClient, "https://example.com", "id", "secret")
-
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "server response missing access_token")
-	assert.Empty(t, token)
-}
-
-func TestAccConfigure_Error_InvalidBase64Content(t *testing.T) {
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
-		Steps: []resource.TestStep{
-			{
-				Config: `
-provider "sci" {
-  tenant_url               = "https://example.com"
-  p12_certificate_content  = "%%%invalid-base64%%%"
-  p12_certificate_password = "dummy"
-}
-
-data "sci_users" "test" {}
-`,
-				ExpectError: regexp.MustCompile("Failed to decode base64 content"),
-			},
-		},
-	})
-}
-
-func TestAccConfigure_Error_InvalidP12Certificate(t *testing.T) {
-	invalidP12 := base64.StdEncoding.EncodeToString([]byte("not-a-valid-p12"))
-
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
-		Steps: []resource.TestStep{
-			{
-				Config: fmt.Sprintf(`
-provider "sci" {
-  tenant_url               = "https://example.com"
-  p12_certificate_content  = "%s"
-  p12_certificate_password = "wrong-password"
-}
-
-data "sci_users" "test" {}
-`, invalidP12),
-				ExpectError: regexp.MustCompile("Invalid .p12 certificate"),
-			},
-		},
-	})
-}
-
-func TestMissing_Authentication_Credentials(t *testing.T) {
-	config := `
-provider "sci" {
-  tenant_url = "https://example.com/"
-}
-
-data "sci_users" "test" {}
-`
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
@@ -412,6 +214,301 @@ data "sci_users" "test" {}
 			{
 				Config:      config,
 				ExpectError: regexp.MustCompile("Please provide either : \n- client_id and client_secret for OAuth2 Authentication \n- p12_certificate_content and p12_certificate_password for X.509\nAuthentication \n- username and password for Basic Authentication"),
+			},
+		},
+	})
+}
+
+func TestProviderConfig_IncompleteAuthCredentials(t *testing.T) {
+
+	config := `
+		provider "sci" {
+			tenant_url = "https://example.com/"
+		}
+	`
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
+		Steps: []resource.TestStep{
+			{
+				PreConfig: func() {
+					t.Setenv("SCI_CLIENT_ID", "client-id")
+				},
+				Config:      config,
+				ExpectError: regexp.MustCompile("Incomplete OAuth2 Authentication Credentials"),
+			},
+			{
+				PreConfig: func() {
+					t.Setenv("SCI_CLIENT_SECRET", "client-secret")
+				},
+				Config:      config,
+				ExpectError: regexp.MustCompile("Incomplete OAuth2 Authentication Credentials"),
+			},
+			{
+				PreConfig: func() {
+					t.Setenv("SCI_USERNAME", "username")
+				},
+				Config:      config,
+				ExpectError: regexp.MustCompile("Incomplete Basic Authentication Credentials"),
+			},
+			{
+				PreConfig: func() {
+					t.Setenv("SCI_PASSWORD", "password")
+				},
+				Config:      config,
+				ExpectError: regexp.MustCompile("Incomplete Basic Authentication Credentials"),
+			},
+			{
+				PreConfig: func() {
+					t.Setenv("SCI_P12_CERTIFICATE_PASSWORD", "password")
+				},
+				Config: `
+					provider "sci" {
+						tenant_url = "https://example.com/"
+						p12_certificate_content = "p12_certificate"
+					}	
+				`,
+				ExpectError: regexp.MustCompile("Incomplete X509 Authentication Credentials"),
+			},
+		},
+	})
+
+}
+
+func TestAuthentication_withOAuth2(t *testing.T) {
+
+	// Setup mock OAuth2 server
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		if r.URL.Path == "/oauth2/token" && r.Method == http.MethodPost {
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{"access_token":"mocked-token","token_type":"Bearer"}`))
+			return
+		}
+
+		if r.URL.Path == "/scim/Users/" && r.Method == http.MethodGet {
+			w.Header().Set("Content-Type", "application/scim+json")
+			_, _ = w.Write([]byte(`{"Resources": [], "totalResults": 0}`))
+			return
+		}
+
+		http.NotFound(w, r)
+	}))
+	defer mockServer.Close()
+
+	// Use the mock server's URL as tenant_url
+	tenantURL := mockServer.URL
+
+	resource.Test(t, resource.TestCase{
+		IsUnitTest:               true,
+		ProtoV6ProviderFactories: getTestProviders(mockServer.Client()),
+		Steps: []resource.TestStep{
+
+			// Test the credentials as env variables
+			{
+				PreConfig: func() {
+					t.Setenv("SCI_CLIENT_ID", "env-client-id")
+					t.Setenv("SCI_CLIENT_SECRET", "env-client-secret")
+				},
+				Config: fmt.Sprintf(`
+					provider "sci" {
+						tenant_url = "%s"
+					}
+
+					data "sci_users" "test" {}
+				`, tenantURL),
+				ExpectNonEmptyPlan: false,
+			},
+
+			// Test the credentials as schema parameters
+			{
+				Config: fmt.Sprintf(`
+					provider "sci" {
+						tenant_url = "%s"
+						client_id  = "test-client-id"
+						client_secret = "test-client-secret"
+					}
+
+					data "sci_users" "test" {}
+				`, tenantURL),
+				ExpectNonEmptyPlan: false,
+			},
+		},
+	})
+
+}
+
+func TestAuthenticationFailure_withOAuth2(t *testing.T) {
+
+	tenantURL := "https://example.accounts.ondemand.com/"
+	clientID := "invalid-client-id"
+	clientSecret := "invalid-client-secret"
+
+	errorCases := []struct {
+		StatusCode   int
+		ResponseBody string
+		Errors       []string
+	}{
+		// Invalid Client Credentials
+		{
+			StatusCode:   http.StatusUnauthorized,
+			ResponseBody: "invalid_client",
+			Errors:       []string{"failed to retrieve token", "invalid_client"},
+		},
+		// Unauthorized Access
+		{
+			StatusCode:   http.StatusUnauthorized,
+			ResponseBody: "unauthorized",
+			Errors:       []string{"failed to retrieve token", "unauthorized"},
+		},
+		// Improper JSON Response
+		{
+			StatusCode:   http.StatusOK,
+			ResponseBody: "not a json",
+			Errors:       []string{"invalid character"},
+		},
+		// Missing Access Token in Response
+		{
+			StatusCode:   http.StatusOK,
+			ResponseBody: `{"token_type":"Bearer"}`,
+			Errors:       []string{"server response missing access_token"},
+		},
+	}
+
+	for _, test := range errorCases {
+
+		httpClient := &http.Client{
+			Transport: RoundTripperFunc(func(req *http.Request) (*http.Response, error) {
+
+				return &http.Response{
+					StatusCode: test.StatusCode,
+					Body:       io.NopCloser(strings.NewReader(test.ResponseBody)),
+				}, nil
+			}),
+		}
+
+		token, err := fetchOAuthToken(httpClient, tenantURL, clientID, clientSecret)
+
+		assert.Empty(t, token, "Expected token to be empty for invalid credentials")
+		assert.Error(t, err, "Expected error for invalid credentials")
+		for _, errMsg := range test.Errors {
+			assert.Contains(t, err.Error(), errMsg, fmt.Sprintf("Error message should contain '%s'", errMsg))
+		}
+	}
+
+}
+
+func TestAuthentication_withX509Auth(t *testing.T) {
+
+	// Setup mock SCIM server
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		if r.URL.Path == "/scim/Users/" && r.Method == http.MethodGet {
+			w.Header().Set("Content-Type", "application/scim+json")
+			_, _ = w.Write([]byte(`{"Resources": [], "totalResults": 0}`))
+			return
+		}
+		http.NotFound(w, r)
+
+	}))
+	defer mockServer.Close()
+
+	// Generate a mock p12 file and password
+	tempDir := t.TempDir()
+	p12File := tempDir + "/mock-cert.p12"
+	p12Password := "mockpassword"
+
+	// Set the file paths
+	configFile := tempDir + "/openssl.cnf"
+	keyFile := tempDir + "/key.pem"
+	certFile := tempDir + "/cert.pem"
+
+	_ = os.WriteFile(
+		configFile,
+		[]byte(`
+			[mock p12 certifictae]
+		`), 0644)
+
+	// Generate a self-signed certificate and convert it to p12 format
+	_ = exec.Command("openssl", "req", "-x509", "-newkey", "rsa:2048", "-keyout", keyFile, "-out", certFile, "-days", "1", "-nodes", "-subj", "/CN=Mock Cert", "-config", configFile).Run()
+	_ = exec.Command("openssl", "pkcs12", "-export", "-out", p12File, "-inkey", keyFile, "-in", certFile, "-password", "pass:"+p12Password).Run()
+
+	p12Bytes, err := os.ReadFile(p12File)
+	assert.NoError(t, err)
+	p12Base64 := base64.StdEncoding.EncodeToString(p12Bytes)
+
+	resource.Test(t, resource.TestCase{
+		IsUnitTest:               true,
+		ProtoV6ProviderFactories: getTestProviders(mockServer.Client()),
+		Steps: []resource.TestStep{
+
+			// Test the certificate content as schema parameter and password as env variable
+			{
+				PreConfig: func() {
+					t.Setenv("SCI_P12_CERTIFICATE_PASSWORD", p12Password)
+				},
+				Config: fmt.Sprintf(`
+                    provider "sci" {
+                        tenant_url               = "%s"
+                        p12_certificate_content  = "%s"
+                    }
+
+                    data "sci_users" "test" {}
+                `, mockServer.URL, p12Base64),
+				ExpectNonEmptyPlan: false,
+			},
+
+			// Test the credentials as schema parameters
+			{
+				Config: fmt.Sprintf(`
+                    provider "sci" {
+                        tenant_url               = "%s"
+                        p12_certificate_content  = "%s"
+                        p12_certificate_password = "%s"
+                    }
+
+                    data "sci_users" "test" {}
+                `, mockServer.URL, p12Base64, p12Password),
+				ExpectNonEmptyPlan: false,
+			},
+		},
+	})
+}
+
+func TestAuthenticationFailure_withX509Auth(t *testing.T) {
+
+	invalidP12 := base64.StdEncoding.EncodeToString([]byte("not-a-valid-p12"))
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
+		Steps: []resource.TestStep{
+
+			// Test invalid base64 content
+			{
+				Config: `
+					provider "sci" {
+						tenant_url               = "https://example.com"
+						p12_certificate_content  = "%%%invalid-base64%%%"
+						p12_certificate_password = "dummy"
+					}
+
+					data "sci_users" "test" {}
+				`,
+				ExpectError: regexp.MustCompile("Failed to decode base64 content"),
+			},
+
+			// Test invalid p12 content
+			{
+				Config: fmt.Sprintf(`
+					provider "sci" {
+						tenant_url               = "https://example.com"
+						p12_certificate_content  = "%s"
+						p12_certificate_password = "wrong-password"
+					}
+
+					data "sci_users" "test" {}
+				`, invalidP12),
+				ExpectError: regexp.MustCompile("Invalid .p12 certificate"),
 			},
 		},
 	})
