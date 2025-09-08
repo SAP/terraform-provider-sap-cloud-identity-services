@@ -225,6 +225,8 @@ func TestProviderConfig_IncompleteAuthCredentials(t *testing.T) {
 		provider "sci" {
 			tenant_url = "https://example.com/"
 		}
+
+		data "sci_users" "test" {}
 	`
 
 	resource.Test(t, resource.TestCase{
@@ -233,42 +235,69 @@ func TestProviderConfig_IncompleteAuthCredentials(t *testing.T) {
 			{
 				PreConfig: func() {
 					t.Setenv("SCI_CLIENT_ID", "client-id")
+					t.Cleanup(func() {
+						t.Setenv("SCI_CLIENT_ID", "")
+					})
 				},
 				Config:      config,
-				ExpectError: regexp.MustCompile("Incomplete OAuth2 Authentication Credentials"),
+				ExpectError: regexp.MustCompile("Please provide the required OAuth Credentials : Client ID and Client Secret"),
 			},
 			{
 				PreConfig: func() {
+					t.Setenv("SCI_CLIENT_ID", "")
 					t.Setenv("SCI_CLIENT_SECRET", "client-secret")
 				},
 				Config:      config,
-				ExpectError: regexp.MustCompile("Incomplete OAuth2 Authentication Credentials"),
+				ExpectError: regexp.MustCompile("Please provide the required OAuth Credentials : Client ID and Client Secret"),
 			},
 			{
 				PreConfig: func() {
+					t.Setenv("SCI_CLIENT_ID", "")
+					t.Setenv("SCI_CLIENT_SECRET", "")
 					t.Setenv("SCI_USERNAME", "username")
 				},
 				Config:      config,
-				ExpectError: regexp.MustCompile("Incomplete Basic Authentication Credentials"),
+				ExpectError: regexp.MustCompile("Please provide the required Basic Authentication Credentials : Username and\nPassword"),
+				
 			},
 			{
 				PreConfig: func() {
+					t.Setenv("SCI_CLIENT_ID", "")
+					t.Setenv("SCI_CLIENT_SECRET", "")
+					t.Setenv("SCI_USERNAME", "")
 					t.Setenv("SCI_PASSWORD", "password")
 				},
 				Config:      config,
-				ExpectError: regexp.MustCompile("Incomplete Basic Authentication Credentials"),
+				ExpectError: regexp.MustCompile("Please provide the required Basic Authentication Credentials : Username and\nPassword"),
 			},
 			{
 				PreConfig: func() {
+					t.Setenv("SCI_CLIENT_ID", "")
+					t.Setenv("SCI_CLIENT_SECRET", "")
+					t.Setenv("SCI_USERNAME", "")
+					t.Setenv("SCI_PASSWORD", "")
 					t.Setenv("SCI_P12_CERTIFICATE_PASSWORD", "password")
+				},
+				Config: config,
+				ExpectError: regexp.MustCompile("Please provide the required X.509 Authentication Credentials : P12\nCertificate and P12 Certificate Password"),
+			},
+			{
+				PreConfig: func() {
+					t.Setenv("SCI_CLIENT_ID", "")
+					t.Setenv("SCI_CLIENT_SECRET", "")
+					t.Setenv("SCI_USERNAME", "")
+					t.Setenv("SCI_PASSWORD", "")
+					t.Setenv("SCI_P12_CERTIFICATE_PASSWORD", "")
 				},
 				Config: `
 					provider "sci" {
 						tenant_url = "https://example.com/"
-						p12_certificate_content = "p12_certificate"
-					}	
+						p12_certificate_content = "certificate-content"
+					}
+
+					data "sci_users" "test" {}
 				`,
-				ExpectError: regexp.MustCompile("Incomplete X509 Authentication Credentials"),
+				ExpectError: regexp.MustCompile("Please provide the required X.509 Authentication Credentials : P12\nCertificate and P12 Certificate Password"),
 			},
 		},
 	})

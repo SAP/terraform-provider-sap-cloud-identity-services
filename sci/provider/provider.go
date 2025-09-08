@@ -262,7 +262,7 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		incompleteCreds, err := checkIncompleteCredentials(username, password, clientID, clientSecret, p12CertificateContent, p12CertificatePassword)
 
 		if incompleteCreds {
-			resp.Diagnostics.AddError(err, "Please provide all required fields.")
+			resp.Diagnostics.AddError("Incomplete Authentication Credentials", err)
 			return
 		}
 
@@ -338,15 +338,15 @@ func determineAuthFlow(username, password, clientID, clientSecret, p12Certificat
 func checkIncompleteCredentials(username, password, clientID, clientSecret, p12CertificateContent, p12CertificatePassword string) (bool, string) {
 
 	if len(clientID) != 0 || len(clientSecret) != 0 {
-		return true, "Incomplete OAuth Credentials"
+		return true, "Please provide the required OAuth Credentials : Client ID and Client Secret"
 	}
 
 	if len(p12CertificateContent) != 0 || len(p12CertificatePassword) != 0 {
-		return true, "Incomplete X.509 Authentication Credentials"
+		return true, "Please provide the required X.509 Authentication Credentials : P12 Certificate and P12 Certificate Password"
 	}
 
 	if len(username) != 0 || len(password) != 0 {
-		return true, "Incomplete Basic Authentication Credentials"
+		return true, "Please provide the required Basic Authentication Credentials : Username and Password"
 	}
 
 	return false, ""
