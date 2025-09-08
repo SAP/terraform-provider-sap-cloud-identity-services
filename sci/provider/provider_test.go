@@ -191,7 +191,7 @@ func TestProviderConfig_MissingTenantURL(t *testing.T) {
 		data "sci_users" "test" {}
 	`
 	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
+		ProtoV6ProviderFactories: getTestProviders(nil),
 		Steps: []resource.TestStep{{
 			Config:      config,
 			ExpectError: regexp.MustCompile(`The argument "tenant_url" is required, but no definition was found.`),
@@ -209,7 +209,7 @@ func TestProviderConfig_MissingAuthCredentials(t *testing.T) {
 	`
 
 	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
+		ProtoV6ProviderFactories: getTestProviders(nil),
 		Steps: []resource.TestStep{
 			{
 				Config:      config,
@@ -228,7 +228,7 @@ func TestProviderConfig_IncompleteAuthCredentials(t *testing.T) {
 	`
 
 	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
+		ProtoV6ProviderFactories: getTestProviders(nil),
 		Steps: []resource.TestStep{
 			{
 				PreConfig: func() {
@@ -480,7 +480,7 @@ func TestAuthenticationFailure_withX509Auth(t *testing.T) {
 	invalidP12 := base64.StdEncoding.EncodeToString([]byte("not-a-valid-p12"))
 
 	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: getTestProviders(http.DefaultClient),
+		ProtoV6ProviderFactories: getTestProviders(nil),
 		Steps: []resource.TestStep{
 
 			// Test invalid base64 content
