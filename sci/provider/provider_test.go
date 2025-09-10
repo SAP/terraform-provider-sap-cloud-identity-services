@@ -258,7 +258,6 @@ func TestProviderConfig_IncompleteAuthCredentials(t *testing.T) {
 				},
 				Config:      config,
 				ExpectError: regexp.MustCompile("Please provide the required Basic Authentication Credentials : Username and\nPassword"),
-				
 			},
 			{
 				PreConfig: func() {
@@ -278,7 +277,7 @@ func TestProviderConfig_IncompleteAuthCredentials(t *testing.T) {
 					t.Setenv("SCI_PASSWORD", "")
 					t.Setenv("SCI_P12_CERTIFICATE_PASSWORD", "password")
 				},
-				Config: config,
+				Config:      config,
 				ExpectError: regexp.MustCompile("Please provide the required X.509 Authentication Credentials : P12\nCertificate and P12 Certificate Password"),
 			},
 			{

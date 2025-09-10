@@ -27,13 +27,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-const (
-	oauth2Flow = "oauth2"
-	x509Flow   = "x509"
-	basicFlow  = "basic"
-	none       = "none"
-)
-
 var (
 	basicAuthConflicts = []path.Expression{
 		path.MatchRoot("client_id"),
@@ -203,10 +196,8 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 
 	client := cli.NewSciClient(cli.NewClient(p.httpClient, parsedUrl))
 
-	authFlow := determineAuthFlow(username, password, clientID, clientSecret, p12CertificateContent, p12CertificatePassword)
-
-	switch authFlow {
-	case "oauth2":
+	switch {
+	case len(clientID) != 0 && len(clientSecret) != 0:
 		// OAuth2 authentication
 		token, err := fetchOAuthToken(p.httpClient, parsedUrl.String(), clientID, clientSecret)
 		if err != nil {
@@ -215,7 +206,7 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		}
 		client.AuthorizationToken = "Bearer " + token
 
-	case "x509":
+	case len(p12CertificateContent) != 0 && len(p12CertificatePassword) != 0:
 		// X.509 authentication will be handled below
 		decoded, err := base64.StdEncoding.DecodeString(p12CertificateContent)
 		if err != nil {
@@ -254,7 +245,7 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 
 		client = cli.NewSciClient(cli.NewClient(httpClient, parsedUrl))
 
-	case "basic":
+	case len(username) != 0 && len(password) != 0:
 		// Basic authentication will be handled below
 		client.AuthorizationToken = "Basic " + base64.StdEncoding.EncodeToString([]byte(username+":"+password))
 
@@ -322,32 +313,16 @@ func fetchOAuthToken(httpClient *http.Client, tenantURL, clientID, clientSecret 
 	return token.AccessToken, nil
 }
 
-func determineAuthFlow(username, password, clientID, clientSecret, p12CertificateContent, p12CertificatePassword string) string {
-
-	if len(clientID)!= 0 && len(clientSecret)!=0 {
-		return oauth2Flow
-	} else if len(p12CertificateContent)!=0 && len(p12CertificatePassword)!=0 {
-		return x509Flow
-	} else if len(username)!=0 && len(password)!=0 {
-		return basicFlow
-	} else {
-		return none
-	}
-}
-
 func checkIncompleteCredentials(username, password, clientID, clientSecret, p12CertificateContent, p12CertificatePassword string) (bool, string) {
 
-	if len(clientID) != 0 || len(clientSecret) != 0 {
+	switch {
+	case len(clientID) != 0 || len(clientSecret) != 0:
 		return true, "Please provide the required OAuth Credentials : Client ID and Client Secret"
-	}
-
-	if len(p12CertificateContent) != 0 || len(p12CertificatePassword) != 0 {
+	case len(p12CertificateContent) != 0 || len(p12CertificatePassword) != 0:
 		return true, "Please provide the required X.509 Authentication Credentials : P12 Certificate and P12 Certificate Password"
-	}
-
-	if len(username) != 0 || len(password) != 0 {
+	case len(username) != 0 || len(password) != 0:
 		return true, "Please provide the required Basic Authentication Credentials : Username and Password"
+	default:
+		return false, ""
 	}
-
-	return false, ""
 }

@@ -49,4 +49,4 @@ You can even use the function `filebase64("path_to_certificate.p12")` to load th
     export SCI_P12_CERTIFICATE_PASSWORD=<your_password>
     ```
 
-    The P12 Certificate itself would still have to be configured as a schema parameter even if the password is exported as an environment variable.
+    **The P12 Certificate itself would still have to be configured as a schema parameter even if the password is exported as an environment variable**.
