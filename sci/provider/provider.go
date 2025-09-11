@@ -131,7 +131,6 @@ func (p *SciProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *
 				MarkdownDescription: "Base64-encoded content of the `.p12` (PKCS#12) certificate bundle file used for x509 authentication. For example you can use `filebase64(\"certifiacte.p12\")` to load the file content, But any source that provides a valid .p12 certificate base64 string is accepted.",
 				Validators: []validator.String{
 					stringvalidator.ConflictsWith(x509Conflicts...),
-					stringvalidator.AlsoRequires(path.MatchRoot("p12_certificate_password")),
 				},
 			},
 			"p12_certificate_password": schema.StringAttribute{
@@ -163,17 +162,59 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		return
 	}
 
-	var httpClient *http.Client
-	var cert *tls.Certificate
+	// OAuth2 Authentication using client_id and client_secret
+	clientID := config.ClientID.ValueString()
+	clientSecret := config.ClientSecret.ValueString()
 
-	if !config.P12CertificateContent.IsNull() && !config.P12CertificatePassword.IsNull() {
-		decoded, err := base64.StdEncoding.DecodeString(config.P12CertificateContent.ValueString())
+	if clientID == "" {
+		clientID = os.Getenv("SCI_CLIENT_ID")
+	}
+
+	if clientSecret == "" {
+		clientSecret = os.Getenv("SCI_CLIENT_SECRET")
+	}
+
+	// X.509 Certificate Authentication
+	p12CertificatePassword := config.P12CertificatePassword.ValueString()
+	if p12CertificatePassword == "" {
+		p12CertificatePassword = os.Getenv("SCI_P12_CERTIFICATE_PASSWORD")
+	}
+
+	p12CertificateContent := config.P12CertificateContent.ValueString()
+
+	// Basic Auth (username + password)
+	username := config.Username.ValueString()
+	password := config.Password.ValueString()
+
+	if username == "" {
+		username = os.Getenv("SCI_USERNAME")
+	}
+
+	if password == "" {
+		password = os.Getenv("SCI_PASSWORD")
+	}
+
+	client := cli.NewSciClient(cli.NewClient(p.httpClient, parsedUrl))
+
+	switch {
+	case len(clientID) != 0 && len(clientSecret) != 0:
+		// OAuth2 authentication
+		token, err := fetchOAuthToken(p.httpClient, parsedUrl.String(), clientID, clientSecret)
+		if err != nil {
+			resp.Diagnostics.AddError("OAuth2 Authentication Failed", err.Error())
+			return
+		}
+		client.AuthorizationToken = "Bearer " + token
+
+	case len(p12CertificateContent) != 0 && len(p12CertificatePassword) != 0:
+		// X.509 authentication will be handled below
+		decoded, err := base64.StdEncoding.DecodeString(p12CertificateContent)
 		if err != nil {
 			resp.Diagnostics.AddError("Failed to decode base64 content", err.Error())
 			return
 		}
 
-		privateKey, leafCert, caCerts, err := pkcs12.DecodeChain(decoded, config.P12CertificatePassword.ValueString())
+		privateKey, leafCert, caCerts, err := pkcs12.DecodeChain(decoded, p12CertificatePassword)
 		if err != nil {
 			resp.Diagnostics.AddError("Invalid .p12 certificate", err.Error())
 			return
@@ -195,69 +236,28 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 			InsecureSkipVerify: false,
 		}
 
-		httpClient = &http.Client{
+		httpClient := &http.Client{
 			Timeout: 30 * time.Second,
 			Transport: &http.Transport{
 				TLSClientConfig: tlsConfig,
 			},
 		}
-		cert = &tlsCert
 
-	} else {
-		httpClient = p.httpClient
-	}
+		client = cli.NewSciClient(cli.NewClient(httpClient, parsedUrl))
 
-	client := cli.NewSciClient(cli.NewClient(httpClient, parsedUrl))
+	case len(username) != 0 && len(password) != 0:
+		// Basic authentication will be handled below
+		client.AuthorizationToken = "Basic " + base64.StdEncoding.EncodeToString([]byte(username+":"+password))
 
-	// OAuth2 authentication using client_id and client_secret
-	var clientID, clientSecret string
-	if config.ClientID.IsNull() {
-		clientID = os.Getenv("SCI_CLIENT_ID")
-	} else {
-		clientID = config.ClientID.ValueString()
-	}
+	default:
+		incompleteCreds, err := checkIncompleteCredentials(username, password, clientID, clientSecret, p12CertificateContent, p12CertificatePassword)
 
-	if config.ClientSecret.IsNull() {
-		clientSecret = os.Getenv("SCI_CLIENT_SECRET")
-	} else {
-		clientSecret = config.ClientSecret.ValueString()
-	}
-
-	if clientID != "" && clientSecret != "" {
-		if cert != nil {
-			resp.Diagnostics.AddWarning("Multiple authentication methods detected", "Both client credentials and certificate-based authentication are provided. Client credentials will be used.")
-		}
-
-		token, err := fetchOAuthToken(httpClient, parsedUrl.String(), clientID, clientSecret)
-		if err != nil {
-			resp.Diagnostics.AddError("OAuth2 Authentication Failed", err.Error())
+		if incompleteCreds {
+			resp.Diagnostics.AddError("Incomplete Authentication Credentials", err)
 			return
 		}
-		client.AuthorizationToken = "Bearer " + token
 
-	} else if cert == nil {
-		// Fallback to Basic Auth (username + password)
-		var username, password string
-		if config.Username.IsNull() {
-			username = os.Getenv("SCI_USERNAME")
-		} else {
-			username = config.Username.ValueString()
-		}
-
-		if config.Password.IsNull() {
-			password = os.Getenv("SCI_PASSWORD")
-		} else {
-			password = config.Password.ValueString()
-		}
-
-		if username != "" && password != "" {
-			client.AuthorizationToken = "Basic " + base64.StdEncoding.EncodeToString([]byte(username+":"+password))
-		} else {
-			resp.Diagnostics.AddError("Authentication Details Missing", "Please provide either : \n- client_id and client_secret for OAuth2 Authentication \n- p12_certificate_content and p12_certificate_password for X.509 Authentication \n- username and password for Basic Authentication")
-		}
-	}
-
-	if resp.Diagnostics.HasError() {
+		resp.Diagnostics.AddError("Authentication Details Missing", "Please provide either : \n- client_id and client_secret for OAuth2 Authentication \n- p12_certificate_content and p12_certificate_password for X.509 Authentication \n- username and password for Basic Authentication")
 		return
 	}
 
@@ -311,4 +311,18 @@ func fetchOAuthToken(httpClient *http.Client, tenantURL, clientID, clientSecret 
 	}
 
 	return token.AccessToken, nil
+}
+
+func checkIncompleteCredentials(username, password, clientID, clientSecret, p12CertificateContent, p12CertificatePassword string) (bool, string) {
+
+	switch {
+	case len(clientID) != 0 || len(clientSecret) != 0:
+		return true, "Please provide the required OAuth Credentials : Client ID and Client Secret"
+	case len(p12CertificateContent) != 0 || len(p12CertificatePassword) != 0:
+		return true, "Please provide the required X.509 Authentication Credentials : P12 Certificate and P12 Certificate Password"
+	case len(username) != 0 || len(password) != 0:
+		return true, "Please provide the required Basic Authentication Credentials : Username and Password"
+	default:
+		return false, ""
+	}
 }
