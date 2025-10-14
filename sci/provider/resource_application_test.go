@@ -51,6 +51,15 @@ func TestResourceApplication(t *testing.T) {
 					IdentityProviderId: "c93f6b04-7a0f-42c1-b3c5-3b30d0ad8910",
 				},
 			},
+			// SapManagedAttributes: &applications.SapManagedAttributes{
+			// 		ServiceInstanceId: "c93f6b04-7a0f-42c1-b3c5-3b30d0ad8910",
+			// 		SourceAppId: 	 "c93f6b04-7a0f-42c1-b3c5-3b30d0ad8910",
+			// 		SourceTenantId: "c93f6b04-7a0f-42c1-b3c5-3b30d0ad8910",
+			// 		AppTenantId:    "c93f6b04-7a0f-42c1-b3c5-3b30d0ad8910",
+			// 		Type:   	"xsuaa",
+			// 		PlanName: "application",
+			// 		BtpTenantType: "customer",
+			// },
 		},
 	}
 	oidcApplication := applications.Application{
@@ -170,6 +179,13 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.conditional_authentication.0.user_type", application.AuthenticationSchema.ConditionalAuthentication[0].UserType),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.conditional_authentication.0.user_email_domain", application.AuthenticationSchema.ConditionalAuthentication[0].UserEmailDomain),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.conditional_authentication.0.ip_network_range", application.AuthenticationSchema.ConditionalAuthentication[0].IpNetworkRange),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sap_managed_attributes.service_instance_id", application.AuthenticationSchema.SapManagedAttributes.ServiceInstanceId),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sap_managed_attributes.source_app_id", application.AuthenticationSchema.SapManagedAttributes.SourceAppId),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sap_managed_attributes.source_tenant_id", application.AuthenticationSchema.SapManagedAttributes.SourceTenantId),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sap_managed_attributes.app_tenant_id", application.AuthenticationSchema.SapManagedAttributes.AppTenantId),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sap_managed_attributes.type", application.AuthenticationSchema.SapManagedAttributes.Type),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sap_managed_attributes.plan_name", application.AuthenticationSchema.SapManagedAttributes.PlanName),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sap_managed_attributes.btp_tenant_type", application.AuthenticationSchema.SapManagedAttributes.BtpTenantType),
 					),
 				},
 				{
@@ -178,7 +194,60 @@ func TestResourceApplication(t *testing.T) {
 					ImportStateVerify: true,
 					// Given that the API always returns the internal ID of the IdP, the state verificiation of the attribute can be ignored in this test since it is configured with the UUID as seen above
 					// The mismatch of IDs is expected behaviour and does not indicate an error, as the parameter can be configured with both the UUID and the internal ID of the IdP
-					ImportStateVerifyIgnore: []string{"authentication_schema.default_authenticating_idp"},
+					ImportStateVerifyIgnore: []string{"authentication_schema.default_authenticating_idp", "authentication_schema.sap_managed_attributes"},
+				},
+			},
+		})
+	})
+	t.Run("happy path - bundled application1", func(t *testing.T) {
+
+		rec, user := setupVCR(t, "fixtures/resource_bundled_application1")
+		defer stopQuietly(rec)
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+			Steps: []resource.TestStep{
+				{
+					Config: providerConfig("", user) + ResourceApplicationWithBundledApp("testBundledApp", "name"),
+					ResourceName: 	"sci_application.testBundledApp",
+					ImportState: 	true,
+					ImportStateId: "73afa691-5946-4bb1-9c39-b404e4b21594",
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestCheckResourceAttr("sci_application.testBundledApp", "id", "73afa691-5946-4bb1-9c39-b404e4b21594"),
+						resource.TestCheckResourceAttr("sci_application.testBundledApp", "name", "XSUAA_b75a605d-151c-4485-83f4-64604378e4ec"),
+						resource.TestCheckResourceAttr("sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.type", "xsuaa"),
+						resource.TestCheckResourceAttr("sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.app_tenant_id", "b75a605d-151c-4485-83f4-64604378e4ec"),
+					),
+				},
+			},
+		})
+	})
+
+	t.Run("happy path - bundled application2", func(t *testing.T) {
+
+		rec, user := setupVCR(t, "fixtures/resource_bundled_application2")
+		defer stopQuietly(rec)
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+			Steps: []resource.TestStep{
+				{
+					Config: providerConfig("", user) + ResourceApplicationWithBundledApp("testBundledApp", "name"),
+					ResourceName: 	"sci_application.testBundledApp",
+					ImportState: 	true,
+					ImportStateId: "31e38d9c-ca48-4227-963d-32e7dfcb5007",
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestCheckResourceAttr("sci_application.testBundledApp", "id", "31e38d9c-ca48-4227-963d-32e7dfcb5007"),
+						resource.TestCheckResourceAttr("sci_application.testBundledApp", "name", "identity-subscription-c6c390f4-c9a2-4a6c-9cc7-01675a31e4f6-in-b75a605d-151c-4485-83f4-64604378e4ec"),
+						resource.TestCheckResourceAttr("sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.type", "xsuaa"),
+						resource.TestCheckResourceAttr("sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.app_tenant_id", "b75a605d-151c-4485-83f4-64604378e4ec"),
+						resource.TestCheckResourceAttr("sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.source_app_id", "3cc4b385-fe8b-423a-a8c0-34e15c9970c"),
+						resource.TestCheckResourceAttr("sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.source_tenant_id", "sapdas"),
+						resource.TestCheckResourceAttr("sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.service_instance_id", "c6c390f4-c9a2-4a6c-9cc7-01675a31e4f6"),
+
+					),
 				},
 			},
 		})
@@ -221,6 +290,15 @@ func TestResourceApplication(t *testing.T) {
 						IdentityProviderId: "7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1",
 					},
 				},
+				// SapManagedAttributes: &applications.SapManagedAttributes{
+				// 	ServiceInstanceId: "7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1",
+				// 	SourceAppId: 	 "7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1",
+				// 	SourceTenantId: "7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1",
+				// 	AppTenantId:    "7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1",
+				// 	Type:   	"subscription",
+				// 	PlanName: "application",
+				// 	BtpTenantType: "customer",
+				// },
 			},
 		}
 
@@ -252,6 +330,13 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.conditional_authentication.0.user_type", application.AuthenticationSchema.ConditionalAuthentication[0].UserType),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.conditional_authentication.0.user_email_domain", application.AuthenticationSchema.ConditionalAuthentication[0].UserEmailDomain),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.conditional_authentication.0.ip_network_range", application.AuthenticationSchema.ConditionalAuthentication[0].IpNetworkRange),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sap_managed_attributes.service_instance_id", application.AuthenticationSchema.SapManagedAttributes.ServiceInstanceId),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sap_managed_attributes.source_app_id", application.AuthenticationSchema.SapManagedAttributes.SourceAppId),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sap_managed_attributes.source_tenant_id", application.AuthenticationSchema.SapManagedAttributes.SourceTenantId),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sap_managed_attributes.app_tenant_id", application.AuthenticationSchema.SapManagedAttributes.AppTenantId),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sap_managed_attributes.type", application.AuthenticationSchema.SapManagedAttributes.Type),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sap_managed_attributes.plan_name", application.AuthenticationSchema.SapManagedAttributes.PlanName),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sap_managed_attributes.btp_tenant_type", application.AuthenticationSchema.SapManagedAttributes.BtpTenantType),
 					),
 				},
 				{
@@ -275,6 +360,13 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.conditional_authentication.0.user_type", updatedApplication.AuthenticationSchema.ConditionalAuthentication[0].UserType),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.conditional_authentication.0.user_email_domain", updatedApplication.AuthenticationSchema.ConditionalAuthentication[0].UserEmailDomain),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.conditional_authentication.0.ip_network_range", updatedApplication.AuthenticationSchema.ConditionalAuthentication[0].IpNetworkRange),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sap_managed_attributes.service_instance_id", updatedApplication.AuthenticationSchema.SapManagedAttributes.ServiceInstanceId),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sap_managed_attributes.source_app_id", updatedApplication.AuthenticationSchema.SapManagedAttributes.SourceAppId),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sap_managed_attributes.source_tenant_id", updatedApplication.AuthenticationSchema.SapManagedAttributes.SourceTenantId),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sap_managed_attributes.app_tenant_id", updatedApplication.AuthenticationSchema.SapManagedAttributes.AppTenantId),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sap_managed_attributes.type", updatedApplication.AuthenticationSchema.SapManagedAttributes.Type),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sap_managed_attributes.plan_name", updatedApplication.AuthenticationSchema.SapManagedAttributes.PlanName),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sap_managed_attributes.btp_tenant_type", updatedApplication.AuthenticationSchema.SapManagedAttributes.BtpTenantType),
 					),
 				},
 			},
@@ -310,6 +402,7 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.oidc_config.restricted_grant_types.*", "clientCredentials"),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.oidc_config.proxy_config.acrs.0", oidcApplication.AuthenticationSchema.OidcConfig.ProxyConfig.Acrs[0]),
 					),
+					ImportStateVerifyIgnore: []string{"authentication_schema.default_authenticating_idp", "authentication_schema.sap_managed_attributes"},
 				},
 			},
 		})
@@ -1183,6 +1276,35 @@ func TestResourceApplication(t *testing.T) {
 			},
 		})
 	})
+
+	// t.Run("error path - sap_managed_attributes.source_app_id needs to be a valid UUID", func(t *testing.T) {
+	// 	resource.Test(t, resource.TestCase{
+	// 		IsUnitTest:               true,
+	// 		ProtoV6ProviderFactories: getTestProviders(nil),
+	// 		Steps: []resource.TestStep{
+	// 			{
+	// 				Config:      ResourceApplicationWithSapManagedAttributesSourceAppID("testApp", "test-app", "application for testing purposes"),
+	// 				//ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_schema.sap_managed_attributes.source_app_id value must be a valid UUID, got:\n%s", "this-is-not-uuid")),
+	// 				Check: resource.ComposeTestCheckFunc(
+	// 					resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.0.sap_managed_attributes.0.source_app_id", ""),
+	// 				),
+	// 			},
+	// 		},
+	// 	})
+	// })
+
+	// t.Run("error path - sap_managed_attributes.type needs to be a valid value", func(t *testing.T) {
+	// 	resource.Test(t, resource.TestCase{
+	// 		IsUnitTest:               true,
+	// 		ProtoV6ProviderFactories: getTestProviders(nil),
+	// 		Steps: []resource.TestStep{
+	// 			{
+	// 				Config:      ResourceApplicationWithSapManagedAttributesType("testApp", "test-app", "application for testing purposes", "this-is-not-a-valid-type"),
+	// 				ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_schema.sap_managed_attributes.type value must be one of:\n\\[\"identityInstance\" \"subscription\" \"reuseInstance\" \"xsuaa\"\\], got:\n\"%s\"", "this-is-not-a-valid-type")),
+	// 			},
+	// 		},
+	// 	})
+	// })
 }
 
 func ResourceApplication(resourceName string, app applications.Application) string {
@@ -1241,6 +1363,14 @@ func ResourceApplication(resourceName string, app applications.Application) stri
 	}`, resourceName, app.Name, app.Description, authSchemaConfig)
 
 	return application
+}
+
+func ResourceApplicationWithBundledApp(resourceName string, appName string) string {
+	return fmt.Sprintf(`
+	resource "sci_application" "%s" {
+		name = "%s"
+	}
+	`, resourceName, appName)
 }
 
 func ResourceSaml2Application(resourceName string, app applications.Application) string {
@@ -1709,3 +1839,24 @@ func ResourceApplicationWithSaml2DigestAlgorithm(resourceName string, appName st
     }
     `, resourceName, appName, digestAlgorithm)
 }
+
+// func ResourceApplicationWithSapManagedAttributesType(resourceName string, appName string, description string, appType string) string{
+// 	return fmt.Sprintf(`
+// 	resource "sci_application" "%s" {
+// 		name = "%s"
+// 		description = "%s"
+// 		authentication_schema = {
+// 			sap_managed_attributes = {
+// 				type = "%s"
+// 			}
+// 		}
+// 	}`, resourceName, appName, description, appType)
+// }
+
+// func ResourceApplicationWithSapManagedAttributesSourceAppID(resourceName string, appName string, description string) string{
+// 	return fmt.Sprintf(`
+// 	resource "sci_application" "%s" {
+// 		name = "%s"
+// 		description = "%s"
+// 	}`, resourceName, appName, description)
+// }
