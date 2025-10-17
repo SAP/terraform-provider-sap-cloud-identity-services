@@ -42,7 +42,7 @@ var (
 	restrictedGrantTypesValues          = []string{"clientCredentials", "authorizationCode", "refreshToken", "password", "implicit", "jwtBearer", "authorizationCodePkceS256", "tokenExchange"}
 	saml2AppNameIdFormatValues          = []string{"urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified", "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress", "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent", "urn:oasis:names:tc:SAML:2.0:nameid-format:transient"}
 	responseElementsToEncrypt           = []string{"none", "wholeAssertion", "subjectNameId", "attributes", "subjectNameIdAndAttributes"}
-	typeOfAppValues                   	= []string{"identityInstance", "subscription", "reuseInstance", "xsuaa"}
+	typeOfAppValues                     = []string{"identityInstance", "subscription", "reuseInstance", "xsuaa"}
 )
 
 func newApplicationResource() resource.Resource {
@@ -719,7 +719,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 							},
 						},
 					},
-					"sap_managed_attributes":  schema.SingleNestedAttribute{
+					"sap_managed_attributes": schema.SingleNestedAttribute{
 						MarkdownDescription: "List of SAP managed attributes that are sent to the application.",
 						Computed:            true,
 						PlanModifiers: []planmodifier.Object{

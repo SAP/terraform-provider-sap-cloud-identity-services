@@ -265,17 +265,17 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 	if a.AuthenticationSchema.OidcConfig != nil {
 		oidc := openIdConnectConfigurationData{}
 
-			oidc.RedirectUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.RedirectUris)
-			diagnostics.Append(diags...)
-			
-			oidc.PostLogoutRedirectUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.PostLogoutRedirectUris)
-			diagnostics.Append(diags...)
+		oidc.RedirectUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.RedirectUris)
+		diagnostics.Append(diags...)
 
-			oidc.FrontChannelLogoutUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.FrontChannelLogoutUris)
-			diagnostics.Append(diags...)
+		oidc.PostLogoutRedirectUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.PostLogoutRedirectUris)
+		diagnostics.Append(diags...)
 
-			oidc.BackChannelLogoutUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.BackChannelLogoutUris)
-			diagnostics.Append(diags...)
+		oidc.FrontChannelLogoutUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.FrontChannelLogoutUris)
+		diagnostics.Append(diags...)
+
+		oidc.BackChannelLogoutUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.BackChannelLogoutUris)
+		diagnostics.Append(diags...)
 
 		if a.AuthenticationSchema.OidcConfig.TokenPolicy != nil {
 			tokenpolicy := tokenPolicyData{
@@ -295,8 +295,8 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 		for _, g := range a.AuthenticationSchema.OidcConfig.RestrictedGrantTypes {
 			restrictedGrants = append(restrictedGrants, string(g))
 		}
-			oidc.RestrictedGrantTypes, diags = types.SetValueFrom(ctx, types.StringType, restrictedGrants)
-			diagnostics.Append(diags...)
+		oidc.RestrictedGrantTypes, diags = types.SetValueFrom(ctx, types.StringType, restrictedGrants)
+		diagnostics.Append(diags...)
 
 		// Proxy Config
 		if a.AuthenticationSchema.OidcConfig.ProxyConfig != nil {
@@ -310,8 +310,8 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 			oidc.ProxyConfig = types.ObjectNull(proxyConfigObjType)
 		}
 
-			authenticationSchema.OpenIdConnectConfiguration, diags = types.ObjectValueFrom(ctx, openIdConnectConfigurationObjType, oidc)
-			diagnostics.Append(diags...)
+		authenticationSchema.OpenIdConnectConfiguration, diags = types.ObjectValueFrom(ctx, openIdConnectConfigurationObjType, oidc)
+		diagnostics.Append(diags...)
 	} else {
 		authenticationSchema.OpenIdConnectConfiguration = types.ObjectNull(openIdConnectConfigurationObjType)
 	}
@@ -438,7 +438,20 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 			return application, diagnostics
 		}
 	} else {
-		authenticationSchema.SapManagedAttributes = types.ObjectNull(sapManagedAttributesObjType)
+		sapManagedAttributes := sapManagedAttributesData{
+			ServiceInstanceId: types.StringNull(),
+			SourceAppId:       types.StringNull(),
+			SourceTenantId:    types.StringNull(),
+			AppTenantId:       types.StringNull(),
+			Type:              types.StringNull(),
+			PlanName:          types.StringNull(),
+			BtpTenantType:     types.StringNull(),
+		}
+		authenticationSchema.SapManagedAttributes, diags = types.ObjectValueFrom(ctx, sapManagedAttributesObjType, sapManagedAttributes)
+		diagnostics.Append(diags...)
+		if diagnostics.HasError() {
+			return application, diagnostics
+		}
 	}
 
 	application.AuthenticationSchema, diags = types.ObjectValueFrom(ctx, authenticationSchemaObjType, authenticationSchema)
