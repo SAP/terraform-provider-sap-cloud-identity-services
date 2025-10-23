@@ -21,6 +21,7 @@ type authenticationSchemaData struct {
 	AuthenticationRules           types.List   `tfsdk:"conditional_authentication"`
 	OpenIdConnectConfiguration    types.Object `tfsdk:"oidc_config"`
 	Saml2Configuration            types.Object `tfsdk:"saml2_config"`
+	SapManagedAttributes          types.Object `tfsdk:"sap_managed_attributes"`
 }
 
 type AppSaml2ConfigData struct {
@@ -65,17 +66,6 @@ type subjectNameIdentifierData struct {
 	Value  types.String `tfsdk:"value"`
 }
 
-type applicationData struct {
-	//INPUT
-	Id types.String `tfsdk:"id"`
-	//OUTPUT
-	Name                 types.String `tfsdk:"name"`
-	Description          types.String `tfsdk:"description"`
-	ParentApplicationId  types.String `tfsdk:"parent_application_id"`
-	MultiTenantApp       types.Bool   `tfsdk:"multi_tenant_app"`
-	AuthenticationSchema types.Object `tfsdk:"authentication_schema"`
-}
-
 type openIdConnectConfigurationData struct {
 	RedirectUris           types.Set    `tfsdk:"redirect_uris"`
 	PostLogoutRedirectUris types.Set    `tfsdk:"post_logout_redirect_uris"`
@@ -97,6 +87,27 @@ type tokenPolicyData struct {
 
 type proxyConfigData struct {
 	Acrs types.Set `tfsdk:"acrs"`
+}
+
+type sapManagedAttributesData struct {
+	ServiceInstanceId types.String `tfsdk:"service_instance_id"`
+	SourceAppId       types.String `tfsdk:"source_app_id"`
+	SourceTenantId    types.String `tfsdk:"source_tenant_id"`
+	AppTenantId       types.String `tfsdk:"app_tenant_id"`
+	Type              types.String `tfsdk:"type"`
+	PlanName          types.String `tfsdk:"plan_name"`
+	BtpTenantType     types.String `tfsdk:"btp_tenant_type"`
+}
+
+type applicationData struct {
+	//INPUT
+	Id types.String `tfsdk:"id"`
+	//OUTPUT
+	Name                 types.String `tfsdk:"name"`
+	Description          types.String `tfsdk:"description"`
+	ParentApplicationId  types.String `tfsdk:"parent_application_id"`
+	MultiTenantApp       types.Bool   `tfsdk:"multi_tenant_app"`
+	AuthenticationSchema types.Object `tfsdk:"authentication_schema"`
 }
 
 func applicationValueFrom(ctx context.Context, a applications.Application) (applicationData, diag.Diagnostics) {
@@ -411,6 +422,38 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 		authenticationSchema.Saml2Configuration = types.ObjectNull(appSaml2ConfigObjType.AttrTypes)
 	}
 
+	if a.AuthenticationSchema.SapManagedAttributes != nil {
+		sapManagedAttributes := sapManagedAttributesData{
+			ServiceInstanceId: types.StringValue(a.AuthenticationSchema.SapManagedAttributes.ServiceInstanceId),
+			SourceAppId:       types.StringValue(a.AuthenticationSchema.SapManagedAttributes.SourceAppId),
+			SourceTenantId:    types.StringValue(a.AuthenticationSchema.SapManagedAttributes.SourceTenantId),
+			AppTenantId:       types.StringValue(a.AuthenticationSchema.SapManagedAttributes.AppTenantId),
+			Type:              types.StringValue(a.AuthenticationSchema.SapManagedAttributes.Type),
+			PlanName:          types.StringValue(a.AuthenticationSchema.SapManagedAttributes.PlanName),
+			BtpTenantType:     types.StringValue(a.AuthenticationSchema.SapManagedAttributes.BtpTenantType),
+		}
+		authenticationSchema.SapManagedAttributes, diags = types.ObjectValueFrom(ctx, sapManagedAttributesObjType, sapManagedAttributes)
+		diagnostics.Append(diags...)
+		if diagnostics.HasError() {
+			return application, diagnostics
+		}
+	} else {
+		sapManagedAttributes := sapManagedAttributesData{
+			ServiceInstanceId: types.StringNull(),
+			SourceAppId:       types.StringNull(),
+			SourceTenantId:    types.StringNull(),
+			AppTenantId:       types.StringNull(),
+			Type:              types.StringNull(),
+			PlanName:          types.StringNull(),
+			BtpTenantType:     types.StringNull(),
+		}
+		authenticationSchema.SapManagedAttributes, diags = types.ObjectValueFrom(ctx, sapManagedAttributesObjType, sapManagedAttributes)
+		diagnostics.Append(diags...)
+		if diagnostics.HasError() {
+			return application, diagnostics
+		}
+	}
+
 	application.AuthenticationSchema, diags = types.ObjectValueFrom(ctx, authenticationSchemaObjType, authenticationSchema)
 	diagnostics.Append(diags...)
 
@@ -668,6 +711,21 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 			}
 			args.AuthenticationSchema.OidcConfig = oidc
 		}
+
+		if !authenticationSchema.SapManagedAttributes.IsNull() && !authenticationSchema.SapManagedAttributes.IsUnknown() {
+			var sapManagedAttributes applications.SapManagedAttributes
+			diags := authenticationSchema.SapManagedAttributes.As(ctx, &sapManagedAttributes, basetypes.ObjectAsOptions{
+				UnhandledNullAsEmpty:    true,
+				UnhandledUnknownAsEmpty: true,
+			})
+			diagnostics.Append(diags...)
+			if diagnostics.HasError() {
+				return nil, diagnostics
+			}
+
+			args.AuthenticationSchema.SapManagedAttributes = &sapManagedAttributes
+		}
+
 	}
 	return args, diagnostics
 }

@@ -47,6 +47,7 @@ Read-Only:
 - `default_authenticating_idp` (String) A default identity provider can be used for users with any user domain, group and type. This identity provider is used when none of the defined authentication rules meets the criteria.
 - `oidc_config` (Attributes) OpenID Connect (OIDC) configuration options for this application. (see [below for nested schema](#nestedatt--values--authentication_schema--oidc_config))
 - `saml2_config` (Attributes) Configure a SAML 2.0 service provider by providing the necessary metadata. (see [below for nested schema](#nestedatt--values--authentication_schema--saml2_config))
+- `sap_managed_attributes` (Attributes) List of SAP managed attributes that are sent to the application. (see [below for nested schema](#nestedatt--values--authentication_schema--sap_managed_attributes))
 - `sso_type` (String) The preferred protocol for the application
 - `subject_name_identifier` (Attributes) The attribute by which the application uses to identify the users. Used by the application to uniquely identify the user during logon.
 Identity Authentication sends the attribute to the application as :
@@ -184,6 +185,20 @@ Read-Only:
 - `location` (String) The value of the URL or endpoint to be called.
 - `response_location` (String) The URL or endpoint to which logout response messages are sent.
 
+
+
+<a id="nestedatt--values--authentication_schema--sap_managed_attributes"></a>
+### Nested Schema for `values.authentication_schema.sap_managed_attributes`
+
+Read-Only:
+
+- `app_tenant_id` (String) The application tenant ID of the SAP application.
+- `btp_tenant_type` (String) The BTP tenant type of the SAP application.
+- `plan_name` (String) The plan name of the SAP application.
+- `service_instance_id` (String) The service instance ID of the SAP application.
+- `source_app_id` (String) The source application ID of the SAP application.
+- `source_tenant_id` (String) The source tenant ID of the SAP application.
+- `type` (String) The type of the SAP application.
 
 
 <a id="nestedatt--values--authentication_schema--subject_name_identifier"></a>

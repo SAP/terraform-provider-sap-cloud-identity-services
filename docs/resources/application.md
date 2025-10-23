@@ -89,6 +89,10 @@ Identity Authentication sends the attribute to the application as :
 	 - name ID in SAML 2.0 assertions (see [below for nested schema](#nestedatt--authentication_schema--subject_name_identifier))
 - `subject_name_identifier_function` (String) Convert the subject name identifier to uppercase or lowercase. Acceptable values are : `none`, `upperCase`, `lowerCase`
 
+Read-Only:
+
+- `sap_managed_attributes` (Attributes) List of SAP managed attributes that are sent to the application. (see [below for nested schema](#nestedatt--authentication_schema--sap_managed_attributes))
+
 <a id="nestedatt--authentication_schema--advanced_assertion_attributes"></a>
 ### Nested Schema for `authentication_schema.advanced_assertion_attributes`
 
@@ -240,6 +244,20 @@ Optional:
 
 - `source` (String) Acceptable values are : `Identity Directory`, `Corporate Identity Provider`, `Expression`
 - `value` (String) If the source is Identity Directory, the only acceptable values are `none`, `uid`, `mail`, `loginName`, `displayName`, `personnelNumber`, `userUuid`
+
+
+<a id="nestedatt--authentication_schema--sap_managed_attributes"></a>
+### Nested Schema for `authentication_schema.sap_managed_attributes`
+
+Read-Only:
+
+- `app_tenant_id` (String) The application tenant ID of the SAP application.
+- `btp_tenant_type` (String) The BTP tenant type of the SAP application.
+- `plan_name` (String) The plan name of the SAP application.
+- `service_instance_id` (String) The service instance ID of the SAP application.
+- `source_app_id` (String) The source application ID of the SAP application.
+- `source_tenant_id` (String) The source tenant ID of the SAP application.
+- `type` (String) The type of the SAP application.
 
 ## Import
 
