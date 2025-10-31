@@ -42,6 +42,7 @@ var (
 	restrictedGrantTypesValues          = []string{"clientCredentials", "authorizationCode", "refreshToken", "password", "implicit", "jwtBearer", "authorizationCodePkceS256", "tokenExchange"}
 	saml2AppNameIdFormatValues          = []string{"urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified", "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress", "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent", "urn:oasis:names:tc:SAML:2.0:nameid-format:transient"}
 	responseElementsToEncrypt           = []string{"none", "wholeAssertion", "subjectNameId", "attributes", "subjectNameIdAndAttributes"}
+	typeOfAppValues                     = []string{"identityInstance", "subscription", "reuseInstance", "xsuaa"}
 )
 
 func newApplicationResource() resource.Resource {
@@ -714,6 +715,70 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 								},
 								Validators: []validator.String{
 									stringvalidator.OneOf(digestAlgorithmValues...),
+								},
+							},
+						},
+					},
+					"sap_managed_attributes": schema.SingleNestedAttribute{
+						MarkdownDescription: "List of SAP managed attributes that are sent to the application.",
+						Computed:            true,
+						PlanModifiers: []planmodifier.Object{
+							objectplanmodifier.UseStateForUnknown(),
+						},
+						Attributes: map[string]schema.Attribute{
+							"service_instance_id": schema.StringAttribute{
+								MarkdownDescription: "The service instance ID of the SAP application.",
+								Computed:            true,
+								PlanModifiers: []planmodifier.String{
+									stringplanmodifier.UseStateForUnknown(),
+								},
+							},
+							"source_app_id": schema.StringAttribute{
+								MarkdownDescription: "The source application ID of the SAP application.",
+								Computed:            true,
+								Validators: []validator.String{
+									utils.ValidUUID(),
+								},
+								PlanModifiers: []planmodifier.String{
+									stringplanmodifier.UseStateForUnknown(),
+								},
+							},
+							"source_tenant_id": schema.StringAttribute{
+								MarkdownDescription: "The source tenant ID of the SAP application.",
+								Computed:            true,
+								PlanModifiers: []planmodifier.String{
+									stringplanmodifier.UseStateForUnknown(),
+								},
+							},
+							"app_tenant_id": schema.StringAttribute{
+								MarkdownDescription: "The application tenant ID of the SAP application.",
+								Computed:            true,
+								PlanModifiers: []planmodifier.String{
+									stringplanmodifier.UseStateForUnknown(),
+								},
+							},
+							"type": schema.StringAttribute{
+								MarkdownDescription: "The type of the SAP application.",
+								Computed:            true,
+								Validators: []validator.String{
+									stringvalidator.OneOf(typeOfAppValues...),
+								},
+								PlanModifiers: []planmodifier.String{
+									stringplanmodifier.UseStateForUnknown(),
+								},
+							},
+							"plan_name": schema.StringAttribute{
+								MarkdownDescription: "The plan name of the SAP application.",
+								Computed:            true,
+								PlanModifiers: []planmodifier.String{
+									stringplanmodifier.UseStateForUnknown(),
+								},
+							},
+							"btp_tenant_type": schema.StringAttribute{
+								MarkdownDescription: "The BTP tenant type of the SAP application.",
+								Computed:            true,
+								PlanModifiers: []planmodifier.String{
+									stringplanmodifier.UseStateForUnknown(),
 								},
 							},
 						},

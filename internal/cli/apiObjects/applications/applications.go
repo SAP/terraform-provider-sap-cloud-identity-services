@@ -195,6 +195,16 @@ const (
 	TOKEN_EXCHANGE_GrantType               GrantType = "tokenExchange"
 )
 
+type SapManagedAttributes struct {
+	ServiceInstanceId string `json:"serviceInstanceId,omitempty" tfsdk:"service_instance_id"`
+	SourceAppId       string `json:"sourceAppId,omitempty" tfsdk:"source_app_id"`
+	SourceTenantId    string `json:"sourceTenantId,omitempty" tfsdk:"source_tenant_id"`
+	AppTenantId       string `json:"appTenantId,omitempty" tfsdk:"app_tenant_id"`
+	Type              string `json:"type,omitempty" tfsdk:"type"`
+	PlanName          string `json:"planName,omitempty" tfsdk:"plan_name"`
+	BtpTenantType     string `json:"btpTenantType,omitempty" tfsdk:"btp_tenant_type"`
+}
+
 type AuthenticationSchema struct {
 	SsoType                       string                       `json:"ssoType,omitempty" tfsdk:"sso_type"`
 	SubjectNameIdentifier         string                       `json:"subjectNameIdentifier,omitempty" tfsdk:"subject_name_identifier"`
@@ -205,6 +215,7 @@ type AuthenticationSchema struct {
 	ConditionalAuthentication     []AuthenicationRule          `json:"conditionalAuthentication,omitempty" tfsdk:"conditional_authentication"`
 	OidcConfig                    *OidcConfig                  `json:"openIdConnectConfiguration,omitempty"`
 	Saml2Configuration            *SamlConfiguration           `json:"saml2Configuration,omitempty" tfsdk:""`
+	SapManagedAttributes          *SapManagedAttributes        `json:"sapManagedAttributes,omitempty"`
 	// RiskBasedAuthentication       RBAConfiguration            `json:"riskBasedAuthentication"`
 	// HomeUrl								string 							`json:"homeUrl"`
 	// FallbackSubjectNameIdentifier		string 							`json:"fallbackSubjectNameIdentifier,omitempty"`
@@ -229,7 +240,6 @@ type AuthenticationSchema struct {
 	// smsVerificationConfig
 	// captchaConfig
 	// openIdConnectConfiguration
-	// sapManagedAttributes
 	// idpCertificateSerialNumber
 	// restApiAuthentication
 }
