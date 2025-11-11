@@ -53,6 +53,7 @@ func TestResourceApplication(t *testing.T) {
 			},
 		},
 	}
+
 	oidcApplication := applications.Application{
 		Name:        "OIDC-test-app",
 		Description: "application for testing purposes",
@@ -183,6 +184,7 @@ func TestResourceApplication(t *testing.T) {
 			},
 		})
 	})
+	
 	t.Run("happy path - bundled application1", func(t *testing.T) {
 
 		rec, user := setupVCR(t, "fixtures/resource_bundled_application1")
@@ -1236,35 +1238,6 @@ func TestResourceApplication(t *testing.T) {
 			},
 		})
 	})
-
-	// t.Run("error path - sap_managed_attributes.source_app_id needs to be a valid UUID", func(t *testing.T) {
-	// 	resource.Test(t, resource.TestCase{
-	// 		IsUnitTest:               true,
-	// 		ProtoV6ProviderFactories: getTestProviders(nil),
-	// 		Steps: []resource.TestStep{
-	// 			{
-	// 				Config:      ResourceApplicationWithSapManagedAttributesSourceAppID("testApp", "test-app", "application for testing purposes"),
-	// 				//ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_schema.sap_managed_attributes.source_app_id value must be a valid UUID, got:\n%s", "this-is-not-uuid")),
-	// 				Check: resource.ComposeTestCheckFunc(
-	// 					resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.0.sap_managed_attributes.0.source_app_id", ""),
-	// 				),
-	// 			},
-	// 		},
-	// 	})
-	// })
-
-	// t.Run("error path - sap_managed_attributes.type needs to be a valid value", func(t *testing.T) {
-	// 	resource.Test(t, resource.TestCase{
-	// 		IsUnitTest:               true,
-	// 		ProtoV6ProviderFactories: getTestProviders(nil),
-	// 		Steps: []resource.TestStep{
-	// 			{
-	// 				Config:      ResourceApplicationWithSapManagedAttributesType("testApp", "test-app", "application for testing purposes", "this-is-not-a-valid-type"),
-	// 				ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_schema.sap_managed_attributes.type value must be one of:\n\\[\"identityInstance\" \"subscription\" \"reuseInstance\" \"xsuaa\"\\], got:\n\"%s\"", "this-is-not-a-valid-type")),
-	// 			},
-	// 		},
-	// 	})
-	// })
 }
 
 func ResourceApplication(resourceName string, app applications.Application) string {
@@ -1799,24 +1772,3 @@ func ResourceApplicationWithSaml2DigestAlgorithm(resourceName string, appName st
     }
     `, resourceName, appName, digestAlgorithm)
 }
-
-// func ResourceApplicationWithSapManagedAttributesType(resourceName string, appName string, description string, appType string) string{
-// 	return fmt.Sprintf(`
-// 	resource "sci_application" "%s" {
-// 		name = "%s"
-// 		description = "%s"
-// 		authentication_schema = {
-// 			sap_managed_attributes = {
-// 				type = "%s"
-// 			}
-// 		}
-// 	}`, resourceName, appName, description, appType)
-// }
-
-// func ResourceApplicationWithSapManagedAttributesSourceAppID(resourceName string, appName string, description string) string{
-// 	return fmt.Sprintf(`
-// 	resource "sci_application" "%s" {
-// 		name = "%s"
-// 		description = "%s"
-// 	}`, resourceName, appName, description)
-// }

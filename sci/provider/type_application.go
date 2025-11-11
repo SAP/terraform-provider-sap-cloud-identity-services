@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"reflect"
 	"regexp"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -438,6 +439,7 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 			return application, diagnostics
 		}
 	} else {
+		// each attribute is set to null as setting the whole object to null causes in place updates
 		sapManagedAttributes := sapManagedAttributesData{
 			ServiceInstanceId: types.StringNull(),
 			SourceAppId:       types.StringNull(),
@@ -712,8 +714,10 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 			args.AuthenticationSchema.OidcConfig = oidc
 		}
 
+		// SAP MANAGED ATTRIBUTES
 		if !authenticationSchema.SapManagedAttributes.IsNull() && !authenticationSchema.SapManagedAttributes.IsUnknown() {
-			var sapManagedAttributes applications.SapManagedAttributes
+			
+			var sapManagedAttributes sapManagedAttributesData
 			diags := authenticationSchema.SapManagedAttributes.As(ctx, &sapManagedAttributes, basetypes.ObjectAsOptions{
 				UnhandledNullAsEmpty:    true,
 				UnhandledUnknownAsEmpty: true,
@@ -723,7 +727,40 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 				return nil, diagnostics
 			}
 
-			args.AuthenticationSchema.SapManagedAttributes = &sapManagedAttributes
+			// reflect over the sapManagedAttributesData to set the attributes in the API request body
+			// this avoids multiple if statements for each attribute
+			// also helps to determine if at least one attribute is set, to decide whether to set the object in the request body or leave it as nil
+		
+			var attributes applications.SapManagedAttributes
+			attributesVal := reflect.ValueOf(&attributes)
+
+			setAttributes := false
+
+			sapManagedAttributesVal := reflect.ValueOf(sapManagedAttributes)
+
+			for i := 0; i < sapManagedAttributesVal.NumField(); i++ {
+
+				fieldName := sapManagedAttributesVal.Type().Field(i)
+				fieldValue := sapManagedAttributesVal.Field(i).Interface().(types.String)
+
+				elem := attributesVal.Elem()
+				field := elem.FieldByName(fieldName.Name)
+
+				if len(fieldValue.ValueString()) > 0 {
+					field.SetString(fieldValue.ValueString())
+					setAttributes = true
+				} else {
+					field.SetString(types.StringNull().ValueString())
+				}
+			}
+
+			if setAttributes {
+				attributes = attributesVal.Elem().Interface().(applications.SapManagedAttributes)	
+				args.AuthenticationSchema.SapManagedAttributes = &attributes
+			} else {
+				args.AuthenticationSchema.SapManagedAttributes = nil
+			}
+
 		}
 
 	}
