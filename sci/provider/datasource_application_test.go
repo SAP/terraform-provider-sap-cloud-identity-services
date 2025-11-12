@@ -66,6 +66,53 @@ func TestDataSourceApplication(t *testing.T) {
 		})
 	})
 
+	t.Run("happy path - bundled application1", func(t *testing.T) {
+
+		rec, user := setupVCR(t, "fixtures/datasource_bundled_application1")
+		defer stopQuietly(rec)
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+			Steps: []resource.TestStep{
+				{
+					Config: providerConfig("", user) + DataSourceApplication("testBundledApp", "XSUAA_b75a605d-151c-4485-83f4-64604378e4ec"),
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestMatchResourceAttr("data.sci_application.testBundledApp", "id", regexpUUID),
+						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "name", "XSUAA_b75a605d-151c-4485-83f4-64604378e4ec"),
+						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.type", "xsuaa"),
+						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.app_tenant_id", "b75a605d-151c-4485-83f4-64604378e4ec"),
+					),
+				},
+			},
+		})
+	})
+
+	t.Run("happy path - bundled application2", func(t *testing.T) {
+
+		rec, user := setupVCR(t, "fixtures/datasource_bundled_application2")
+		defer stopQuietly(rec)
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+			Steps: []resource.TestStep{
+				{
+					Config: providerConfig("", user) + DataSourceApplication("testBundledApp", "identity-subscription-c6c390f4-c9a2-4a6c-9cc7-01675a31e4f6-in-b75a605d-151c-4485-83f4-64604378e4ec"),
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestMatchResourceAttr("data.sci_application.testBundledApp", "id", regexpUUID),
+						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "name", "identity-subscription-c6c390f4-c9a2-4a6c-9cc7-01675a31e4f6-in-b75a605d-151c-4485-83f4-64604378e4ec"),
+						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.type", "subscription"),
+						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.app_tenant_id", "b75a605d-151c-4485-83f4-64604378e4ec"),
+						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.source_app_id", "3cc4b385-fe8b-423a-a8c0-34e15c9970cd"),
+						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.source_tenant_id", "sapdas"),
+						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.service_instance_id", "c6c390f4-c9a2-4a6c-9cc7-01675a31e4f6"),
+					),
+				},
+			},
+		})
+	})
+
 	t.Run("error path - invalid app id", func(t *testing.T) {
 
 		resource.Test(t, resource.TestCase{

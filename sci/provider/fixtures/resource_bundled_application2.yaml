@@ -1,0 +1,176 @@
+---
+version: 2
+interactions:
+    - id: 0
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            Accept:
+                - '*/*'
+            Authorization:
+                - REDACTED
+            Content-Type:
+                - application/json
+            Dataserviceversion:
+                - "2.0"
+        url: https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/31e38d9c-ca48-4227-963d-32e7dfcb5007
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: true
+        body: |-
+            {
+              "id" : "31e38d9c-ca48-4227-963d-32e7dfcb5007",
+              "meta" : {
+                "created" : "2025-10-14T10:59:05.06Z",
+                "createdBy" : "CN=identity-broker-qa,L=identity-broker,OU=8e1affb2-62a1-43cc-a687-2ba75e4b3d84,OU=Canary,OU=SAP Cloud Platform Clients,O=SAP SE,C=DE",
+                "lastModified" : "2025-10-14T10:59:05.06Z",
+                "modifiedBy" : "CN=identity-broker-qa,L=identity-broker,OU=8e1affb2-62a1-43cc-a687-2ba75e4b3d84,OU=Canary,OU=SAP Cloud Platform Clients,O=SAP SE,C=DE",
+                "location" : "https://iasprovidertestblr.accounts400.ondemand.com/Applications/v1/31e38d9c-ca48-4227-963d-32e7dfcb5007",
+                "type" : "bundled",
+                "version" : "1"
+              },
+              "name" : "identity-subscription-c6c390f4-c9a2-4a6c-9cc7-01675a31e4f6-in-b75a605d-151c-4485-83f4-64604378e4ec",
+              "multiTenantApp" : false,
+              "globalAccount" : "e92e2c9c-ea09-4c43-a061-a136a7cfcca0",
+              "schemas" : [ "urn:sap:identity:application:schemas:core:1.0", "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication", "urn:sap:identity:application:schemas:extension:sci:1.0:Authorization", "urn:sap:identity:application:schemas:extension:sci:1.0:Provisioning" ],
+              "branding" : {
+                "displayName" : "das-ias (test_ias)",
+                "showDisplayNameOnLogonScreen" : true,
+                "rememberMeVisible" : true,
+                "rememberMeChecked" : false,
+                "refreshParent" : true,
+                "tokenUrlEmbedCharacter" : ";",
+                "theme" : {
+                  "type" : "horizon"
+                }
+              },
+              "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication" : {
+                "rememberMeExpirationTimeInMonths" : 3,
+                "passwordPolicy" : "https://accounts.sap.com/policy/passwords/sap/web/1.1",
+                "userAccess" : {
+                  "type" : "internal",
+                  "userAttributesForAccess" : [ {
+                    "userAttributeName" : "firstName",
+                    "isRequired" : false
+                  }, {
+                    "userAttributeName" : "lastName",
+                    "isRequired" : true
+                  }, {
+                    "userAttributeName" : "mail",
+                    "isRequired" : true
+                  } ]
+                },
+                "companyId" : "global",
+                "clientId" : "3853bfb3-c941-4490-b31f-0c00283a9ceb",
+                "disabledInheritedProperties" : { },
+                "spnegoEnabled" : false,
+                "biometricAuthenticationEnabled" : false,
+                "verifyMail" : true,
+                "forceAuthentication" : false,
+                "trustAllCorporateIdentityProviders" : false,
+                "allowIasUsers" : false,
+                "defaultAuthenticatingIdpId" : "664c660e25cff252c5c202dc",
+                "consumedServices" : [ {
+                  "appId" : "73afa691-5946-4bb1-9c39-b404e4b21594",
+                  "clientId" : "63101cc9-749d-4ef3-b17a-613481e52de0",
+                  "inherit" : false
+                } ],
+                "riskBasedAuthentication" : {
+                  "defaultAction" : [ "allow" ]
+                },
+                "saml2Configuration" : {
+                  "signSLOMessages" : true,
+                  "requireSignedSLOMessages" : true,
+                  "requireSignedAuthnRequest" : false,
+                  "signAssertions" : true,
+                  "signAuthnResponses" : false,
+                  "responseElementsToEncrypt" : "none",
+                  "proxyAuthnRequest" : {
+                    "authenticationContext" : "none"
+                  }
+                },
+                "openIdConnectConfiguration" : { },
+                "sapManagedAttributes" : {
+                  "serviceInstanceId" : "c6c390f4-c9a2-4a6c-9cc7-01675a31e4f6",
+                  "sourceAppId" : "3cc4b385-fe8b-423a-a8c0-34e15c9970cd",
+                  "sourceTenantId" : "sapdas",
+                  "appTenantId" : "b75a605d-151c-4485-83f4-64604378e4ec",
+                  "type" : "subscription"
+                },
+                "restApiAuthentication" : {
+                  "allowPublicClientFlows" : false,
+                  "allApisAccess" : false,
+                  "allowLocking" : true,
+                  "failedLoginAttempts" : 0
+                }
+              },
+              "urn:sap:identity:application:schemas:extension:sci:1.0:Provisioning" : {
+                "centralStoreProvisioningEnabled" : false
+              },
+              "urn:sap:identity:application:schemas:extension:sci:1.0:Authorization" : { }
+            }
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
+            Content-Type:
+                - application/json;charset=UTF-8
+            Critical-Origin-Trial:
+                - Tpcd
+            Date:
+                - Tue, 14 Oct 2025 11:15:51 GMT
+            Expires:
+                - "0"
+            Origin-Trial:
+                - Avu6rn7emV5gK8gvyGHlX8TMqM9uo1FacP2j/RWTq+8j+yKnqcTO0TQh0bXJ/7QntxD4/JzXv8aXoqxxZQuqXgYAAABdeyJvcmlnaW4iOiJodHRwczovL29uZGVtYW5kLmNvbTo0NDMiLCJmZWF0dXJlIjoiVHBjZCIsImV4cGlyeSI6MTczNTM0Mzk5OSwiaXNTdWJkb21haW4iOnRydWV9
+            Pragma:
+                - no-cache
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains; preload
+            Vary:
+                - accept-encoding,X-CSP-STRIP
+            X-Content-Type-Options:
+                - nosniff
+            X-Ids-Id:
+                - 3B9CC8C7-CC11-43DA-97AE-F7862021DA08
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-w7mr9
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Ids-Region:
+                - eu-de-1
+            X-Robots-Tag:
+                - none
+            X-Xss-Protection:
+                - 1; mode=block
+        status: '200 '
+        code: 200
+        duration: 246.241292ms

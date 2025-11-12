@@ -47,6 +47,9 @@ var authenticationSchemaObjType = map[string]attr.Type{
 	"saml2_config": types.ObjectType{
 		AttrTypes: appSaml2ConfigObjType.AttrTypes,
 	},
+	"sap_managed_attributes": types.ObjectType{
+		AttrTypes: sapManagedAttributesObjType,
+	},
 }
 
 var appSaml2ConfigObjType = types.ObjectType{
@@ -168,6 +171,16 @@ var proxyConfigObjType = map[string]attr.Type{
 	"acrs": types.SetType{
 		ElemType: types.StringType,
 	},
+}
+
+var sapManagedAttributesObjType = map[string]attr.Type{
+	"service_instance_id": types.StringType,
+	"source_app_id":       types.StringType,
+	"source_tenant_id":    types.StringType,
+	"app_tenant_id":       types.StringType,
+	"type":                types.StringType,
+	"plan_name":           types.StringType,
+	"btp_tenant_type":     types.StringType,
 }
 
 var appObjType = types.ObjectType{
@@ -537,6 +550,43 @@ func (d *applicationsDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 										},
 										"digest_algorithm": schema.StringAttribute{
 											MarkdownDescription: "Configure the algorithm for signing outgoing messages. " + utils.ValidValuesString(digestAlgorithmValues),
+											Computed:            true,
+										},
+									},
+								},
+								"sap_managed_attributes": schema.SingleNestedAttribute{
+									MarkdownDescription: "List of SAP managed attributes that are sent to the application.",
+									Computed:            true,
+									Attributes: map[string]schema.Attribute{
+										"service_instance_id": schema.StringAttribute{
+											MarkdownDescription: "The service instance ID of the SAP application.",
+											Computed:            true,
+										},
+										"source_app_id": schema.StringAttribute{
+											MarkdownDescription: "The source application ID of the SAP application.",
+											Computed:            true,
+											Validators: []validator.String{
+												utils.ValidUUID(),
+											},
+										},
+										"source_tenant_id": schema.StringAttribute{
+											MarkdownDescription: "The source tenant ID of the SAP application.",
+											Computed:            true,
+										},
+										"app_tenant_id": schema.StringAttribute{
+											MarkdownDescription: "The application tenant ID of the SAP application.",
+											Computed:            true,
+										},
+										"type": schema.StringAttribute{
+											MarkdownDescription: "The type of the SAP application.",
+											Computed:            true,
+										},
+										"plan_name": schema.StringAttribute{
+											MarkdownDescription: "The plan name of the SAP application.",
+											Computed:            true,
+										},
+										"btp_tenant_type": schema.StringAttribute{
+											MarkdownDescription: "The BTP tenant type of the SAP application.",
 											Computed:            true,
 										},
 									},
