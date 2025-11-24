@@ -30,7 +30,7 @@ jobs:
          go mod tidy
       - run: go build -v .
       - name: Run linters
-        uses: golangci/golangci-lint-action@c7c1219093bae1f72610c5fd1a51a674647863f8 # v3.7.1
+        uses: golangci/golangci-lint-action@e7fa5ac41e1cf5b7d48e45e42232ce7ada589601 # v3.7.1
         with:
           version: latest
           skip-cache: true
