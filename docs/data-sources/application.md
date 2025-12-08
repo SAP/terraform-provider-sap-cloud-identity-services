@@ -14,7 +14,7 @@ Gets an application from the SAP Cloud Identity services.
 ```terraform
 # Read an application by ID
 data "sci_application" "by_id" {
-  id = "app_1234567890"     # Must be a valid UUID
+  id = "app_1234567890" # Must be a valid UUID
 }
 ```
 

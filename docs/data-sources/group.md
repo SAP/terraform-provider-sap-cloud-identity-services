@@ -14,7 +14,7 @@ Gets a group from the SAP Cloud Identity services.
 ```terraform
 # Read a group by ID
 data "sci_group" "by_id" {
-  id = "group_1234567890"       # Must be a valid UUID
+  id = "group_1234567890" # Must be a valid UUID
 }
 ```
 
