@@ -184,7 +184,7 @@ func TestResourceApplication(t *testing.T) {
 			},
 		})
 	})
-	
+
 	t.Run("happy path - bundled application1", func(t *testing.T) {
 
 		rec, user := setupVCR(t, "fixtures/resource_bundled_application1")
