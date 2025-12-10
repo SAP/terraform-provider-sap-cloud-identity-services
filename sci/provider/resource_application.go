@@ -253,7 +253,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 									MarkdownDescription: "Indicates whether the attribute has been inherited from a parent application.",
 									Computed:            true,
 									PlanModifiers: []planmodifier.Bool{
-										boolplanmodifier.UseStateForUnknown(),
+										boolplanmodifier.UseNonNullStateForUnknown(),
 									},
 								},
 							},
@@ -580,21 +580,21 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 											MarkdownDescription: "A unique identifier for the certificate.",
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
-												stringplanmodifier.UseStateForUnknown(),
+												stringplanmodifier.UseNonNullStateForUnknown(),
 											},
 										},
 										"valid_from": schema.StringAttribute{
 											MarkdownDescription: "Set the date from which the certificate is valid.",
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
-												stringplanmodifier.UseStateForUnknown(),
+												stringplanmodifier.UseNonNullStateForUnknown(),
 											},
 										},
 										"valid_to": schema.StringAttribute{
 											MarkdownDescription: "Set the date uptil which the certificate is valid.",
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
-												stringplanmodifier.UseStateForUnknown(),
+												stringplanmodifier.UseNonNullStateForUnknown(),
 											},
 										},
 									},
@@ -624,21 +624,21 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 										MarkdownDescription: "A unique identifier for the certificate.",
 										Computed:            true,
 										PlanModifiers: []planmodifier.String{
-											stringplanmodifier.UseStateForUnknown(),
+											stringplanmodifier.UseNonNullStateForUnknown(),
 										},
 									},
 									"valid_from": schema.StringAttribute{
 										MarkdownDescription: "Set the date from which the certificate is valid.",
 										Computed:            true,
 										PlanModifiers: []planmodifier.String{
-											stringplanmodifier.UseStateForUnknown(),
+											stringplanmodifier.UseNonNullStateForUnknown(),
 										},
 									},
 									"valid_to": schema.StringAttribute{
 										MarkdownDescription: "Set the date uptil which the certificate is valid.",
 										Computed:            true,
 										PlanModifiers: []planmodifier.String{
-											stringplanmodifier.UseStateForUnknown(),
+											stringplanmodifier.UseNonNullStateForUnknown(),
 										},
 									},
 								},
