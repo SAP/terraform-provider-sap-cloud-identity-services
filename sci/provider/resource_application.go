@@ -960,6 +960,34 @@ func stateModify(ctx context.Context, plan applicationData, state *applicationDa
 			stateData.DefaultAuthenticatingIdpId = planData.DefaultAuthenticatingIdpId
 		}
 
+		// do the same for the Conditional Authentication parameter
+		if !planData.AuthenticationRules.IsNull() && !planData.AuthenticationRules.IsUnknown() {
+
+			var planAuthRulesData []authenticationRulesData
+			diags = planData.AuthenticationRules.ElementsAs(ctx, &planAuthRulesData, true)
+			if diags.HasError() {
+				return diags
+			}
+
+			var stateAuthRulesData []authenticationRulesData
+			diags = stateData.AuthenticationRules.ElementsAs(ctx, &stateAuthRulesData, true)
+			if diags.HasError() {
+				return diags
+			}
+
+			for i, rule := range planAuthRulesData {
+				if !rule.IdentityProviderId.IsNull() && !rule.IdentityProviderId.IsUnknown() {
+					stateAuthRulesData[i].IdentityProviderId = rule.IdentityProviderId
+				}
+			}
+
+			stateData.AuthenticationRules, diags = types.ListValueFrom(ctx, authenticationRulesObjType, stateAuthRulesData)
+			if diags.HasError() {
+				return diags
+			}
+
+		}
+
 		state.AuthenticationSchema, diags = types.ObjectValueFrom(ctx, authenticationSchemaObjType, stateData)
 		if diags.HasError() {
 			return diags

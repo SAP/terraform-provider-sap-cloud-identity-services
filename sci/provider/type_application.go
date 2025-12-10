@@ -716,7 +716,7 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 
 		// SAP MANAGED ATTRIBUTES
 		if !authenticationSchema.SapManagedAttributes.IsNull() && !authenticationSchema.SapManagedAttributes.IsUnknown() {
-			
+
 			var sapManagedAttributes sapManagedAttributesData
 			diags := authenticationSchema.SapManagedAttributes.As(ctx, &sapManagedAttributes, basetypes.ObjectAsOptions{
 				UnhandledNullAsEmpty:    true,
@@ -730,7 +730,7 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 			// reflect over the sapManagedAttributesData to set the attributes in the API request body
 			// this avoids multiple if statements for each attribute
 			// also helps to determine if at least one attribute is set, to decide whether to set the object in the request body or leave it as nil
-		
+
 			var attributes applications.SapManagedAttributes
 			attributesVal := reflect.ValueOf(&attributes)
 
@@ -755,7 +755,7 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 			}
 
 			if setAttributes {
-				attributes = attributesVal.Elem().Interface().(applications.SapManagedAttributes)	
+				attributes = attributesVal.Elem().Interface().(applications.SapManagedAttributes)
 				args.AuthenticationSchema.SapManagedAttributes = &attributes
 			} else {
 				args.AuthenticationSchema.SapManagedAttributes = nil
