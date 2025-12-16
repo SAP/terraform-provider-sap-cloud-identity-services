@@ -3,7 +3,6 @@ name: Integration Test - Terraform Provider
 # Running tests against the prod tenant
 
 on:
-  pull_request:
   workflow_dispatch:
 
 env:

@@ -3,7 +3,6 @@ name: Canary regression Test - Terraform Provider
 # Running tests against the canary tenant
 
 on:
-  pull_request:
   workflow_dispatch:
   schedule:
     - cron: '0 2 * * *'
