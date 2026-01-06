@@ -117,9 +117,9 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 						MarkdownDescription: "The preferred protocol for the application. " + utils.ValidValuesString(ssoValues),
 						Optional:            true,
 						Computed:            true,
-						Validators: []validator.String{
-							stringvalidator.OneOf(ssoValues...),
-						},
+						// Validators: []validator.String{
+						// 	stringvalidator.OneOf(ssoValues...),
+						// },
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
 						},
@@ -131,12 +131,12 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 							fmt.Sprintln("\t - name ID in SAML 2.0 assertions"),
 						Optional: true,
 						Computed: true,
-						Validators: []validator.Object{
-							objectvalidator.AlsoRequires(
-								path.MatchRoot("authentication_schema").AtName("subject_name_identifier").AtName("source"),
-								path.MatchRoot("authentication_schema").AtName("subject_name_identifier").AtName("value"),
-							),
-						},
+						// Validators: []validator.Object{
+						// 	objectvalidator.AlsoRequires(
+						// 		path.MatchRoot("authentication_schema").AtName("subject_name_identifier").AtName("source"),
+						// 		path.MatchRoot("authentication_schema").AtName("subject_name_identifier").AtName("value"),
+						// 	),
+						// },
 						PlanModifiers: []planmodifier.Object{
 							objectplanmodifier.UseStateForUnknown(),
 						},
@@ -152,9 +152,9 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 								MarkdownDescription: "If the source is Identity Directory, the only acceptable values are `none`, `uid`, `mail`, `loginName`, `displayName`, `personnelNumber`, `userUuid`",
 								Optional:            true,
 								Computed:            true,
-								Validators: []validator.String{
-									stringvalidator.LengthBetween(1, 255),
-								},
+								// Validators: []validator.String{
+								// 	stringvalidator.LengthBetween(1, 255),
+								// },
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
@@ -330,19 +330,19 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 						PlanModifiers: []planmodifier.Object{
 							objectplanmodifier.UseStateForUnknown(),
 						},
-						Validators: []validator.Object{
-							objectvalidator.AlsoRequires(
-								path.MatchRoot("authentication_schema").AtName("oidc_config").AtName("redirect_uris"),
-							),
-						},
+						// Validators: []validator.Object{
+						// 	objectvalidator.AlsoRequires(
+						// 		path.MatchRoot("authentication_schema").AtName("oidc_config").AtName("redirect_uris"),
+						// 	),
+						// },
 						Attributes: map[string]schema.Attribute{
 							"redirect_uris": schema.SetAttribute{
 								MarkdownDescription: "A list of redirect URIs that the OpenID Provider is allowed to redirect to after authentication. Must contain 1 to 20 valid URIs.",
 								ElementType:         types.StringType,
 								Optional:            true,
-								Validators: []validator.Set{
-									setvalidator.SizeBetween(1, 20),
-								},
+								// Validators: []validator.Set{
+								// 	setvalidator.SizeBetween(1, 20),
+								// },
 							},
 							"post_logout_redirect_uris": schema.SetAttribute{
 								MarkdownDescription: "List of URIs to which the user will be redirected after logging out from the application. Can include up to 20 URIs.",
@@ -406,9 +406,9 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 										MarkdownDescription: "Maximum token exchange period. " + utils.ValidValuesString(maxExchangePeriodValues),
 										Optional:            true,
 										Computed:            true,
-										Validators: []validator.String{
-											stringvalidator.OneOf(maxExchangePeriodValues...),
-										},
+										// Validators: []validator.String{
+										// 	stringvalidator.OneOf(maxExchangePeriodValues...),
+										// },
 									},
 									"refresh_token_rotation_scenario": schema.StringAttribute{
 										MarkdownDescription: "Defines the scenario for refresh token rotation. " + utils.ValidValuesString(refreshTokenRotationScenarioValues),
@@ -469,10 +469,10 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 							objectvalidator.AlsoRequires(
 								path.MatchRoot("name"),
 							),
-							utils.ValidType(
-								path.MatchRoot("authentication_schema").AtName("sso_type"),
-								ssoValues[1:],
-							),
+							// utils.ValidType(
+							// 	path.MatchRoot("authentication_schema").AtName("sso_type"),
+							// 	ssoValues[1:],
+							// ),
 						},
 						PlanModifiers: []planmodifier.Object{
 							objectplanmodifier.UseStateForUnknown(),
@@ -647,10 +647,10 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 								MarkdownDescription: "Specify which SAML response elements should be encrypted. " + utils.ValidValuesString(responseElementsToEncrypt),
 								Optional:            true,
 								Computed:            true,
-								Validators: []validator.String{
-									stringvalidator.OneOf(responseElementsToEncrypt...),
-									stringvalidator.AlsoRequires(path.MatchRoot("authentication_schema").AtName("saml2_config").AtName("encryption_certificate")),
-								},
+								// Validators: []validator.String{
+								// 	stringvalidator.OneOf(responseElementsToEncrypt...),
+								// 	stringvalidator.AlsoRequires(path.MatchRoot("authentication_schema").AtName("saml2_config").AtName("encryption_certificate")),
+								// },
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
 								},
