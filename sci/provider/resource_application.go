@@ -253,7 +253,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 									MarkdownDescription: "Indicates whether the attribute has been inherited from a parent application.",
 									Computed:            true,
 									PlanModifiers: []planmodifier.Bool{
-										boolplanmodifier.UseStateForUnknown(),
+										boolplanmodifier.UseNonNullStateForUnknown(),
 									},
 								},
 							},
@@ -580,21 +580,21 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 											MarkdownDescription: "A unique identifier for the certificate.",
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
-												stringplanmodifier.UseStateForUnknown(),
+												stringplanmodifier.UseNonNullStateForUnknown(),
 											},
 										},
 										"valid_from": schema.StringAttribute{
 											MarkdownDescription: "Set the date from which the certificate is valid.",
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
-												stringplanmodifier.UseStateForUnknown(),
+												stringplanmodifier.UseNonNullStateForUnknown(),
 											},
 										},
 										"valid_to": schema.StringAttribute{
 											MarkdownDescription: "Set the date uptil which the certificate is valid.",
 											Computed:            true,
 											PlanModifiers: []planmodifier.String{
-												stringplanmodifier.UseStateForUnknown(),
+												stringplanmodifier.UseNonNullStateForUnknown(),
 											},
 										},
 									},
@@ -624,21 +624,21 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 										MarkdownDescription: "A unique identifier for the certificate.",
 										Computed:            true,
 										PlanModifiers: []planmodifier.String{
-											stringplanmodifier.UseStateForUnknown(),
+											stringplanmodifier.UseNonNullStateForUnknown(),
 										},
 									},
 									"valid_from": schema.StringAttribute{
 										MarkdownDescription: "Set the date from which the certificate is valid.",
 										Computed:            true,
 										PlanModifiers: []planmodifier.String{
-											stringplanmodifier.UseStateForUnknown(),
+											stringplanmodifier.UseNonNullStateForUnknown(),
 										},
 									},
 									"valid_to": schema.StringAttribute{
 										MarkdownDescription: "Set the date uptil which the certificate is valid.",
 										Computed:            true,
 										PlanModifiers: []planmodifier.String{
-											stringplanmodifier.UseStateForUnknown(),
+											stringplanmodifier.UseNonNullStateForUnknown(),
 										},
 									},
 								},
@@ -958,6 +958,34 @@ func stateModify(ctx context.Context, plan applicationData, state *applicationDa
 		// modify the state data based on the plan data
 		if !planData.DefaultAuthenticatingIdpId.IsNull() && !planData.DefaultAuthenticatingIdpId.IsUnknown() {
 			stateData.DefaultAuthenticatingIdpId = planData.DefaultAuthenticatingIdpId
+		}
+
+		// do the same for the Conditional Authentication parameter
+		if !planData.AuthenticationRules.IsNull() && !planData.AuthenticationRules.IsUnknown() {
+
+			var planAuthRulesData []authenticationRulesData
+			diags = planData.AuthenticationRules.ElementsAs(ctx, &planAuthRulesData, true)
+			if diags.HasError() {
+				return diags
+			}
+
+			var stateAuthRulesData []authenticationRulesData
+			diags = stateData.AuthenticationRules.ElementsAs(ctx, &stateAuthRulesData, true)
+			if diags.HasError() {
+				return diags
+			}
+
+			for i, rule := range planAuthRulesData {
+				if !rule.IdentityProviderId.IsNull() && !rule.IdentityProviderId.IsUnknown() {
+					stateAuthRulesData[i].IdentityProviderId = rule.IdentityProviderId
+				}
+			}
+
+			stateData.AuthenticationRules, diags = types.ListValueFrom(ctx, authenticationRulesObjType, stateAuthRulesData)
+			if diags.HasError() {
+				return diags
+			}
+
 		}
 
 		state.AuthenticationSchema, diags = types.ObjectValueFrom(ctx, authenticationSchemaObjType, stateData)
