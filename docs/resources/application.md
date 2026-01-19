@@ -82,7 +82,7 @@ Optional:
 - `default_authenticating_idp` (String) A default identity provider can be used for users with any user domain, group and type. This identity provider is used when none of the defined authentication rules meets the criteria.
 - `oidc_config` (Attributes) OpenID Connect (OIDC) configuration options for this application. (see [below for nested schema](#nestedatt--authentication_schema--oidc_config))
 - `saml2_config` (Attributes) Configure a SAML 2.0 service provider by providing the necessary metadata. (see [below for nested schema](#nestedatt--authentication_schema--saml2_config))
-- `sso_type` (String) The preferred protocol for the application. Acceptable values are : `openIdConnect`, `saml2`
+- `sso_type` (String) The preferred protocol for the application. Acceptable values are : `openIdConnect`, `saml2`, `saml2oidc`
 - `subject_name_identifier` (Attributes) The attribute by which the application uses to identify the users. Used by the application to uniquely identify the user during logon.
 Identity Authentication sends the attribute to the application as :
 	 - subject in OpenID Connect tokens
