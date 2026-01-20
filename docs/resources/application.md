@@ -160,7 +160,7 @@ Optional:
 
 - `access_token_format` (String) The format of the access token issued.Acceptable values are : `default`, `jwt`, `opaque`
 - `jwt_validity` (Number) JWT access token validity in seconds. Must be between 60 seconds (1 minute) and 43200 seconds (12 hours).
-- `max_exchange_period` (String) Maximum token exchange period. Acceptable values are : `unlimited`, `maxSessionValidity`, `initialRefreshTokenValidity`
+- `max_exchange_period` (String) Maximum token exchange period. Acceptable values are : `unlimited`, `maxSessionValidity`, `initialRefreshTokenValidity`, `custom`
 - `refresh_parallel` (Number) Maximum number of refresh tokens that can be used in parallel. Valid values range from 1 to 10.
 - `refresh_token_rotation_scenario` (String) Defines the scenario for refresh token rotation. Acceptable values are : `off`, `online`, `mobile`
 - `refresh_validity` (Number) Refresh token validity in seconds. Can range from 0 to 15552000 seconds (180 days).

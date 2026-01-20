@@ -36,7 +36,7 @@ var (
 	ssoValues                           = []string{"openIdConnect", "saml2", "saml2oidc"}
 	usersTypeValues                     = []string{"public", "employee", "customer", "partner", "external", "onboardee"}
 	subjectNameIdentifierFunctionValues = []string{"none", "upperCase", "lowerCase"}
-	maxExchangePeriodValues             = []string{"unlimited", "maxSessionValidity", "initialRefreshTokenValidity"}
+	maxExchangePeriodValues             = []string{"unlimited", "maxSessionValidity", "initialRefreshTokenValidity", "custom"}
 	refreshTokenRotationScenarioValues  = []string{"off", "online", "mobile"}
 	accessTokenFormatValues             = []string{"default", "jwt", "opaque"}
 	restrictedGrantTypesValues          = []string{"clientCredentials", "authorizationCode", "refreshToken", "password", "implicit", "jwtBearer", "authorizationCodePkceS256", "tokenExchange"}
@@ -401,9 +401,9 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 										MarkdownDescription: "Maximum token exchange period. " + utils.ValidValuesString(maxExchangePeriodValues),
 										Optional:            true,
 										Computed:            true,
-										// Validators: []validator.String{
-										// 	stringvalidator.OneOf(maxExchangePeriodValues...),
-										// },
+										Validators: []validator.String{
+											stringvalidator.OneOf(maxExchangePeriodValues...),
+										},
 									},
 									"refresh_token_rotation_scenario": schema.StringAttribute{
 										MarkdownDescription: "Defines the scenario for refresh token rotation. " + utils.ValidValuesString(refreshTokenRotationScenarioValues),
