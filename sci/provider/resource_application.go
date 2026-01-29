@@ -331,9 +331,9 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 							objectplanmodifier.UseStateForUnknown(),
 						},
 						Validators: []validator.Object{
-							objectvalidator.AlsoRequires(
-								path.MatchRoot("authentication_schema").AtName("oidc_config").AtName("redirect_uris"),
-							),
+							// objectvalidator.AlsoRequires(
+							// 	path.MatchRoot("authentication_schema").AtName("oidc_config").AtName("redirect_uris"),
+							// ), 
 						},
 						Attributes: map[string]schema.Attribute{
 							"redirect_uris": schema.SetAttribute{
@@ -406,9 +406,9 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 										MarkdownDescription: "Maximum token exchange period. " + utils.ValidValuesString(maxExchangePeriodValues),
 										Optional:            true,
 										Computed:            true,
-										Validators: []validator.String{
-											stringvalidator.OneOf(maxExchangePeriodValues...),
-										},
+										// Validators: []validator.String{
+										// 	stringvalidator.OneOf(maxExchangePeriodValues...),
+										// },
 									},
 									"refresh_token_rotation_scenario": schema.StringAttribute{
 										MarkdownDescription: "Defines the scenario for refresh token rotation. " + utils.ValidValuesString(refreshTokenRotationScenarioValues),
@@ -469,10 +469,10 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 							objectvalidator.AlsoRequires(
 								path.MatchRoot("name"),
 							),
-							utils.ValidType(
-								path.MatchRoot("authentication_schema").AtName("sso_type"),
-								ssoValues[1:],
-							),
+							// utils.ValidType(
+							// 	path.MatchRoot("authentication_schema").AtName("sso_type"),
+							// 	ssoValues[1:],
+							// ),
 						},
 						PlanModifiers: []planmodifier.Object{
 							objectplanmodifier.UseStateForUnknown(),
@@ -649,7 +649,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 								Computed:            true,
 								Validators: []validator.String{
 									stringvalidator.OneOf(responseElementsToEncrypt...),
-									stringvalidator.AlsoRequires(path.MatchRoot("authentication_schema").AtName("saml2_config").AtName("encryption_certificate")),
+									// stringvalidator.AlsoRequires(path.MatchRoot("authentication_schema").AtName("saml2_config").AtName("encryption_certificate")),
 								},
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
