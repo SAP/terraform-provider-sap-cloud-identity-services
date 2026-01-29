@@ -785,7 +785,7 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithSsoType("testApp", "test-app", "application for testing purposes", "this-is-not-a-valid-sso_type", ""),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_schema.sso_type value must be one of:\n\\[\"openIdConnect\" \"saml2\"], got: \"%s\"", "this-is-not-a-valid-sso_type")),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_schema.sso_type value must be one of:\n\\[\"openIdConnect\" \"saml2\" \"saml2oidc\"], got: \"%s\"", "this-is-not-a-valid-sso_type")),
 				},
 			},
 		})
@@ -932,19 +932,6 @@ func TestResourceApplication(t *testing.T) {
 				{
 					Config:      ResourceApplicationWithAuthenticationRules("testApp", "test-app", "application for testing purposes", "identity_provider_id = \"664c660e25cff252c5c202dc\", ip_network_range = \"this-is-not-ip-address\""),
 					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute\nauthentication_schema.conditional_authentication\\[0].ip_network_range value\nmust be a valid IP Address with a valid CIDR notation, got:\n%s", "this-is-not-ip-address")),
-				},
-			},
-		})
-	})
-
-	t.Run("error path - authentication_schema.sso_type must be a valid value when saml2 is configured", func(t *testing.T) {
-		resource.Test(t, resource.TestCase{
-			IsUnitTest:               true,
-			ProtoV6ProviderFactories: getTestProviders(nil),
-			Steps: []resource.TestStep{
-				{
-					Config:      ResourceApplicationWithSsoType("testApp", "test-app", "application for testing purposes", "openIdConnect", "saml2_config = {}"),
-					ExpectError: regexp.MustCompile("Attribute authentication_schema.saml2_config : value of attribute\n\"authentication_schema.sso_type\" must be modified to match the IDP\nconfiguration provided. Acceptable values are : `saml2`, got: openIdConnect"),
 				},
 			},
 		})
@@ -1119,20 +1106,6 @@ func TestResourceApplication(t *testing.T) {
 		})
 	})
 
-	t.Run("error path - saml2_config.response_elements_to_encrypt requires attribute encryption_certificate", func(t *testing.T) {
-
-		resource.Test(t, resource.TestCase{
-			IsUnitTest:               true,
-			ProtoV6ProviderFactories: getTestProviders(nil),
-			Steps: []resource.TestStep{
-				{
-					Config:      ResourceApplicationWithSaml2ResponseElementsToEncrypt("testApp", "test-app", "", "none"),
-					ExpectError: regexp.MustCompile(`Attribute "authentication_schema.saml2_config.encryption_certificate" must be\nspecified when\n"authentication_schema.saml2_config.response_elements_to_encrypt" is\nspecified`),
-				},
-			},
-		})
-	})
-
 	t.Run("error path - saml2_config.digest_algorithm must be a valid value", func(t *testing.T) {
 		digestAlgorithm := "invalid-digest-algorithm"
 
@@ -1146,19 +1119,6 @@ func TestResourceApplication(t *testing.T) {
 				},
 			},
 		})
-	})
-	t.Run("error path - oidc_config.redirect_uris is mandatory with oidc configuration", func(t *testing.T) {
-		resource.Test(t, resource.TestCase{
-			IsUnitTest:               true,
-			ProtoV6ProviderFactories: getTestProviders(nil),
-			Steps: []resource.TestStep{
-				{
-					Config:      ResourceApplicationWithoutRedirectUris("testApp", "test-app", "application for testing purposes"),
-					ExpectError: regexp.MustCompile("Attribute \"authentication_schema.oidc_config.redirect_uris\" must be specified\nwhen \"authentication_schema.oidc_config\" is specified"),
-				},
-			},
-		})
-
 	})
 
 	t.Run("error path - oidc_config.front_channel_logout invalid URI", func(t *testing.T) {
@@ -1194,7 +1154,7 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceApplicationWithMaxExchangePeriod("testApp", "test-app", "application for testing purposes", "this-is-not-a-valid-max_exchange_period"),
-					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_schema.oidc_config.token_policy.max_exchange_period\nvalue must be one of: \\[\"unlimited\" \"maxSessionValidity\"\n\"initialRefreshTokenValidity\"\\], got:\n\"%s\"", "this-is-not-a-valid-max_exchange_period")),
+					ExpectError: regexp.MustCompile(fmt.Sprintf("Attribute authentication_schema.oidc_config.token_policy.max_exchange_period\nvalue must be one of: \\[\"unlimited\" \"maxSessionValidity\"\n\"initialRefreshTokenValidity\" \"custom\"\\], got:\n\"%s\"", "this-is-not-a-valid-max_exchange_period")),
 				},
 			},
 		})

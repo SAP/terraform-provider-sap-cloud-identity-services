@@ -82,7 +82,7 @@ Optional:
 - `default_authenticating_idp` (String) A default identity provider can be used for users with any user domain, group and type. This identity provider is used when none of the defined authentication rules meets the criteria.
 - `oidc_config` (Attributes) OpenID Connect (OIDC) configuration options for this application. (see [below for nested schema](#nestedatt--authentication_schema--oidc_config))
 - `saml2_config` (Attributes) Configure a SAML 2.0 service provider by providing the necessary metadata. (see [below for nested schema](#nestedatt--authentication_schema--saml2_config))
-- `sso_type` (String) The preferred protocol for the application. Acceptable values are : `openIdConnect`, `saml2`
+- `sso_type` (String) The preferred protocol for the application. Acceptable values are : `openIdConnect`, `saml2`, `saml2oidc`
 - `subject_name_identifier` (Attributes) The attribute by which the application uses to identify the users. Used by the application to uniquely identify the user during logon.
 Identity Authentication sends the attribute to the application as :
 	 - subject in OpenID Connect tokens
@@ -160,7 +160,7 @@ Optional:
 
 - `access_token_format` (String) The format of the access token issued.Acceptable values are : `default`, `jwt`, `opaque`
 - `jwt_validity` (Number) JWT access token validity in seconds. Must be between 60 seconds (1 minute) and 43200 seconds (12 hours).
-- `max_exchange_period` (String) Maximum token exchange period. Acceptable values are : `unlimited`, `maxSessionValidity`, `initialRefreshTokenValidity`
+- `max_exchange_period` (String) Maximum token exchange period. Acceptable values are : `unlimited`, `maxSessionValidity`, `initialRefreshTokenValidity`, `custom`
 - `refresh_parallel` (Number) Maximum number of refresh tokens that can be used in parallel. Valid values range from 1 to 10.
 - `refresh_token_rotation_scenario` (String) Defines the scenario for refresh token rotation. Acceptable values are : `off`, `online`, `mobile`
 - `refresh_validity` (Number) Refresh token validity in seconds. Can range from 0 to 15552000 seconds (180 days).

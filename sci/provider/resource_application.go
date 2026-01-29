@@ -33,10 +33,10 @@ import (
 
 var (
 	sourceValues                        = []string{"Identity Directory", "Corporate Identity Provider", "Expression"}
-	ssoValues                           = []string{"openIdConnect", "saml2"}
+	ssoValues                           = []string{"openIdConnect", "saml2", "saml2oidc"}
 	usersTypeValues                     = []string{"public", "employee", "customer", "partner", "external", "onboardee"}
 	subjectNameIdentifierFunctionValues = []string{"none", "upperCase", "lowerCase"}
-	maxExchangePeriodValues             = []string{"unlimited", "maxSessionValidity", "initialRefreshTokenValidity"}
+	maxExchangePeriodValues             = []string{"unlimited", "maxSessionValidity", "initialRefreshTokenValidity", "custom"}
 	refreshTokenRotationScenarioValues  = []string{"off", "online", "mobile"}
 	accessTokenFormatValues             = []string{"default", "jwt", "opaque"}
 	restrictedGrantTypesValues          = []string{"clientCredentials", "authorizationCode", "refreshToken", "password", "implicit", "jwtBearer", "authorizationCodePkceS256", "tokenExchange"}
@@ -330,11 +330,6 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 						PlanModifiers: []planmodifier.Object{
 							objectplanmodifier.UseStateForUnknown(),
 						},
-						Validators: []validator.Object{
-							objectvalidator.AlsoRequires(
-								path.MatchRoot("authentication_schema").AtName("oidc_config").AtName("redirect_uris"),
-							),
-						},
 						Attributes: map[string]schema.Attribute{
 							"redirect_uris": schema.SetAttribute{
 								MarkdownDescription: "A list of redirect URIs that the OpenID Provider is allowed to redirect to after authentication. Must contain 1 to 20 valid URIs.",
@@ -468,10 +463,6 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 						Validators: []validator.Object{
 							objectvalidator.AlsoRequires(
 								path.MatchRoot("name"),
-							),
-							utils.ValidType(
-								path.MatchRoot("authentication_schema").AtName("sso_type"),
-								ssoValues[1:],
 							),
 						},
 						PlanModifiers: []planmodifier.Object{
@@ -649,7 +640,6 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 								Computed:            true,
 								Validators: []validator.String{
 									stringvalidator.OneOf(responseElementsToEncrypt...),
-									stringvalidator.AlsoRequires(path.MatchRoot("authentication_schema").AtName("saml2_config").AtName("encryption_certificate")),
 								},
 								PlanModifiers: []planmodifier.String{
 									stringplanmodifier.UseStateForUnknown(),
