@@ -126,9 +126,10 @@ func getPatchRequestBody(args any, tag string) ([]generic.PatchRequest) {
 				valSet = true
 
 				if val == "" {
-					switch fieldTag {
-					case "/urn:sap:identity:application:schemas:extension:sci:1.0:Authentication/subjectNameIdentifierFunction":
-						val = "none"
+					remove := validate(fieldTag)
+
+					if remove {
+						continue
 					}
 				}
 			case "bool":
@@ -139,7 +140,6 @@ func getPatchRequestBody(args any, tag string) ([]generic.PatchRequest) {
 				valSet = true
 			case "slice":
 				if fieldValue.IsNil() {
-					// fieldValue.SetZero()
 					val = []any{}
 					valSet = true
 				} else {
@@ -185,3 +185,16 @@ func getPatchRequestBody(args any, tag string) ([]generic.PatchRequest) {
 	return patchRequests
 }
 
+func validate(fieldTag string) bool {
+
+	remove := false
+
+	switch fieldTag {
+	case "/urn:sap:identity:application:schemas:extension:sci:1.0:Authentication/saml2Configuration/samlMetadataUrl":
+		fallthrough
+	case "/urn:sap:identity:application:schemas:extension:sci:1.0:Authentication/subjectNameIdentifierFunction":
+		remove = true
+	}
+
+	return remove
+}
