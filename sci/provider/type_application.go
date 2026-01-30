@@ -323,19 +323,27 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 		saml2Res := a.AuthenticationSchema.Saml2Configuration
 		saml2Config := AppSaml2ConfigData{
 			ResponseElementsToEncrypt: types.StringValue(saml2Res.ResponseElementsToEncrypt),
-			DefaultNameIdFormat:       types.StringValue(saml2Res.DefaultNameIdFormat),
 			SignSloMessages:           types.BoolValue(saml2Res.SignSLOMessages),
 			RequireSignedSloMessages:  types.BoolValue(saml2Res.RequireSignedSLOMessages),
 			RequireSignedAuthnRequest: types.BoolValue(saml2Res.RequireSignedAuthnRequest),
 			SignAssertions:            types.BoolValue(saml2Res.SignAssertions),
 			SignAuthnResponses:        types.BoolValue(saml2Res.SignAuthnResponses),
-			DigestAlgorithm:           types.StringValue(saml2Res.DigestAlgorithm),
 		}
 
 		// SAML2
 		// Saml Metadata URL
 		if len(saml2Res.SamlMetadataUrl) > 0 {
 			saml2Config.SamlMetadataUrl = types.StringValue(saml2Res.SamlMetadataUrl)
+		}
+
+		// Saml Digest Algorithm
+		if len(saml2Res.DigestAlgorithm) > 0 {
+			saml2Config.DigestAlgorithm = types.StringValue(saml2Res.DigestAlgorithm)
+		}
+
+		// Saml Default NameId Format
+		if len((saml2Res.DefaultNameIdFormat)) > 0 {
+			saml2Config.DefaultNameIdFormat = types.StringValue(reflect.ValueOf(saml2Res.DefaultNameIdFormat).String())
 		}
 
 		// SAML2 ACS Endpoints
