@@ -192,6 +192,10 @@ func validate(fieldTag string) bool {
 	switch fieldTag {
 	case "/urn:sap:identity:application:schemas:extension:sci:1.0:Authentication/saml2Configuration/samlMetadataUrl":
 		fallthrough
+	case "/urn:sap:identity:application:schemas:extension:sci:1.0:Authentication/saml2Configuration/digestAlgorithm":
+		fallthrough
+	case "/urn:sap:identity:application:schemas:extension:sci:1.0:Authentication/saml2Configuration/defaultNameIdFormat":
+		fallthrough
 	case "/urn:sap:identity:application:schemas:extension:sci:1.0:Authentication/subjectNameIdentifierFunction":
 		remove = true
 	}
