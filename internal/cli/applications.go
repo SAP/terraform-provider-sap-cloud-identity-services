@@ -82,7 +82,7 @@ func (a *ApplicationsCli) Delete(ctx context.Context, appId string) error {
 	return err
 }
 
-func getPatchRequestBody(args any, tag string) ([]generic.PatchRequest) {
+func getPatchRequestBody(args any, tag string) []generic.PatchRequest {
 	var patchRequests, reqs []generic.PatchRequest
 
 	argsVal := reflect.ValueOf(args)
@@ -93,13 +93,13 @@ func getPatchRequestBody(args any, tag string) ([]generic.PatchRequest) {
 		argsType = argsType.Elem()
 	}
 
-	for i:=0; i<argsType.NumField(); i++ {
+	for i := 0; i < argsType.NumField(); i++ {
 
 		field := argsType.Field(i)
-	
+
 		fieldName := field.Name
 		fieldType := field.Type
-		
+
 		fieldTag := fmt.Sprintf("/%s", strings.Split(field.Tag.Get("json"), ",")[0])
 
 		if tag != "" {
@@ -113,67 +113,72 @@ func getPatchRequestBody(args any, tag string) ([]generic.PatchRequest) {
 		t := fieldType.Kind().String()
 
 		switch t {
-			case "struct":
-			case "ptr":
-				if fieldValue.IsNil() { 
-					val = nil
-				} else {
-					reqs = getPatchRequestBody(fieldValue.Interface(), fieldTag)
-					valSet = false
+		case "struct":
+		case "ptr":
+			if fieldValue.IsNil() {
+				val = nil
+			} else {
+				reqs = getPatchRequestBody(fieldValue.Interface(), fieldTag)
+				valSet = false
+			}
+		case "string":
+			val = fieldValue.String()
+			valSet = true
+
+			if val == "" {
+				// remove := validate(fieldTag)
+
+				// if remove {
+				// 	continue
+				// }
+
+				switch fieldTag {
+				case "/urn:sap:identity:application:schemas:extension:sci:1.0:Authentication/subjectNameIdentifierFunction":
+					val = "none"
+
 				}
-			case "string":
-				val = fieldValue.String()
+			}
+		case "bool":
+			val = fieldValue.Bool()
+			valSet = true
+		case "int":
+			val = fieldValue.Int()
+			valSet = true
+		case "slice":
+			if fieldValue.IsNil() {
+				val = []any{}
 				valSet = true
+			} else {
 
-				if val == "" {
-					remove := validate(fieldTag)
+				for i := range fieldValue.Len() {
+					obj := fieldValue.Index(i).Interface()
+					var req []generic.PatchRequest
 
-					if remove {
-						continue
-					}
-				}
-			case "bool":
-				val = fieldValue.Bool()
-				valSet = true
-			case "int":
-				val = fieldValue.Int()
-				valSet = true
-			case "slice":
-				if fieldValue.IsNil() {
-					val = []any{}
-					valSet = true
-				} else {
-					
-
-					for i := range fieldValue.Len() {
-						obj := fieldValue.Index(i).Interface()
-						var req []generic.PatchRequest
-
-						objType := reflect.TypeOf(obj)
-						if objType.Kind().String() != "ptr" && objType.Kind().String() != "struct" {
-							req = []generic.PatchRequest{ 
-								{
-									Op:    "replace",
-									Path:  fmt.Sprintf("%s/%d", fieldTag, i),
-									Value: obj,
-								},
-							}
-						} else {
-							req = getPatchRequestBody(obj, fmt.Sprintf("%s/%d", fieldTag, i))
+					objType := reflect.TypeOf(obj)
+					if objType.Kind().String() != "ptr" && objType.Kind().String() != "struct" {
+						req = []generic.PatchRequest{
+							{
+								Op:    "replace",
+								Path:  fmt.Sprintf("%s/%d", fieldTag, i),
+								Value: obj,
+							},
 						}
-						
-						reqs = append(reqs, req...)
+					} else {
+						req = getPatchRequestBody(obj, fmt.Sprintf("%s/%d", fieldTag, i))
 					}
-					valSet = false
+
+					reqs = append(reqs, req...)
 				}
+				valSet = false
+			}
 		}
 
 		if !valSet {
 			patchRequests = append(patchRequests, reqs...)
 		} else {
 			patchRequest := generic.PatchRequest{
-				Op:   "replace",
-				Path: fieldTag,
+				Op:    "replace",
+				Path:  fieldTag,
 				Value: val,
 			}
 
@@ -185,20 +190,20 @@ func getPatchRequestBody(args any, tag string) ([]generic.PatchRequest) {
 	return patchRequests
 }
 
-func validate(fieldTag string) bool {
+// func validate(fieldTag string) bool {
 
-	remove := false
+// 	remove := false
 
-	switch fieldTag {
-	case "/urn:sap:identity:application:schemas:extension:sci:1.0:Authentication/saml2Configuration/samlMetadataUrl":
-		fallthrough
-	case "/urn:sap:identity:application:schemas:extension:sci:1.0:Authentication/saml2Configuration/digestAlgorithm":
-		fallthrough
-	case "/urn:sap:identity:application:schemas:extension:sci:1.0:Authentication/saml2Configuration/defaultNameIdFormat":
-		fallthrough
-	case "/urn:sap:identity:application:schemas:extension:sci:1.0:Authentication/subjectNameIdentifierFunction":
-		remove = true
-	}
+// 	switch fieldTag {
+// 	case "/urn:sap:identity:application:schemas:extension:sci:1.0:Authentication/saml2Configuration/samlMetadataUrl":
+// 		fallthrough
+// 	case "/urn:sap:identity:application:schemas:extension:sci:1.0:Authentication/saml2Configuration/digestAlgorithm":
+// 		fallthrough
+// 	case "/urn:sap:identity:application:schemas:extension:sci:1.0:Authentication/saml2Configuration/defaultNameIdFormat":
+// 		fallthrough
+// 	case "/urn:sap:identity:application:schemas:extension:sci:1.0:Authentication/subjectNameIdentifierFunction":
+// 		remove = true
+// 	}
 
-	return remove
-}
+// 	return remove
+// }

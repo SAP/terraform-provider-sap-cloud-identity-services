@@ -208,7 +208,7 @@ type SapManagedAttributes struct {
 type AuthenticationSchema struct {
 	SsoType                       string                       `json:"ssoType,omitempty" tfsdk:"sso_type"`
 	SubjectNameIdentifier         string                       `json:"subjectNameIdentifier,omitempty" tfsdk:"subject_name_identifier"`
-	SubjectNameIdentifierFunction string                       `json:"subjectNameIdentifierFunction,omitempty" tfsdk:"subject_name_identifier_function"` 
+	SubjectNameIdentifierFunction string                       `json:"subjectNameIdentifierFunction,omitempty" tfsdk:"subject_name_identifier_function"`
 	AssertionAttributes           []AssertionAttribute         `json:"assertionAttributes" tfsdk:"assertion_attributes"`
 	AdvancedAssertionAttributes   []AdvancedAssertionAttribute `json:"advancedAssertionAttributes,omitempty" tfsdk:"advanced_assertion_attributes"`
 	DefaultAuthenticatingIdpId    string                       `json:"defaultAuthenticatingIdpId,omitempty" tfsdk:"default_authenticating_idp"`

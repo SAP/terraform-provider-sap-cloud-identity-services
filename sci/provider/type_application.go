@@ -263,7 +263,8 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 
 	// Authentication Schema OIDC
 	// the mapping is done manually in order to handle the null values
-	if a.AuthenticationSchema.OidcConfig != nil {
+
+	if a.AuthenticationSchema.SsoType != "saml2" {
 		oidc := openIdConnectConfigurationData{}
 
 		oidc.RedirectUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.RedirectUris)
@@ -319,7 +320,8 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 
 	// Authentication Schema SAML2
 	// the mapping is done manually in order to handle the null values
-	if a.AuthenticationSchema.Saml2Configuration != nil {
+
+	if a.AuthenticationSchema.SsoType != "openIdConnect" {
 		saml2Res := a.AuthenticationSchema.Saml2Configuration
 		saml2Config := AppSaml2ConfigData{
 			ResponseElementsToEncrypt: types.StringValue(saml2Res.ResponseElementsToEncrypt),
@@ -600,118 +602,122 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 		}
 
 		//SAML2 CONFIGURATION
-		if !authenticationSchema.Saml2Configuration.IsNull() && !authenticationSchema.Saml2Configuration.IsUnknown() {
+		if authenticationSchema.SsoType.ValueString() != "openIdConnect" {
+			if !authenticationSchema.Saml2Configuration.IsNull() && !authenticationSchema.Saml2Configuration.IsUnknown() {
 
-			var saml2config applications.SamlConfiguration
-			diags := authenticationSchema.Saml2Configuration.As(ctx, &saml2config, basetypes.ObjectAsOptions{
-				UnhandledNullAsEmpty:    true,
-				UnhandledUnknownAsEmpty: true,
-			})
-			diagnostics.Append(diags...)
+				var saml2config applications.SamlConfiguration
+				diags := authenticationSchema.Saml2Configuration.As(ctx, &saml2config, basetypes.ObjectAsOptions{
+					UnhandledNullAsEmpty:    true,
+					UnhandledUnknownAsEmpty: true,
+				})
+				diagnostics.Append(diags...)
 
-			if diagnostics.HasError() {
-				return nil, diagnostics
+				if diagnostics.HasError() {
+					return nil, diagnostics
+				}
+
+				args.AuthenticationSchema.Saml2Configuration = &saml2config
 			}
-
-			args.AuthenticationSchema.Saml2Configuration = &saml2config
 		}
 
 		//OPEN_ID_CONNECT_CONFIGURATION
-		if !authenticationSchema.OpenIdConnectConfiguration.IsNull() && !authenticationSchema.OpenIdConnectConfiguration.IsUnknown() {
+		if authenticationSchema.SsoType.ValueString() != "saml2" {
+			if !authenticationSchema.OpenIdConnectConfiguration.IsNull() && !authenticationSchema.OpenIdConnectConfiguration.IsUnknown() {
 
-			var openIdConnectConfiguration openIdConnectConfigurationData
-			diags := authenticationSchema.OpenIdConnectConfiguration.As(ctx, &openIdConnectConfiguration, basetypes.ObjectAsOptions{
-				UnhandledNullAsEmpty:    true,
-				UnhandledUnknownAsEmpty: true,
-			})
-			diagnostics.Append(diags...)
-
-			oidc := &applications.OidcConfig{}
-
-			// Redirect URIs
-			if !openIdConnectConfiguration.RedirectUris.IsNull() {
-				diags := openIdConnectConfiguration.RedirectUris.ElementsAs(ctx, &oidc.RedirectUris, true)
-				diagnostics.Append(diags...)
-			}
-
-			// Post Logout Redirect URIs
-			if !openIdConnectConfiguration.PostLogoutRedirectUris.IsNull() {
-				diags := openIdConnectConfiguration.PostLogoutRedirectUris.ElementsAs(ctx, &oidc.PostLogoutRedirectUris, true)
-				diagnostics.Append(diags...)
-			}
-
-			// Front Channel Logout URIs
-			if !openIdConnectConfiguration.FrontChannelLogoutUris.IsNull() {
-				diags := openIdConnectConfiguration.FrontChannelLogoutUris.ElementsAs(ctx, &oidc.FrontChannelLogoutUris, true)
-				diagnostics.Append(diags...)
-			}
-
-			// Back Channel Logout URIs
-			if !openIdConnectConfiguration.BackChannelLogoutUris.IsNull() {
-				diags := openIdConnectConfiguration.BackChannelLogoutUris.ElementsAs(ctx, &oidc.BackChannelLogoutUris, true)
-				diagnostics.Append(diags...)
-			}
-
-			// Restricted Grant Types
-			if !openIdConnectConfiguration.RestrictedGrantTypes.IsNull() {
-				diags := openIdConnectConfiguration.RestrictedGrantTypes.ElementsAs(ctx, &oidc.RestrictedGrantTypes, true)
-				diagnostics.Append(diags...)
-			}
-			if diagnostics.HasError() {
-				return nil, diagnostics
-			}
-
-			// Token Policy
-			if !openIdConnectConfiguration.TokenPolicy.IsNull() {
-				var token tokenPolicyData
-				diags := openIdConnectConfiguration.TokenPolicy.As(ctx, &token, basetypes.ObjectAsOptions{
+				var openIdConnectConfiguration openIdConnectConfigurationData
+				diags := authenticationSchema.OpenIdConnectConfiguration.As(ctx, &openIdConnectConfiguration, basetypes.ObjectAsOptions{
 					UnhandledNullAsEmpty:    true,
 					UnhandledUnknownAsEmpty: true,
 				})
 				diagnostics.Append(diags...)
-				if diagnostics.HasError() {
-					return nil, diagnostics
+
+				oidc := &applications.OidcConfig{}
+
+				// Redirect URIs
+				if !openIdConnectConfiguration.RedirectUris.IsNull() {
+					diags := openIdConnectConfiguration.RedirectUris.ElementsAs(ctx, &oidc.RedirectUris, true)
+					diagnostics.Append(diags...)
 				}
 
-				oidc.TokenPolicy = &applications.TokenPolicy{
-					JwtValidity:                  token.JwtValidity.ValueInt32(),
-					RefreshValidity:              token.RefreshValidity.ValueInt32(),
-					RefreshParallel:              token.RefreshParallel.ValueInt32(),
-					MaxExchangePeriod:            token.MaxExchangePeriod.ValueString(),
-					RefreshTokenRotationScenario: token.RefreshTokenRotationScenario.ValueString(),
-					AccessTokenFormat:            token.AccessTokenFormat.ValueString(),
-				}
-			}
-
-			// Proxy Config
-			if !openIdConnectConfiguration.ProxyConfig.IsNull() {
-				var proxy proxyConfigData
-				diags := openIdConnectConfiguration.ProxyConfig.As(ctx, &proxy, basetypes.ObjectAsOptions{
-					UnhandledNullAsEmpty:    true,
-					UnhandledUnknownAsEmpty: true,
-				})
-				diagnostics.Append(diags...)
-				if diagnostics.HasError() {
-					return nil, diagnostics
+				// Post Logout Redirect URIs
+				if !openIdConnectConfiguration.PostLogoutRedirectUris.IsNull() {
+					diags := openIdConnectConfiguration.PostLogoutRedirectUris.ElementsAs(ctx, &oidc.PostLogoutRedirectUris, true)
+					diagnostics.Append(diags...)
 				}
 
-				var acrs []string
-				if !proxy.Acrs.IsNull() {
-					diags := proxy.Acrs.ElementsAs(ctx, &acrs, true)
+				// Front Channel Logout URIs
+				if !openIdConnectConfiguration.FrontChannelLogoutUris.IsNull() {
+					diags := openIdConnectConfiguration.FrontChannelLogoutUris.ElementsAs(ctx, &oidc.FrontChannelLogoutUris, true)
+					diagnostics.Append(diags...)
+				}
+
+				// Back Channel Logout URIs
+				if !openIdConnectConfiguration.BackChannelLogoutUris.IsNull() {
+					diags := openIdConnectConfiguration.BackChannelLogoutUris.ElementsAs(ctx, &oidc.BackChannelLogoutUris, true)
+					diagnostics.Append(diags...)
+				}
+
+				// Restricted Grant Types
+				if !openIdConnectConfiguration.RestrictedGrantTypes.IsNull() {
+					diags := openIdConnectConfiguration.RestrictedGrantTypes.ElementsAs(ctx, &oidc.RestrictedGrantTypes, true)
 					diagnostics.Append(diags...)
 				}
 				if diagnostics.HasError() {
 					return nil, diagnostics
 				}
-				oidc.ProxyConfig = &applications.OidcProxyConfig{
-					Acrs: acrs,
-				}
-			}
 
-			if diagnostics.HasError() {
-				return nil, diagnostics
+				// Token Policy
+				if !openIdConnectConfiguration.TokenPolicy.IsNull() {
+					var token tokenPolicyData
+					diags := openIdConnectConfiguration.TokenPolicy.As(ctx, &token, basetypes.ObjectAsOptions{
+						UnhandledNullAsEmpty:    true,
+						UnhandledUnknownAsEmpty: true,
+					})
+					diagnostics.Append(diags...)
+					if diagnostics.HasError() {
+						return nil, diagnostics
+					}
+
+					oidc.TokenPolicy = &applications.TokenPolicy{
+						JwtValidity:                  token.JwtValidity.ValueInt32(),
+						RefreshValidity:              token.RefreshValidity.ValueInt32(),
+						RefreshParallel:              token.RefreshParallel.ValueInt32(),
+						MaxExchangePeriod:            token.MaxExchangePeriod.ValueString(),
+						RefreshTokenRotationScenario: token.RefreshTokenRotationScenario.ValueString(),
+						AccessTokenFormat:            token.AccessTokenFormat.ValueString(),
+					}
+				}
+
+				// Proxy Config
+				if !openIdConnectConfiguration.ProxyConfig.IsNull() {
+					var proxy proxyConfigData
+					diags := openIdConnectConfiguration.ProxyConfig.As(ctx, &proxy, basetypes.ObjectAsOptions{
+						UnhandledNullAsEmpty:    true,
+						UnhandledUnknownAsEmpty: true,
+					})
+					diagnostics.Append(diags...)
+					if diagnostics.HasError() {
+						return nil, diagnostics
+					}
+
+					var acrs []string
+					if !proxy.Acrs.IsNull() {
+						diags := proxy.Acrs.ElementsAs(ctx, &acrs, true)
+						diagnostics.Append(diags...)
+					}
+					if diagnostics.HasError() {
+						return nil, diagnostics
+					}
+					oidc.ProxyConfig = &applications.OidcProxyConfig{
+						Acrs: acrs,
+					}
+				}
+
+				if diagnostics.HasError() {
+					return nil, diagnostics
+				}
+				args.AuthenticationSchema.OidcConfig = oidc
 			}
-			args.AuthenticationSchema.OidcConfig = oidc
 		}
 
 		// SAP MANAGED ATTRIBUTES
