@@ -76,12 +76,12 @@ func TestDataSourceApplication(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + DataSourceApplication("testBundledApp", "XSUAA_b75a605d-151c-4485-83f4-64604378e4ec"),
+					Config: providerConfig("", user) + DataSourceApplication("testBundledApp", "XSUAA_59cd458e-e66e-4b60-b6d8-8f219379f9a5"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("data.sci_application.testBundledApp", "id", regexpUUID),
-						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "name", "XSUAA_b75a605d-151c-4485-83f4-64604378e4ec"),
+						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "name", "XSUAA_59cd458e-e66e-4b60-b6d8-8f219379f9a5"),
 						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.type", "xsuaa"),
-						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.app_tenant_id", "b75a605d-151c-4485-83f4-64604378e4ec"),
+						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.app_tenant_id", "59cd458e-e66e-4b60-b6d8-8f219379f9a5"),
 					),
 				},
 			},
@@ -98,15 +98,15 @@ func TestDataSourceApplication(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + DataSourceApplication("testBundledApp", "identity-subscription-c6c390f4-c9a2-4a6c-9cc7-01675a31e4f6-in-b75a605d-151c-4485-83f4-64604378e4ec"),
+					Config: providerConfig("", user) + DataSourceApplication("testBundledApp", "identity-subscription-ab2dc547-eb19-4689-adbb-1dfa5f9da6fd-in-59cd458e-e66e-4b60-b6d8-8f219379f9a5"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("data.sci_application.testBundledApp", "id", regexpUUID),
-						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "name", "identity-subscription-c6c390f4-c9a2-4a6c-9cc7-01675a31e4f6-in-b75a605d-151c-4485-83f4-64604378e4ec"),
+						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "name", "identity-subscription-ab2dc547-eb19-4689-adbb-1dfa5f9da6fd-in-59cd458e-e66e-4b60-b6d8-8f219379f9a5"),
 						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.type", "subscription"),
-						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.app_tenant_id", "b75a605d-151c-4485-83f4-64604378e4ec"),
-						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.source_app_id", "3cc4b385-fe8b-423a-a8c0-34e15c9970cd"),
-						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.source_tenant_id", "sapdas"),
-						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.service_instance_id", "c6c390f4-c9a2-4a6c-9cc7-01675a31e4f6"),
+						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.app_tenant_id", "59cd458e-e66e-4b60-b6d8-8f219379f9a5"),
+						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.source_app_id", "727a3744-ec0b-4c03-8f3f-693cf16c8748"),
+						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.source_tenant_id", "aqbwe1y4z"),
+						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.service_instance_id", "ab2dc547-eb19-4689-adbb-1dfa5f9da6fd"),
 					),
 				},
 			},

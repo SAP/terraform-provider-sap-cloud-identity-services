@@ -20,7 +20,7 @@ func (g *GroupsCli) getUrl() string {
 
 func (g *GroupsCli) Get(ctx context.Context) (groups.GroupsResponse, string, error) {
 
-	res, _, err := g.cliClient.Execute(ctx, "GET", g.getUrl(), nil, "", ScimRequestHeader, nil)
+	res, _, err := g.cliClient.Execute(ctx, "GET", g.getUrl(), nil, nil, "", ScimRequestHeader, nil)
 
 	if err != nil {
 		return groups.GroupsResponse{}, "", err
@@ -31,7 +31,7 @@ func (g *GroupsCli) Get(ctx context.Context) (groups.GroupsResponse, string, err
 
 func (g *GroupsCli) GetByGroupId(ctx context.Context, groupId string) (groups.Group, string, error) {
 
-	res, _, err := g.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", g.getUrl(), groupId), nil, "", ScimRequestHeader, nil)
+	res, _, err := g.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", g.getUrl(), groupId), nil, nil, "", ScimRequestHeader, nil)
 
 	if err != nil {
 		return groups.Group{}, "", err
@@ -42,7 +42,7 @@ func (g *GroupsCli) GetByGroupId(ctx context.Context, groupId string) (groups.Gr
 
 func (g *GroupsCli) Create(ctx context.Context, args *groups.Group) (groups.Group, string, error) {
 
-	res, _, err := g.cliClient.Execute(ctx, "POST", g.getUrl(), args, "", ScimRequestHeader, nil)
+	res, _, err := g.cliClient.Execute(ctx, "POST", g.getUrl(), nil, args, "", ScimRequestHeader, nil)
 
 	if err != nil {
 		return groups.Group{}, "", err
@@ -53,7 +53,7 @@ func (g *GroupsCli) Create(ctx context.Context, args *groups.Group) (groups.Grou
 
 func (g *GroupsCli) Update(ctx context.Context, args *groups.Group) (groups.Group, string, error) {
 
-	res, _, err := g.cliClient.Execute(ctx, "PUT", fmt.Sprintf("%s%s", g.getUrl(), args.Id), args, "", ScimRequestHeader, nil)
+	res, _, err := g.cliClient.Execute(ctx, "PUT", fmt.Sprintf("%s%s", g.getUrl(), args.Id), nil, args, "", ScimRequestHeader, nil)
 
 	if err != nil {
 		return groups.Group{}, "", err
@@ -64,7 +64,7 @@ func (g *GroupsCli) Update(ctx context.Context, args *groups.Group) (groups.Grou
 
 func (g *GroupsCli) Delete(ctx context.Context, groupId string) error {
 
-	_, _, err := g.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", g.getUrl(), groupId), nil, "", ScimRequestHeader, nil)
+	_, _, err := g.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", g.getUrl(), groupId), nil, nil, "", ScimRequestHeader, nil)
 
 	return err
 }
