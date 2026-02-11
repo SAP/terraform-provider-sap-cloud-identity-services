@@ -86,9 +86,11 @@ func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, 
 		return nil, err
 	}
 
-	for k, v := range queryStrings {
+	if len(queryStrings) > 0 {
 		query := req.URL.Query()
-		query.Add(k, v)
+		for k, v := range queryStrings {
+			query.Set(k, v)
+		}
 		req.URL.RawQuery = query.Encode()
 	}
 

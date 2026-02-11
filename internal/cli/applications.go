@@ -20,31 +20,37 @@ func (a *ApplicationsCli) getUrl() string {
 	return "Applications/v1/"
 }
 
-func (a *ApplicationsCli) Get(cursor string, ctx context.Context) (applications.ApplicationsResponse, string, error) {
+func (a *ApplicationsCli) Get(ctx context.Context, cursor string) (applications.ApplicationsResponse, string, error) {
 
-	queryStrings := map[string]string{
-		"cursor": cursor,
-	}
+	var allApps applications.ApplicationsResponse
 
-	res, _, err := a.cliClient.Execute(ctx, "GET", a.getUrl(), queryStrings, nil, "", RequestHeader, nil)
+	for {
+		queryStrings := map[string]string{
+			"cursor": cursor,
+		}
 
-	if err != nil {
-		return applications.ApplicationsResponse{}, "", err
-	}
-
-	responses, _, err := unMarshalResponse[applications.ApplicationsResponse](res, false)
-
-	if responses.NextCursor != "" {
-		nextResponses, _, err := a.Get(responses.NextCursor, ctx)
-
+		res, _, err := a.cliClient.Execute(ctx, "GET", a.getUrl(), queryStrings, nil, "", RequestHeader, nil)
 		if err != nil {
 			return applications.ApplicationsResponse{}, "", err
 		}
 
-		responses.Applications = append(responses.Applications, nextResponses.Applications...)
+		resp, _, err := unMarshalResponse[applications.ApplicationsResponse](res, false)
+		if err != nil {
+			return applications.ApplicationsResponse{}, "", err
+		}
+
+		allApps.Applications = append(allApps.Applications, resp.Applications...)
+
+		if resp.NextCursor == "" {
+			break
+		}
+
+		cursor = resp.NextCursor
 	}
 
-	return responses, "", err
+	allApps.NextCursor = cursor
+
+	return allApps, "", nil
 }
 
 func (a *ApplicationsCli) GetByAppId(ctx context.Context, appId string) (applications.Application, string, error) {

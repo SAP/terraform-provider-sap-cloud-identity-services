@@ -206,7 +206,7 @@ func TestApplications_Get(t *testing.T) {
 
 		defer srv.Close()
 
-		_, _, err := client.Application.Get("", context.TODO())
+		_, _, err := client.Application.Get(context.TODO(), "")
 
 		assert.NoError(t, err)
 	})
@@ -214,7 +214,7 @@ func TestApplications_Get(t *testing.T) {
 	t.Run("validate the API request - with cursor", func(t *testing.T) {
 
 		resWithCursor, _ := json.Marshal(applications.ApplicationsResponse{
-			NextCursor: "test",
+			NextCursor:   "test",
 			Applications: allApplications,
 		})
 
@@ -223,7 +223,7 @@ func TestApplications_Get(t *testing.T) {
 		})
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			
+
 			if r.URL.Query().Get("cursor") == "" {
 				_, err := w.Write(resWithCursor)
 				assert.NoError(t, err, "Failed to write response")
@@ -231,14 +231,13 @@ func TestApplications_Get(t *testing.T) {
 				_, err := w.Write(resWithoutCursor)
 				assert.NoError(t, err, "Failed to write response")
 			}
-			
 
 			assertCall[applications.Application](t, r, applicationsPath, "GET", nil)
 		}))
 
 		defer srv.Close()
 
-		res, _, err := client.Application.Get("", context.TODO())
+		res, _, err := client.Application.Get(context.TODO(), "")
 
 		assert.NoError(t, err)
 		assert.Len(t, res.Applications, 4)
@@ -270,7 +269,7 @@ func TestApplications_Get(t *testing.T) {
 
 		defer srv.Close()
 
-		res, _, err := client.Application.Get("", context.TODO())
+		res, _, err := client.Application.Get(context.TODO(), "")
 
 		assert.Zero(t, res)
 		assert.Error(t, err)

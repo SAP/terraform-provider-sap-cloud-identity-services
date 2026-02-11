@@ -106,7 +106,7 @@ func TestDataSourceApplication(t *testing.T) {
 						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.app_tenant_id", "59cd458e-e66e-4b60-b6d8-8f219379f9a5"),
 						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.source_app_id", "727a3744-ec0b-4c03-8f3f-693cf16c8748"),
 						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.source_tenant_id", "aqbwe1y4z"),
-						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.service_instance_id", "ab2dc547-eb19-4689-adbb-1dfa5f9da6fd"),
+						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.service_instance_id", "ab2dc547-eb19-4689-adbb-1dfa5f9da6fdx"),
 					),
 				},
 			},
