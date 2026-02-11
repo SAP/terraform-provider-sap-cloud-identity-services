@@ -22,7 +22,7 @@ func (c *CorporateIdPsCli) getUrl() string {
 
 func (c *CorporateIdPsCli) Get(ctx context.Context) (corporateidps.IdentityProvidersResponse, string, error) {
 
-	res, _, err := c.cliClient.Execute(ctx, "GET", c.getUrl(), nil, "", RequestHeader, nil)
+	res, _, err := c.cliClient.Execute(ctx, "GET", c.getUrl(), nil, nil, "", RequestHeader, nil)
 
 	if err != nil {
 		return corporateidps.IdentityProvidersResponse{}, "", err
@@ -33,7 +33,7 @@ func (c *CorporateIdPsCli) Get(ctx context.Context) (corporateidps.IdentityProvi
 
 func (c *CorporateIdPsCli) GetByIdPId(ctx context.Context, idpId string) (corporateidps.IdentityProvider, string, error) {
 
-	res, _, err := c.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", c.getUrl(), idpId), nil, "", RequestHeader, nil)
+	res, _, err := c.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", c.getUrl(), idpId), nil, nil, "", RequestHeader, nil)
 
 	if err != nil {
 		return corporateidps.IdentityProvider{}, "", err
@@ -44,7 +44,7 @@ func (c *CorporateIdPsCli) GetByIdPId(ctx context.Context, idpId string) (corpor
 
 func (c *CorporateIdPsCli) Create(ctx context.Context, args *corporateidps.IdentityProvider) (corporateidps.IdentityProvider, string, error) {
 
-	_, headers, err := c.cliClient.Execute(ctx, "POST", c.getUrl(), args, "", RequestHeader, []string{
+	_, headers, err := c.cliClient.Execute(ctx, "POST", c.getUrl(), nil, args, "", RequestHeader, []string{
 		"location",
 	})
 
@@ -58,6 +58,6 @@ func (c *CorporateIdPsCli) Create(ctx context.Context, args *corporateidps.Ident
 // TODO update function must be implemented once the API is available
 
 func (c *CorporateIdPsCli) Delete(ctx context.Context, idpId string) error {
-	_, _, err := c.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", c.getUrl(), idpId), nil, "", RequestHeader, nil)
+	_, _, err := c.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", c.getUrl(), idpId), nil, nil, "", RequestHeader, nil)
 	return err
 }

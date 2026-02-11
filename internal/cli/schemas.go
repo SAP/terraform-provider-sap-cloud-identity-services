@@ -21,7 +21,7 @@ func (s *SchemasCli) getUrl() string {
 
 func (s *SchemasCli) Get(ctx context.Context) (schemas.SchemasResponse, string, error) {
 
-	res, _, err := s.cliClient.Execute(ctx, "GET", s.getUrl(), nil, "", ScimRequestHeader, nil)
+	res, _, err := s.cliClient.Execute(ctx, "GET", s.getUrl(), nil, nil, "", ScimRequestHeader, nil)
 
 	if err != nil {
 		return schemas.SchemasResponse{}, "", err
@@ -32,7 +32,7 @@ func (s *SchemasCli) Get(ctx context.Context) (schemas.SchemasResponse, string, 
 
 func (s *SchemasCli) GetBySchemaId(ctx context.Context, schemaId string) (schemas.Schema, string, error) {
 
-	res, _, err := s.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", s.getUrl(), schemaId), nil, "", ScimRequestHeader, nil)
+	res, _, err := s.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", s.getUrl(), schemaId), nil, nil, "", ScimRequestHeader, nil)
 
 	if err != nil {
 		return schemas.Schema{}, "", err
@@ -43,7 +43,7 @@ func (s *SchemasCli) GetBySchemaId(ctx context.Context, schemaId string) (schema
 
 func (s *SchemasCli) Create(ctx context.Context, args *schemas.Schema) (schemas.Schema, string, error) {
 
-	res, _, err := s.cliClient.Execute(ctx, "POST", s.getUrl(), args, "", ScimRequestHeader, nil)
+	res, _, err := s.cliClient.Execute(ctx, "POST", s.getUrl(), nil, args, "", ScimRequestHeader, nil)
 	if err != nil {
 		return schemas.Schema{}, "", err
 	}
@@ -53,7 +53,7 @@ func (s *SchemasCli) Create(ctx context.Context, args *schemas.Schema) (schemas.
 
 func (s *SchemasCli) Delete(ctx context.Context, schemaId string) error {
 
-	_, _, err := s.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", s.getUrl(), schemaId), nil, "", ScimRequestHeader, nil)
+	_, _, err := s.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", s.getUrl(), schemaId), nil, nil, "", ScimRequestHeader, nil)
 
 	return err
 }

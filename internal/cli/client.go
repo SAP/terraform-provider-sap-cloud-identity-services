@@ -53,7 +53,7 @@ type Client struct {
 	AuthorizationToken string
 }
 
-func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, body any, customSchemas string, reqHeader string) (*http.Response, error) {
+func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, queryStrings map[string]string, body any, customSchemas string, reqHeader string) (*http.Response, error) {
 	parsedUrl, err := url.Parse(endpoint)
 	if err != nil {
 		return nil, err
@@ -86,6 +86,14 @@ func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, 
 		return nil, err
 	}
 
+	if len(queryStrings) > 0 {
+		query := req.URL.Query()
+		for k, v := range queryStrings {
+			query.Set(k, v)
+		}
+		req.URL.RawQuery = query.Encode()
+	}
+
 	// Only set Authorization header if it's not empty
 	if c.AuthorizationToken != "" {
 		req.Header.Set("Authorization", c.AuthorizationToken)
@@ -98,12 +106,12 @@ func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, 
 	return c.HttpClient.Do(req)
 }
 
-func (c *Client) Execute(ctx context.Context, method string, endpoint string, body any, customSchemas string, reqHeader string, headers []string) (interface{}, map[string]string, error) {
+func (c *Client) Execute(ctx context.Context, method string, endpoint string, queryStrings map[string]string, body any, customSchemas string, reqHeader string, headers []string) (interface{}, map[string]string, error) {
 
 	var O interface{}
 	out := make(map[string]string, len(headers))
 
-	res, err := c.DoRequest(ctx, method, endpoint, body, customSchemas, reqHeader)
+	res, err := c.DoRequest(ctx, method, endpoint, queryStrings, body, customSchemas, reqHeader)
 
 	if err != nil {
 		return nil, out, err
