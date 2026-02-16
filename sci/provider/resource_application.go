@@ -459,7 +459,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 								Optional:            true,
 								Computed:            true,
 								PlanModifiers: []planmodifier.Object{
-									objectplanmodifier.UseStateForUnknown(),
+									objectplanmodifier.UseNonNullStateForUnknown(),
 								},
 								Attributes: map[string]schema.Attribute{
 									"acrs": schema.SetAttribute{
@@ -669,7 +669,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 								Optional:            true,
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
-									stringplanmodifier.UseStateForUnknown(),
+									stringplanmodifier.UseNonNullStateForUnknown(),
 								},
 								Validators: []validator.String{
 									stringvalidator.OneOf(saml2AppNameIdFormatValues...),
@@ -732,14 +732,14 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 						MarkdownDescription: "List of SAP managed attributes that are sent to the application.",
 						Computed:            true,
 						PlanModifiers: []planmodifier.Object{
-							objectplanmodifier.UseStateForUnknown(),
+							objectplanmodifier.UseNonNullStateForUnknown(),
 						},
 						Attributes: map[string]schema.Attribute{
 							"service_instance_id": schema.StringAttribute{
 								MarkdownDescription: "The service instance ID of the SAP application.",
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
-									stringplanmodifier.UseStateForUnknown(),
+									stringplanmodifier.UseNonNullStateForUnknown(),
 								},
 							},
 							"source_app_id": schema.StringAttribute{
@@ -749,21 +749,21 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 									utils.ValidUUID(),
 								},
 								PlanModifiers: []planmodifier.String{
-									stringplanmodifier.UseStateForUnknown(),
+									stringplanmodifier.UseNonNullStateForUnknown(),
 								},
 							},
 							"source_tenant_id": schema.StringAttribute{
 								MarkdownDescription: "The source tenant ID of the SAP application.",
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
-									stringplanmodifier.UseStateForUnknown(),
+									stringplanmodifier.UseNonNullStateForUnknown(),
 								},
 							},
 							"app_tenant_id": schema.StringAttribute{
 								MarkdownDescription: "The application tenant ID of the SAP application.",
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
-									stringplanmodifier.UseStateForUnknown(),
+									stringplanmodifier.UseNonNullStateForUnknown(),
 								},
 							},
 							"type": schema.StringAttribute{
@@ -773,21 +773,21 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 									stringvalidator.OneOf(typeOfAppValues...),
 								},
 								PlanModifiers: []planmodifier.String{
-									stringplanmodifier.UseStateForUnknown(),
+									stringplanmodifier.UseNonNullStateForUnknown(),
 								},
 							},
 							"plan_name": schema.StringAttribute{
 								MarkdownDescription: "The plan name of the SAP application.",
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
-									stringplanmodifier.UseStateForUnknown(),
+									stringplanmodifier.UseNonNullStateForUnknown(),
 								},
 							},
 							"btp_tenant_type": schema.StringAttribute{
 								MarkdownDescription: "The BTP tenant type of the SAP application.",
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
-									stringplanmodifier.UseStateForUnknown(),
+									stringplanmodifier.UseNonNullStateForUnknown(),
 								},
 							},
 						},
