@@ -34,7 +34,7 @@ func PrintDefaultSchemas(schemas []attr.Value) string {
 			str = str[:len(str)-1]
 		}
 
-		schemasString.WriteString(fmt.Sprintf("\t- `%s` \n", str))
+		fmt.Fprintf(&schemasString, "\t- `%s` \n", str)
 	}
 	return schemasString.String()
 }

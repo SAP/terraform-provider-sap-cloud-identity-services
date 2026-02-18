@@ -3,10 +3,11 @@ package provider
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/users"
 	"regexp"
 	"strings"
 	"testing"
+
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/users"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
@@ -471,9 +472,9 @@ func ResourceUserWithCustomSchemas(resourceName string, user users.User, customS
 
 	var schemas strings.Builder
 	for _, schema := range user.Schemas {
-		schemas.WriteString(fmt.Sprintf(`
+		fmt.Fprintf(&schemas, `
 			"%s" ,
-		`, schema))
+		`, schema)
 	}
 
 	return fmt.Sprintf(`
@@ -494,13 +495,13 @@ func getEmails(userEmails []users.Email) string {
 
 	var emails strings.Builder
 	for _, email := range userEmails {
-		emails.WriteString(fmt.Sprintf(`
+		fmt.Fprintf(&emails, `
 			{
 				value = "%s",
 				type = "%s",
 				primary = "%t",
 			},
-		`, email.Value, email.Type, email.Primary))
+		`, email.Value, email.Type, email.Primary)
 
 	}
 	return emails.String()

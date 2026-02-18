@@ -714,7 +714,7 @@ func ResourceCorporateIdP(resourceName string, idp corporateidps.IdentityProvide
 
 	var groups strings.Builder
 	for _, group := range idp.IdentityFederation.RequiredGroups {
-		groups.WriteString(fmt.Sprintf(`"%s",`, group))
+		fmt.Fprintf(&groups, `"%s",`, group)
 	}
 
 	resourceIdP := fmt.Sprintf(`
@@ -741,9 +741,9 @@ func ResourceCorporateIdP(resourceName string, idp corporateidps.IdentityProvide
 
 		var scopes strings.Builder
 		for _, scope := range oidcConfig.Scopes {
-			scopes.WriteString(fmt.Sprintf(`
+			fmt.Fprintf(&scopes, `
 					"%s",
-				`, scope))
+				`, scope)
 		}
 
 		additionalConfig := fmt.Sprintf(`
@@ -773,17 +773,17 @@ func ResourceCorporateIdP(resourceName string, idp corporateidps.IdentityProvide
 
 		var assertionAttributes strings.Builder
 		for _, attribute := range saml2Config.AssertionAttributes {
-			assertionAttributes.WriteString(fmt.Sprintf(`
+			fmt.Fprintf(&assertionAttributes, `
 					{
 						name = "%s"
 						value = "%s"
 					},
-				`, attribute.Name, attribute.Value))
+				`, attribute.Name, attribute.Value)
 		}
 
 		var certificates strings.Builder
 		for _, certificate := range saml2Config.CertificatesForSigning {
-			certificates.WriteString(fmt.Sprintf(`
+			fmt.Fprintf(&certificates, `
 					{
 						base64_certificate = "%s"
 						dn = "%s"
@@ -791,30 +791,30 @@ func ResourceCorporateIdP(resourceName string, idp corporateidps.IdentityProvide
 						valid_from = "%s"
 						valid_to = "%s"
 					}
-				`, certificate.Base64Certificate, certificate.Dn, certificate.IsDefault, certificate.ValidFrom, certificate.ValidTo))
+				`, certificate.Base64Certificate, certificate.Dn, certificate.IsDefault, certificate.ValidFrom, certificate.ValidTo)
 		}
 
 		var ssoEndpoints strings.Builder
 		for _, endpoint := range saml2Config.SsoEndpoints {
-			ssoEndpoints.WriteString(fmt.Sprintf(`
+			fmt.Fprintf(&ssoEndpoints, `
 					{
 						binding_name = "%s"
 						location = "%s"
 						default = %t
 					}
-				`, endpoint.BindingName, endpoint.Location, endpoint.IsDefault))
+				`, endpoint.BindingName, endpoint.Location, endpoint.IsDefault)
 		}
 
 		var sloEndpoints strings.Builder
 		for _, endpoint := range saml2Config.SloEndpoints {
-			sloEndpoints.WriteString(fmt.Sprintf(`
+			fmt.Fprintf(&sloEndpoints, `
 					{
 						binding_name = "%s"
 						location = "%s"
 						response_location = "%s"
 						default = %t
 					}
-				`, endpoint.BindingName, endpoint.Location, endpoint.ResponseLocation, endpoint.IsDefault))
+				`, endpoint.BindingName, endpoint.Location, endpoint.ResponseLocation, endpoint.IsDefault)
 		}
 
 		resourceIdP += fmt.Sprintf(`
@@ -858,7 +858,7 @@ func ResourceCorporateIdPWithoutNameType(resourceName string, idpName string, co
 	resource "sci_corporate_idp" "%s" {
 		display_name = "%s"
 		%s
-	}	
+	}
 	`, resourceName, idpName, config)
 }
 

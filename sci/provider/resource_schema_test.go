@@ -2,10 +2,11 @@ package provider
 
 import (
 	"fmt"
-	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/schemas"
 	"regexp"
 	"strings"
 	"testing"
+
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/schemas"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
@@ -345,12 +346,12 @@ func getSchemaAttributes(schemaAttributes []schemas.Attribute) string {
 
 		var canonicalValues strings.Builder
 		for _, val := range attr.CanonicalValues {
-			canonicalValues.WriteString(fmt.Sprintf(`
+			fmt.Fprintf(&canonicalValues, `
 				"%s",
-			`, val))
+			`, val)
 		}
 
-		attributes.WriteString(fmt.Sprintf(`{
+		fmt.Fprintf(&attributes, `{
 			name = "%s"
 			mutability = "%s"
 			returned = "%s"
@@ -362,7 +363,7 @@ func getSchemaAttributes(schemaAttributes []schemas.Attribute) string {
 			required = %t
 			case_exact = %t
 		},`, attr.Name, attr.Mutability, attr.Returned, attr.Type, attr.Uniqueness,
-			canonicalValues.String(), attr.Multivalued, attr.Description, attr.Required, attr.CaseExact))
+			canonicalValues.String(), attr.Multivalued, attr.Description, attr.Required, attr.CaseExact)
 	}
 	return attributes.String()
 }

@@ -2,10 +2,11 @@ package provider
 
 import (
 	"fmt"
-	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/groups"
 	"regexp"
 	"strings"
 	"testing"
+
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/groups"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
@@ -233,10 +234,10 @@ func getGroupMembers(groupMembers []groups.GroupMember) string {
 
 	var members strings.Builder
 	for _, member := range groupMembers {
-		members.WriteString(fmt.Sprintf(`{
+		fmt.Fprintf(&members, `{
 			value = "%s"
 			type = "%s"
-		},`, member.Value, member.Type))
+		},`, member.Value, member.Type)
 	}
 	return members.String()
 }
