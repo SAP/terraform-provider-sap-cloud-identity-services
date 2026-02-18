@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/groups"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -230,12 +231,12 @@ func ResourceGroupWithoutDisplayName(resoureName string) string {
 
 func getGroupMembers(groupMembers []groups.GroupMember) string {
 
-	members := ""
+	var members strings.Builder
 	for _, member := range groupMembers {
-		members += fmt.Sprintf(`{
+		members.WriteString(fmt.Sprintf(`{
 			value = "%s"
 			type = "%s"
-		},`, member.Value, member.Type)
+		},`, member.Value, member.Type))
 	}
-	return members
+	return members.String()
 }

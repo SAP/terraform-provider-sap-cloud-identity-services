@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 )
@@ -21,7 +22,7 @@ func ValidValuesString(values []string) string {
 
 // string together the default schemas
 func PrintDefaultSchemas(schemas []attr.Value) string {
-	schemasString := ""
+	var schemasString strings.Builder
 	for _, schema := range schemas {
 		str := schema.String()
 
@@ -33,7 +34,7 @@ func PrintDefaultSchemas(schemas []attr.Value) string {
 			str = str[:len(str)-1]
 		}
 
-		schemasString += fmt.Sprintf("\t- `%s` \n", str)
+		schemasString.WriteString(fmt.Sprintf("\t- `%s` \n", str))
 	}
-	return schemasString
+	return schemasString.String()
 }

@@ -21,13 +21,13 @@ func Test_UnmarshalResponse(t *testing.T) {
 
 	tests := []struct {
 		description           string
-		res                   interface{}
+		res                   any
 		retrieveCustomSchemas bool
 		expectError           bool
 	}{
 		{
 			description: "happy path - no custom schema retrieval",
-			res: map[string]interface{}{
+			res: map[string]any{
 				"param1": req.Param1,
 				"param2": req.Param2,
 			},
@@ -36,7 +36,7 @@ func Test_UnmarshalResponse(t *testing.T) {
 		},
 		{
 			description: "happy path - custom schema retrieval",
-			res: map[string]interface{}{
+			res: map[string]any{
 				"param1":        req.Param1,
 				"param2":        req.Param2,
 				"customSchemas": "valid-custom-schema-structure",
@@ -90,13 +90,13 @@ func Test_UnmarshalResponse(t *testing.T) {
 func Test_GetCustomSchemas(t *testing.T) {
 	tests := []struct {
 		description          string
-		res                  interface{}
+		res                  any
 		containsCustomSchema bool
 		expectError          bool
 	}{
 		{
 			description: "happy path",
-			res: map[string]interface{}{
+			res: map[string]any{
 				"param1":        "test",
 				"param2":        false,
 				"customSchemas": "valid-custom-schemas-structure",
@@ -106,7 +106,7 @@ func Test_GetCustomSchemas(t *testing.T) {
 		},
 		{
 			description: "happy path - no custom schemas",
-			res: map[string]interface{}{
+			res: map[string]any{
 				"param1": "test",
 				"param2": false,
 			},
@@ -136,8 +136,8 @@ func Test_GetCustomSchemas(t *testing.T) {
 // the following tests compare() as well
 func Test_ValidateCustomSchemaResponse(t *testing.T) {
 
-	customSchemasMarshaled, _ := json.Marshal(map[string]interface{}{
-		"schema_id": map[string]interface{}{
+	customSchemasMarshaled, _ := json.Marshal(map[string]any{
+		"schema_id": map[string]any{
 			"schema_attr_1": 1,
 			"schema_attr_2": false,
 		},
@@ -145,16 +145,16 @@ func Test_ValidateCustomSchemaResponse(t *testing.T) {
 
 	tests := []struct {
 		description      string
-		res              interface{}
+		res              any
 		customSchemasReq string
 		expectError      bool
 	}{
 		{
 			description: "happy path",
-			res: map[string]interface{}{
+			res: map[string]any{
 				"param1": "test",
 				"param2": true,
-				"schema_id": map[string]interface{}{
+				"schema_id": map[string]any{
 					"schema_attr_1": 1,
 					"schema_attr_2": false,
 				},
@@ -164,10 +164,10 @@ func Test_ValidateCustomSchemaResponse(t *testing.T) {
 		},
 		{
 			description: "error path - custom schemas request and response mismatch",
-			res: map[string]interface{}{
+			res: map[string]any{
 				"param1": "test",
 				"param2": true,
-				"schema_id": map[string]interface{}{
+				"schema_id": map[string]any{
 					"schema_attr_1": 2,
 					"schema_attr_2": false,
 				},
@@ -177,10 +177,10 @@ func Test_ValidateCustomSchemaResponse(t *testing.T) {
 		},
 		{
 			description: "error path - custom schemas request and response mismatch",
-			res: map[string]interface{}{
+			res: map[string]any{
 				"param1": "test",
 				"param2": true,
-				"schema_id_mismatch": map[string]interface{}{
+				"schema_id_mismatch": map[string]any{
 					"schema_attr_1": 1,
 				},
 			},
@@ -206,27 +206,27 @@ func Test_CompareAttributes(t *testing.T) {
 	tests := []struct {
 		description      string
 		key              string
-		resMap           map[string]interface{}
-		customSchemasMap map[string]interface{}
+		resMap           map[string]any
+		customSchemasMap map[string]any
 		errMessage       string
 	}{
 		{
 			description: "happy path",
 			key:         "",
-			resMap: map[string]interface{}{
+			resMap: map[string]any{
 				"schema_attr_1": "test",
 				"schema_attr_2": false,
 				"schema_attr_3": 12.24,
-				"schema_attr_4": map[string]interface{}{
+				"schema_attr_4": map[string]any{
 					"schema_attr_4a": "test",
 					"schema_attr_4b": true,
 				},
 			},
-			customSchemasMap: map[string]interface{}{
+			customSchemasMap: map[string]any{
 				"schema_attr_1": "test",
 				"schema_attr_2": false,
 				"schema_attr_3": 12.24,
-				"schema_attr_4": map[string]interface{}{
+				"schema_attr_4": map[string]any{
 					"schema_attr_4a": "test",
 					"schema_attr_4b": true,
 				},
@@ -236,16 +236,16 @@ func Test_CompareAttributes(t *testing.T) {
 		{
 			description: "error path - attribute not found in response",
 			key:         "schema_id",
-			resMap: map[string]interface{}{
+			resMap: map[string]any{
 				"schema_attr_1": "test",
 				"schema_attr_2": false,
 				"schema_attr_3": 12.24,
 			},
-			customSchemasMap: map[string]interface{}{
+			customSchemasMap: map[string]any{
 				"schema_attr_1": "test",
 				"schema_attr_2": false,
 				"schema_attr_3": 12.24,
-				"schema_attr_4": map[string]interface{}{
+				"schema_attr_4": map[string]any{
 					"schema_attr_4a": "test",
 					"schema_attr_4b": true,
 				},
@@ -255,10 +255,10 @@ func Test_CompareAttributes(t *testing.T) {
 		{
 			description: "error path - mismatch in string attribute",
 			key:         "schema_id",
-			resMap: map[string]interface{}{
+			resMap: map[string]any{
 				"schema_attr_1": "test",
 			},
-			customSchemasMap: map[string]interface{}{
+			customSchemasMap: map[string]any{
 				"schema_attr_1": "new_test",
 			},
 			errMessage: "mismatch between response and request in attribute schema_id.schema_attr_1, request sent: \"new_test\" but response received: \"test\"",
@@ -266,10 +266,10 @@ func Test_CompareAttributes(t *testing.T) {
 		{
 			description: "error path - mismatch in float attribute",
 			key:         "schema_id",
-			resMap: map[string]interface{}{
+			resMap: map[string]any{
 				"schema_attr_1": 1.24,
 			},
-			customSchemasMap: map[string]interface{}{
+			customSchemasMap: map[string]any{
 				"schema_attr_1": 1.23,
 			},
 			errMessage: "mismatch between response and request in attribute schema_id.schema_attr_1, request sent: \"1.23\" but response received: \"1.24\"",
@@ -277,10 +277,10 @@ func Test_CompareAttributes(t *testing.T) {
 		{
 			description: "error path - mismatch in boolean attribute",
 			key:         "schema_id",
-			resMap: map[string]interface{}{
+			resMap: map[string]any{
 				"schema_attr_1": true,
 			},
-			customSchemasMap: map[string]interface{}{
+			customSchemasMap: map[string]any{
 				"schema_attr_1": false,
 			},
 			errMessage: "mismatch between response and request in attribute schema_id.schema_attr_1, request sent: \"false\" but response received: \"true\"",
@@ -288,13 +288,13 @@ func Test_CompareAttributes(t *testing.T) {
 		{
 			description: "error path - mismatch in nested attribute",
 			key:         "schema_id",
-			resMap: map[string]interface{}{
-				"schema_attr_1": map[string]interface{}{
+			resMap: map[string]any{
+				"schema_attr_1": map[string]any{
 					"schema_attr_1a": "test",
 				},
 			},
-			customSchemasMap: map[string]interface{}{
-				"schema_attr_1": map[string]interface{}{
+			customSchemasMap: map[string]any{
+				"schema_attr_1": map[string]any{
 					"schema_attr_1a": "new_test",
 				},
 			},

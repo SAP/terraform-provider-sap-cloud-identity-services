@@ -27,7 +27,7 @@ func (u *UsersCli) Get(ctx context.Context) (users.UsersResponse, map[int]string
 	}
 
 	usersList := users.UsersResponse{}
-	resMap := res.(map[string]interface{})["Resources"].([]interface{})
+	resMap := res.(map[string]any)["Resources"].([]any)
 	customSchemas := map[int]string{}
 
 	for i, r := range resMap {

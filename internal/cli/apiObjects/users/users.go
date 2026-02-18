@@ -117,7 +117,7 @@ type Group struct {
 type User struct {
 	Id                string         `json:"id,omitempty"`
 	ExternalId        string         `json:"externalId,omitempty"`
-	Meta              Meta           `json:"meta,omitempty"`
+	Meta              Meta           `json:"meta"`
 	Schemas           []string       `json:"schemas"`
 	UserName          string         `json:"userName"`
 	Password          string         `json:"password,omitempty"`

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/users"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -163,11 +164,11 @@ func TestResourceUser(t *testing.T) {
 		}
 
 		customSchemas, _ := json.Marshal(
-			map[string]interface{}{
-				"urn:test:terraform:1.0:User": map[string]interface{}{
+			map[string]any{
+				"urn:test:terraform:1.0:User": map[string]any{
 					"test1": "testValue",
 					"test2": false,
-					"test3": map[string]interface{}{
+					"test3": map[string]any{
 						"test3a": 12.33,
 						"test3b": 12,
 					},
@@ -207,11 +208,11 @@ func TestResourceUser(t *testing.T) {
 		}
 
 		customSchemas, _ := json.Marshal(
-			map[string]interface{}{
-				"urn:test:terraform:1.0:User": map[string]interface{}{
+			map[string]any{
+				"urn:test:terraform:1.0:User": map[string]any{
 					"test1": "testValue",
 					"test2": false,
-					"test3": map[string]interface{}{
+					"test3": map[string]any{
 						"test3a": 12.33,
 						"test3b": 12,
 					},
@@ -220,8 +221,8 @@ func TestResourceUser(t *testing.T) {
 		)
 
 		newCustomSchemas, _ := json.Marshal(
-			map[string]interface{}{
-				"urn:test:terraform:1.0:User": map[string]interface{}{
+			map[string]any{
+				"urn:test:terraform:1.0:User": map[string]any{
 					"test1": "newTestValue",
 					"test2": true,
 				},
@@ -468,11 +469,11 @@ func ResourceUserWithStatus(resourceName string, user users.User) string {
 
 func ResourceUserWithCustomSchemas(resourceName string, user users.User, customSchemas string) string {
 
-	var schemas string
+	var schemas strings.Builder
 	for _, schema := range user.Schemas {
-		schemas += fmt.Sprintf(`
+		schemas.WriteString(fmt.Sprintf(`
 			"%s" ,
-		`, schema)
+		`, schema))
 	}
 
 	return fmt.Sprintf(`
@@ -486,21 +487,21 @@ func ResourceUserWithCustomSchemas(resourceName string, user users.User, customS
 		emails = [%s]
 		custom_schemas = %q
 	}
-	`, resourceName, schemas, user.UserName, user.Name.FamilyName, user.Name.GivenName, getEmails(user.Emails), customSchemas)
+	`, resourceName, schemas.String(), user.UserName, user.Name.FamilyName, user.Name.GivenName, getEmails(user.Emails), customSchemas)
 }
 
 func getEmails(userEmails []users.Email) string {
 
-	var emails string
+	var emails strings.Builder
 	for _, email := range userEmails {
-		emails += fmt.Sprintf(`
+		emails.WriteString(fmt.Sprintf(`
 			{
 				value = "%s",
 				type = "%s",
 				primary = "%t",
 			},
-		`, email.Value, email.Type, email.Primary)
+		`, email.Value, email.Type, email.Primary))
 
 	}
-	return emails
+	return emails.String()
 }

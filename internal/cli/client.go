@@ -106,9 +106,9 @@ func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, 
 	return c.HttpClient.Do(req)
 }
 
-func (c *Client) Execute(ctx context.Context, method string, endpoint string, queryStrings map[string]string, body any, customSchemas string, reqHeader string, headers []string) (interface{}, map[string]string, error) {
+func (c *Client) Execute(ctx context.Context, method string, endpoint string, queryStrings map[string]string, body any, customSchemas string, reqHeader string, headers []string) (any, map[string]string, error) {
 
-	var O interface{}
+	var O any
 	out := make(map[string]string, len(headers))
 
 	res, err := c.DoRequest(ctx, method, endpoint, queryStrings, body, customSchemas, reqHeader)
