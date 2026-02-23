@@ -16,7 +16,7 @@ type GroupMember struct {
 
 type Group struct {
 	Id             string          `json:"id,omitempty"`
-	Meta           users.Meta      `json:"meta,omitempty"`
+	Meta           users.Meta      `json:"meta"`
 	Schemas        []string        `json:"schemas,omitempty"`
 	DisplayName    string          `json:"displayName,omitempty"`
 	GroupMembers   []GroupMember   `json:"members,omitempty"`

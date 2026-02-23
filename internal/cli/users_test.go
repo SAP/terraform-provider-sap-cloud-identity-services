@@ -33,15 +33,15 @@ func TestUsers_Create(t *testing.T) {
 
 	usersResponse, _ = json.Marshal(usersBody)
 
-	customSchemas, _ := json.Marshal(map[string]interface{}{
-		"schema_id": map[string]interface{}{
+	customSchemas, _ := json.Marshal(map[string]any{
+		"schema_id": map[string]any{
 			"var1": "test",
 			"var2": 1,
 		},
 	})
 
-	incorrectCustomSchemas, _ := json.Marshal(map[string]interface{}{
-		"new_schema_id": map[string]interface{}{
+	incorrectCustomSchemas, _ := json.Marshal(map[string]any{
+		"new_schema_id": map[string]any{
 			"var1": "test",
 			"var2": 1,
 		},
@@ -224,15 +224,15 @@ func TestUsers_Update(t *testing.T) {
 	usersBody.Id = "valid-user-id"
 	usersResponse, _ := json.Marshal(usersBody)
 
-	customSchemas, _ := json.Marshal(map[string]interface{}{
-		"schema_id": map[string]interface{}{
+	customSchemas, _ := json.Marshal(map[string]any{
+		"schema_id": map[string]any{
 			"var1": "test",
 			"var2": 1,
 		},
 	})
 
-	incorrectCustomSchemas, _ := json.Marshal(map[string]interface{}{
-		"new_schema_id": map[string]interface{}{
+	incorrectCustomSchemas, _ := json.Marshal(map[string]any{
+		"new_schema_id": map[string]any{
 			"var1": "test",
 			"var2": 1,
 		},
