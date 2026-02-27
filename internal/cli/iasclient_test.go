@@ -22,7 +22,7 @@ func testClient(handleFn http.HandlerFunc) (*SciClient, *httptest.Server) {
 	return NewSciClient(client), srv
 }
 
-func assertCall[I interface{}](t *testing.T, r *http.Request, expectedPath string, expectedMethod string, expectedBody any) {
+func assertCall[I any](t *testing.T, r *http.Request, expectedPath string, expectedMethod string, expectedBody any) {
 	t.Helper()
 
 	var obj I

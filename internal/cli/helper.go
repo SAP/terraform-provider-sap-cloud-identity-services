@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func unMarshalResponse[I interface{}](res interface{}, retrieveCustomSchemas bool) (I, string, error) {
+func unMarshalResponse[I any](res any, retrieveCustomSchemas bool) (I, string, error) {
 	var obj I
 	if res == nil {
 		return obj, "", fmt.Errorf("response is nil")
@@ -30,16 +30,16 @@ func unMarshalResponse[I interface{}](res interface{}, retrieveCustomSchemas boo
 	return obj, customSchemaResponse, err
 }
 
-func getCustomSchemas[I interface{}](res interface{}) (string, error) {
+func getCustomSchemas[I any](res any) (string, error) {
 
 	var customSchemas string
 	var obj I
 
 	reflectType := reflect.TypeOf(obj)
-	resMap := res.(map[string]interface{})
+	resMap := res.(map[string]any)
 
-	for i := 0; i < reflectType.NumField(); i++ {
-		key := strings.Split(reflectType.Field(i).Tag.Get("json"), ",")[0]
+	for field := range reflectType.Fields() {
+		key := strings.Split(field.Tag.Get("json"), ",")[0]
 		delete(resMap, key)
 	}
 
@@ -54,7 +54,7 @@ func getCustomSchemas[I interface{}](res interface{}) (string, error) {
 	return customSchemas, nil
 }
 
-func validateCustomSchemasResponse(res interface{}, customSchemas string) (bool, error) {
+func validateCustomSchemasResponse(res any, customSchemas string) (bool, error) {
 
 	var resBody string
 	if marshaledRes, err := json.Marshal(res); err == nil {
@@ -69,14 +69,14 @@ func validateCustomSchemasResponse(res interface{}, customSchemas string) (bool,
 	//check if the custom schemas passed as a request is a substring in the response body
 	if !strings.Contains(resBody, modifiedCustomSchemas) {
 
-		var customSchemasMap map[string]interface{}
+		var customSchemasMap map[string]any
 		err := json.Unmarshal([]byte(customSchemas), &customSchemasMap)
 
 		if err != nil {
 			return false, err
 		}
 
-		resBodyMap := res.(map[string]interface{})
+		resBodyMap := res.(map[string]any)
 
 		// if not a substring, compare the request and response
 		return compare(customSchemasMap, resBodyMap)
@@ -85,7 +85,7 @@ func validateCustomSchemasResponse(res interface{}, customSchemas string) (bool,
 	return true, nil
 }
 
-func compare(cS map[string]interface{}, rB map[string]interface{}) (bool, error) {
+func compare(cS map[string]any, rB map[string]any) (bool, error) {
 
 	for k, csValue := range cS {
 
@@ -95,7 +95,7 @@ func compare(cS map[string]interface{}, rB map[string]interface{}) (bool, error)
 			return false, err
 		}
 
-		result, err := compareAttributes(k, csValue.(map[string]interface{}), rbValue.(map[string]interface{}))
+		result, err := compareAttributes(k, csValue.(map[string]any), rbValue.(map[string]any))
 
 		if !result {
 			return false, fmt.Errorf("%s", err)
@@ -105,7 +105,7 @@ func compare(cS map[string]interface{}, rB map[string]interface{}) (bool, error)
 	return true, nil
 }
 
-func compareAttributes(key string, csValue map[string]interface{}, rbValue map[string]interface{}) (bool, string) {
+func compareAttributes(key string, csValue map[string]any, rbValue map[string]any) (bool, string) {
 	for ckey, cval := range csValue {
 
 		rval, ok := rbValue[ckey]
@@ -147,9 +147,9 @@ func compareAttributes(key string, csValue map[string]interface{}, rbValue map[s
 
 		// for nested structures, call the function recursively
 		// API allows only one level of nesting
-		case map[string]interface{}:
-			rRes := rval.(map[string]interface{})
-			cRes := cval.(map[string]interface{})
+		case map[string]any:
+			rRes := rval.(map[string]any)
+			cRes := cval.(map[string]any)
 			result, err = compareAttributes(ckey, cRes, rRes)
 			if !result {
 				err = err[:51] + key + "." + err[51:]
