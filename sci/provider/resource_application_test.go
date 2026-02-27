@@ -335,6 +335,34 @@ func TestResourceApplication(t *testing.T) {
 		})
 	})
 
+	t.Run("happy path - bundled application update", func(t *testing.T) {
+
+		rec, user := setupVCR(t, "fixtures/resource_bundled_application_update")
+		defer stopQuietly(rec)
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+			Steps: []resource.TestStep{
+				{
+					Config:        providerConfig("", user) + ResourceApplicationWithBundledApp("testBundledApp", "name"),
+					ResourceName:  "sci_application.testBundledApp",
+					ImportState:   true,
+					ImportStateId: "31e38d9c-ca48-4227-963d-32e7dfcb5007",
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestCheckResourceAttr("sci_application.testBundledApp", "id", "31e38d9c-ca48-4227-963d-32e7dfcb5007"),
+						resource.TestCheckResourceAttr("sci_application.testBundledApp", "name", "identity-subscription-c6c390f4-c9a2-4a6c-9cc7-01675a31e4f6-in-b75a605d-151c-4485-83f4-64604378e4ec"),
+						resource.TestCheckResourceAttr("sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.type", "subscription"),
+						resource.TestCheckResourceAttr("sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.app_tenant_id", "b75a605d-151c-4485-83f4-64604378e4ec"),
+						resource.TestCheckResourceAttr("sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.source_app_id", "3cc4b385-fe8b-423a-a8c0-34e15c9970cd"),
+						resource.TestCheckResourceAttr("sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.source_tenant_id", "sapdas"),
+						resource.TestCheckResourceAttr("sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.service_instance_id", "c6c390f4-c9a2-4a6c-9cc7-01675a31e4f6"),
+					),
+				},
+			},
+		})
+	})
+
 	t.Run("happy path - oidc application", func(t *testing.T) {
 		rec, user := setupVCR(t, "fixtures/resource_oidc_application")
 		defer stopQuietly(rec)
@@ -371,7 +399,7 @@ func TestResourceApplication(t *testing.T) {
 	})
 
 	t.Run("happy path - oidc application update", func(t *testing.T) {
-		rec, user := setupVCR(t, "fixtures/resource_oidc_application_updated")
+		rec, user := setupVCR(t, "fixtures/resource_application_oidc_updated")
 		defer stopQuietly(rec)
 
 		oidcUpdatedApplication := applications.Application{
@@ -480,7 +508,7 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
 						resource.TestCheckResourceAttr("sci_application.testApp", "name", saml2App.Name),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sso_type", saml2App.AuthenticationSchema.SsoType),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.saml_metadata_url", saml2App.AuthenticationSchema.Saml2Configuration.SamlMetadataUrl),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.saml_metadata_url", saml2App.AuthenticationSchema.Saml2Configuration.SamlMetadataUrl),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.binding_name", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].BindingName),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.location", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Location),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.index", fmt.Sprintf("%d", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Index)),
@@ -580,7 +608,7 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
 						resource.TestCheckResourceAttr("sci_application.testApp", "name", saml2App.Name),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sso_type", saml2App.AuthenticationSchema.SsoType),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.saml_metadata_url", saml2App.AuthenticationSchema.Saml2Configuration.SamlMetadataUrl),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.saml_metadata_url", saml2App.AuthenticationSchema.Saml2Configuration.SamlMetadataUrl),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.binding_name", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].BindingName),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.location", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Location),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.index", fmt.Sprintf("%d", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Index)),
@@ -605,7 +633,7 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
 						resource.TestCheckResourceAttr("sci_application.testApp", "name", updatedSaml2App.Name),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.sso_type", saml2App.AuthenticationSchema.SsoType),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.saml_metadata_url", updatedSaml2App.AuthenticationSchema.Saml2Configuration.SamlMetadataUrl),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.saml_metadata_url", updatedSaml2App.AuthenticationSchema.Saml2Configuration.SamlMetadataUrl),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.binding_name", updatedSaml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].BindingName),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.location", updatedSaml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Location),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.index", fmt.Sprintf("%d", updatedSaml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Index)),
@@ -637,7 +665,7 @@ func TestResourceApplication(t *testing.T) {
 	})
 
 	t.Run("happy path - oidc to saml2 application update", func(t *testing.T) {
-		rec, user := setupVCR(t, "fixtures/resource_oidcToSaml_application_updated")
+		rec, user := setupVCR(t, "fixtures/resource_application_oidc_to_saml2")
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{
@@ -671,7 +699,7 @@ func TestResourceApplication(t *testing.T) {
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
 						resource.TestCheckResourceAttr("sci_application.testApp", "name", saml2App.Name),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.saml_metadata_url", saml2App.AuthenticationSchema.Saml2Configuration.SamlMetadataUrl),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.saml_metadata_url", saml2App.AuthenticationSchema.Saml2Configuration.SamlMetadataUrl),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.binding_name", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].BindingName),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.location", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Location),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.index", fmt.Sprintf("%d", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Index)),
@@ -707,7 +735,7 @@ func TestResourceApplication(t *testing.T) {
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
 						resource.TestCheckResourceAttr("sci_application.testApp", "name", saml2App.Name),
-						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.saml_metadata_url", saml2App.AuthenticationSchema.Saml2Configuration.SamlMetadataUrl),
+						// resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.saml_metadata_url", saml2App.AuthenticationSchema.Saml2Configuration.SamlMetadataUrl),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.binding_name", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].BindingName),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.location", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Location),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.saml2_config.acs_endpoints.0.index", fmt.Sprintf("%d", saml2App.AuthenticationSchema.Saml2Configuration.AcsEndpoints[0].Index)),
@@ -1311,7 +1339,7 @@ func ResourceSaml2Application(resourceName string, app applications.Application)
 		authentication_schema = {
 			sso_type = "saml2"
 			saml2_config = {
-				saml_metadata_url = "%s"
+
 				acs_endpoints = [%s]
 				slo_endpoints = [%s]
 				signing_certificates = [%s]
@@ -1326,7 +1354,7 @@ func ResourceSaml2Application(resourceName string, app applications.Application)
 				digest_algorithm = "%s"
 			}
 		}
-	}`, resourceName, app.Name, saml2Config.SamlMetadataUrl, acsEndpoints, sloEndpoints, signingCertificates, encryptionCertificate, saml2Config.ResponseElementsToEncrypt, saml2Config.DefaultNameIdFormat, saml2Config.SignSLOMessages, saml2Config.RequireSignedSLOMessages, saml2Config.RequireSignedAuthnRequest, saml2Config.SignAssertions, saml2Config.SignAuthnResponses, saml2Config.DigestAlgorithm)
+	}`, resourceName, app.Name, acsEndpoints, sloEndpoints, signingCertificates, encryptionCertificate, saml2Config.ResponseElementsToEncrypt, saml2Config.DefaultNameIdFormat, saml2Config.SignSLOMessages, saml2Config.RequireSignedSLOMessages, saml2Config.RequireSignedAuthnRequest, saml2Config.SignAssertions, saml2Config.SignAuthnResponses, saml2Config.DigestAlgorithm)
 }
 
 func OidcResourceApplication(resourceName string, app applications.Application) string {

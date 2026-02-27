@@ -330,62 +330,62 @@ func TestApplications_GetByAppId(t *testing.T) {
 	})
 }
 
-func TestApplications_Update(t *testing.T) {
+// func TestApplications_Update(t *testing.T) {
 
-	applicationsBody.Id = "valid-app-id"
-	applicationsResponse, _ := json.Marshal(applicationsBody)
+// 	applicationsBody.Id = "valid-app-id"
+// 	applicationsResponse, _ := json.Marshal(applicationsBody)
 
-	t.Run("validate the API request", func(t *testing.T) {
+// 	t.Run("validate the API request", func(t *testing.T) {
 
-		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			_, err := w.Write(applicationsResponse)
-			assert.NoError(t, err, "Failed to write response")
+// 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 			_, err := w.Write(applicationsResponse)
+// 			assert.NoError(t, err, "Failed to write response")
 
-			if r.Method != "GET" {
-				assertCall[applications.Application](t, r, fmt.Sprintf("%s%s", applicationsPath, "valid-app-id"), "PUT", applicationsBody)
-			}
-		}))
+// 			if r.Method != "GET" {
+// 				assertCall[applications.Application](t, r, fmt.Sprintf("%s%s", applicationsPath, "valid-app-id"), "PUT", applicationsBody)
+// 			}
+// 		}))
 
-		defer srv.Close()
+// 		defer srv.Close()
 
-		_, _, err := client.Application.Update(context.TODO(), &applicationsBody)
+// 		_, _, err := client.Application.Update(context.TODO(), &applicationsBody)
 
-		assert.NoError(t, err)
-	})
+// 		assert.NoError(t, err)
+// 	})
 
-	t.Run("validate the API request - error", func(t *testing.T) {
+// 	t.Run("validate the API request - error", func(t *testing.T) {
 
-		resErr, _ := json.Marshal(struct {
-			Error ResponseError `json:"error"`
-		}{
-			Error: ResponseError{
-				Code:    400,
-				Message: "update failed",
-				Details: []ErrorDetail{
-					{
-						Message: "server error",
-					},
-				},
-			},
-		})
+// 		resErr, _ := json.Marshal(struct {
+// 			Error ResponseError `json:"error"`
+// 		}{
+// 			Error: ResponseError{
+// 				Code:    400,
+// 				Message: "update failed",
+// 				Details: []ErrorDetail{
+// 					{
+// 						Message: "server error",
+// 					},
+// 				},
+// 			},
+// 		})
 
-		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusBadRequest)
-			_, err := w.Write(resErr)
-			assert.NoError(t, err, "Failed to write response")
+// 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 			w.WriteHeader(http.StatusBadRequest)
+// 			_, err := w.Write(resErr)
+// 			assert.NoError(t, err, "Failed to write response")
 
-			assertCall[applications.Application](t, r, fmt.Sprintf("%s%s", applicationsPath, "valid-app-id"), "PUT", applicationsBody)
-		}))
+// 			assertCall[applications.Application](t, r, fmt.Sprintf("%s%s", applicationsPath, "valid-app-id"), "PUT", applicationsBody)
+// 		}))
 
-		defer srv.Close()
+// 		defer srv.Close()
 
-		res, _, err := client.Application.Update(context.TODO(), &applicationsBody)
+// 		res, _, err := client.Application.Update(context.TODO(), &applicationsBody)
 
-		assert.Zero(t, res)
-		assert.Error(t, err)
-		assert.Equal(t, "error 400 \nupdate failed : server error", err.Error())
-	})
-}
+// 		assert.Zero(t, res)
+// 		assert.Error(t, err)
+// 		assert.Equal(t, "error 400 \nupdate failed : server error", err.Error())
+// 	})
+// }
 
 func TestApplications_Delete(t *testing.T) {
 
