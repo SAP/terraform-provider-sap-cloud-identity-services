@@ -436,7 +436,9 @@ func TestApplications_Update(t *testing.T) {
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.Method == "PATCH" {
 				var actualBody generic.PatchRequestBody
-				json.NewDecoder(r.Body).Decode(&actualBody)
+				err := json.NewDecoder(r.Body).Decode(&actualBody)
+
+				assert.NoError(t, err)
 				assert.Equal(t, 11, len(actualBody.Operations))
 			}
 			_, err := w.Write(applicationsResponse)

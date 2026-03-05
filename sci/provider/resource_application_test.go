@@ -1370,7 +1370,7 @@ func ResourceSaml2Application(resourceName string, app applications.Application)
 				digest_algorithm = "%s"
 			}
 		}
-	}`, resourceName, app.Name, acsEndpoints, sloEndpoints, signingCertificates, encryptionCertificate, saml2Config.ResponseElementsToEncrypt, saml2Config.DefaultNameIdFormat, saml2Config.SignSLOMessages, saml2Config.RequireSignedSLOMessages, saml2Config.RequireSignedAuthnRequest, saml2Config.SignAssertions, saml2Config.SignAuthnResponses, saml2Config.DigestAlgorithm)
+	}`, resourceName, app.Name, acsEndpoints.String(), sloEndpoints.String(), signingCertificates.String(), encryptionCertificate, saml2Config.ResponseElementsToEncrypt, saml2Config.DefaultNameIdFormat, saml2Config.SignSLOMessages, saml2Config.RequireSignedSLOMessages, saml2Config.RequireSignedAuthnRequest, saml2Config.SignAssertions, saml2Config.SignAuthnResponses, saml2Config.DigestAlgorithm)
 }
 
 func OidcResourceApplication(resourceName string, app applications.Application) string {
