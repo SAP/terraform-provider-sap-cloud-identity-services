@@ -13,6 +13,7 @@ import (
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/applications"
 	corporateidps "github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/corporateIdps"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/generic"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
 )
 
 type authenticationSchemaData struct {
@@ -754,7 +755,7 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 				elem := attributesVal.Elem()
 				field := elem.FieldByName(fieldName.Name)
 
-				if len(fieldValue.ValueString()) > 0 {
+				if !fieldValue.IsNull() {
 					field.SetString(fieldValue.ValueString())
 					setAttributes = true
 				} else {
@@ -775,68 +776,112 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 	return args, diagnostics
 }
 
-func getUpdateRequest(ctx context.Context, plan applicationData, state applicationData) []generic.PatchRequest {
+func getUpdateRequest(ctx context.Context, plan applicationData, state applicationData) ([]generic.PatchRequest, diag.Diagnostics) {
 
+	var diags diag.Diagnostics
 	reqs := []generic.PatchRequest{}
 
 	argsType := reflect.TypeFor[applicationData]()
 
 	if !plan.Name.Equal(state.Name) {
-		reqs = append(reqs, getPatchRequest("replace", "Name", "", plan.Name.ValueString(), argsType))
+		patchReq, diags := utils.GetPatchRequest("Name", "", plan.Name.ValueString(), argsType)
+		if diags.HasError() {
+			return []generic.PatchRequest{}, diags
+		}
+		reqs = append(reqs, patchReq)
 	}
 
 	if !plan.Description.Equal(state.Description) {
-		reqs = append(reqs, getPatchRequest("replace", "Description", "", plan.Description.ValueString(), argsType))
+		patchReq, diags := utils.GetPatchRequest("Description", "", plan.Description.ValueString(), argsType)
+		if diags.HasError() {
+			return []generic.PatchRequest{}, diags
+		}
+		reqs = append(reqs, patchReq)
 	}
 
 	if !plan.MultiTenantApp.Equal(state.MultiTenantApp) {
-		reqs = append(reqs, getPatchRequest("replace", "MultiTenantApp", "", plan.MultiTenantApp.ValueBool(), argsType))
+		patchReq, diags := utils.GetPatchRequest("MultiTenantApp", "", plan.MultiTenantApp.ValueBool(), argsType)
+		if diags.HasError() {
+			return nil, diags
+		}
+		reqs = append(reqs, patchReq)
 	}
 
 	if !plan.ParentApplicationId.Equal(state.ParentApplicationId) {
-		reqs = append(reqs, getPatchRequest("replace", "ParentApplicationId", "", plan.ParentApplicationId.ValueString(), argsType))
+		patchReq, diags := utils.GetPatchRequest("ParentApplicationId", "", plan.ParentApplicationId.ValueString(), argsType)
+		if diags.HasError() {
+			return nil, diags
+		}
+		reqs = append(reqs, patchReq)
 	}
 
 	if !plan.AuthenticationSchema.Equal(state.AuthenticationSchema) {
 
-		arg, _ := argsType.FieldByName("AuthenticationSchema")
-		path := fmt.Sprintf("/%s", arg.Tag.Get("json"))
+		authSchemaPath, diags := utils.GetAttributeTag("AuthenticationSchema", argsType)
+		if diags.HasError() {
+			return reqs, diags
+		}
 
 		argsType = reflect.TypeFor[authenticationSchemaData]()
 
 		var planAuthSchema, stateAuthSchema authenticationSchemaData
 
-		_ = plan.AuthenticationSchema.As(ctx, &planAuthSchema, basetypes.ObjectAsOptions{
+		diags = plan.AuthenticationSchema.As(ctx, &planAuthSchema, basetypes.ObjectAsOptions{
 			UnhandledNullAsEmpty:    true,
 			UnhandledUnknownAsEmpty: true,
 		})
+		if diags.HasError() {
+			return reqs, diags
+		}
 
-		_ = state.AuthenticationSchema.As(ctx, &stateAuthSchema, basetypes.ObjectAsOptions{
+		diags = state.AuthenticationSchema.As(ctx, &stateAuthSchema, basetypes.ObjectAsOptions{
 			UnhandledNullAsEmpty:    true,
 			UnhandledUnknownAsEmpty: true,
 		})
+		if diags.HasError() {
+			return reqs, diags
+		}
 
 		if !planAuthSchema.SsoType.Equal(stateAuthSchema.SsoType) {
-			reqs = append(reqs, getPatchRequest("replace", "SsoType", path, planAuthSchema.SsoType.ValueString(), argsType))
+			patchReq, diags := utils.GetPatchRequest("SsoType", authSchemaPath, planAuthSchema.SsoType.ValueString(), argsType)
+			if diags.HasError() {
+				return reqs, diags
+			}
+			reqs = append(reqs, patchReq)
 		}
 
 		if !planAuthSchema.SubjectNameIdentifier.Equal(stateAuthSchema.SubjectNameIdentifier) {
 			var planSubjectNameIdentifier subjectNameIdentifierData
 
-			_ = planAuthSchema.SubjectNameIdentifier.As(ctx, &planSubjectNameIdentifier, basetypes.ObjectAsOptions{
+			diags = planAuthSchema.SubjectNameIdentifier.As(ctx, &planSubjectNameIdentifier, basetypes.ObjectAsOptions{
 				UnhandledNullAsEmpty:    true,
 				UnhandledUnknownAsEmpty: true,
 			})
+			if diags.HasError() {
+				return reqs, diags
+			}
 
 			if planSubjectNameIdentifier.Source.ValueString() == sourceValues[0] || planSubjectNameIdentifier.Source.ValueString() == sourceValues[2] {
-				reqs = append(reqs, getPatchRequest("replace", "SubjectNameIdentifier", path, planSubjectNameIdentifier.Value.ValueString(), argsType))
+				patchReq, diags := utils.GetPatchRequest("SubjectNameIdentifier", authSchemaPath, planSubjectNameIdentifier.Value.ValueString(), argsType)
+				if diags.HasError() {
+					return reqs, diags
+				}
+				reqs = append(reqs, patchReq)
 			} else {
-				reqs = append(reqs, getPatchRequest("replace", "SubjectNameIdentifier", path, "${corporateIdP."+planSubjectNameIdentifier.Value.ValueString()+"}", argsType))
+				patchReq, diags := utils.GetPatchRequest("SubjectNameIdentifier", authSchemaPath, "${corporateIdP."+planSubjectNameIdentifier.Value.ValueString()+"}", argsType)
+				if diags.HasError() {
+					return reqs, diags
+				}
+				reqs = append(reqs, patchReq)
 			}
 		}
 
 		if !planAuthSchema.SubjectNameIdentifierFunction.Equal(stateAuthSchema.SubjectNameIdentifierFunction) {
-			reqs = append(reqs, getPatchRequest("replace", "SubjectNameIdentifierFunction", path, planAuthSchema.SubjectNameIdentifierFunction.ValueString(), argsType))
+			patchReq, diags := utils.GetPatchRequest("SubjectNameIdentifierFunction", authSchemaPath, planAuthSchema.SubjectNameIdentifierFunction.ValueString(), argsType)
+			if diags.HasError() {
+				return reqs, diags
+			}
+			reqs = append(reqs, patchReq)
 		}
 
 		if !planAuthSchema.AssertionAttributes.Equal(stateAuthSchema.AssertionAttributes) {
@@ -844,10 +889,17 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 			planAssertionAttributes := []applications.AssertionAttribute{}
 
 			if !planAuthSchema.AssertionAttributes.IsNull() {
-				_ = planAuthSchema.AssertionAttributes.ElementsAs(ctx, &planAssertionAttributes, true)
+				diags = planAuthSchema.AssertionAttributes.ElementsAs(ctx, &planAssertionAttributes, true)
+				if diags.HasError(){
+					return reqs, diags
+				}
 			}
 
-			reqs = append(reqs, getPatchRequest("replace", "AssertionAttributes", path, planAssertionAttributes, argsType))
+			patchReq, diags := utils.GetPatchRequest("AssertionAttributes", authSchemaPath, planAssertionAttributes, argsType)
+			if diags.HasError() {
+				return reqs, diags
+			}
+			reqs = append(reqs, patchReq)
 		}
 
 		if !planAuthSchema.AdvancedAssertionAttributes.Equal(stateAuthSchema.AdvancedAssertionAttributes) {
@@ -856,7 +908,11 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 
 			if !planAuthSchema.AdvancedAssertionAttributes.IsNull() {
 				var planAdvancedAssertionAttributes []advancedAssertionAttributesData
-				_ = planAuthSchema.AdvancedAssertionAttributes.ElementsAs(ctx, &planAdvancedAssertionAttributes, true)
+				diags = planAuthSchema.AdvancedAssertionAttributes.ElementsAs(ctx, &planAdvancedAssertionAttributes, true)
+
+				if diags.HasError() {
+					return reqs, diags
+				}
 
 				for _, attribute := range planAdvancedAssertionAttributes {
 
@@ -875,11 +931,19 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 				}
 			}
 
-			reqs = append(reqs, getPatchRequest("replace", "AdvancedAssertionAttributes", path, attributes, argsType))
+			patchReq, diags := utils.GetPatchRequest("AdvancedAssertionAttributes", authSchemaPath, attributes, argsType)
+			if diags.HasError() {
+				return reqs, diags
+			}
+			reqs = append(reqs, patchReq)
 		}
 
 		if !planAuthSchema.DefaultAuthenticatingIdpId.Equal(stateAuthSchema.DefaultAuthenticatingIdpId) {
-			reqs = append(reqs, getPatchRequest("replace", "DefaultAuthenticatingIdpId", path, planAuthSchema.DefaultAuthenticatingIdpId.ValueString(), argsType))
+			patchReq, diags := utils.GetPatchRequest("DefaultAuthenticatingIdpId", authSchemaPath, planAuthSchema.DefaultAuthenticatingIdpId.ValueString(), argsType)
+			if diags.HasError() {
+				return reqs, diags
+			}
+			reqs = append(reqs, patchReq)
 		}
 
 		if !planAuthSchema.AuthenticationRules.Equal(stateAuthSchema.AuthenticationRules) {
@@ -887,69 +951,113 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 			rules := []applications.AuthenicationRule{}
 
 			if !planAuthSchema.AuthenticationRules.IsNull() {
-				_ = planAuthSchema.AuthenticationRules.ElementsAs(ctx, &rules, true)
+				diags = planAuthSchema.AuthenticationRules.ElementsAs(ctx, &rules, true)
+				if diags.HasError() {
+					return reqs, diags
+				}
 			}
 
-			reqs = append(reqs, getPatchRequest("replace", "AuthenticationRules", path, rules, argsType))
+			patchReq, diags := utils.GetPatchRequest("AuthenticationRules", authSchemaPath, rules, argsType)
+			if diags.HasError() {
+				return reqs, diags
+			}
+			reqs = append(reqs, patchReq)
 		}
 
 		if !planAuthSchema.OpenIdConnectConfiguration.Equal(stateAuthSchema.OpenIdConnectConfiguration) {
 
-			arg, _ := argsType.FieldByName("OidcConfig")
-			path = fmt.Sprintf("%s/%s", path, arg.Tag.Get("json"))
+			path, diags := utils.GetAttributeTag("OpenIdConnectConfiguration", argsType)
+			if diags.HasError(){
+				return reqs, diags
+			}
 
-			argsType = reflect.TypeFor[applications.OidcConfig]()
+			oidcPath := fmt.Sprintf("%s/%s", authSchemaPath, path)
+			argsType = reflect.TypeFor[openIdConnectConfigurationData]()
 
 			var planOidcSchema, stateOidcSchema openIdConnectConfigurationData
 
-			_ = planAuthSchema.OpenIdConnectConfiguration.As(ctx, &planOidcSchema, basetypes.ObjectAsOptions{
+			diags = planAuthSchema.OpenIdConnectConfiguration.As(ctx, &planOidcSchema, basetypes.ObjectAsOptions{
 				UnhandledNullAsEmpty:    true,
 				UnhandledUnknownAsEmpty: true,
 			})
+			if diags.HasError(){
+				return reqs, diags
+			}
 
-			_ = stateAuthSchema.OpenIdConnectConfiguration.As(ctx, &stateOidcSchema, basetypes.ObjectAsOptions{
+			diags = stateAuthSchema.OpenIdConnectConfiguration.As(ctx, &stateOidcSchema, basetypes.ObjectAsOptions{
 				UnhandledNullAsEmpty:    true,
 				UnhandledUnknownAsEmpty: true,
 			})
+			if diags.HasError(){
+				return reqs, diags
+			}
 
 			if !planOidcSchema.RedirectUris.Equal(stateOidcSchema.RedirectUris) {
 				val := []string{}
 
 				if !planOidcSchema.RedirectUris.IsNull() {
-					_ = planOidcSchema.RedirectUris.ElementsAs(ctx, &val, true)
+					diags = planOidcSchema.RedirectUris.ElementsAs(ctx, &val, true)
+					if diags.HasError(){
+						return reqs, diags
+					}
 				}
 
-				reqs = append(reqs, getPatchRequest("replace", "RedirectUris", path, val, argsType))
+				patchReq, diags := utils.GetPatchRequest("RedirectUris", oidcPath, val, argsType)
+				if diags.HasError() {
+					return reqs, diags
+				}
+				reqs = append(reqs, patchReq)
 			}
 
 			if !planOidcSchema.PostLogoutRedirectUris.Equal(stateOidcSchema.PostLogoutRedirectUris) {
 				val := []string{}
 
 				if !planOidcSchema.PostLogoutRedirectUris.IsNull() {
-					_ = planOidcSchema.PostLogoutRedirectUris.ElementsAs(ctx, &val, true)
+					diags = planOidcSchema.PostLogoutRedirectUris.ElementsAs(ctx, &val, true)
+					if diags.HasError(){
+						return reqs, diags
+					}
 				}
 
-				reqs = append(reqs, getPatchRequest("replace", "PostLogoutRedirectUris", path, val, argsType))
+				patchReq, diags := utils.GetPatchRequest("PostLogoutRedirectUris", oidcPath, val, argsType)
+				if diags.HasError() {
+					return reqs, diags
+				}
+				reqs = append(reqs, patchReq)
 			}
 
 			if !planOidcSchema.FrontChannelLogoutUris.Equal(stateOidcSchema.FrontChannelLogoutUris) {
 				val := []string{}
 
 				if !planOidcSchema.FrontChannelLogoutUris.IsNull() {
-					_ = planOidcSchema.FrontChannelLogoutUris.ElementsAs(ctx, &val, true)
+					diags = planOidcSchema.FrontChannelLogoutUris.ElementsAs(ctx, &val, true)
+					if diags.HasError(){
+						return reqs, diags
+					}
 				}
 
-				reqs = append(reqs, getPatchRequest("replace", "FrontChannelLogoutUris", path, val, argsType))
+				patchReq, diags := utils.GetPatchRequest("FrontChannelLogoutUris", oidcPath, val, argsType)
+				if diags.HasError() {
+					return reqs, diags
+				}
+				reqs = append(reqs, patchReq)
 			}
 
 			if !planOidcSchema.BackChannelLogoutUris.Equal(stateOidcSchema.BackChannelLogoutUris) {
 				val := []string{}
 
 				if !planOidcSchema.BackChannelLogoutUris.IsNull() {
-					_ = planOidcSchema.BackChannelLogoutUris.ElementsAs(ctx, &val, true)
+					diags = planOidcSchema.BackChannelLogoutUris.ElementsAs(ctx, &val, true)
+					if diags.HasError(){
+						return reqs, diags
+					}
 				}
 
-				reqs = append(reqs, getPatchRequest("replace", "BackChannelLogoutUris", path, val, argsType))
+				patchReq, diags := utils.GetPatchRequest("BackChannelLogoutUris", oidcPath, val, argsType)
+				if diags.HasError() {
+					return reqs, diags
+				}
+				reqs = append(reqs, patchReq)
 			}
 
 			if !planOidcSchema.TokenPolicy.Equal(stateOidcSchema.TokenPolicy) {
@@ -957,153 +1065,231 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 				val := applications.TokenPolicy{}
 
 				if !planOidcSchema.TokenPolicy.IsNull() {
-					_ = planOidcSchema.TokenPolicy.As(ctx, &val, basetypes.ObjectAsOptions{
+					diags = planOidcSchema.TokenPolicy.As(ctx, &val, basetypes.ObjectAsOptions{
 						UnhandledNullAsEmpty:    true,
 						UnhandledUnknownAsEmpty: true,
 					})
+					if diags.HasError(){
+						return reqs, diags
+					}
 				}
 
-				reqs = append(reqs, getPatchRequest("replace", "TokenPolicy", path, val, argsType))
+				patchReq, diags := utils.GetPatchRequest("TokenPolicy", oidcPath, val, argsType)
+				if diags.HasError() {
+					return []generic.PatchRequest{}, diags
+				}
+				reqs = append(reqs, patchReq)
 			}
 
 			if !planOidcSchema.RestrictedGrantTypes.Equal(stateOidcSchema.RestrictedGrantTypes) {
 				val := []string{}
 
 				if !planOidcSchema.RestrictedGrantTypes.IsNull() {
-					_ = planOidcSchema.RestrictedGrantTypes.ElementsAs(ctx, &val, true)
+					diags = planOidcSchema.RestrictedGrantTypes.ElementsAs(ctx, &val, true)
+					if diags.HasError(){
+						return reqs, diags
+					}
 				}
 
-				reqs = append(reqs, getPatchRequest("replace", "RestrictedGrantTypes", path, val, argsType))
+				patchReq, diags := utils.GetPatchRequest("RestrictedGrantTypes", oidcPath, val, argsType)
+				if diags.HasError() {
+					return []generic.PatchRequest{}, diags
+				}
+				reqs = append(reqs, patchReq)
 			}
 
 			if !planOidcSchema.ProxyConfig.Equal(stateOidcSchema.ProxyConfig) {
 				val := applications.OidcProxyConfig{}
 
-				_ = planOidcSchema.ProxyConfig.As(ctx, &val, basetypes.ObjectAsOptions{
+				diags = planOidcSchema.ProxyConfig.As(ctx, &val, basetypes.ObjectAsOptions{
 					UnhandledNullAsEmpty:    true,
 					UnhandledUnknownAsEmpty: true,
 				})
+				if diags.HasError(){
+					return reqs, diags
+				}
 
-				reqs = append(reqs, getPatchRequest("replace", "ProxyConfig", path, val, argsType))
+				patchReq, diags := utils.GetPatchRequest("ProxyConfig", oidcPath, val, argsType)
+				if diags.HasError() {
+					return []generic.PatchRequest{}, diags
+				}
+				reqs = append(reqs, patchReq)
 			}
 		}
 
 		if !planAuthSchema.Saml2Configuration.Equal(stateAuthSchema.Saml2Configuration) {
 
-			arg, _ := argsType.FieldByName("Saml2Configuration")
-			path = fmt.Sprintf("%s/%s", path, arg.Tag.Get("json"))
+			path, diags := utils.GetAttributeTag("Saml2Configuration", argsType)
+			if diags.HasError(){
+				return reqs, diags
+			}
 
-			argsType = reflect.TypeFor[applications.SamlConfiguration]()
+			samlPath := fmt.Sprintf("%s/%s", authSchemaPath, path)
+
+			argsType = reflect.TypeFor[AppSaml2ConfigData]()
 
 			var planSaml2Schema, stateSaml2Schema AppSaml2ConfigData
 
-			_ = planAuthSchema.Saml2Configuration.As(ctx, &planSaml2Schema, basetypes.ObjectAsOptions{
+			diags = planAuthSchema.Saml2Configuration.As(ctx, &planSaml2Schema, basetypes.ObjectAsOptions{
 				UnhandledNullAsEmpty:    true,
 				UnhandledUnknownAsEmpty: true,
 			})
+			if diags.HasError(){
+				return reqs, diags
+			}
 
-			_ = stateAuthSchema.Saml2Configuration.As(ctx, &stateSaml2Schema, basetypes.ObjectAsOptions{
+			diags = stateAuthSchema.Saml2Configuration.As(ctx, &stateSaml2Schema, basetypes.ObjectAsOptions{
 				UnhandledNullAsEmpty:    true,
 				UnhandledUnknownAsEmpty: true,
 			})
+			if diags.HasError(){
+				return reqs, diags
+			}
 
 			if !planSaml2Schema.SamlMetadataUrl.Equal(stateSaml2Schema.SamlMetadataUrl) {
-				reqs = append(reqs, getPatchRequest("replace", "SamlMetadataUrl", path, planSaml2Schema.SamlMetadataUrl.ValueString(), argsType))
+				patchReq, diags := utils.GetPatchRequest("SamlMetadataUrl", samlPath, planSaml2Schema.SamlMetadataUrl.ValueString(), argsType)
+				if diags.HasError() {
+					return []generic.PatchRequest{}, diags
+				}
+				reqs = append(reqs, patchReq)
 			}
 
 			if !planSaml2Schema.AcsEndpoints.Equal(stateSaml2Schema.AcsEndpoints) {
 				val := []applications.Saml2AcsEndpoint{}
 
 				if !planSaml2Schema.AcsEndpoints.IsNull() {
-					_ = planSaml2Schema.AcsEndpoints.ElementsAs(ctx, &val, true)
+					diags = planSaml2Schema.AcsEndpoints.ElementsAs(ctx, &val, true)
+					if diags.HasError(){
+						return reqs, diags
+					}
 				}
 
-				reqs = append(reqs, getPatchRequest("replace", "AcsEndpoints", path, val, argsType))
+				patchReq, diags := utils.GetPatchRequest("AcsEndpoints", samlPath, val, argsType)
+				if diags.HasError() {
+					return []generic.PatchRequest{}, diags
+				}
+				reqs = append(reqs, patchReq)
 			}
 
 			if !planSaml2Schema.SloEndpoints.Equal(stateSaml2Schema.SloEndpoints) {
 				val := []applications.Saml2SLOEndpoint{}
 
 				if !planSaml2Schema.SloEndpoints.IsNull() {
-					_ = planSaml2Schema.SloEndpoints.ElementsAs(ctx, &val, true)
+					diags = planSaml2Schema.SloEndpoints.ElementsAs(ctx, &val, true)
+					if diags.HasError(){
+						return reqs, diags
+					}
 				}
 
-				reqs = append(reqs, getPatchRequest("replace", "SloEndpoints", path, val, argsType))
+				patchReq, diags := utils.GetPatchRequest("SloEndpoints", samlPath, val, argsType)
+				if diags.HasError() {
+					return []generic.PatchRequest{}, diags
+				}
+				reqs = append(reqs, patchReq)
 			}
 
 			if !planSaml2Schema.CertificatesForSigning.Equal(stateSaml2Schema.CertificatesForSigning) {
 				val := []corporateidps.SigningCertificateData{}
 
 				if !planSaml2Schema.CertificatesForSigning.IsNull() {
-					_ = planSaml2Schema.CertificatesForSigning.ElementsAs(ctx, &val, true)
+					diags = planSaml2Schema.CertificatesForSigning.ElementsAs(ctx, &val, true)
+					if diags.HasError(){
+						return reqs, diags
+					}
 				}
 
-				reqs = append(reqs, getPatchRequest("replace", "CertificatesForSigning", path, val, argsType))
+				patchReq, diags := utils.GetPatchRequest("CertificatesForSigning", samlPath, val, argsType)
+				if diags.HasError(){
+					return reqs, diags
+				}
+				reqs = append(reqs, patchReq)
 			}
 
 			if !planSaml2Schema.CertificateForEncryption.Equal(stateSaml2Schema.CertificateForEncryption) {
 				val := applications.EncryptionCertificateData{}
 
 				if !planSaml2Schema.CertificatesForSigning.IsNull() {
-					_ = planSaml2Schema.CertificateForEncryption.As(ctx, &val, basetypes.ObjectAsOptions{
+					diags = planSaml2Schema.CertificateForEncryption.As(ctx, &val, basetypes.ObjectAsOptions{
 						UnhandledNullAsEmpty:    true,
 						UnhandledUnknownAsEmpty: true,
 					})
+					if diags.HasError(){
+						return reqs, diags
+					}
 				}
 
-				reqs = append(reqs, getPatchRequest("replace", "CertificateForEncryption", path, val, argsType))
+				patchReq, diags := utils.GetPatchRequest("CertificateForEncryption", samlPath, val, argsType)
+				if diags.HasError(){
+					return reqs, diags
+				}
+				reqs = append(reqs, patchReq)
 			}
 
 			if !planSaml2Schema.ResponseElementsToEncrypt.Equal(stateSaml2Schema.ResponseElementsToEncrypt) {
-				reqs = append(reqs, getPatchRequest("replace", "ResponseElementsToEncrypt", path, planSaml2Schema.ResponseElementsToEncrypt.ValueString(), argsType))
+				patchReq, diags := utils.GetPatchRequest("ResponseElementsToEncrypt", samlPath, planSaml2Schema.ResponseElementsToEncrypt.ValueString(), argsType)
+				if diags.HasError(){
+					return reqs, diags
+				}
+				reqs = append(reqs, patchReq)
 			}
 
 			if !planSaml2Schema.DefaultNameIdFormat.Equal(stateSaml2Schema.DefaultNameIdFormat) {
-				reqs = append(reqs, getPatchRequest("replace", "DefaultNameIdFormat", path, planSaml2Schema.DefaultNameIdFormat.ValueString(), argsType))
+				patchReq, diags := utils.GetPatchRequest("DefaultNameIdFormat", samlPath, planSaml2Schema.DefaultNameIdFormat.ValueString(), argsType)
+				if diags.HasError(){
+					return reqs, diags
+				}
+				reqs = append(reqs, patchReq)
 			}
 
 			if !planSaml2Schema.SignSloMessages.Equal(stateSaml2Schema.SignSloMessages) {
-				reqs = append(reqs, getPatchRequest("replace", "SignSLOMessages", path, planSaml2Schema.SignSloMessages.ValueBool(), argsType))
+				patchReq, diags := utils.GetPatchRequest("SignSloMessages", samlPath, planSaml2Schema.SignSloMessages.ValueBool(), argsType)
+				if diags.HasError(){
+					return reqs, diags
+				}
+				reqs = append(reqs, patchReq)
 			}
 
 			if !planSaml2Schema.RequireSignedSloMessages.Equal(stateSaml2Schema.RequireSignedSloMessages) {
-				reqs = append(reqs, getPatchRequest("replace", "RequireSignedSLOMessages", path, planSaml2Schema.RequireSignedSloMessages.ValueBool(), argsType))
+				patchReq, diags := utils.GetPatchRequest("RequireSignedSloMessages", samlPath, planSaml2Schema.RequireSignedSloMessages.ValueBool(), argsType)
+				if diags.HasError(){
+					return reqs, diags
+				}
+				reqs = append(reqs, patchReq)
 			}
 
 			if !planSaml2Schema.RequireSignedAuthnRequest.Equal(stateSaml2Schema.RequireSignedAuthnRequest) {
-				reqs = append(reqs, getPatchRequest("replace", "RequireSignedAuthnRequest", path, planSaml2Schema.RequireSignedAuthnRequest.ValueBool(), argsType))
+				patchReq, diags := utils.GetPatchRequest("RequireSignedAuthnRequest", samlPath, planSaml2Schema.RequireSignedAuthnRequest.ValueBool(), argsType)
+				if diags.HasError(){
+					return reqs, diags
+				}
+				reqs = append(reqs, patchReq)
 			}
 
 			if !planSaml2Schema.SignAssertions.Equal(stateSaml2Schema.SignAssertions) {
-				reqs = append(reqs, getPatchRequest("replace", "SignAssertions", path, planSaml2Schema.SignAssertions.ValueBool(), argsType))
+				patchReq, diags := utils.GetPatchRequest("SignAssertions", samlPath, planSaml2Schema.SignAssertions.ValueBool(), argsType)
+				if diags.HasError(){
+					return reqs, diags
+				}
+				reqs = append(reqs, patchReq)
 			}
 
 			if !planSaml2Schema.SignAuthnResponses.Equal(stateSaml2Schema.SignAuthnResponses) {
-				reqs = append(reqs, getPatchRequest("replace", "SignAuthnResponses", path, planSaml2Schema.SignAuthnResponses.ValueBool(), argsType))
+				patchReq, diags := utils.GetPatchRequest("SignAuthnResponses", samlPath, planSaml2Schema.SignAuthnResponses.ValueBool(), argsType)
+				if diags.HasError(){
+					return reqs, diags
+				}
+				reqs = append(reqs, patchReq)
 			}
 
 			if !planSaml2Schema.DigestAlgorithm.Equal(stateSaml2Schema.DigestAlgorithm) {
-				reqs = append(reqs, getPatchRequest("replace", "DigestAlgorithm", path, planSaml2Schema.DigestAlgorithm.ValueString(), argsType))
+				patchReq, diags := utils.GetPatchRequest("DigestAlgorithm", samlPath, planSaml2Schema.DigestAlgorithm.ValueString(), argsType)
+				if diags.HasError() {
+					return reqs, diags
+				}
+				reqs = append(reqs, patchReq)
 			}
 		}
 	}
 
-	return reqs
-}
-
-func getPatchRequest(operation string, attrName string, path string, value any, argsType reflect.Type) generic.PatchRequest {
-
-	arg, _ := argsType.FieldByName(attrName)
-	tag := fmt.Sprintf("/%s", arg.Tag.Get("json"))
-
-	if path != "" {
-		tag = fmt.Sprintf("%s%s", path, tag)
-	}
-
-	return generic.PatchRequest{
-		Op:    operation,
-		Path:  tag,
-		Value: value,
-	}
-
+	return reqs, diags
 }

@@ -164,8 +164,12 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 					"subject_name_identifier_function": schema.StringAttribute{
 						MarkdownDescription: "Convert the subject name identifier to uppercase or lowercase. " + utils.ValidValuesString(subjectNameIdentifierFunctionValues),
 						Optional:            true,
+						Computed:            true,
 						Validators: []validator.String{
 							stringvalidator.OneOf(subjectNameIdentifierFunctionValues...),
+						},
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.UseStateForUnknown(),
 						},
 					},
 					"assertion_attributes": schema.ListNestedAttribute{
@@ -870,16 +874,11 @@ func (r *applicationResource) Update(ctx context.Context, req resource.UpdateReq
 		return
 	}
 
-	// Update the application details
-	// args, diags := getApplicationRequest(ctx, plan)
-	// resp.Diagnostics.Append(diags...)
-	// if resp.Diagnostics.HasError() {
-	// 	return
-	// }
-
-	// args.Id = state.Id.ValueString()
-
-	args := getUpdateRequest(ctx, plan, state)
+	args, diag := getUpdateRequest(ctx, plan, state)
+	resp.Diagnostics.Append(diag.Errors()...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	res, _, err := r.cli.Application.Update(ctx, args, state.Id.ValueString())
 	if err != nil {

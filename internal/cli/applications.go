@@ -87,7 +87,6 @@ func (a *ApplicationsCli) Update(ctx context.Context, args []generic.PatchReques
 		Operations: args,
 	}
 
-	// _, _, err := a.cliClient.Execute(ctx, "PUT", fmt.Sprintf("%s%s", a.getUrl(), args.Id), args, "", RequestHeader, nil)
 	_, _, err := a.cliClient.Execute(ctx, "PATCH", fmt.Sprintf("%s%s", a.getUrl(), appId), nil, reqBody, "", RequestHeader, nil)
 
 	if err != nil {

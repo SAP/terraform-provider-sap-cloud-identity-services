@@ -138,6 +138,44 @@ func TestResourceApplication(t *testing.T) {
 		},
 	}
 
+	updatedApplication := applications.Application{
+		Name:        "test-app-updated",
+		Description: "application for testing purposes",
+		AuthenticationSchema: &applications.AuthenticationSchema{
+			SubjectNameIdentifier:         "userUuid",
+			SubjectNameIdentifierFunction: "upperCase",
+			AssertionAttributes: []applications.AssertionAttribute{
+				{
+					AssertionAttributeName: "param1",
+					UserAttributeName:      "lastName",
+				},
+			},
+			AdvancedAssertionAttributes: []applications.AdvancedAssertionAttribute{
+				{
+					AttributeName:  "adv_param1",
+					AttributeValue: "updated_value1",
+				},
+				{
+					AttributeName:  "adv_param2",
+					AttributeValue: "value2",
+				},
+				{
+					AttributeName:  "adv_param3",
+					AttributeValue: "value3",
+				},
+			},
+			DefaultAuthenticatingIdpId: "7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1",
+			ConditionalAuthentication: []applications.AuthenicationRule{
+				{
+					UserType:           "customer",
+					UserEmailDomain:    "sap.com",
+					IpNetworkRange:     "192.168.1.1/24",
+					IdentityProviderId: "7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1",
+				},
+			},
+		},
+	}
+
 	t.Parallel()
 
 	t.Run("happy path - application", func(t *testing.T) {
@@ -185,98 +223,7 @@ func TestResourceApplication(t *testing.T) {
 		})
 	})
 
-	t.Run("happy path - bundled application1", func(t *testing.T) {
-
-		rec, user := setupVCR(t, "fixtures/resource_bundled_application1")
-		defer stopQuietly(rec)
-
-		resource.Test(t, resource.TestCase{
-			IsUnitTest:               true,
-			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
-			Steps: []resource.TestStep{
-				{
-					Config:        providerConfig("", user) + ResourceApplicationWithBundledApp("testBundledApp", "name"),
-					ResourceName:  "sci_application.testBundledApp",
-					ImportState:   true,
-					ImportStateId: "73afa691-5946-4bb1-9c39-b404e4b21594",
-					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestCheckResourceAttr("sci_application.testBundledApp", "id", "73afa691-5946-4bb1-9c39-b404e4b21594"),
-						resource.TestCheckResourceAttr("sci_application.testBundledApp", "name", "XSUAA_b75a605d-151c-4485-83f4-64604378e4ec"),
-						resource.TestCheckResourceAttr("sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.type", "xsuaa"),
-						resource.TestCheckResourceAttr("sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.app_tenant_id", "b75a605d-151c-4485-83f4-64604378e4ec"),
-					),
-				},
-			},
-		})
-	})
-
-	t.Run("happy path - bundled application2", func(t *testing.T) {
-
-		rec, user := setupVCR(t, "fixtures/resource_bundled_application2")
-		defer stopQuietly(rec)
-
-		resource.Test(t, resource.TestCase{
-			IsUnitTest:               true,
-			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
-			Steps: []resource.TestStep{
-				{
-					Config:        providerConfig("", user) + ResourceApplicationWithBundledApp("testBundledApp", "name"),
-					ResourceName:  "sci_application.testBundledApp",
-					ImportState:   true,
-					ImportStateId: "31e38d9c-ca48-4227-963d-32e7dfcb5007",
-					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestCheckResourceAttr("sci_application.testBundledApp", "id", "31e38d9c-ca48-4227-963d-32e7dfcb5007"),
-						resource.TestCheckResourceAttr("sci_application.testBundledApp", "name", "identity-subscription-c6c390f4-c9a2-4a6c-9cc7-01675a31e4f6-in-b75a605d-151c-4485-83f4-64604378e4ec"),
-						resource.TestCheckResourceAttr("sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.type", "subscription"),
-						resource.TestCheckResourceAttr("sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.app_tenant_id", "b75a605d-151c-4485-83f4-64604378e4ec"),
-						resource.TestCheckResourceAttr("sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.source_app_id", "3cc4b385-fe8b-423a-a8c0-34e15c9970cd"),
-						resource.TestCheckResourceAttr("sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.source_tenant_id", "sapdas"),
-						resource.TestCheckResourceAttr("sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.service_instance_id", "c6c390f4-c9a2-4a6c-9cc7-01675a31e4f6"),
-					),
-				},
-			},
-		})
-	})
-
 	t.Run("happy path - application update", func(t *testing.T) {
-
-		updatedApplication := applications.Application{
-			Name:        "test-app-updated",
-			Description: "application for testing purposes",
-			AuthenticationSchema: &applications.AuthenticationSchema{
-				SubjectNameIdentifier:         "userUuid",
-				SubjectNameIdentifierFunction: "upperCase",
-				AssertionAttributes: []applications.AssertionAttribute{
-					{
-						AssertionAttributeName: "param1",
-						UserAttributeName:      "lastName",
-					},
-				},
-				AdvancedAssertionAttributes: []applications.AdvancedAssertionAttribute{
-					{
-						AttributeName:  "adv_param1",
-						AttributeValue: "updated_value1",
-					},
-					{
-						AttributeName:  "adv_param2",
-						AttributeValue: "value2",
-					},
-					{
-						AttributeName:  "adv_param3",
-						AttributeValue: "value3",
-					},
-				},
-				DefaultAuthenticatingIdpId: "7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1",
-				ConditionalAuthentication: []applications.AuthenicationRule{
-					{
-						UserType:           "customer",
-						UserEmailDomain:    "sap.com",
-						IpNetworkRange:     "192.168.1.1/24",
-						IdentityProviderId: "7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1",
-					},
-				},
-			},
-		}
 
 		rec, user := setupVCR(t, "fixtures/resource_application_updated")
 		defer stopQuietly(rec)
@@ -335,9 +282,34 @@ func TestResourceApplication(t *testing.T) {
 		})
 	})
 
-	t.Run("happy path - bundled application update", func(t *testing.T) {
+	t.Run("happy path - bundled application1", func(t *testing.T) {
 
-		rec, user := setupVCR(t, "fixtures/resource_bundled_application_update")
+		rec, user := setupVCR(t, "fixtures/resource_bundled_application1")
+		defer stopQuietly(rec)
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+			Steps: []resource.TestStep{
+				{
+					Config:        providerConfig("", user) + ResourceApplicationWithBundledApp("testBundledApp", "name"),
+					ResourceName:  "sci_application.testBundledApp",
+					ImportState:   true,
+					ImportStateId: "73afa691-5946-4bb1-9c39-b404e4b21594",
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestCheckResourceAttr("sci_application.testBundledApp", "id", "73afa691-5946-4bb1-9c39-b404e4b21594"),
+						resource.TestCheckResourceAttr("sci_application.testBundledApp", "name", "XSUAA_b75a605d-151c-4485-83f4-64604378e4ec"),
+						resource.TestCheckResourceAttr("sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.type", "xsuaa"),
+						resource.TestCheckResourceAttr("sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.app_tenant_id", "b75a605d-151c-4485-83f4-64604378e4ec"),
+					),
+				},
+			},
+		})
+	})
+
+	t.Run("happy path - bundled application2", func(t *testing.T) {
+
+		rec, user := setupVCR(t, "fixtures/resource_bundled_application2")
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{
@@ -357,6 +329,49 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestCheckResourceAttr("sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.source_app_id", "3cc4b385-fe8b-423a-a8c0-34e15c9970cd"),
 						resource.TestCheckResourceAttr("sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.source_tenant_id", "sapdas"),
 						resource.TestCheckResourceAttr("sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.service_instance_id", "c6c390f4-c9a2-4a6c-9cc7-01675a31e4f6"),
+					),
+				},
+			},
+		})
+	})
+
+	t.Run("happy path - imported application update", func(t *testing.T) {
+
+		rec, user := setupVCR(t, "fixtures/resource_imported_application_update")
+		defer stopQuietly(rec)
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+			Steps: []resource.TestStep{
+				{
+					Config: providerConfig("", user) + ResourceApplication("testImportedApp", application),
+				},
+				{
+					ResourceName: "sci_application.testImportedApp",
+					ImportState:  true,
+				},
+				{
+					Config:       providerConfig("", user) + ResourceApplication("testImportedApp", updatedApplication),
+					ResourceName: "sci_application.testImportedApp",
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestMatchResourceAttr("sci_application.testImportedApp", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_application.testImportedApp", "name", updatedApplication.Name),
+						resource.TestCheckResourceAttr("sci_application.testImportedApp", "description", updatedApplication.Description),
+						resource.TestCheckResourceAttr("sci_application.testImportedApp", "multi_tenant_app", "false"),
+						resource.TestCheckResourceAttr("sci_application.testImportedApp", "authentication_schema.subject_name_identifier.value", updatedApplication.AuthenticationSchema.SubjectNameIdentifier),
+						resource.TestCheckResourceAttr("sci_application.testImportedApp", "authentication_schema.subject_name_identifier_function", updatedApplication.AuthenticationSchema.SubjectNameIdentifierFunction),
+						resource.TestCheckResourceAttr("sci_application.testImportedApp", "authentication_schema.assertion_attributes.0.attribute_name", updatedApplication.AuthenticationSchema.AssertionAttributes[0].AssertionAttributeName),
+						resource.TestCheckResourceAttr("sci_application.testImportedApp", "authentication_schema.assertion_attributes.0.attribute_value", updatedApplication.AuthenticationSchema.AssertionAttributes[0].UserAttributeName),
+						resource.TestCheckResourceAttr("sci_application.testImportedApp", "authentication_schema.advanced_assertion_attributes.0.attribute_name", updatedApplication.AuthenticationSchema.AdvancedAssertionAttributes[0].AttributeName),
+						resource.TestCheckResourceAttr("sci_application.testImportedApp", "authentication_schema.advanced_assertion_attributes.0.attribute_value", updatedApplication.AuthenticationSchema.AdvancedAssertionAttributes[0].AttributeValue),
+						resource.TestCheckResourceAttr("sci_application.testImportedApp", "authentication_schema.advanced_assertion_attributes.1.attribute_name", updatedApplication.AuthenticationSchema.AdvancedAssertionAttributes[1].AttributeName),
+						resource.TestCheckResourceAttr("sci_application.testImportedApp", "authentication_schema.advanced_assertion_attributes.1.attribute_value", updatedApplication.AuthenticationSchema.AdvancedAssertionAttributes[1].AttributeValue),
+						resource.TestCheckResourceAttr("sci_application.testImportedApp", "authentication_schema.advanced_assertion_attributes.2.attribute_name", updatedApplication.AuthenticationSchema.AdvancedAssertionAttributes[2].AttributeName),
+						resource.TestCheckResourceAttr("sci_application.testImportedApp", "authentication_schema.advanced_assertion_attributes.2.attribute_value", updatedApplication.AuthenticationSchema.AdvancedAssertionAttributes[2].AttributeValue),
+						resource.TestCheckResourceAttr("sci_application.testImportedApp", "authentication_schema.default_authenticating_idp", updatedApplication.AuthenticationSchema.DefaultAuthenticatingIdpId),
+						resource.TestCheckResourceAttr("sci_application.testImportedApp", "authentication_schema.conditional_authentication.0.user_type", updatedApplication.AuthenticationSchema.ConditionalAuthentication[0].UserType),
+						resource.TestCheckResourceAttr("sci_application.testImportedApp", "authentication_schema.conditional_authentication.0.user_email_domain", updatedApplication.AuthenticationSchema.ConditionalAuthentication[0].UserEmailDomain),
+						resource.TestCheckResourceAttr("sci_application.testImportedApp", "authentication_schema.conditional_authentication.0.ip_network_range", updatedApplication.AuthenticationSchema.ConditionalAuthentication[0].IpNetworkRange),
 					),
 				},
 			},
