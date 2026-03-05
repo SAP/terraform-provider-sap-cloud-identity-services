@@ -275,157 +275,164 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 	// Authentication Schema OIDC
 	// the mapping is done manually in order to handle the null values
 
-	oidc := openIdConnectConfigurationData{}
+	if a.AuthenticationSchema.OidcConfig != nil {
+		oidc := openIdConnectConfigurationData{}
 
-	oidc.RedirectUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.RedirectUris)
-	diagnostics.Append(diags...)
+		oidc.RedirectUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.RedirectUris)
+		diagnostics.Append(diags...)
 
-	oidc.PostLogoutRedirectUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.PostLogoutRedirectUris)
-	diagnostics.Append(diags...)
+		oidc.PostLogoutRedirectUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.PostLogoutRedirectUris)
+		diagnostics.Append(diags...)
 
-	oidc.FrontChannelLogoutUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.FrontChannelLogoutUris)
-	diagnostics.Append(diags...)
+		oidc.FrontChannelLogoutUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.FrontChannelLogoutUris)
+		diagnostics.Append(diags...)
 
-	oidc.BackChannelLogoutUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.BackChannelLogoutUris)
-	diagnostics.Append(diags...)
+		oidc.BackChannelLogoutUris, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.BackChannelLogoutUris)
+		diagnostics.Append(diags...)
 
-	if a.AuthenticationSchema.OidcConfig.TokenPolicy != nil {
-		tokenpolicy := tokenPolicyData{
-			JwtValidity:                  types.Int32Value(a.AuthenticationSchema.OidcConfig.TokenPolicy.JwtValidity),
-			RefreshValidity:              types.Int32Value(a.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshValidity),
-			RefreshParallel:              types.Int32Value(a.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshParallel),
-			MaxExchangePeriod:            types.StringValue(a.AuthenticationSchema.OidcConfig.TokenPolicy.MaxExchangePeriod),
-			RefreshTokenRotationScenario: types.StringValue(a.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshTokenRotationScenario),
-			AccessTokenFormat:            types.StringValue(a.AuthenticationSchema.OidcConfig.TokenPolicy.AccessTokenFormat),
+		if a.AuthenticationSchema.OidcConfig.TokenPolicy != nil {
+			tokenpolicy := tokenPolicyData{
+				JwtValidity:                  types.Int32Value(a.AuthenticationSchema.OidcConfig.TokenPolicy.JwtValidity),
+				RefreshValidity:              types.Int32Value(a.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshValidity),
+				RefreshParallel:              types.Int32Value(a.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshParallel),
+				MaxExchangePeriod:            types.StringValue(a.AuthenticationSchema.OidcConfig.TokenPolicy.MaxExchangePeriod),
+				RefreshTokenRotationScenario: types.StringValue(a.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshTokenRotationScenario),
+				AccessTokenFormat:            types.StringValue(a.AuthenticationSchema.OidcConfig.TokenPolicy.AccessTokenFormat),
+			}
+			oidc.TokenPolicy, diags = types.ObjectValueFrom(ctx, tokenPolicyObjType, tokenpolicy)
+			diagnostics.Append(diags...)
+		} else {
+			oidc.TokenPolicy = types.ObjectNull(tokenPolicyObjType)
 		}
-		oidc.TokenPolicy, diags = types.ObjectValueFrom(ctx, tokenPolicyObjType, tokenpolicy)
+		var restrictedGrants []string
+		for _, g := range a.AuthenticationSchema.OidcConfig.RestrictedGrantTypes {
+			restrictedGrants = append(restrictedGrants, string(g))
+		}
+		oidc.RestrictedGrantTypes, diags = types.SetValueFrom(ctx, types.StringType, restrictedGrants)
+		diagnostics.Append(diags...)
+
+		// Proxy Config
+		if a.AuthenticationSchema.OidcConfig.ProxyConfig != nil {
+			proxyConfig := proxyConfigData{}
+			proxyConfig.Acrs, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.ProxyConfig.Acrs)
+			diagnostics.Append(diags...)
+
+			oidc.ProxyConfig, diags = types.ObjectValueFrom(ctx, proxyConfigObjType, proxyConfig)
+			diagnostics.Append(diags...)
+		} else {
+			oidc.ProxyConfig = types.ObjectNull(proxyConfigObjType)
+		}
+
+		authenticationSchema.OpenIdConnectConfiguration, diags = types.ObjectValueFrom(ctx, openIdConnectConfigurationObjType, oidc)
 		diagnostics.Append(diags...)
 	} else {
-		oidc.TokenPolicy = types.ObjectNull(tokenPolicyObjType)
+		authenticationSchema.OpenIdConnectConfiguration = types.ObjectNull(openIdConnectConfigurationObjType)
 	}
-	var restrictedGrants []string
-	for _, g := range a.AuthenticationSchema.OidcConfig.RestrictedGrantTypes {
-		restrictedGrants = append(restrictedGrants, string(g))
-	}
-	oidc.RestrictedGrantTypes, diags = types.SetValueFrom(ctx, types.StringType, restrictedGrants)
-	diagnostics.Append(diags...)
-
-	// Proxy Config
-	if a.AuthenticationSchema.OidcConfig.ProxyConfig != nil {
-		proxyConfig := proxyConfigData{}
-		proxyConfig.Acrs, diags = types.SetValueFrom(ctx, types.StringType, a.AuthenticationSchema.OidcConfig.ProxyConfig.Acrs)
-		diagnostics.Append(diags...)
-
-		oidc.ProxyConfig, diags = types.ObjectValueFrom(ctx, proxyConfigObjType, proxyConfig)
-		diagnostics.Append(diags...)
-	} else {
-		oidc.ProxyConfig = types.ObjectNull(proxyConfigObjType)
-	}
-
-	authenticationSchema.OpenIdConnectConfiguration, diags = types.ObjectValueFrom(ctx, openIdConnectConfigurationObjType, oidc)
-	diagnostics.Append(diags...)
 
 	// Authentication Schema SAML2
 	// the mapping is done manually in order to handle the null values
-
-	saml2Res := a.AuthenticationSchema.Saml2Configuration
-	saml2Config := AppSaml2ConfigData{
-		ResponseElementsToEncrypt: types.StringValue(saml2Res.ResponseElementsToEncrypt),
-		DefaultNameIdFormat:       types.StringValue(saml2Res.DefaultNameIdFormat),
-		SignSloMessages:           types.BoolValue(saml2Res.SignSLOMessages),
-		RequireSignedSloMessages:  types.BoolValue(saml2Res.RequireSignedSLOMessages),
-		RequireSignedAuthnRequest: types.BoolValue(saml2Res.RequireSignedAuthnRequest),
-		SignAssertions:            types.BoolValue(saml2Res.SignAssertions),
-		SignAuthnResponses:        types.BoolValue(saml2Res.SignAuthnResponses),
-		DigestAlgorithm:           types.StringValue(saml2Res.DigestAlgorithm),
-	}
-
-	// SAML2
-	// Saml Metadata URL
-	if len(saml2Res.SamlMetadataUrl) > 0 {
-		saml2Config.SamlMetadataUrl = types.StringValue(saml2Res.SamlMetadataUrl)
-	}
-
-	// SAML2 ACS Endpoints
-	if len(a.AuthenticationSchema.Saml2Configuration.AcsEndpoints) > 0 {
-		saml2Config.AcsEndpoints, diags = types.ListValueFrom(ctx, acsEndpointsObjType, a.AuthenticationSchema.Saml2Configuration.AcsEndpoints)
-		diagnostics.Append(diags...)
-
-		if diagnostics.HasError() {
-			return application, diagnostics
+	if a.AuthenticationSchema.Saml2Configuration != nil {
+		saml2Res := a.AuthenticationSchema.Saml2Configuration
+		saml2Config := AppSaml2ConfigData{
+			ResponseElementsToEncrypt: types.StringValue(saml2Res.ResponseElementsToEncrypt),
+			DefaultNameIdFormat:       types.StringValue(saml2Res.DefaultNameIdFormat),
+			SignSloMessages:           types.BoolValue(saml2Res.SignSLOMessages),
+			RequireSignedSloMessages:  types.BoolValue(saml2Res.RequireSignedSLOMessages),
+			RequireSignedAuthnRequest: types.BoolValue(saml2Res.RequireSignedAuthnRequest),
+			SignAssertions:            types.BoolValue(saml2Res.SignAssertions),
+			SignAuthnResponses:        types.BoolValue(saml2Res.SignAuthnResponses),
+			DigestAlgorithm:           types.StringValue(saml2Res.DigestAlgorithm),
 		}
-	} else {
-		saml2Config.AcsEndpoints = types.ListNull(acsEndpointsObjType)
-	}
 
-	// SAML2 SLO Endpoints
-	if len(a.AuthenticationSchema.Saml2Configuration.SloEndpoints) > 0 {
+		// SAML2
+		// Saml Metadata URL
+		if len(saml2Res.SamlMetadataUrl) > 0 {
+			saml2Config.SamlMetadataUrl = types.StringValue(saml2Res.SamlMetadataUrl)
+		}
 
-		endpointsData := []AppSloEndpointData{}
+		// SAML2 ACS Endpoints
+		if len(a.AuthenticationSchema.Saml2Configuration.AcsEndpoints) > 0 {
+			saml2Config.AcsEndpoints, diags = types.ListValueFrom(ctx, acsEndpointsObjType, a.AuthenticationSchema.Saml2Configuration.AcsEndpoints)
+			diagnostics.Append(diags...)
 
-		for _, endpoint := range a.AuthenticationSchema.Saml2Configuration.SloEndpoints {
-			endpointData := AppSloEndpointData{
-				BindingName: types.StringValue(endpoint.BindingName),
-				Location:    types.StringValue(endpoint.Location),
+			if diagnostics.HasError() {
+				return application, diagnostics
+			}
+		} else {
+			saml2Config.AcsEndpoints = types.ListNull(acsEndpointsObjType)
+		}
+
+		// SAML2 SLO Endpoints
+		if len(a.AuthenticationSchema.Saml2Configuration.SloEndpoints) > 0 {
+
+			endpointsData := []AppSloEndpointData{}
+
+			for _, endpoint := range a.AuthenticationSchema.Saml2Configuration.SloEndpoints {
+				endpointData := AppSloEndpointData{
+					BindingName: types.StringValue(endpoint.BindingName),
+					Location:    types.StringValue(endpoint.Location),
+				}
+
+				if len(endpoint.ResponseLocation) > 0 {
+					endpointData.ResponseLocation = types.StringValue(endpoint.ResponseLocation)
+				}
+
+				endpointsData = append(endpointsData, endpointData)
 			}
 
-			if len(endpoint.ResponseLocation) > 0 {
-				endpointData.ResponseLocation = types.StringValue(endpoint.ResponseLocation)
+			saml2Endpoints, diags := types.ListValueFrom(ctx, appSaml2SloEndpointObjType, endpointsData)
+			diagnostics.Append(diags...)
+
+			if diagnostics.HasError() {
+				return application, diagnostics
 			}
 
-			endpointsData = append(endpointsData, endpointData)
+			saml2Config.SloEndpoints = saml2Endpoints
+
+		} else {
+			saml2Config.SloEndpoints = types.ListNull(appSaml2SloEndpointObjType)
 		}
 
-		saml2Endpoints, diags := types.ListValueFrom(ctx, appSaml2SloEndpointObjType, endpointsData)
-		diagnostics.Append(diags...)
+		// SAML2 Signing Certificates
+		if len(saml2Res.CertificatesForSigning) > 0 {
+			certificates, diags := types.ListValueFrom(ctx, saml2SigningCertificateObjType, saml2Res.CertificatesForSigning)
+			diagnostics.Append(diags...)
+
+			if diagnostics.HasError() {
+				return application, diagnostics
+			}
+
+			saml2Config.CertificatesForSigning = certificates
+		} else {
+			saml2Config.CertificatesForSigning = types.ListNull(saml2SigningCertificateObjType)
+		}
+
+		//SAML2 Encryption Certificate
+		if saml2Res.CertificateForEncryption != nil {
+			encryptionCertificate, diags := types.ObjectValueFrom(ctx, saml2EncryptionCertificateObjType.AttrTypes, saml2Res.CertificateForEncryption)
+			diagnostics.Append(diags...)
+
+			if diagnostics.HasError() {
+				return application, diagnostics
+			}
+
+			saml2Config.CertificateForEncryption = encryptionCertificate
+		} else {
+			saml2Config.CertificateForEncryption = types.ObjectNull(saml2EncryptionCertificateObjType.AttrTypes)
+		}
 
 		if diagnostics.HasError() {
 			return application, diagnostics
 		}
 
-		saml2Config.SloEndpoints = saml2Endpoints
-
-	} else {
-		saml2Config.SloEndpoints = types.ListNull(appSaml2SloEndpointObjType)
-	}
-
-	// SAML2 Signing Certificates
-	if len(saml2Res.CertificatesForSigning) > 0 {
-		certificates, diags := types.ListValueFrom(ctx, saml2SigningCertificateObjType, saml2Res.CertificatesForSigning)
+		authenticationSchema.Saml2Configuration, diags = types.ObjectValueFrom(ctx, appSaml2ConfigObjType.AttrTypes, saml2Config)
 		diagnostics.Append(diags...)
 
 		if diagnostics.HasError() {
 			return application, diagnostics
 		}
-
-		saml2Config.CertificatesForSigning = certificates
 	} else {
-		saml2Config.CertificatesForSigning = types.ListNull(saml2SigningCertificateObjType)
-	}
-
-	//SAML2 Encryption Certificate
-	if saml2Res.CertificateForEncryption != nil {
-		encryptionCertificate, diags := types.ObjectValueFrom(ctx, saml2EncryptionCertificateObjType.AttrTypes, saml2Res.CertificateForEncryption)
-		diagnostics.Append(diags...)
-
-		if diagnostics.HasError() {
-			return application, diagnostics
-		}
-
-		saml2Config.CertificateForEncryption = encryptionCertificate
-	} else {
-		saml2Config.CertificateForEncryption = types.ObjectNull(saml2EncryptionCertificateObjType.AttrTypes)
-	}
-
-	if diagnostics.HasError() {
-		return application, diagnostics
-	}
-
-	authenticationSchema.Saml2Configuration, diags = types.ObjectValueFrom(ctx, appSaml2ConfigObjType.AttrTypes, saml2Config)
-	diagnostics.Append(diags...)
-
-	if diagnostics.HasError() {
-		return application, diagnostics
+		authenticationSchema.Saml2Configuration = types.ObjectNull(appSaml2ConfigObjType.AttrTypes)
 	}
 
 	if a.AuthenticationSchema.SapManagedAttributes != nil {
@@ -890,7 +897,7 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 
 			if !planAuthSchema.AssertionAttributes.IsNull() {
 				diags = planAuthSchema.AssertionAttributes.ElementsAs(ctx, &planAssertionAttributes, true)
-				if diags.HasError(){
+				if diags.HasError() {
 					return reqs, diags
 				}
 			}
@@ -967,7 +974,7 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 		if !planAuthSchema.OpenIdConnectConfiguration.Equal(stateAuthSchema.OpenIdConnectConfiguration) {
 
 			path, diags := utils.GetAttributeTag("OpenIdConnectConfiguration", argsType)
-			if diags.HasError(){
+			if diags.HasError() {
 				return reqs, diags
 			}
 
@@ -980,7 +987,7 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 				UnhandledNullAsEmpty:    true,
 				UnhandledUnknownAsEmpty: true,
 			})
-			if diags.HasError(){
+			if diags.HasError() {
 				return reqs, diags
 			}
 
@@ -988,7 +995,7 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 				UnhandledNullAsEmpty:    true,
 				UnhandledUnknownAsEmpty: true,
 			})
-			if diags.HasError(){
+			if diags.HasError() {
 				return reqs, diags
 			}
 
@@ -997,7 +1004,7 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 
 				if !planOidcSchema.RedirectUris.IsNull() {
 					diags = planOidcSchema.RedirectUris.ElementsAs(ctx, &val, true)
-					if diags.HasError(){
+					if diags.HasError() {
 						return reqs, diags
 					}
 				}
@@ -1014,7 +1021,7 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 
 				if !planOidcSchema.PostLogoutRedirectUris.IsNull() {
 					diags = planOidcSchema.PostLogoutRedirectUris.ElementsAs(ctx, &val, true)
-					if diags.HasError(){
+					if diags.HasError() {
 						return reqs, diags
 					}
 				}
@@ -1031,7 +1038,7 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 
 				if !planOidcSchema.FrontChannelLogoutUris.IsNull() {
 					diags = planOidcSchema.FrontChannelLogoutUris.ElementsAs(ctx, &val, true)
-					if diags.HasError(){
+					if diags.HasError() {
 						return reqs, diags
 					}
 				}
@@ -1048,7 +1055,7 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 
 				if !planOidcSchema.BackChannelLogoutUris.IsNull() {
 					diags = planOidcSchema.BackChannelLogoutUris.ElementsAs(ctx, &val, true)
-					if diags.HasError(){
+					if diags.HasError() {
 						return reqs, diags
 					}
 				}
@@ -1069,7 +1076,7 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 						UnhandledNullAsEmpty:    true,
 						UnhandledUnknownAsEmpty: true,
 					})
-					if diags.HasError(){
+					if diags.HasError() {
 						return reqs, diags
 					}
 				}
@@ -1086,7 +1093,7 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 
 				if !planOidcSchema.RestrictedGrantTypes.IsNull() {
 					diags = planOidcSchema.RestrictedGrantTypes.ElementsAs(ctx, &val, true)
-					if diags.HasError(){
+					if diags.HasError() {
 						return reqs, diags
 					}
 				}
@@ -1105,7 +1112,7 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 					UnhandledNullAsEmpty:    true,
 					UnhandledUnknownAsEmpty: true,
 				})
-				if diags.HasError(){
+				if diags.HasError() {
 					return reqs, diags
 				}
 
@@ -1120,7 +1127,7 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 		if !planAuthSchema.Saml2Configuration.Equal(stateAuthSchema.Saml2Configuration) {
 
 			path, diags := utils.GetAttributeTag("Saml2Configuration", argsType)
-			if diags.HasError(){
+			if diags.HasError() {
 				return reqs, diags
 			}
 
@@ -1134,7 +1141,7 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 				UnhandledNullAsEmpty:    true,
 				UnhandledUnknownAsEmpty: true,
 			})
-			if diags.HasError(){
+			if diags.HasError() {
 				return reqs, diags
 			}
 
@@ -1142,7 +1149,7 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 				UnhandledNullAsEmpty:    true,
 				UnhandledUnknownAsEmpty: true,
 			})
-			if diags.HasError(){
+			if diags.HasError() {
 				return reqs, diags
 			}
 
@@ -1159,7 +1166,7 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 
 				if !planSaml2Schema.AcsEndpoints.IsNull() {
 					diags = planSaml2Schema.AcsEndpoints.ElementsAs(ctx, &val, true)
-					if diags.HasError(){
+					if diags.HasError() {
 						return reqs, diags
 					}
 				}
@@ -1176,7 +1183,7 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 
 				if !planSaml2Schema.SloEndpoints.IsNull() {
 					diags = planSaml2Schema.SloEndpoints.ElementsAs(ctx, &val, true)
-					if diags.HasError(){
+					if diags.HasError() {
 						return reqs, diags
 					}
 				}
@@ -1193,13 +1200,13 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 
 				if !planSaml2Schema.CertificatesForSigning.IsNull() {
 					diags = planSaml2Schema.CertificatesForSigning.ElementsAs(ctx, &val, true)
-					if diags.HasError(){
+					if diags.HasError() {
 						return reqs, diags
 					}
 				}
 
 				patchReq, diags := utils.GetPatchRequest("CertificatesForSigning", samlPath, val, argsType)
-				if diags.HasError(){
+				if diags.HasError() {
 					return reqs, diags
 				}
 				reqs = append(reqs, patchReq)
@@ -1208,18 +1215,18 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 			if !planSaml2Schema.CertificateForEncryption.Equal(stateSaml2Schema.CertificateForEncryption) {
 				val := applications.EncryptionCertificateData{}
 
-				if !planSaml2Schema.CertificatesForSigning.IsNull() {
+				if !planSaml2Schema.CertificateForEncryption.IsNull() {
 					diags = planSaml2Schema.CertificateForEncryption.As(ctx, &val, basetypes.ObjectAsOptions{
 						UnhandledNullAsEmpty:    true,
 						UnhandledUnknownAsEmpty: true,
 					})
-					if diags.HasError(){
+					if diags.HasError() {
 						return reqs, diags
 					}
 				}
 
 				patchReq, diags := utils.GetPatchRequest("CertificateForEncryption", samlPath, val, argsType)
-				if diags.HasError(){
+				if diags.HasError() {
 					return reqs, diags
 				}
 				reqs = append(reqs, patchReq)
@@ -1227,7 +1234,7 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 
 			if !planSaml2Schema.ResponseElementsToEncrypt.Equal(stateSaml2Schema.ResponseElementsToEncrypt) {
 				patchReq, diags := utils.GetPatchRequest("ResponseElementsToEncrypt", samlPath, planSaml2Schema.ResponseElementsToEncrypt.ValueString(), argsType)
-				if diags.HasError(){
+				if diags.HasError() {
 					return reqs, diags
 				}
 				reqs = append(reqs, patchReq)
@@ -1235,7 +1242,7 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 
 			if !planSaml2Schema.DefaultNameIdFormat.Equal(stateSaml2Schema.DefaultNameIdFormat) {
 				patchReq, diags := utils.GetPatchRequest("DefaultNameIdFormat", samlPath, planSaml2Schema.DefaultNameIdFormat.ValueString(), argsType)
-				if diags.HasError(){
+				if diags.HasError() {
 					return reqs, diags
 				}
 				reqs = append(reqs, patchReq)
@@ -1243,7 +1250,7 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 
 			if !planSaml2Schema.SignSloMessages.Equal(stateSaml2Schema.SignSloMessages) {
 				patchReq, diags := utils.GetPatchRequest("SignSloMessages", samlPath, planSaml2Schema.SignSloMessages.ValueBool(), argsType)
-				if diags.HasError(){
+				if diags.HasError() {
 					return reqs, diags
 				}
 				reqs = append(reqs, patchReq)
@@ -1251,7 +1258,7 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 
 			if !planSaml2Schema.RequireSignedSloMessages.Equal(stateSaml2Schema.RequireSignedSloMessages) {
 				patchReq, diags := utils.GetPatchRequest("RequireSignedSloMessages", samlPath, planSaml2Schema.RequireSignedSloMessages.ValueBool(), argsType)
-				if diags.HasError(){
+				if diags.HasError() {
 					return reqs, diags
 				}
 				reqs = append(reqs, patchReq)
@@ -1259,7 +1266,7 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 
 			if !planSaml2Schema.RequireSignedAuthnRequest.Equal(stateSaml2Schema.RequireSignedAuthnRequest) {
 				patchReq, diags := utils.GetPatchRequest("RequireSignedAuthnRequest", samlPath, planSaml2Schema.RequireSignedAuthnRequest.ValueBool(), argsType)
-				if diags.HasError(){
+				if diags.HasError() {
 					return reqs, diags
 				}
 				reqs = append(reqs, patchReq)
@@ -1267,7 +1274,7 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 
 			if !planSaml2Schema.SignAssertions.Equal(stateSaml2Schema.SignAssertions) {
 				patchReq, diags := utils.GetPatchRequest("SignAssertions", samlPath, planSaml2Schema.SignAssertions.ValueBool(), argsType)
-				if diags.HasError(){
+				if diags.HasError() {
 					return reqs, diags
 				}
 				reqs = append(reqs, patchReq)
@@ -1275,7 +1282,7 @@ func getUpdateRequest(ctx context.Context, plan applicationData, state applicati
 
 			if !planSaml2Schema.SignAuthnResponses.Equal(stateSaml2Schema.SignAuthnResponses) {
 				patchReq, diags := utils.GetPatchRequest("SignAuthnResponses", samlPath, planSaml2Schema.SignAuthnResponses.ValueBool(), argsType)
-				if diags.HasError(){
+				if diags.HasError() {
 					return reqs, diags
 				}
 				reqs = append(reqs, patchReq)

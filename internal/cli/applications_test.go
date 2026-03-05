@@ -344,11 +344,6 @@ func TestApplications_Update(t *testing.T) {
 		},
 		{
 			Op:    "replace",
-			Path:  "/name",
-			Value: "Updated Test Application",
-		},
-		{
-			Op:    "replace",
 			Path:  "/description",
 			Value: "updated test app description",
 		},
@@ -439,7 +434,7 @@ func TestApplications_Update(t *testing.T) {
 				err := json.NewDecoder(r.Body).Decode(&actualBody)
 
 				assert.NoError(t, err)
-				assert.Equal(t, 11, len(actualBody.Operations))
+				assert.Equal(t, 10, len(actualBody.Operations))
 			}
 			_, err := w.Write(applicationsResponse)
 			assert.NoError(t, err, "Failed to write response")
