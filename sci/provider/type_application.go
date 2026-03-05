@@ -331,19 +331,19 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 		}
 
 		// SAML2
-		// Saml Metadata URL
+		// SAML Metadata URL
 		if len(saml2Res.SamlMetadataUrl) > 0 {
 			saml2Config.SamlMetadataUrl = types.StringValue(saml2Res.SamlMetadataUrl)
 		}
 
-		// Saml Digest Algorithm
+		// SAML Digest Algorithm
 		if len(saml2Res.DigestAlgorithm) > 0 {
 			saml2Config.DigestAlgorithm = types.StringValue(saml2Res.DigestAlgorithm)
 		}
 
-		// Saml Default NameId Format
+		// SAML Default NameId Format
 		if len((saml2Res.DefaultNameIdFormat)) > 0 {
-			saml2Config.DefaultNameIdFormat = types.StringValue(reflect.ValueOf(saml2Res.DefaultNameIdFormat).String())
+			saml2Config.DefaultNameIdFormat = types.StringValue(saml2Res.DefaultNameIdFormat)
 		}
 
 		// SAML2 ACS Endpoints
