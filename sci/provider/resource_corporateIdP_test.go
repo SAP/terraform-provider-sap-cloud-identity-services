@@ -3,6 +3,7 @@ package provider
 import (
 	"fmt"
 	"regexp"
+	"strings"
 	"testing"
 
 	corporateidps "github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/corporateIdps"
@@ -711,9 +712,9 @@ func TestResourceCorporateIdP(t *testing.T) {
 
 func ResourceCorporateIdP(resourceName string, idp corporateidps.IdentityProvider) string {
 
-	var groups string
+	var groups strings.Builder
 	for _, group := range idp.IdentityFederation.RequiredGroups {
-		groups += fmt.Sprintf(`"%s",`, group)
+		fmt.Fprintf(&groups, `"%s",`, group)
 	}
 
 	resourceIdP := fmt.Sprintf(`
@@ -732,15 +733,15 @@ func ResourceCorporateIdP(resourceName string, idp corporateidps.IdentityProvide
 			login_hint_type = "%s"
 			send_method = "%s"
 		}
-	`, resourceName, idp.DisplayName, idp.Name, idp.LogoutUrl, idp.ForwardAllSsoRequests, idp.IdentityFederation.UseLocalUserStore, idp.IdentityFederation.AllowLocalUsersOnly, idp.IdentityFederation.ApplyLocalIdPAuthnChecks, groups, idp.LoginHintConfiguration.LoginHintType, idp.LoginHintConfiguration.SendMethod)
+	`, resourceName, idp.DisplayName, idp.Name, idp.LogoutUrl, idp.ForwardAllSsoRequests, idp.IdentityFederation.UseLocalUserStore, idp.IdentityFederation.AllowLocalUsersOnly, idp.IdentityFederation.ApplyLocalIdPAuthnChecks, groups.String(), idp.LoginHintConfiguration.LoginHintType, idp.LoginHintConfiguration.SendMethod)
 
 	switch idp.Type {
 	case "openIdConnect":
 		oidcConfig := idp.OidcConfiguration
 
-		var scopes string
+		var scopes strings.Builder
 		for _, scope := range oidcConfig.Scopes {
-			scopes += fmt.Sprintf(`
+			fmt.Fprintf(&scopes, `
 					"%s",
 				`, scope)
 		}
@@ -765,14 +766,14 @@ func ResourceCorporateIdP(resourceName string, idp corporateidps.IdentityProvide
 					enable_pkce = %t
 					%s
 				}
-			`, idp.Type, oidcConfig.DiscoveryUrl, oidcConfig.ClientId, oidcConfig.ClientSecret, oidcConfig.SubjectNameIdentifier, oidcConfig.TokenEndpointAuthMethod, scopes, oidcConfig.PkceEnabled, additionalConfig)
+			`, idp.Type, oidcConfig.DiscoveryUrl, oidcConfig.ClientId, oidcConfig.ClientSecret, oidcConfig.SubjectNameIdentifier, oidcConfig.TokenEndpointAuthMethod, scopes.String(), oidcConfig.PkceEnabled, additionalConfig)
 
 	case "saml2", "sapSSO", "microsoftADFS":
 		saml2Config := idp.Saml2Configuration
 
-		var assertionAttributes string
+		var assertionAttributes strings.Builder
 		for _, attribute := range saml2Config.AssertionAttributes {
-			assertionAttributes += fmt.Sprintf(`
+			fmt.Fprintf(&assertionAttributes, `
 					{
 						name = "%s"
 						value = "%s"
@@ -780,9 +781,9 @@ func ResourceCorporateIdP(resourceName string, idp corporateidps.IdentityProvide
 				`, attribute.Name, attribute.Value)
 		}
 
-		var certificates string
+		var certificates strings.Builder
 		for _, certificate := range saml2Config.CertificatesForSigning {
-			certificates += fmt.Sprintf(`
+			fmt.Fprintf(&certificates, `
 					{
 						base64_certificate = "%s"
 						dn = "%s"
@@ -793,9 +794,9 @@ func ResourceCorporateIdP(resourceName string, idp corporateidps.IdentityProvide
 				`, certificate.Base64Certificate, certificate.Dn, certificate.IsDefault, certificate.ValidFrom, certificate.ValidTo)
 		}
 
-		var ssoEndpoints string
+		var ssoEndpoints strings.Builder
 		for _, endpoint := range saml2Config.SsoEndpoints {
-			ssoEndpoints += fmt.Sprintf(`
+			fmt.Fprintf(&ssoEndpoints, `
 					{
 						binding_name = "%s"
 						location = "%s"
@@ -804,9 +805,9 @@ func ResourceCorporateIdP(resourceName string, idp corporateidps.IdentityProvide
 				`, endpoint.BindingName, endpoint.Location, endpoint.IsDefault)
 		}
 
-		var sloEndpoints string
+		var sloEndpoints strings.Builder
 		for _, endpoint := range saml2Config.SloEndpoints {
-			sloEndpoints += fmt.Sprintf(`
+			fmt.Fprintf(&sloEndpoints, `
 					{
 						binding_name = "%s"
 						location = "%s"
@@ -829,7 +830,7 @@ func ResourceCorporateIdP(resourceName string, idp corporateidps.IdentityProvide
 					sso_endpoints = [%s]
 					slo_endpoints = [%s]
 				}
-			`, idp.Type, saml2Config.SamlMetadataUrl, assertionAttributes, saml2Config.DigestAlgorithm, saml2Config.IncludeScoping, saml2Config.DefaultNameIdFormat, saml2Config.AllowCreate, certificates, ssoEndpoints, sloEndpoints)
+			`, idp.Type, saml2Config.SamlMetadataUrl, assertionAttributes.String(), saml2Config.DigestAlgorithm, saml2Config.IncludeScoping, saml2Config.DefaultNameIdFormat, saml2Config.AllowCreate, certificates.String(), ssoEndpoints.String(), sloEndpoints.String())
 	}
 
 	resourceIdP += `}`
@@ -857,7 +858,7 @@ func ResourceCorporateIdPWithoutNameType(resourceName string, idpName string, co
 	resource "sci_corporate_idp" "%s" {
 		display_name = "%s"
 		%s
-	}	
+	}
 	`, resourceName, idpName, config)
 }
 

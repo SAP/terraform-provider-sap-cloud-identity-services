@@ -11,12 +11,12 @@ on:
       - synchronize
       - ready_for_review
     paths-ignore:
-      - '*.md'
+      - "*.md"
   push:
     branches:
       - main
     paths-ignore:
-      - '*.md'
+      - "*.md"
   workflow_dispatch:
   workflow_call:
 
@@ -35,14 +35,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v6 # v4.0.0
+      - uses: actions/checkout@v6
       - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
           cache: false
       - run: |
-         go mod download
-         go mod tidy
+          go mod download
+          go mod tidy
       - run: go build -v .
       - name: Run linters
         uses: golangci/golangci-lint-action@1e7e51e771db61008b38414a730f564565cf7c20 # v3.7.1
@@ -55,10 +55,10 @@ jobs:
     name: Docu Generation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6 # v4.0.0
+      - uses: actions/checkout@v6
       - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
           cache: false
       - run: go generate ./...
       - name: git diff
@@ -66,12 +66,28 @@ jobs:
           git diff --compact-summary --exit-code || \
             (echo; echo "Unexpected difference in directories after code generation. Run 'go generate ./...' command and commit."; exit 1)
 
+  gofix:
+    if: github.event.pull_request.draft == false
+    name: Go Fix
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
+        with:
+          go-version-file: "go.mod"
+          cache: false
+      - run: go fix ./...
+      - name: git diff
+        run: |
+          git diff --compact-summary --exit-code || \
+            (echo; echo "Unexpected difference in directories after running 'go fix'. Run 'go fix ./...' command and commit."; exit 1)
+
   fixtureDriftDetect:
     if: github.event.pull_request.draft == false
     name: Fixture Drift Detection
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6 # v4.0.0
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - run: .github/scripts/fixtureDriftDetect.sh sci/provider/fixtures/
@@ -96,22 +112,22 @@ jobs:
         # '1.10.*' end of security support 14 May 2025
         # '1.11.*' end of security support 20 Aug 2025
         terraform:
-          - '1.12.*'
-          - '1.13.*'
-          - '1.14.*'
+          - "1.12.*"
+          - "1.13.*"
+          - "1.14.*"
     steps:
-      - uses: actions/checkout@v6 # v4.0.0
+      - uses: actions/checkout@v6
       - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
           cache: false
-      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
+      - uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85 
         with:
           terraform_version: ${{ matrix.terraform }}
           terraform_wrapper: false
       - run: |
-         go mod download
-         go mod tidy
+          go mod download
+          go mod tidy
       - run: go test -v -timeout=1800s -parallel=4 ./...
         if: ${{ matrix.terraform == env.LATEST_TF_VERSION}}
         env:
@@ -127,7 +143,7 @@ jobs:
           testArguments: -v -cover -coverprofile=cover.out -timeout=1800s -parallel=4 ./...
 
         # Upload coverage report for latest Terraform version only to avoid nameing issues in upload (see also https://github.com/actions/upload-artifact/tree/v4/?tab=readme-ov-file#breaking-changes)
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: ${{ matrix.terraform == env.LATEST_TF_VERSION}}
         with:
           name: coverage-report
@@ -141,7 +157,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
       - uses: actions/download-artifact@v7
         with:
           name: coverage-report

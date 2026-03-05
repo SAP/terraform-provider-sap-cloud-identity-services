@@ -3,9 +3,11 @@ package provider
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/users"
 	"regexp"
+	"strings"
 	"testing"
+
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/users"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
@@ -163,11 +165,11 @@ func TestResourceUser(t *testing.T) {
 		}
 
 		customSchemas, _ := json.Marshal(
-			map[string]interface{}{
-				"urn:test:terraform:1.0:User": map[string]interface{}{
+			map[string]any{
+				"urn:test:terraform:1.0:User": map[string]any{
 					"test1": "testValue",
 					"test2": false,
-					"test3": map[string]interface{}{
+					"test3": map[string]any{
 						"test3a": 12.33,
 						"test3b": 12,
 					},
@@ -207,11 +209,11 @@ func TestResourceUser(t *testing.T) {
 		}
 
 		customSchemas, _ := json.Marshal(
-			map[string]interface{}{
-				"urn:test:terraform:1.0:User": map[string]interface{}{
+			map[string]any{
+				"urn:test:terraform:1.0:User": map[string]any{
 					"test1": "testValue",
 					"test2": false,
-					"test3": map[string]interface{}{
+					"test3": map[string]any{
 						"test3a": 12.33,
 						"test3b": 12,
 					},
@@ -220,8 +222,8 @@ func TestResourceUser(t *testing.T) {
 		)
 
 		newCustomSchemas, _ := json.Marshal(
-			map[string]interface{}{
-				"urn:test:terraform:1.0:User": map[string]interface{}{
+			map[string]any{
+				"urn:test:terraform:1.0:User": map[string]any{
 					"test1": "newTestValue",
 					"test2": true,
 				},
@@ -468,9 +470,9 @@ func ResourceUserWithStatus(resourceName string, user users.User) string {
 
 func ResourceUserWithCustomSchemas(resourceName string, user users.User, customSchemas string) string {
 
-	var schemas string
+	var schemas strings.Builder
 	for _, schema := range user.Schemas {
-		schemas += fmt.Sprintf(`
+		fmt.Fprintf(&schemas, `
 			"%s" ,
 		`, schema)
 	}
@@ -486,14 +488,14 @@ func ResourceUserWithCustomSchemas(resourceName string, user users.User, customS
 		emails = [%s]
 		custom_schemas = %q
 	}
-	`, resourceName, schemas, user.UserName, user.Name.FamilyName, user.Name.GivenName, getEmails(user.Emails), customSchemas)
+	`, resourceName, schemas.String(), user.UserName, user.Name.FamilyName, user.Name.GivenName, getEmails(user.Emails), customSchemas)
 }
 
 func getEmails(userEmails []users.Email) string {
 
-	var emails string
+	var emails strings.Builder
 	for _, email := range userEmails {
-		emails += fmt.Sprintf(`
+		fmt.Fprintf(&emails, `
 			{
 				value = "%s",
 				type = "%s",
@@ -502,5 +504,5 @@ func getEmails(userEmails []users.Email) string {
 		`, email.Value, email.Type, email.Primary)
 
 	}
-	return emails
+	return emails.String()
 }

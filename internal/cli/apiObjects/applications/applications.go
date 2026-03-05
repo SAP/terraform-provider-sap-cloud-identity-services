@@ -36,8 +36,8 @@ type Branding struct {
 	RefreshParent                bool   `json:"refreshParent,omitempty"`
 	TokenUrlEmbedCharacter       string `json:"tokenUrlEmbedCharacter,omitempty"`
 	EmailTemplateSet             string `json:"emailTemplateSet,omitempty"`
-	Theme                        Theme  `json:"theme,omitempty"`
-	Logo                         Logo   `json:"logo,omitempty"`
+	Theme                        Theme  `json:"theme"`
+	Logo                         Logo   `json:"logo"`
 }
 
 type UserAttribute struct {

@@ -3,6 +3,7 @@ package provider
 import (
 	"fmt"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/applications"
@@ -1247,18 +1248,18 @@ func ResourceApplication(resourceName string, app applications.Application) stri
 
 	authSchema := app.AuthenticationSchema
 
-	var assertionAttributes string
+	var assertionAttributes strings.Builder
 	for _, attribute := range app.AuthenticationSchema.AssertionAttributes {
-		assertionAttributes += fmt.Sprintf(`
+		fmt.Fprintf(&assertionAttributes, `
 				{
 					attribute_name = "%s"
 					attribute_value = "%s"
 				},`, attribute.AssertionAttributeName, attribute.UserAttributeName)
 	}
 
-	var advancedAssertionAttributes string
+	var advancedAssertionAttributes strings.Builder
 	for _, attribute := range app.AuthenticationSchema.AdvancedAssertionAttributes {
-		advancedAssertionAttributes += fmt.Sprintf(`
+		fmt.Fprintf(&advancedAssertionAttributes, `
 				{
 					source = "Corporate Identity Provider",
 					attribute_name = "%s",
@@ -1267,9 +1268,9 @@ func ResourceApplication(resourceName string, app applications.Application) stri
 				},`, attribute.AttributeName, attribute.AttributeValue)
 	}
 
-	var authenticationRules string
+	var authenticationRules strings.Builder
 	for _, rule := range app.AuthenticationSchema.ConditionalAuthentication {
-		authenticationRules += fmt.Sprintf(`{
+		fmt.Fprintf(&authenticationRules, `{
 					user_type = "%s"
 					user_email_domain = "%s"
 					ip_network_range = "%s"
@@ -1287,7 +1288,7 @@ func ResourceApplication(resourceName string, app applications.Application) stri
 		advanced_assertion_attributes = [%s]
 		default_authenticating_idp = "%s"
 		conditional_authentication = [%s]
-	`, authSchema.SubjectNameIdentifier, authSchema.SubjectNameIdentifierFunction, assertionAttributes, advancedAssertionAttributes, authSchema.DefaultAuthenticatingIdpId, authenticationRules)
+	`, authSchema.SubjectNameIdentifier, authSchema.SubjectNameIdentifierFunction, assertionAttributes.String(), advancedAssertionAttributes.String(), authSchema.DefaultAuthenticatingIdpId, authenticationRules.String())
 
 	application := fmt.Sprintf(`
 	resource "sci_application" "%s" {
@@ -1313,9 +1314,9 @@ func ResourceSaml2Application(resourceName string, app applications.Application)
 
 	saml2Config := app.AuthenticationSchema.Saml2Configuration
 
-	var acsEndpoints string
+	var acsEndpoints strings.Builder
 	for _, endpoint := range saml2Config.AcsEndpoints {
-		acsEndpoints += fmt.Sprintf(`
+		fmt.Fprintf(&acsEndpoints, `
 				{
 					binding_name = "%s"
 					location = "%s"
@@ -1325,9 +1326,9 @@ func ResourceSaml2Application(resourceName string, app applications.Application)
 			`, endpoint.BindingName, endpoint.Location, endpoint.Index, endpoint.IsDefault)
 	}
 
-	var sloEndpoints string
+	var sloEndpoints strings.Builder
 	for _, endpoint := range saml2Config.SloEndpoints {
-		sloEndpoints += fmt.Sprintf(`
+		fmt.Fprintf(&sloEndpoints, `
                 {
                     binding_name = "%s"
                     location = "%s"
@@ -1336,9 +1337,9 @@ func ResourceSaml2Application(resourceName string, app applications.Application)
             `, endpoint.BindingName, endpoint.Location, endpoint.ResponseLocation)
 	}
 
-	var signingCertificates string
+	var signingCertificates strings.Builder
 	for _, cert := range saml2Config.CertificatesForSigning {
-		signingCertificates += fmt.Sprintf(`
+		fmt.Fprintf(&signingCertificates, `
                 {
                     base64_certificate = "%s"
                     default = %t
@@ -1374,29 +1375,29 @@ func ResourceSaml2Application(resourceName string, app applications.Application)
 
 func OidcResourceApplication(resourceName string, app applications.Application) string {
 
-	var redirectUris string
+	var redirectUris strings.Builder
 	for _, uri := range app.AuthenticationSchema.OidcConfig.RedirectUris {
-		redirectUris += fmt.Sprintf(`"%s",`, uri)
+		fmt.Fprintf(&redirectUris, `"%s",`, uri)
 	}
-	var postLogoutRedirectUris string
+	var postLogoutRedirectUris strings.Builder
 	for _, uri := range app.AuthenticationSchema.OidcConfig.PostLogoutRedirectUris {
-		postLogoutRedirectUris += fmt.Sprintf(`"%s",`, uri)
+		fmt.Fprintf(&postLogoutRedirectUris, `"%s",`, uri)
 	}
-	var frontChannelLogoutUris string
+	var frontChannelLogoutUris strings.Builder
 	for _, uri := range app.AuthenticationSchema.OidcConfig.FrontChannelLogoutUris {
-		frontChannelLogoutUris += fmt.Sprintf(`"%s",`, uri)
+		fmt.Fprintf(&frontChannelLogoutUris, `"%s",`, uri)
 	}
-	var backChannelLogoutUris string
+	var backChannelLogoutUris strings.Builder
 	for _, uri := range app.AuthenticationSchema.OidcConfig.BackChannelLogoutUris {
-		backChannelLogoutUris += fmt.Sprintf(`"%s",`, uri)
+		fmt.Fprintf(&backChannelLogoutUris, `"%s",`, uri)
 	}
-	var restrictedGrantTypes string
+	var restrictedGrantTypes strings.Builder
 	for _, grantType := range app.AuthenticationSchema.OidcConfig.RestrictedGrantTypes {
-		restrictedGrantTypes += fmt.Sprintf(`"%s",`, grantType)
+		fmt.Fprintf(&restrictedGrantTypes, `"%s",`, grantType)
 	}
-	var acrs string
+	var acrs strings.Builder
 	for _, acr := range app.AuthenticationSchema.OidcConfig.ProxyConfig.Acrs {
-		acrs += fmt.Sprintf(`"%s",`, acr)
+		fmt.Fprintf(&acrs, `"%s",`, acr)
 	}
 
 	return fmt.Sprintf(
@@ -1412,7 +1413,7 @@ func OidcResourceApplication(resourceName string, app applications.Application) 
 				back_channel_logout_uris=[%s]
 				token_policy = {
 					jwt_validity = %d
-					refresh_validity = %d		
+					refresh_validity = %d
 					refresh_parallel = %d
 					max_exchange_period = "%s"
 					refresh_token_rotation_scenario="%s"
@@ -1423,9 +1424,9 @@ func OidcResourceApplication(resourceName string, app applications.Application) 
 					acrs = [%s]
 				}
 			}
-			
+
 		}
-	}`, resourceName, app.Name, app.Description, app.AuthenticationSchema.SsoType, redirectUris, postLogoutRedirectUris, frontChannelLogoutUris, backChannelLogoutUris, app.AuthenticationSchema.OidcConfig.TokenPolicy.JwtValidity, app.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshValidity, app.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshParallel, app.AuthenticationSchema.OidcConfig.TokenPolicy.MaxExchangePeriod, app.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshTokenRotationScenario, app.AuthenticationSchema.OidcConfig.TokenPolicy.AccessTokenFormat, restrictedGrantTypes, acrs)
+	}`, resourceName, app.Name, app.Description, app.AuthenticationSchema.SsoType, redirectUris.String(), postLogoutRedirectUris.String(), frontChannelLogoutUris.String(), backChannelLogoutUris.String(), app.AuthenticationSchema.OidcConfig.TokenPolicy.JwtValidity, app.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshValidity, app.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshParallel, app.AuthenticationSchema.OidcConfig.TokenPolicy.MaxExchangePeriod, app.AuthenticationSchema.OidcConfig.TokenPolicy.RefreshTokenRotationScenario, app.AuthenticationSchema.OidcConfig.TokenPolicy.AccessTokenFormat, restrictedGrantTypes.String(), acrs.String())
 }
 
 func ResourceApplicationWithParent(resourceName string, appName string, description string, parentAppId string) string {
@@ -1540,9 +1541,9 @@ func ResourceApplicationWithAuthenticationRules(resourceName string, appName str
 
 func ResourceApplicationWithFrontChannelLogoutUris(resourceName string, appName string, description string, subAttribute []string) string {
 
-	var builder string
+	var builder strings.Builder
 	for _, uri := range subAttribute {
-		builder += fmt.Sprintf(`"%s",`, uri)
+		fmt.Fprintf(&builder, `"%s",`, uri)
 	}
 
 	return fmt.Sprintf(`
@@ -1553,16 +1554,16 @@ func ResourceApplicationWithFrontChannelLogoutUris(resourceName string, appName 
 			oidc_config = {
 				redirect_uris = ["https://redirecturi.com"]
 				front_channel_logout_uris = [%s]
-			}	
+			}
 		}
 	}
-	`, resourceName, appName, description, builder)
+	`, resourceName, appName, description, builder.String())
 }
 
 func ResourceApplicationWithBackChannelLogoutUris(resourceName string, appName string, description string, subAttribute []string) string {
-	var builder string
+	var builder strings.Builder
 	for _, uri := range subAttribute {
-		builder += fmt.Sprintf(`"%s",`, uri)
+		fmt.Fprintf(&builder, `"%s",`, uri)
 	}
 
 	return fmt.Sprintf(`
@@ -1573,10 +1574,10 @@ func ResourceApplicationWithBackChannelLogoutUris(resourceName string, appName s
 			oidc_config = {
 				redirect_uris = ["https://redirecturi.com"]
 				back_channel_logout_uris = [%s]
-			}	
+			}
 		}
 	}
-	`, resourceName, appName, description, builder)
+	`, resourceName, appName, description, builder.String())
 }
 
 func ResourceApplicationWithMaxExchangePeriod(resourceName string, appName string, description string, subAttribute string) string {
@@ -1632,9 +1633,9 @@ func ResourceApplicationWithAccessTokenFormat(resourceName string, appName strin
 
 func ResourceApplicationWithRestrictedGrantTypes(resourceName string, appName string, description string, subAttribute []string) string {
 
-	var builder string
+	var builder strings.Builder
 	for _, uri := range subAttribute {
-		builder += fmt.Sprintf(`"%s",`, uri)
+		fmt.Fprintf(&builder, `"%s",`, uri)
 	}
 
 	return fmt.Sprintf(`
@@ -1645,10 +1646,10 @@ func ResourceApplicationWithRestrictedGrantTypes(resourceName string, appName st
 			oidc_config = {
 				redirect_uris = ["https://redirecturi.com"]
 				restricted_grant_types = [%s]
-			}	
+			}
 		}
 	}
-	`, resourceName, appName, description, builder)
+	`, resourceName, appName, description, builder.String())
 }
 
 func ResourceApplicationWithoutRedirectUris(resourceName string, appName string, description string) string {
