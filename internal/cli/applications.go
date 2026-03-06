@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/applications"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/generic"
 )
 
 type ApplicationsCli struct {
@@ -80,15 +81,19 @@ func (a *ApplicationsCli) Create(ctx context.Context, args *applications.Applica
 	return a.GetByAppId(ctx, strings.Split(headers["location"], "/")[3])
 }
 
-func (a *ApplicationsCli) Update(ctx context.Context, args *applications.Application) (applications.Application, string, error) {
+func (a *ApplicationsCli) Update(ctx context.Context, args []generic.PatchRequest, appId string) (applications.Application, string, error) {
 
-	_, _, err := a.cliClient.Execute(ctx, "PUT", fmt.Sprintf("%s%s", a.getUrl(), args.Id), nil, args, "", RequestHeader, nil)
+	reqBody := generic.PatchRequestBody{
+		Operations: args,
+	}
+
+	_, _, err := a.cliClient.Execute(ctx, "PATCH", fmt.Sprintf("%s%s", a.getUrl(), appId), nil, reqBody, "", RequestHeader, nil)
 
 	if err != nil {
 		return applications.Application{}, "", err
 	}
 
-	return a.GetByAppId(ctx, args.Id)
+	return a.GetByAppId(ctx, appId)
 }
 
 func (a *ApplicationsCli) Delete(ctx context.Context, appId string) error {

@@ -10,6 +10,7 @@ import (
 
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/applications"
 	corporateidps "github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/corporateIdps"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/generic"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -335,20 +336,113 @@ func TestApplications_Update(t *testing.T) {
 	applicationsBody.Id = "valid-app-id"
 	applicationsResponse, _ := json.Marshal(applicationsBody)
 
+	patchRequests := []generic.PatchRequest{
+		{
+			Op:    "replace",
+			Path:  "/name",
+			Value: "Updated Test Application",
+		},
+		{
+			Op:    "replace",
+			Path:  "/description",
+			Value: "updated test app description",
+		},
+		{
+			Op:    "replace",
+			Path:  "/authenticationSchema/ssoType",
+			Value: "oidc",
+		},
+		{
+			Op:    "replace",
+			Path:  "/authenticationSchema/subjectNameIdentifier",
+			Value: "userId",
+		},
+		{
+			Op:    "replace",
+			Path:  "/authenticationSchema/defaultAuthenticatingIdpId",
+			Value: "new-idp-uuid",
+		},
+		{
+			Op:   "replace",
+			Path: "/authenticationSchema/assertionAttributes",
+			Value: []applications.AssertionAttribute{
+				{
+					AssertionAttributeName: "new_attr_1",
+					UserAttributeName:      "new_user_1",
+				},
+			},
+		},
+		{
+			Op:   "replace",
+			Path: "/authenticationSchema/advancedAssertionAttributes",
+			Value: []applications.AdvancedAssertionAttribute{
+				{
+					AttributeName:  "new_adv_attr_1",
+					AttributeValue: "new_adv_value_1",
+				},
+			},
+		},
+		{
+			Op:   "replace",
+			Path: "/authenticationSchema/conditionalAuthentication",
+			Value: []applications.AuthenicationRule{
+				{
+					UserType:           "contractor",
+					IdentityProviderId: "new-idp-uuid",
+				},
+			},
+		},
+		{
+			Op:   "replace",
+			Path: "/authenticationSchema/oidcConfig",
+			Value: applications.OidcConfig{
+				RedirectUris: []string{
+					"https://new.redirect.uri",
+				},
+				PostLogoutRedirectUris: []string{
+					"https://new.postlogout.uri",
+				},
+				TokenPolicy: &applications.TokenPolicy{
+					JwtValidity:                  7200,
+					RefreshValidity:              86400,
+					RefreshParallel:              2,
+					MaxExchangePeriod:            "limited",
+					RefreshTokenRotationScenario: "on",
+					AccessTokenFormat:            "jwt",
+				},
+			},
+		},
+		{
+			Op:   "replace",
+			Path: "/authenticationSchema/saml2Configuration",
+			Value: applications.SamlConfiguration{
+				DefaultNameIdFormat:      "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+				SignSLOMessages:          false,
+				RequireSignedSLOMessages: false,
+				SignAssertions:           false,
+				SignAuthnResponses:       false,
+				DigestAlgorithm:          "sha256",
+			},
+		},
+	}
+
 	t.Run("validate the API request", func(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.Method == "PATCH" {
+				var actualBody generic.PatchRequestBody
+				err := json.NewDecoder(r.Body).Decode(&actualBody)
+
+				assert.NoError(t, err)
+				assert.Equal(t, 10, len(actualBody.Operations))
+			}
 			_, err := w.Write(applicationsResponse)
 			assert.NoError(t, err, "Failed to write response")
-
-			if r.Method != "GET" {
-				assertCall[applications.Application](t, r, fmt.Sprintf("%s%s", applicationsPath, "valid-app-id"), "PUT", applicationsBody)
-			}
 		}))
 
 		defer srv.Close()
 
-		_, _, err := client.Application.Update(context.TODO(), &applicationsBody)
+		_, _, err := client.Application.Update(context.TODO(), patchRequests, "valid-app-id")
 
 		assert.NoError(t, err)
 	})
@@ -370,16 +464,22 @@ func TestApplications_Update(t *testing.T) {
 		})
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusBadRequest)
-			_, err := w.Write(resErr)
-			assert.NoError(t, err, "Failed to write response")
+			if r.Method == "PATCH" {
+				w.WriteHeader(http.StatusBadRequest)
+				_, err := w.Write(resErr)
+				assert.NoError(t, err, "Failed to write response")
 
-			assertCall[applications.Application](t, r, fmt.Sprintf("%s%s", applicationsPath, "valid-app-id"), "PUT", applicationsBody)
+				assert.Equal(t, fmt.Sprintf("%s%s", applicationsPath, "valid-app-id"), r.URL.Path)
+				assert.Equal(t, "PATCH", r.Method)
+			} else {
+				_, err := w.Write(applicationsResponse)
+				assert.NoError(t, err, "Failed to write response")
+			}
 		}))
 
 		defer srv.Close()
 
-		res, _, err := client.Application.Update(context.TODO(), &applicationsBody)
+		res, _, err := client.Application.Update(context.TODO(), patchRequests, "valid-app-id")
 
 		assert.Zero(t, res)
 		assert.Error(t, err)
