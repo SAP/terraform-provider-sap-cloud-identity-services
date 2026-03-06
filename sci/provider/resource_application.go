@@ -22,6 +22,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int32planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -385,6 +386,9 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 										Validators: []validator.Int32{
 											int32validator.Between(60, 43200),
 										},
+										PlanModifiers: []planmodifier.Int32{
+											int32planmodifier.UseNonNullStateForUnknown(),
+										},
 									},
 									"refresh_validity": schema.Int32Attribute{
 										MarkdownDescription: "Refresh token validity in seconds. Can range from 0 to 15552000 seconds (180 days).",
@@ -392,6 +396,9 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 										Computed:            true,
 										Validators: []validator.Int32{
 											int32validator.Between(0, 15552000),
+										},
+										PlanModifiers: []planmodifier.Int32{
+											int32planmodifier.UseNonNullStateForUnknown(),
 										},
 									},
 									"refresh_parallel": schema.Int32Attribute{
@@ -401,6 +408,9 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 										Validators: []validator.Int32{
 											int32validator.Between(1, 10),
 										},
+										PlanModifiers: []planmodifier.Int32{
+											int32planmodifier.UseNonNullStateForUnknown(),
+										},
 									},
 									"max_exchange_period": schema.StringAttribute{
 										MarkdownDescription: "Maximum token exchange period. " + utils.ValidValuesString(maxExchangePeriodValues),
@@ -408,6 +418,9 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 										Computed:            true,
 										Validators: []validator.String{
 											stringvalidator.OneOf(maxExchangePeriodValues...),
+										},
+										PlanModifiers: []planmodifier.String{
+											stringplanmodifier.UseNonNullStateForUnknown(),
 										},
 									},
 									"refresh_token_rotation_scenario": schema.StringAttribute{
@@ -417,6 +430,9 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 										Validators: []validator.String{
 											stringvalidator.OneOf(refreshTokenRotationScenarioValues...),
 										},
+										PlanModifiers: []planmodifier.String{
+											stringplanmodifier.UseNonNullStateForUnknown(),
+										},
 									},
 									"access_token_format": schema.StringAttribute{
 										MarkdownDescription: "The format of the access token issued." + utils.ValidValuesString(accessTokenFormatValues),
@@ -424,6 +440,9 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 										Computed:            true,
 										Validators: []validator.String{
 											stringvalidator.OneOf(accessTokenFormatValues...),
+										},
+										PlanModifiers: []planmodifier.String{
+											stringplanmodifier.UseNonNullStateForUnknown(),
 										},
 									},
 								},
@@ -445,7 +464,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 								Optional:            true,
 								Computed:            true,
 								PlanModifiers: []planmodifier.Object{
-									objectplanmodifier.UseStateForUnknown(),
+									objectplanmodifier.UseNonNullStateForUnknown(),
 								},
 								Attributes: map[string]schema.Attribute{
 									"acrs": schema.SetAttribute{
@@ -658,7 +677,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 								Optional:            true,
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
-									stringplanmodifier.UseStateForUnknown(),
+									stringplanmodifier.UseNonNullStateForUnknown(),
 								},
 								Validators: []validator.String{
 									stringvalidator.OneOf(saml2AppNameIdFormatValues...),
@@ -709,7 +728,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 								Optional:            true,
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
-									stringplanmodifier.UseStateForUnknown(),
+									stringplanmodifier.UseNonNullStateForUnknown(),
 								},
 								Validators: []validator.String{
 									stringvalidator.OneOf(digestAlgorithmValues...),
@@ -721,14 +740,14 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 						MarkdownDescription: "List of SAP managed attributes that are sent to the application.",
 						Computed:            true,
 						PlanModifiers: []planmodifier.Object{
-							objectplanmodifier.UseStateForUnknown(),
+							objectplanmodifier.UseNonNullStateForUnknown(),
 						},
 						Attributes: map[string]schema.Attribute{
 							"service_instance_id": schema.StringAttribute{
 								MarkdownDescription: "The service instance ID of the SAP application.",
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
-									stringplanmodifier.UseStateForUnknown(),
+									stringplanmodifier.UseNonNullStateForUnknown(),
 								},
 							},
 							"source_app_id": schema.StringAttribute{
@@ -738,21 +757,21 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 									utils.ValidUUID(),
 								},
 								PlanModifiers: []planmodifier.String{
-									stringplanmodifier.UseStateForUnknown(),
+									stringplanmodifier.UseNonNullStateForUnknown(),
 								},
 							},
 							"source_tenant_id": schema.StringAttribute{
 								MarkdownDescription: "The source tenant ID of the SAP application.",
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
-									stringplanmodifier.UseStateForUnknown(),
+									stringplanmodifier.UseNonNullStateForUnknown(),
 								},
 							},
 							"app_tenant_id": schema.StringAttribute{
 								MarkdownDescription: "The application tenant ID of the SAP application.",
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
-									stringplanmodifier.UseStateForUnknown(),
+									stringplanmodifier.UseNonNullStateForUnknown(),
 								},
 							},
 							"type": schema.StringAttribute{
@@ -762,21 +781,21 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 									stringvalidator.OneOf(typeOfAppValues...),
 								},
 								PlanModifiers: []planmodifier.String{
-									stringplanmodifier.UseStateForUnknown(),
+									stringplanmodifier.UseNonNullStateForUnknown(),
 								},
 							},
 							"plan_name": schema.StringAttribute{
 								MarkdownDescription: "The plan name of the SAP application.",
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
-									stringplanmodifier.UseStateForUnknown(),
+									stringplanmodifier.UseNonNullStateForUnknown(),
 								},
 							},
 							"btp_tenant_type": schema.StringAttribute{
 								MarkdownDescription: "The BTP tenant type of the SAP application.",
 								Computed:            true,
 								PlanModifiers: []planmodifier.String{
-									stringplanmodifier.UseStateForUnknown(),
+									stringplanmodifier.UseNonNullStateForUnknown(),
 								},
 							},
 						},
