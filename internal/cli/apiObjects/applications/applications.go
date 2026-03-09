@@ -170,16 +170,16 @@ type OidcConfig struct {
 }
 
 type TokenPolicy struct {
-	JwtValidity                  int32  `json:"jwtValidity,omitempty"`
-	RefreshValidity              int32  `json:"refreshValidity,omitempty"`
-	RefreshParallel              int32  `json:"refreshParallel,omitempty"`
-	MaxExchangePeriod            string `json:"maxExchangePeriod,omitempty"`
-	RefreshTokenRotationScenario string `json:"refreshTokenRotationScenario,omitempty"`
-	AccessTokenFormat            string `json:"accessTokenFormat,omitempty"`
+	JwtValidity                  int32  `json:"jwtValidity,omitempty" tfsdk:"jwt_validity"`
+	RefreshValidity              int32  `json:"refreshValidity,omitempty" tfsdk:"refresh_validity"`
+	RefreshParallel              int32  `json:"refreshParallel,omitempty" tfsdk:"refresh_parallel"`
+	MaxExchangePeriod            string `json:"maxExchangePeriod,omitempty" tfsdk:"max_exchange_period"`
+	RefreshTokenRotationScenario string `json:"refreshTokenRotationScenario,omitempty" tfsdk:"refresh_token_rotation_scenario"`
+	AccessTokenFormat            string `json:"accessTokenFormat,omitempty" tfsdk:"access_token_format"`
 }
 
 type OidcProxyConfig struct {
-	Acrs []string `json:"acrs,omitempty"`
+	Acrs []string `json:"acrs,omitempty" tfsdk:"acrs"`
 }
 type GrantType string
 

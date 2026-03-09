@@ -165,8 +165,12 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 					"subject_name_identifier_function": schema.StringAttribute{
 						MarkdownDescription: "Convert the subject name identifier to uppercase or lowercase. " + utils.ValidValuesString(subjectNameIdentifierFunctionValues),
 						Optional:            true,
+						Computed:            true,
 						Validators: []validator.String{
 							stringvalidator.OneOf(subjectNameIdentifierFunctionValues...),
+						},
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.UseStateForUnknown(),
 						},
 					},
 					"assertion_attributes": schema.ListNestedAttribute{
@@ -180,7 +184,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 							),
 						},
 						PlanModifiers: []planmodifier.List{
-							listplanmodifier.UseStateForUnknown(),
+							listplanmodifier.UseNonNullStateForUnknown(),
 						},
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
@@ -192,7 +196,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 										stringvalidator.LengthBetween(1, 255),
 									},
 									PlanModifiers: []planmodifier.String{
-										stringplanmodifier.UseStateForUnknown(),
+										stringplanmodifier.UseNonNullStateForUnknown(),
 									},
 								},
 								"attribute_value": schema.StringAttribute{
@@ -203,7 +207,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 										stringvalidator.LengthBetween(1, 255),
 									},
 									PlanModifiers: []planmodifier.String{
-										stringplanmodifier.UseStateForUnknown(),
+										stringplanmodifier.UseNonNullStateForUnknown(),
 									},
 								},
 								"inherited": schema.BoolAttribute{
@@ -278,6 +282,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 							listvalidator.AlsoRequires(
 								path.MatchRoot("authentication_schema").AtName("conditional_authentication").AtAnyListIndex().AtName("identity_provider_id"),
 							),
+							listvalidator.SizeAtLeast(1),
 						},
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
@@ -501,6 +506,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 										path.MatchRoot("authentication_schema").AtName("saml2_config").AtName("acs_endpoints").AtAnyListIndex().AtName("location"),
 										path.MatchRoot("authentication_schema").AtName("saml2_config").AtName("acs_endpoints").AtAnyListIndex().AtName("index"),
 									),
+									listvalidator.SizeAtLeast(1),
 								},
 								NestedObject: schema.NestedAttributeObject{
 									Attributes: map[string]schema.Attribute{
@@ -538,6 +544,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 										path.MatchRoot("authentication_schema").AtName("saml2_config").AtName("slo_endpoints").AtAnyListIndex().AtName("binding_name"),
 										path.MatchRoot("authentication_schema").AtName("saml2_config").AtName("slo_endpoints").AtAnyListIndex().AtName("location"),
 									),
+									listvalidator.SizeAtLeast(1),
 								},
 								NestedObject: schema.NestedAttributeObject{
 									Attributes: map[string]schema.Attribute{
@@ -563,6 +570,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 								MarkdownDescription: "Base64-encoded certificates used by the service provider to sign digitally, SAML protocol messages sent to Identity Authentication. A maximum of 2 certificates are allowed.",
 								Optional:            true,
 								Validators: []validator.List{
+									listvalidator.SizeAtLeast(1),
 									listvalidator.SizeAtMost(2),
 									listvalidator.AlsoRequires(
 										path.MatchRoot("authentication_schema").AtName("saml2_config").AtName("signing_certificates").AtAnyListIndex().AtName("base64_certificate"),
@@ -885,16 +893,13 @@ func (r *applicationResource) Update(ctx context.Context, req resource.UpdateReq
 		return
 	}
 
-	// Update the application details
-	args, diags := getApplicationRequest(ctx, plan)
-	resp.Diagnostics.Append(diags...)
+	args, diag := getUpdateRequest(ctx, plan, state)
+	resp.Diagnostics.Append(diag.Errors()...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	args.Id = state.Id.ValueString()
-
-	res, _, err := r.cli.Application.Update(ctx, args)
+	res, _, err := r.cli.Application.Update(ctx, args, state.Id.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("Error updating application", fmt.Sprintf("%s", err))
 		return
