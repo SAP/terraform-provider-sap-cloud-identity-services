@@ -70,13 +70,14 @@ func validateCustomSchemasResponse(res any, customSchemas string) (bool, error) 
 	if !strings.Contains(resBody, modifiedCustomSchemas) {
 
 		var customSchemasMap map[string]any
-		err := json.Unmarshal([]byte(customSchemas), &customSchemasMap)
-
-		if err != nil {
+		if err := json.Unmarshal([]byte(customSchemas), &customSchemasMap); err != nil {
 			return false, err
 		}
 
-		resBodyMap := res.(map[string]any)
+		var resBodyMap map[string]any
+		if err := json.Unmarshal([]byte(resBody), &resBodyMap); err != nil {
+			return false, err
+		}
 
 		// if not a substring, compare the request and response
 		return compare(customSchemasMap, resBodyMap)

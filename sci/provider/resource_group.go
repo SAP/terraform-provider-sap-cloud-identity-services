@@ -267,7 +267,7 @@ func (r *groupResource) ImportState(ctx context.Context, req resource.ImportStat
 func validateMembers(ctx context.Context, client *cli.SciClient, member string) error {
 
 	// do a GET call for both the users and groups to check if the member exists
-	_, _, userErr := client.User.GetByUserId(ctx, member)
+	_, _, userErr := client.User.GetByUserId(ctx, member, false, "")
 	_, _, groupErr := client.Group.GetByGroupId(ctx, member)
 
 	if userErr != nil && groupErr != nil {

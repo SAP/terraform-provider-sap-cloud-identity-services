@@ -2,12 +2,17 @@ package provider
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"reflect"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/generic"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/users"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
 )
 
 type nameData struct {
@@ -18,17 +23,17 @@ type nameData struct {
 
 type userData struct {
 	Id               types.String `tfsdk:"id"`
-	Schemas          types.Set    `tfsdk:"schemas"`
-	UserName         types.String `tfsdk:"user_name"`
-	Name             types.Object `tfsdk:"name"`
-	DisplayName      types.String `tfsdk:"display_name"`
-	Emails           types.Set    `tfsdk:"emails"`
-	InitialPassword  types.String `tfsdk:"initial_password"`
-	UserType         types.String `tfsdk:"user_type"`
-	Active           types.Bool   `tfsdk:"active"`
-	SapExtensionUser types.Object `tfsdk:"sap_extension_user"`
+	Schemas          types.Set    `tfsdk:"schemas" json:"schemas"`
+	UserName         types.String `tfsdk:"user_name" json:"userName"`
+	Name             types.Object `tfsdk:"name" json:"name"`
+	DisplayName      types.String `tfsdk:"display_name" json:"displayName"`
+	Emails           types.Set    `tfsdk:"emails" json:"emails"`
+	InitialPassword  types.String `tfsdk:"initial_password" json:"password"`
+	UserType         types.String `tfsdk:"user_type" json:"userType"`
+	Active           types.Bool   `tfsdk:"active" json:"active"`
+	SapExtensionUser types.Object `tfsdk:"sap_extension_user" json:"urn:ietf:params:scim:schemas:extension:sap:2.0:User"`
 	CustomSchemas    types.String `tfsdk:"custom_schemas"`
-	Groups           types.List   `tfsdk:"groups"`
+	Groups           types.List   `tfsdk:"groups" json:"groups"`
 }
 
 func userValueFrom(ctx context.Context, u users.User, cS string) (userData, diag.Diagnostics) {
@@ -100,6 +105,8 @@ func userValueFrom(ctx context.Context, u users.User, cS string) (userData, diag
 
 	if len(cS) > 0 {
 		user.CustomSchemas = types.StringValue(cS)
+	} else {
+		user.CustomSchemas = types.StringNull()
 	}
 
 	// Groups
@@ -208,4 +215,225 @@ func getUserRequest(ctx context.Context, plan userData) (*users.User, string, di
 	}
 
 	return args, customSchemas, diagnostics
+}
+
+func getUserUpdateRequest(ctx context.Context, plan userData, state userData) ([]generic.PatchRequest, diag.Diagnostics) {
+
+	var diags diag.Diagnostics
+	reqs := []generic.PatchRequest{}
+
+	argsType := reflect.TypeFor[userData]()
+
+	if !plan.Schemas.Equal(state.Schemas) {
+
+		schemas := []string{}
+
+		if !plan.Schemas.IsNull() {
+			diags = plan.Schemas.ElementsAs(ctx, &schemas, true)
+			if diags.HasError() {
+				return reqs, diags
+			}
+		}
+
+		patchReq, diags := utils.GetScimPatchRequest("Schemas", "", schemas, argsType)
+		if diags.HasError() {
+			return reqs, diags
+		}
+		reqs = append(reqs, patchReq)
+	}
+
+	if !plan.UserName.Equal(state.UserName) {
+		patchReq, diags := utils.GetScimPatchRequest("UserName", "", plan.UserName.ValueString(), argsType)
+		if diags.HasError() {
+			return reqs, diags
+		}
+		reqs = append(reqs, patchReq)
+	}
+
+	if !plan.DisplayName.Equal(state.DisplayName) {
+		var displayName string
+		if !plan.DisplayName.IsNull() {
+			displayName = plan.DisplayName.ValueString()
+		}
+		patchReq, diags := utils.GetScimPatchRequest("DisplayName", "", displayName, argsType)
+		if diags.HasError() {
+			return reqs, diags
+		}
+		reqs = append(reqs, patchReq)
+	}
+
+	if !plan.Emails.Equal(state.Emails) {
+		emails := []users.Email{}
+
+		if !plan.Emails.IsNull() {
+			diags = plan.Emails.ElementsAs(ctx, &emails, true)
+			if diags.HasError() {
+				return reqs, diags
+			}
+		}
+
+		patchReq, diags := utils.GetScimPatchRequest("Emails", "", emails, argsType)
+		if diags.HasError() {
+			return reqs, diags
+		}
+		reqs = append(reqs, patchReq)
+	}
+
+	if !plan.InitialPassword.Equal(state.InitialPassword) {
+		var password string
+		if !plan.InitialPassword.IsNull() {
+			password = plan.InitialPassword.ValueString()
+		}
+		patchReq, diags := utils.GetScimPatchRequest("InitialPassword", "", password, argsType)
+		if diags.HasError() {
+			return reqs, diags
+		}
+		reqs = append(reqs, patchReq)
+	}
+
+	if !plan.UserType.Equal(state.UserType) {
+		var userType string
+		if !plan.UserType.IsNull() && !plan.UserType.IsUnknown() {
+			userType = plan.UserType.ValueString()
+		}
+		patchReq, diags := utils.GetScimPatchRequest("UserType", "", userType, argsType)
+		if diags.HasError() {
+			return reqs, diags
+		}
+		reqs = append(reqs, patchReq)
+	}
+
+	if !plan.Active.Equal(state.Active) {
+		var active bool
+		if !plan.Active.IsNull() && !plan.Active.IsUnknown() {
+			active = plan.Active.ValueBool()
+		}
+		patchReq, diags := utils.GetScimPatchRequest("Active", "", active, argsType)
+		if diags.HasError() {
+			return reqs, diags
+		}
+		reqs = append(reqs, patchReq)
+	}
+
+	if !plan.Name.Equal(state.Name) {
+		name := users.Name{}
+
+		if !plan.Name.IsNull() {
+			diags = plan.Name.As(ctx, &name, basetypes.ObjectAsOptions{
+				UnhandledNullAsEmpty:    true,
+				UnhandledUnknownAsEmpty: true,
+			})
+			if diags.HasError() {
+				return reqs, diags
+			}
+		}
+
+		patchRequest, diags := utils.GetScimPatchRequest("Name", "", name, argsType)
+
+		if diags.HasError() {
+			return reqs, diags
+		}
+
+		reqs = append(reqs, patchRequest)
+	}
+
+	if !plan.Groups.Equal(state.Groups) {
+		groups := groupData{}
+
+		if !plan.Groups.IsNull() {
+			diags = plan.Groups.ElementsAs(ctx, &groups, true)
+			if diags.HasError() {
+				return reqs, diags
+			}
+		}
+
+		patchReq, diags := utils.GetScimPatchRequest("Groups", "", groups, argsType)
+		if diags.HasError() {
+			return reqs, diags
+		}
+
+		reqs = append(reqs, patchReq)
+	}
+
+	if !plan.SapExtensionUser.Equal(state.SapExtensionUser) {
+		sapExtensionPath, diags := utils.GetAttributeTag("SapExtensionUser", argsType)
+		if diags.HasError() {
+			return reqs, diags
+		}
+
+		sapExtensionArgsType := reflect.TypeFor[users.SAPExtension]()
+
+		var planSapExtension, stateSapExtension users.SAPExtension
+
+		diags = plan.SapExtensionUser.As(ctx, &planSapExtension, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty:    true,
+			UnhandledUnknownAsEmpty: true,
+		})
+		if diags.HasError() {
+			return reqs, diags
+		}
+
+		diags = state.SapExtensionUser.As(ctx, &stateSapExtension, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty:    true,
+			UnhandledUnknownAsEmpty: true,
+		})
+		if diags.HasError() {
+			return reqs, diags
+		}
+
+		if planSapExtension.SendMail != stateSapExtension.SendMail {
+			patchReq, diags := utils.GetScimPatchRequest("SendMail", sapExtensionPath, planSapExtension.SendMail, sapExtensionArgsType)
+			if diags.HasError() {
+				return reqs, diags
+			}
+			reqs = append(reqs, patchReq)
+		}
+
+		if planSapExtension.MailVerified != stateSapExtension.MailVerified {
+			patchReq, diags := utils.GetScimPatchRequest("MailVerified", sapExtensionPath, planSapExtension.MailVerified, sapExtensionArgsType)
+			if diags.HasError() {
+				return reqs, diags
+			}
+			reqs = append(reqs, patchReq)
+		}
+
+		if planSapExtension.Status != stateSapExtension.Status {
+			patchReq, diags := utils.GetScimPatchRequest("Status", sapExtensionPath, planSapExtension.Status, sapExtensionArgsType)
+			if diags.HasError() {
+				return reqs, diags
+			}
+			reqs = append(reqs, patchReq)
+		}
+	}
+
+	if !plan.CustomSchemas.Equal(state.CustomSchemas) {
+
+		planCustomSchemas := ""
+
+		if !plan.CustomSchemas.IsNull() {
+
+			planCustomSchemas = plan.CustomSchemas.ValueString()
+
+			var planCustomSchemasMap map[string]map[string]any
+			if err := json.Unmarshal([]byte(planCustomSchemas), &planCustomSchemasMap); err != nil {
+				diags.AddError("Failed to unmarshal custom schemas", err.Error())
+				return reqs, diags
+			}
+
+			for schema, attributesMap := range planCustomSchemasMap {
+
+				for k, v := range attributesMap {
+
+					path := fmt.Sprintf("%s:%s", schema, k)
+					patchReq := utils.GeneratePatchRequest(path, v)
+					reqs = append(reqs, patchReq)
+
+				}
+
+			}
+		}
+
+	}
+
+	return reqs, diags
 }

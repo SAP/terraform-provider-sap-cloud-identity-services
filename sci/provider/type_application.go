@@ -791,7 +791,7 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 	return args, diagnostics
 }
 
-func getUpdateRequest(ctx context.Context, plan applicationData, state applicationData) ([]generic.PatchRequest, diag.Diagnostics) {
+func getApplicationUpdateRequest(ctx context.Context, plan applicationData, state applicationData) ([]generic.PatchRequest, diag.Diagnostics) {
 
 	var diags diag.Diagnostics
 	reqs := []generic.PatchRequest{}

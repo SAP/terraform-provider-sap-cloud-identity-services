@@ -171,7 +171,7 @@ func (d *userDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 		return
 	}
 
-	res, customSchemasRes, err := d.cli.User.GetByUserId(ctx, config.Id.ValueString())
+	res, customSchemasRes, err := d.cli.User.GetByUserId(ctx, config.Id.ValueString(), false, "")
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving user", fmt.Sprintf("%s", err))
 		return

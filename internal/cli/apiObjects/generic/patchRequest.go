@@ -5,7 +5,3 @@ type PatchRequest struct {
 	Path  string `json:"path"`
 	Value any    `json:"value,omitempty"`
 }
-
-type PatchRequestBody struct {
-	Operations []PatchRequest `json:"operations"`
-}

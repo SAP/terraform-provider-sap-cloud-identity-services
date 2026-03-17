@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"fmt"
+
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/generic"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/users"
 )
 
@@ -46,12 +48,18 @@ func (u *UsersCli) Get(ctx context.Context) (users.UsersResponse, map[int]string
 	return usersList, customSchemas, err
 }
 
-func (u *UsersCli) GetByUserId(ctx context.Context, userId string) (users.User, string, error) {
+func (u *UsersCli) GetByUserId(ctx context.Context, userId string, validateCustomSchemas bool, customSchemas string) (users.User, string, error) {
 
 	res, _, err := u.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", u.getUrl(), userId), nil, nil, "", ScimRequestHeader, nil)
 
 	if err != nil {
 		return users.User{}, "", err
+	}
+
+	if len(customSchemas) > 0 && validateCustomSchemas {
+		if result, err := validateCustomSchemasResponse(res, customSchemas); !result {
+			return users.User{}, "", err
+		}
 	}
 
 	return unMarshalResponse[users.User](res, true)
@@ -73,21 +81,25 @@ func (u *UsersCli) Create(ctx context.Context, customSchemas string, args *users
 	return unMarshalResponse[users.User](res, false)
 }
 
-func (u *UsersCli) Update(ctx context.Context, customSchemas string, args *users.User) (users.User, string, error) {
+func (u *UsersCli) Update(ctx context.Context, id string, args []generic.PatchRequest, customSchemas string) (users.User, string, error) {
 
-	res, _, err := u.cliClient.Execute(ctx, "PUT", fmt.Sprintf("%s%s", u.getUrl(), args.Id), nil, args, customSchemas, ScimRequestHeader, nil)
+	reqBody := users.PatchRequestBody{
+		Schemas:    []string{ScimUpdateSchemas},
+		Operations: args,
+	}
+
+	_, _, err := u.cliClient.Execute(ctx, "PATCH", fmt.Sprintf("%s%s", u.getUrl(), id), nil, reqBody, "", ScimRequestHeader, nil)
 
 	if err != nil {
 		return users.User{}, "", err
 	}
 
-	if len(customSchemas) > 0 {
-		if result, err := validateCustomSchemasResponse(res, customSchemas); !result {
-			return users.User{}, "", err
-		}
+	res, cS, err := u.GetByUserId(ctx, id, true, customSchemas)
+	if err != nil {
+		return users.User{}, "", err
 	}
 
-	return unMarshalResponse[users.User](res, false)
+	return res, cS, nil
 }
 
 func (u *UsersCli) Delete(ctx context.Context, userId string) error {
