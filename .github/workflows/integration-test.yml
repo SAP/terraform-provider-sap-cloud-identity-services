@@ -4,6 +4,8 @@ name: Integration Test - Terraform Provider
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * 0'
 
 env:
   PATH_TO_TFSCRIPT: 'regression-test'
