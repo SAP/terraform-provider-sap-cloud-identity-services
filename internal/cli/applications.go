@@ -81,11 +81,7 @@ func (a *ApplicationsCli) Create(ctx context.Context, args *applications.Applica
 	return a.GetByAppId(ctx, strings.Split(headers["location"], "/")[3])
 }
 
-func (a *ApplicationsCli) Update(ctx context.Context, args []generic.PatchRequest, appId string) (applications.Application, string, error) {
-
-	reqBody := applications.PatchRequestBody{
-		Operations: args,
-	}
+func (a *ApplicationsCli) Update(ctx context.Context, args *applications.Application) (applications.Application, string, error) {
 
 	_, _, err := a.cliClient.Execute(ctx, "PATCH", fmt.Sprintf("%s%s", a.getUrl(), appId), nil, reqBody, "", RequestHeader, nil)
 
