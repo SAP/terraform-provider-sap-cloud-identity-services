@@ -16,7 +16,6 @@ locals {
     saml_app_unique_name = "${local.prefix_unique_name}-saml-app"
     oidc_app_unique_name = "${local.prefix_unique_name}-oidc-app"
 
-    saml_metadata_url = "https://test.com/metadata"
     saml_type = "saml2"
     saml_idp_binding_name = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
     saml_app_binding_name = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
@@ -128,7 +127,6 @@ resource "sci_corporate_idp" "testSamlIdP" {
         send_method = local.idp_send_method
     }
     saml2_config = {
-        saml_metadata_url = local.saml_metadata_url
         assertion_attributes = [
             {
                 name = "uid"
@@ -256,7 +254,6 @@ resource "sci_application" "testSamlApp" {
         sso_type = local.saml_type
         default_authenticating_idp = sci_corporate_idp.testSamlIdP.id
         saml2_config = {
-            saml_metadata_url = local.saml_metadata_url
             acs_endpoints = [
                 {
                     binding_name = local.saml_app_binding_name
