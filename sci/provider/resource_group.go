@@ -155,7 +155,7 @@ func (r *groupResource) Create(ctx context.Context, req resource.CreateRequest, 
 
 	res, _, err := r.cli.Group.Create(ctx, args)
 	if err != nil {
-		resp.Diagnostics.AddError("Error creating user", fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError("Error creating group", fmt.Sprintf("%s", err))
 		return
 	}
 
@@ -180,7 +180,7 @@ func (r *groupResource) Read(ctx context.Context, req resource.ReadRequest, resp
 
 	res, _, err := r.cli.Group.GetByGroupId(ctx, config.Id.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("Error retrieving user", fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError("Error retrieving group", fmt.Sprintf("%s", err))
 		return
 	}
 
@@ -255,7 +255,7 @@ func (r *groupResource) Delete(ctx context.Context, req resource.DeleteRequest, 
 
 	err := r.cli.Group.Delete(ctx, config.Id.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("Error deleting user", fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError("Error deleting group", fmt.Sprintf("%s", err))
 		return
 	}
 }
