@@ -1,8 +1,10 @@
 package provider
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -11,9 +13,9 @@ import (
 
 	"os"
 	"regexp"
-	"strings"
-
+	"sort"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -103,9 +105,68 @@ func requestMatcher(t *testing.T) cassette.MatcherFunc {
 			t.Fatal("Unable to read request body")
 		}
 
-		requestBody := string(body)
-		return requestBody == i.Body
+		r.Body = io.NopCloser(bytes.NewBuffer(body))
+
+		// for PATCH requests to the SCIM Users endpoint, the comparison of the requests must be carried out by first sorting the operations
+		// this is to avoid false negatives due to the non-deterministic ordering of the patch operations in the request body, as the provider currently does not enforce a specific ordering of patch operations in its implementation
+		if isScimPatchRequest(r) {
+			return comparePatchOperations(t, body, []byte(i.Body))
+		}
+
+		return string(body) == i.Body
 	}
+}
+
+func isScimPatchRequest(r *http.Request) bool {
+	return r.Method == http.MethodPatch && strings.Contains(r.URL.Path, "/scim/Users/")
+}
+
+func comparePatchOperations(t *testing.T, reqBody, cassetteBody []byte) bool {
+	type patchRequest struct {
+		Schemas    []string         `json:"schemas"`
+		Operations []map[string]any `json:"Operations"`
+	}
+
+	var reqPatch, cassettePatch patchRequest
+	if err := json.Unmarshal(reqBody, &reqPatch); err != nil {
+		return string(reqBody) == string(cassetteBody)
+	}
+	if err := json.Unmarshal(cassetteBody, &cassettePatch); err != nil {
+		return string(reqBody) == string(cassetteBody)
+	}
+
+	if len(reqPatch.Operations) != len(cassettePatch.Operations) {
+		return false
+	}
+
+	sortPatchOps(reqPatch.Operations)
+	sortPatchOps(cassettePatch.Operations)
+
+	reqJSON, _ := json.Marshal(reqPatch.Operations)
+	cassJSON, _ := json.Marshal(cassettePatch.Operations)
+
+	return string(reqJSON) == string(cassJSON)
+}
+
+func sortPatchOps(ops []map[string]any) {
+	sort.Slice(ops, func(i, j int) bool {
+		oi, oj := ops[i], ops[j]
+		opI := getString(oi, "op")
+		opJ := getString(oj, "op")
+		if opI != opJ {
+			return opI < opJ
+		}
+		pathI := getString(oi, "path")
+		pathJ := getString(oj, "path")
+		return pathI < pathJ
+	})
+}
+
+func getString(m map[string]any, key string) string {
+	if v, ok := m[key].(string); ok {
+		return v
+	}
+	return ""
 }
 
 func redactCredentials() recorder.HookFunc {

@@ -30,11 +30,11 @@ func TestResourceUser(t *testing.T) {
 		},
 		DisplayName: "Joe Doe",
 		UserType:    "employee",
-		Active:      true,
+		Active:      false,
 		SAPExtension: &users.SAPExtension{
 			SendMail:     false,
-			MailVerified: true,
-			Status:       "active",
+			MailVerified: false,
+			Status:       "new",
 		},
 	}
 
@@ -99,7 +99,7 @@ func TestResourceUser(t *testing.T) {
 			Active:      true,
 			SAPExtension: &users.SAPExtension{
 				SendMail:     false,
-				MailVerified: false,
+				MailVerified: true,
 				Status:       "active",
 			},
 		}
@@ -208,11 +208,16 @@ func TestResourceUser(t *testing.T) {
 			"urn:test:terraform:1.0:User",
 		}
 
+		newUser := sciUser
+		newUserSchemas := make([]string, len(sciUser.Schemas))
+		copy(newUserSchemas, sciUser.Schemas)
+		newUser.Schemas = newUserSchemas
+		newUser.Schemas = append(newUser.Schemas, "urn:test:terraform:2.0:User")
+
 		customSchemas, _ := json.Marshal(
 			map[string]any{
 				"urn:test:terraform:1.0:User": map[string]any{
 					"test1": "testValue",
-					"test2": false,
 					"test3": map[string]any{
 						"test3a": 12.33,
 						"test3b": 12,
@@ -222,6 +227,19 @@ func TestResourceUser(t *testing.T) {
 		)
 
 		newCustomSchemas, _ := json.Marshal(
+			map[string]any{
+				"urn:test:terraform:1.0:User": map[string]any{
+					"test1": "newTestValue",
+					"test2": true,
+				},
+				"urn:test:terraform:2.0:User": map[string]any{
+					"test1": 12,
+					"test2": 12.34,
+				},
+			},
+		)
+
+		removedCustomSchemas, _ := json.Marshal(
 			map[string]any{
 				"urn:test:terraform:1.0:User": map[string]any{
 					"test1": "newTestValue",
@@ -247,7 +265,20 @@ func TestResourceUser(t *testing.T) {
 					),
 				},
 				{
-					Config: providerConfig("", user) + ResourceUserWithCustomSchemas("testUser", sciUser, string(newCustomSchemas)),
+					Config: providerConfig("", user) + ResourceUserWithCustomSchemas("testUser", newUser, string(newCustomSchemas)),
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestMatchResourceAttr("sci_user.testUser", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_user.testUser", "schemas.3", newUser.Schemas[3]),
+						resource.TestCheckResourceAttr("sci_user.testUser", "user_name", newUser.UserName),
+						resource.TestCheckResourceAttr("sci_user.testUser", "name.family_name", newUser.Name.FamilyName),
+						resource.TestCheckResourceAttr("sci_user.testUser", "name.given_name", newUser.Name.GivenName),
+						resource.TestCheckResourceAttr("sci_user.testUser", "emails.0.type", newUser.Emails[0].Type),
+						resource.TestCheckResourceAttr("sci_user.testUser", "emails.0.value", newUser.Emails[0].Value),
+						resource.TestCheckResourceAttr("sci_user.testUser", "custom_schemas", string(newCustomSchemas)),
+					),
+				},
+				{
+					Config: providerConfig("", user) + ResourceUserWithCustomSchemas("testUser", sciUser, string(removedCustomSchemas)),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("sci_user.testUser", "id", regexpUUID),
 						resource.TestCheckResourceAttr("sci_user.testUser", "user_name", sciUser.UserName),
@@ -255,7 +286,7 @@ func TestResourceUser(t *testing.T) {
 						resource.TestCheckResourceAttr("sci_user.testUser", "name.given_name", sciUser.Name.GivenName),
 						resource.TestCheckResourceAttr("sci_user.testUser", "emails.0.type", sciUser.Emails[0].Type),
 						resource.TestCheckResourceAttr("sci_user.testUser", "emails.0.value", sciUser.Emails[0].Value),
-						resource.TestCheckResourceAttr("sci_user.testUser", "custom_schemas", string(newCustomSchemas)),
+						resource.TestCheckResourceAttr("sci_user.testUser", "custom_schemas", string(removedCustomSchemas)),
 					),
 				},
 			},

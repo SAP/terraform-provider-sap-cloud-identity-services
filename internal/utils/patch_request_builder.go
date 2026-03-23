@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 
@@ -10,6 +11,48 @@ import (
 )
 
 var replaceOperation = "replace"
+var addOperation = "add"
+var deleteOperation = "remove"
+
+func GenerateReplacePatchRequest(path string, value any) generic.PatchRequest {
+	return generic.PatchRequest{
+		Op:    replaceOperation,
+		Path:  path,
+		Value: value,
+	}
+}
+
+func GenerateAddPatchRequest(path string, value any) generic.PatchRequest {
+	return generic.PatchRequest{
+		Op:    addOperation,
+		Path:  path,
+		Value: value,
+	}
+}
+
+func GenerateDeletePatchRequest(path string) generic.PatchRequest {
+	return generic.PatchRequest{
+		Op:   deleteOperation,
+		Path: path,
+	}
+}
+
+func GetScimPatchRequest(attrName string, path string, value any, argsType reflect.Type) (generic.PatchRequest, diag.Diagnostics) {
+
+	tag, diags := GetAttributeTag(attrName, argsType)
+	if diags.HasError() {
+		return generic.PatchRequest{}, diags
+	}
+
+	attrPaths := strings.Split(tag, ",")
+	tag = attrPaths[0]
+
+	if path != "" {
+		tag = fmt.Sprintf("%s:%s", path, tag)
+	}
+
+	return GenerateReplacePatchRequest(tag, value), nil
+}
 
 func GetPatchRequest(attrName string, path string, value any, argsType reflect.Type) (generic.PatchRequest, diag.Diagnostics) {
 
@@ -24,11 +67,7 @@ func GetPatchRequest(attrName string, path string, value any, argsType reflect.T
 		tag = fmt.Sprintf("/%s%s", path, tag)
 	}
 
-	return generic.PatchRequest{
-		Op:    replaceOperation,
-		Path:  tag,
-		Value: value,
-	}, nil
+	return GenerateReplacePatchRequest(tag, value), nil
 }
 
 func GetAttributeTag(attrName string, argsType reflect.Type) (string, diag.Diagnostics) {

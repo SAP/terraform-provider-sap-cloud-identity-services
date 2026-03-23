@@ -39,6 +39,7 @@ type ResponseError struct {
 
 const RequestHeader = "application/json"
 const ScimRequestHeader = "application/scim+json"
+const ScimUpdateSchemas = "urn:ietf:params:scim:api:messages:2.0:PatchOp"
 
 func NewClient(h *http.Client, u *url.URL) *Client {
 	return &Client{

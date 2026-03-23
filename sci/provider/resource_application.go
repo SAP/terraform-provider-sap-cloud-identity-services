@@ -893,7 +893,7 @@ func (r *applicationResource) Update(ctx context.Context, req resource.UpdateReq
 		return
 	}
 
-	args, diag := getUpdateRequest(ctx, plan, state)
+	args, diag := getApplicationUpdateRequest(ctx, plan, state)
 	resp.Diagnostics.Append(diag.Errors()...)
 	if resp.Diagnostics.HasError() {
 		return

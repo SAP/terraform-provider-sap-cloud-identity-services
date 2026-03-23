@@ -5,11 +5,13 @@ import (
 	"fmt"
 
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/users"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -21,6 +23,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
 
 var (
@@ -169,9 +172,11 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 				},
 				Attributes: map[string]schema.Attribute{
 					"send_mail": schema.BoolAttribute{
-						MarkdownDescription: "Specifies if an activation mail should be sent. The value of the attribute only matters when creating the user.",
-						Optional:            true,
-						Computed:            true,
+						MarkdownDescription: fmt.Sprintln("Specifies if an activation email should be sent to the user. Only applicable during user creation.") +
+							fmt.Sprintln("This attribute only affects the initial creation and is not stored or returned by the API afterward.") +
+							fmt.Sprintln("Hence, in-place updates on subsequent runs are expected if the attribute is configured as true."),
+						Optional: true,
+						Computed: true,
 						PlanModifiers: []planmodifier.Bool{
 							boolplanmodifier.UseStateForUnknown(),
 						},
@@ -199,10 +204,14 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 				},
 			},
 			"custom_schemas": schema.StringAttribute{
-				Optional:            true,
-				MarkdownDescription: "Furthur enhance your user with custom schemas. The attribute must configured as a valid JSON string.",
+				Optional: true,
+				MarkdownDescription: "Further enhance your user with custom schemas. The attribute must be configured as a valid JSON string.\n" +
+					"For custom schema attributes of type `complex`, overwriting specific attributes of the object to null is not supported.\n" +
+					"\n\tFor example, if a custom schema has an attribute `address` of type `complex` with sub-attributes `street`, `postalCode`, and `city`, setting the value of `street` to null will not remove the street information from the user.\n" +
+					"\n\tTo overwrite specific attributes to null, the entire complex attribute must be set to null, after which the desired sub-attributes can be configured.",
 				Validators: []validator.String{
 					utils.ValidJSON(),
+					stringvalidator.LengthAtLeast(1),
 				},
 			},
 			"groups": schema.ListNestedAttribute{
@@ -271,9 +280,10 @@ func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, r
 	// the initial password is not returned in the response, hence it must be read from the plan
 	state.InitialPassword = plan.InitialPassword
 
-	// if the custom schemas are not configured, set the value to null to prevent in place updates
-	if plan.CustomSchemas.IsNull() {
-		state.CustomSchemas = types.StringNull()
+	diags = userStateModify(ctx, plan, &state)
+	resp.Diagnostics.Append(diags...)
+	if diags.HasError() {
+		return
 	}
 
 	diags = resp.State.Set(ctx, &state)
@@ -289,7 +299,7 @@ func (r *userResource) Read(ctx context.Context, req resource.ReadRequest, resp 
 		return
 	}
 
-	res, customSchemasRes, err := r.cli.User.GetByUserId(ctx, config.Id.ValueString())
+	res, customSchemasRes, err := r.cli.User.GetByUserId(ctx, config.Id.ValueString(), false, "")
 	if err != nil {
 		resp.Diagnostics.AddError("Error retrieving user", fmt.Sprintf("%s", err))
 		return
@@ -303,11 +313,6 @@ func (r *userResource) Read(ctx context.Context, req resource.ReadRequest, resp 
 
 	// the initial password is not returned in the response, hence it must be read from the state
 	state.InitialPassword = config.InitialPassword
-
-	// if the custom schemas are not configured, set the value to null to prevent in place updates
-	if config.CustomSchemas.IsNull() {
-		state.CustomSchemas = types.StringNull()
-	}
 
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -334,21 +339,21 @@ func (r *userResource) Update(ctx context.Context, req resource.UpdateRequest, r
 		return
 	}
 
-	args, customSchemas, diags := getUserRequest(ctx, plan)
+	args, diags := getUserUpdateRequest(ctx, plan, state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	args.Id = state.Id.ValueString()
+	customSchemas := plan.CustomSchemas.ValueString()
 
-	res, _, err := r.cli.User.Update(ctx, customSchemas, args)
+	res, cS, err := r.cli.User.Update(ctx, state.Id.ValueString(), args, customSchemas)
 	if err != nil {
-		resp.Diagnostics.AddError("Error updating application", fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError("Error updating user", fmt.Sprintf("%s", err))
 		return
 	}
 
-	updatedState, diags := userValueFrom(ctx, res, customSchemas)
+	updatedState, diags := userValueFrom(ctx, res, cS)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -357,9 +362,10 @@ func (r *userResource) Update(ctx context.Context, req resource.UpdateRequest, r
 	// the initial password is not returned in the response, hence it must be read from the plan
 	updatedState.InitialPassword = plan.InitialPassword
 
-	// if the custom schemas are not configured, set the value to null to prevent in place updates
-	if plan.CustomSchemas.IsNull() {
-		updatedState.CustomSchemas = types.StringNull()
+	diags = userStateModify(ctx, plan, &updatedState)
+	resp.Diagnostics.Append(diags...)
+	if diags.HasError() {
+		return
 	}
 
 	diags = resp.State.Set(ctx, &updatedState)
@@ -390,4 +396,41 @@ func (r *userResource) Delete(ctx context.Context, req resource.DeleteRequest, r
 
 func (r *userResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+}
+
+func userStateModify(ctx context.Context, plan userData, state *userData) diag.Diagnostics {
+
+	if !plan.SapExtensionUser.IsNull() && !plan.SapExtensionUser.IsUnknown() {
+
+		// fetch the plan data
+		var planData users.SAPExtension
+		diags := plan.SapExtensionUser.As(ctx, &planData, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty:    true,
+			UnhandledUnknownAsEmpty: true,
+		})
+		if diags.HasError() {
+			return diags
+		}
+
+		// fetch the state data
+		var stateData users.SAPExtension
+		diags = state.SapExtensionUser.As(ctx, &stateData, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty:    true,
+			UnhandledUnknownAsEmpty: true,
+		})
+		if diags.HasError() {
+			return diags
+		}
+
+		// as sendMail is a writeOnly attribute, it is not returned the GET call
+		// modify the state data based on the plan data
+		stateData.SendMail = planData.SendMail
+
+		state.SapExtensionUser, diags = types.ObjectValueFrom(ctx, sapExtensionUserObjType, stateData)
+		if diags.HasError() {
+			return diags
+		}
+	}
+
+	return nil
 }

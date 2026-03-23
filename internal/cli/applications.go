@@ -83,7 +83,7 @@ func (a *ApplicationsCli) Create(ctx context.Context, args *applications.Applica
 
 func (a *ApplicationsCli) Update(ctx context.Context, args []generic.PatchRequest, appId string) (applications.Application, string, error) {
 
-	reqBody := generic.PatchRequestBody{
+	reqBody := applications.PatchRequestBody{
 		Operations: args,
 	}
 
