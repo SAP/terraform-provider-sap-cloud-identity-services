@@ -181,11 +181,9 @@ func TestGetAttributeTag(t *testing.T) {
 			expectedErrMsg: "field 'NonExistent' not found in type",
 		},
 		{
-			name:     "field without json tag",
-			attrName: "FieldWithNoTag",
-			argsType: reflect.TypeOf(struct {
-				FieldWithNoTag string
-			}{}),
+			name:           "field without json tag",
+			attrName:       "FieldWithNoTag",
+			argsType:       reflect.TypeFor[struct{ FieldWithNoTag string }](),
 			expectedTag:    "",
 			expectedError:  true,
 			expectedErrMsg: "field 'FieldWithNoTag' has no json tag",
@@ -193,9 +191,9 @@ func TestGetAttributeTag(t *testing.T) {
 		{
 			name:     "field with omitempty",
 			attrName: "OptionalField",
-			argsType: reflect.TypeOf(struct {
-				OptionalField string `json:"optionalField,omitempty"`
-			}{}),
+			argsType: reflect.TypeFor[struct {
+				OptionalField string "json:\"optionalField,omitempty\""
+			}](),
 			expectedTag:   "optionalField,omitempty",
 			expectedError: false,
 		},
@@ -321,9 +319,9 @@ func TestGetScimPatchRequest(t *testing.T) {
 			attrName: "OptionalField",
 			path:     "",
 			value:    "value",
-			argsType: reflect.TypeOf(struct {
-				OptionalField string `json:"optionalField,omitempty"`
-			}{}),
+			argsType: reflect.TypeFor[struct {
+				OptionalField string "json:\"optionalField,omitempty\""
+			}](),
 			expected: generic.PatchRequest{Op: "replace", Path: "optionalField", Value: "value"},
 		},
 		{
