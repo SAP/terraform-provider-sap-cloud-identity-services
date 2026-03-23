@@ -209,6 +209,9 @@ func TestResourceUser(t *testing.T) {
 		}
 
 		newUser := sciUser
+		newUserSchemas := make([]string, len(sciUser.Schemas))
+		copy(newUserSchemas, sciUser.Schemas)
+		newUser.Schemas = newUserSchemas
 		newUser.Schemas = append(newUser.Schemas, "urn:test:terraform:2.0:User")
 
 		customSchemas, _ := json.Marshal(

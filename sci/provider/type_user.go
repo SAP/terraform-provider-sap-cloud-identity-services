@@ -224,7 +224,7 @@ func getUserUpdateRequest(ctx context.Context, plan userData, state userData) ([
 	argsType := reflect.TypeFor[userData]()
 
 	// A patch call on the attribute schemas results in an internal error from the API
-	// if the schema is used in the custom schemas, it is returned in the response body as well, hence no explicit of the attribute is needed
+	// if the schema is used in the custom schemas, it is returned in the response body as well, hence no explicit patch of this attribute is needed
 
 	if !plan.UserName.Equal(state.UserName) {
 		patchReq, diags := utils.GetScimPatchRequest("UserName", "", plan.UserName.ValueString(), argsType)

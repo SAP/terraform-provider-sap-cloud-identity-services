@@ -173,10 +173,10 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 				Attributes: map[string]schema.Attribute{
 					"send_mail": schema.BoolAttribute{
 						MarkdownDescription: fmt.Sprintln("Specifies if an activation email should be sent to the user. Only applicable during user creation.") +
-											 fmt.Sprintln("This attribute only affects the initial creation and is not stored or returned by the API afterward.") +
-											 fmt.Sprintln("Hence, in-place updates on subsequent runs are expected if the attribute is configured as true."),
-						Optional:            true,
-						Computed:            true,
+							fmt.Sprintln("This attribute only affects the initial creation and is not stored or returned by the API afterward.") +
+							fmt.Sprintln("Hence, in-place updates on subsequent runs are expected if the attribute is configured as true."),
+						Optional: true,
+						Computed: true,
 						PlanModifiers: []planmodifier.Bool{
 							boolplanmodifier.UseStateForUnknown(),
 						},
@@ -205,11 +205,10 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 			},
 			"custom_schemas": schema.StringAttribute{
 				Optional: true,
-				MarkdownDescription: "Furthur enhance your user with custom schemas. The attribute must configured as a valid JSON string." +
-					fmt.Sprintln("For custom schema attributes of type `complex`, overwriting specific attributes of the object to null is not supported.") +
-					fmt.Sprintln("i.e., if a custom schema has an attribute `address` of type `complex` with sub-attributes `street`, `postalCode` and `city`, setting the value of `street` to null will not remove the street information from the user.") +
-					fmt.Sprintln("Hence in order to overwrite specific attributes to null, the entire complex attribute must be set to null.") +
-					fmt.Sprintln("Following which the desired sub-attributes can be configured."),
+				MarkdownDescription: "Further enhance your user with custom schemas. The attribute must be configured as a valid JSON string.\n" +
+					"For custom schema attributes of type `complex`, overwriting specific attributes of the object to null is not supported.\n" +
+					"\n\tFor example, if a custom schema has an attribute `address` of type `complex` with sub-attributes `street`, `postalCode`, and `city`, setting the value of `street` to null will not remove the street information from the user.\n" +
+					"\n\tTo overwrite specific attributes to null, the entire complex attribute must be set to null, after which the desired sub-attributes can be configured.",
 				Validators: []validator.String{
 					utils.ValidJSON(),
 					stringvalidator.LengthAtLeast(1),
@@ -350,7 +349,7 @@ func (r *userResource) Update(ctx context.Context, req resource.UpdateRequest, r
 
 	res, cS, err := r.cli.User.Update(ctx, state.Id.ValueString(), args, customSchemas)
 	if err != nil {
-		resp.Diagnostics.AddError("Error updating application", fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError("Error updating user", fmt.Sprintf("%s", err))
 		return
 	}
 
