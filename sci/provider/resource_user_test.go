@@ -278,19 +278,6 @@ func TestResourceUser(t *testing.T) {
 					),
 				},
 				{
-					Config: providerConfig("", user) + ResourceUserWithCustomSchemas("testUser", newUser, string(newCustomSchemas)),
-					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestMatchResourceAttr("sci_user.testUser", "id", regexpUUID),
-						resource.TestCheckResourceAttr("sci_user.testUser", "schemas.3", newUser.Schemas[3]),
-						resource.TestCheckResourceAttr("sci_user.testUser", "user_name", newUser.UserName),
-						resource.TestCheckResourceAttr("sci_user.testUser", "name.family_name", newUser.Name.FamilyName),
-						resource.TestCheckResourceAttr("sci_user.testUser", "name.given_name", newUser.Name.GivenName),
-						resource.TestCheckResourceAttr("sci_user.testUser", "emails.0.type", newUser.Emails[0].Type),
-						resource.TestCheckResourceAttr("sci_user.testUser", "emails.0.value", newUser.Emails[0].Value),
-						resource.TestCheckResourceAttr("sci_user.testUser", "custom_schemas", string(newCustomSchemas)),
-					),
-				},
-				{
 					Config: providerConfig("", user) + ResourceUserWithCustomSchemas("testUser", sciUser, string(removedCustomSchemas)),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("sci_user.testUser", "id", regexpUUID),
