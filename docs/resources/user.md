@@ -72,7 +72,10 @@ resource "sci_user" "new_user" {
 ### Optional
 
 - `active` (Boolean) Determines whether the user is active or not. The default value for the attribute is false.
-- `custom_schemas` (String) Furthur enhance your user with custom schemas. The attribute must configured as a valid JSON string.
+- `custom_schemas` (String) Furthur enhance your user with custom schemas. The attribute must configured as a valid JSON string.For custom schema attributes of type `complex`, overwriting specific attributes of the object to null is not supported.
+i.e., if a custom schema has an attribute `address` of type `complex` with sub-attributes `street`, `postalCode` and `city`, setting the value of `street` to null will not remove the street information from the user.
+Hence in order to overwrite specific attributes to null, the entire complex attribute must be set to null.
+Following which the desired sub-attributes can be configured.
 - `display_name` (String) The name to be displayed for the user.
 - `initial_password` (String, Sensitive) The initial password to be configured for the user. If this attribute is configured, the password will have to be changed by the user at the first login.
 - `name` (Attributes) Name of the user (see [below for nested schema](#nestedatt--name))
@@ -118,7 +121,9 @@ Optional:
 Optional:
 
 - `mail_verified` (Boolean) The attribute specifies if the e-mail of the newly created user is verified or not. So if the values of the "mail_verified" and "send_mail" attributes are true, the user will receive an e-mail and they will be able to log on. On the other hand, if the "send_mail" is true, but the "mail_verified" is false, the user will receive e-mail and they have to click the verification link in the e-mail. If the attribute "mail_verified" is not configured, the default value is false.
-- `send_mail` (Boolean) Specifies if an activation mail should be sent. The value of the attribute only matters when creating the user.
+- `send_mail` (Boolean) Specifies if an activation email should be sent to the user. Only applicable during user creation.
+This attribute only affects the initial creation and is not stored or returned by the API afterward.
+Hence, in-place updates on subsequent runs are expected if the attribute is configured as true.
 - `status` (String) Specifies if the user is created as active, inactive or new. If the attribute "active" is not configured, the default value is inactive. Acceptable values are : `active`, `inactive`, `new`
 
 

@@ -5,9 +5,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/users"
 	"net/http"
 	"testing"
+
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/generic"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/users"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -219,99 +221,175 @@ func TestUsers_GetByUserId(t *testing.T) {
 	})
 }
 
-// func TestUsers_Update(t *testing.T) {
+func TestUsers_Update(t *testing.T) {
 
-// 	usersBody.Id = "valid-user-id"
-// 	usersResponse, _ := json.Marshal(usersBody)
+	usersBody.Id = "valid-user-id"
+	usersResponse, _ := json.Marshal(usersBody)
 
-// 	customSchemas, _ := json.Marshal(map[string]any{
-// 		"schema_id": map[string]any{
-// 			"var1": "test",
-// 			"var2": 1,
-// 		},
-// 	})
+	patchRequests := []generic.PatchRequest{
+		{
+			Op:    "replace",
+			Path:  "userName",
+			Value: "updated-user-name",
+		},
+		{
+			Op:    "replace",
+			Path:  "schemas",
+			Value: []string{"urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:CustomSchema"},
+		},
+		{
+			Op:    "replace",
+			Path:  "password",
+			Value: "updated-password",
+		},
+		{
+			Op:    "replace",
+			Path:  "name",
+			Value: "updated-name",
+		},
+		{
+			Op:    "replace",
+			Path:  "displayName",
+			Value: "updated-display-name",
+		},
+		{
+			Op:    "replace",
+			Path:  "userType",
+			Value: "external",
+		},
+		{
+			Op:    "replace",
+			Path:  "active",
+			Value: true,
+		},
+		{
+			Op:   "replace",
+			Path: "emails",
+			Value: []users.Email{
+				{
+					Value:   "test1@gmail.com",
+					Type:    "work",
+					Primary: true,
+				},
+			},
+		},
+		{
+			Op:    "replace",
+			Path:  "urn:ietf:params:scim:schemas:extension:sap:2.0:User:sendMail",
+			Value: true,
+		},
+		{
+			Op:    "replace",
+			Path:  "urn:ietf:params:scim:schemas:extension:sap:2.0:User:mailVerified",
+			Value: true,
+		},
+		{
+			Op:    "replace",
+			Path:  "urn:ietf:params:scim:schemas:extension:sap:2.0:User:status",
+			Value: "active",
+		},
+		{
+			Op:    "replace",
+			Path:  "urn:ietf:params:scim:CustomSchema:test1",
+			Value: "test-val",
+		},
+	}
 
-// 	incorrectCustomSchemas, _ := json.Marshal(map[string]any{
-// 		"new_schema_id": map[string]any{
-// 			"var1": "test",
-// 			"var2": 1,
-// 		},
-// 	})
+	customSchemas, _ := json.Marshal(map[string]any{
+		"urn:ietf:params:scim:CustomSchema": map[string]any{
+			"test1": "test-val",
+		},
+	})
 
-// 	t.Run("validate the API request", func(t *testing.T) {
+	incorrectCustomSchemas, _ := json.Marshal(map[string]any{
+		"new_schema_id": map[string]any{
+			"var1": "test",
+			"var2": 1,
+		},
+	})
 
-// 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 			_, err := w.Write(usersResponse)
-// 			assert.NoError(t, err, "Failed to write response")
+	t.Run("validate the API request", func(t *testing.T) {
 
-// 			assertCall[users.User](t, r, fmt.Sprintf("%s%s", usersPath, "valid-user-id"), "PUT", usersBody)
-// 		}))
+		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.Method == "PATCH" {
 
-// 		defer srv.Close()
+				var actualBody users.PatchRequestBody
+				err := json.NewDecoder(r.Body).Decode(&actualBody)
 
-// 		_, _, err := client.User.Update(context.TODO(), "", &usersBody)
+				assert.NoError(t, err)
+				assert.Equal(t, 12, len(actualBody.Operations))
+			}
+			_, err := w.Write(usersResponse)
+			assert.NoError(t, err, "Failed to write response")
+		}))
 
-// 		assert.NoError(t, err)
-// 	})
+		defer srv.Close()
 
-// 	t.Run("validate the API request with custom schemas", func(t *testing.T) {
+		_, _, err := client.User.Update(context.TODO(), "valid-user-id", patchRequests, "")
 
-// 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 			_, err := w.Write(responseWithCustomSchemas(usersResponse, customSchemas))
-// 			assert.NoError(t, err, "Failed to write response")
+		assert.NoError(t, err)
+	})
 
-// 			assertCall[users.User](t, r, fmt.Sprintf("%s%s", usersPath, "valid-user-id"), "PUT", usersBody)
-// 		}))
+	t.Run("validate the API request with custom schemas", func(t *testing.T) {
 
-// 		defer srv.Close()
+		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.Method == "PATCH" {
 
-// 		_, _, err := client.User.Update(context.TODO(), string(customSchemas), &usersBody)
+				var actualBody users.PatchRequestBody
+				err := json.NewDecoder(r.Body).Decode(&actualBody)
 
-// 		assert.NoError(t, err)
-// 	})
+				assert.NoError(t, err)
+				assert.Equal(t, 12, len(actualBody.Operations))
+			}
+			_, err := w.Write(responseWithCustomSchemas(usersResponse, customSchemas))
+			assert.NoError(t, err, "Failed to write response")
+		}))
 
-// 	t.Run("validate the API request with error", func(t *testing.T) {
+		defer srv.Close()
 
-// 		resErr, _ := json.Marshal(ScimResponseError{
-// 			Detail: "update failed",
-// 			Status: "400",
-// 		})
+		_, _, err := client.User.Update(context.TODO(), "valid-user-id", patchRequests, string(customSchemas))
 
-// 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 			w.WriteHeader(http.StatusBadRequest)
-// 			_, err := w.Write(resErr)
-// 			assert.NoError(t, err, "Failed to write response")
+		assert.NoError(t, err)
+	})
 
-// 			assertCall[users.User](t, r, fmt.Sprintf("%s%s", usersPath, "valid-user-id"), "PUT", usersBody)
-// 		}))
+	t.Run("validate the API request with error", func(t *testing.T) {
 
-// 		defer srv.Close()
+		resErr, _ := json.Marshal(ScimResponseError{
+			Detail: "update failed",
+			Status: "400",
+		})
 
-// 		res, _, err := client.User.Update(context.TODO(), "", &usersBody)
+		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusBadRequest)
+			_, err := w.Write(resErr)
+			assert.NoError(t, err, "Failed to write response")
+		}))
 
-// 		assert.Zero(t, res)
-// 		assert.Error(t, err)
-// 		assert.Equal(t, "SCIM error 400 \nupdate failed", err.Error())
-// 	})
+		defer srv.Close()
 
-// 	t.Run("validate the API request with custom schemas - error", func(t *testing.T) {
+		res, _, err := client.User.Update(context.TODO(), "valid-user-id", patchRequests, "")
 
-// 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 			_, err := w.Write(responseWithCustomSchemas(usersResponse, incorrectCustomSchemas))
-// 			assert.NoError(t, err, "Failed to write response")
+		assert.Zero(t, res)
+		assert.Error(t, err)
+		assert.Equal(t, "SCIM error 400 \nupdate failed", err.Error())
+	})
 
-// 			assertCall[users.User](t, r, fmt.Sprintf("%s%s", usersPath, "valid-user-id"), "PUT", usersBody)
-// 		}))
+	t.Run("validate the API request with custom schemas - error", func(t *testing.T) {
 
-// 		defer srv.Close()
+		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			_, err := w.Write(responseWithCustomSchemas(usersResponse, incorrectCustomSchemas))
+			assert.NoError(t, err, "Failed to write response")
+		}))
 
-// 		res, _, err := client.User.Update(context.TODO(), string(customSchemas), &usersBody)
+		defer srv.Close()
 
-// 		assert.Zero(t, res)
-// 		assert.Error(t, err)
-// 		assert.Equal(t, "schema_id not found in the returned response", err.Error())
-// 	})
-// }
+		res, _, err := client.User.Update(context.TODO(), "valid-user-id", patchRequests, string(customSchemas))
+
+		assert.Zero(t, res)
+		assert.Error(t, err)
+		assert.Equal(t, "urn:ietf:params:scim:CustomSchema not found in the returned response", err.Error())
+	})
+}
 
 func TestUsers_Delete(t *testing.T) {
 

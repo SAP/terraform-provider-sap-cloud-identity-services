@@ -3,7 +3,6 @@ package provider
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"reflect"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -224,23 +223,8 @@ func getUserUpdateRequest(ctx context.Context, plan userData, state userData) ([
 
 	argsType := reflect.TypeFor[userData]()
 
-	if !plan.Schemas.Equal(state.Schemas) {
-
-		schemas := []string{}
-
-		if !plan.Schemas.IsNull() {
-			diags = plan.Schemas.ElementsAs(ctx, &schemas, true)
-			if diags.HasError() {
-				return reqs, diags
-			}
-		}
-
-		patchReq, diags := utils.GetScimPatchRequest("Schemas", "", schemas, argsType)
-		if diags.HasError() {
-			return reqs, diags
-		}
-		reqs = append(reqs, patchReq)
-	}
+	// A patch call on the attribute schemas results in an internal error from the API
+	// if the schema is used in the custom schemas, it is returned in the response body as well, hence no explicit of the attribute is needed
 
 	if !plan.UserName.Equal(state.UserName) {
 		patchReq, diags := utils.GetScimPatchRequest("UserName", "", plan.UserName.ValueString(), argsType)
@@ -337,24 +321,6 @@ func getUserUpdateRequest(ctx context.Context, plan userData, state userData) ([
 		reqs = append(reqs, patchRequest)
 	}
 
-	if !plan.Groups.Equal(state.Groups) {
-		groups := groupData{}
-
-		if !plan.Groups.IsNull() {
-			diags = plan.Groups.ElementsAs(ctx, &groups, true)
-			if diags.HasError() {
-				return reqs, diags
-			}
-		}
-
-		patchReq, diags := utils.GetScimPatchRequest("Groups", "", groups, argsType)
-		if diags.HasError() {
-			return reqs, diags
-		}
-
-		reqs = append(reqs, patchReq)
-	}
-
 	if !plan.SapExtensionUser.Equal(state.SapExtensionUser) {
 		sapExtensionPath, diags := utils.GetAttributeTag("SapExtensionUser", argsType)
 		if diags.HasError() {
@@ -408,28 +374,60 @@ func getUserUpdateRequest(ctx context.Context, plan userData, state userData) ([
 
 	if !plan.CustomSchemas.Equal(state.CustomSchemas) {
 
-		planCustomSchemas := ""
+		if plan.CustomSchemas.IsNull() && state.CustomSchemas.IsNull() {
+			return reqs, diags
+		}
+
+		planCustomSchemasMap := make(map[string]map[string]any)
+		stateCustomSchemasMap := make(map[string]map[string]any)
 
 		if !plan.CustomSchemas.IsNull() {
-
-			planCustomSchemas = plan.CustomSchemas.ValueString()
-
-			var planCustomSchemasMap map[string]map[string]any
+			planCustomSchemas := plan.CustomSchemas.ValueString()
 			if err := json.Unmarshal([]byte(planCustomSchemas), &planCustomSchemasMap); err != nil {
 				diags.AddError("Failed to unmarshal custom schemas", err.Error())
 				return reqs, diags
 			}
+		}
 
-			for schema, attributesMap := range planCustomSchemasMap {
+		if !state.CustomSchemas.IsNull() {
+			stateCustomSchemas := state.CustomSchemas.ValueString()
+			if err := json.Unmarshal([]byte(stateCustomSchemas), &stateCustomSchemasMap); err != nil {
+				diags.AddError("Failed to unmarshal custom schemas", err.Error())
+				return reqs, diags
+			}
+		}
 
-				for k, v := range attributesMap {
+		for schema, planAttributesMap := range planCustomSchemasMap {
+			stateAttributesMap, schemaFound := stateCustomSchemasMap[schema]
 
-					path := fmt.Sprintf("%s:%s", schema, k)
-					patchReq := utils.GeneratePatchRequest(path, v)
-					reqs = append(reqs, patchReq)
-
+			if schemaFound {
+				for attrKey, planAttrValue := range planAttributesMap {
+					if stateAttrValue, attrFound := stateAttributesMap[attrKey]; attrFound {
+						if !reflect.DeepEqual(planAttrValue, stateAttrValue) {
+							reqs = append(reqs, utils.GenerateReplacePatchRequest(schema+":"+attrKey, planAttrValue))
+						}
+						delete(stateAttributesMap, attrKey)
+					} else {
+						reqs = append(reqs, utils.GenerateAddPatchRequest(schema+":"+attrKey, planAttrValue))
+					}
 				}
 
+				for attrKey := range stateAttributesMap {
+					if _, exists := planAttributesMap[attrKey]; !exists {
+						reqs = append(reqs, utils.GenerateDeletePatchRequest(schema+":"+attrKey))
+					}
+				}
+				delete(stateCustomSchemasMap, schema)
+			} else {
+				for attrKey, attrValue := range planAttributesMap {
+					reqs = append(reqs, utils.GenerateAddPatchRequest(schema+":"+attrKey, attrValue))
+				}
+			}
+		}
+
+		for schema := range stateCustomSchemasMap {
+			if _, schemaFound := planCustomSchemasMap[schema]; !schemaFound {
+				reqs = append(reqs, utils.GenerateDeletePatchRequest(schema))
 			}
 		}
 

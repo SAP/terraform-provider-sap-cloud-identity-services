@@ -172,7 +172,9 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 				},
 				Attributes: map[string]schema.Attribute{
 					"send_mail": schema.BoolAttribute{
-						MarkdownDescription: "Specifies if an activation mail should be sent. The value of the attribute only matters when creating the user.",
+						MarkdownDescription: fmt.Sprintln("Specifies if an activation email should be sent to the user. Only applicable during user creation.") +
+											 fmt.Sprintln("This attribute only affects the initial creation and is not stored or returned by the API afterward.") +
+											 fmt.Sprintln("Hence, in-place updates on subsequent runs are expected if the attribute is configured as true."),
 						Optional:            true,
 						Computed:            true,
 						PlanModifiers: []planmodifier.Bool{
@@ -202,10 +204,15 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 				},
 			},
 			"custom_schemas": schema.StringAttribute{
-				Optional:            true,
-				MarkdownDescription: "Furthur enhance your user with custom schemas. The attribute must configured as a valid JSON string.",
+				Optional: true,
+				MarkdownDescription: "Furthur enhance your user with custom schemas. The attribute must configured as a valid JSON string." +
+					fmt.Sprintln("For custom schema attributes of type `complex`, overwriting specific attributes of the object to null is not supported.") +
+					fmt.Sprintln("i.e., if a custom schema has an attribute `address` of type `complex` with sub-attributes `street`, `postalCode` and `city`, setting the value of `street` to null will not remove the street information from the user.") +
+					fmt.Sprintln("Hence in order to overwrite specific attributes to null, the entire complex attribute must be set to null.") +
+					fmt.Sprintln("Following which the desired sub-attributes can be configured."),
 				Validators: []validator.String{
 					utils.ValidJSON(),
+					stringvalidator.LengthAtLeast(1),
 				},
 			},
 			"groups": schema.ListNestedAttribute{
@@ -273,6 +280,12 @@ func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, r
 
 	// the initial password is not returned in the response, hence it must be read from the plan
 	state.InitialPassword = plan.InitialPassword
+
+	diags = userStateModify(ctx, plan, &state)
+	resp.Diagnostics.Append(diags...)
+	if diags.HasError() {
+		return
+	}
 
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -353,7 +366,7 @@ func (r *userResource) Update(ctx context.Context, req resource.UpdateRequest, r
 	diags = userStateModify(ctx, plan, &updatedState)
 	resp.Diagnostics.Append(diags...)
 	if diags.HasError() {
-		return 
+		return
 	}
 
 	diags = resp.State.Set(ctx, &updatedState)

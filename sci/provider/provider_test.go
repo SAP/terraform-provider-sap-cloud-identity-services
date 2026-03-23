@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"fmt"
@@ -103,8 +104,8 @@ func requestMatcher(t *testing.T) cassette.MatcherFunc {
 			t.Fatal("Unable to read request body")
 		}
 
-		requestBody := string(body)
-		return requestBody == i.Body
+		r.Body = io.NopCloser(bytes.NewBuffer(body))
+		return string(body) == i.Body
 	}
 }
 
