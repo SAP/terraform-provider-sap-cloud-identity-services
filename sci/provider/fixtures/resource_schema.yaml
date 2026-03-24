@@ -6,14 +6,14 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 396
+        content_length: 378
         transfer_encoding: []
         trailer: {}
         host: iasprovidertestblr.accounts400.ondemand.com
         remote_addr: ""
         request_uri: ""
         body: |
-            {"id":"urn:ietf:scim:schemas:Terraform","name":"Terraform","description":"Test Schema","meta":{},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Schema"],"attributes":[{"name":"test_attribute","type":"string","multiValued":true,"description":"Test Attribute","required":true,"canonicalValues":["test","attr"],"caseExact":false,"mutability":"readWrite","returned":"never","uniqueness":"none"}]}
+            {"id":"urn:ietf:scim:schemas:Terraform","name":"Terraform","description":"Test Schema","meta":{},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Schema"],"attributes":[{"name":"test_attribute","type":"string","multiValued":true,"description":"Test Attribute","required":true,"canonicalValues":["test","attr"],"mutability":"readWrite","returned":"never","uniqueness":"none"}]}
         form: {}
         headers:
             Accept:
@@ -34,7 +34,7 @@ interactions:
         trailer: {}
         content_length: 656
         uncompressed: false
-        body: '{"id":"urn:ietf:scim:schemas:Terraform","schemas":["urn:ietf:params:scim:schemas:core:2.0:Schema"],"attributes":[{"name":"test_attribute","type":"string","multiValued":true,"description":"Test Attribute","required":true,"canonicalValues":["test","attr"],"caseExact":false,"mutability":"readWrite","returned":"never","uniqueness":"none"}],"name":"Terraform","description":"Test Schema","meta":{"created":"2025-08-29T09:47:10Z","lastModified":"2025-08-29T09:47:10Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Schemas/urn%3Aietf%3Ascim%3Aschemas%3ATerraform","resourceType":"Schema","version":"8f197078-e4b6-4068-a5c5-bca2747a112c"}}'
+        body: '{"id":"urn:ietf:scim:schemas:Terraform","schemas":["urn:ietf:params:scim:schemas:core:2.0:Schema"],"attributes":[{"name":"test_attribute","type":"string","multiValued":true,"description":"Test Attribute","required":true,"canonicalValues":["test","attr"],"caseExact":false,"mutability":"readWrite","returned":"never","uniqueness":"none"}],"name":"Terraform","description":"Test Schema","meta":{"created":"2026-03-24T09:22:16Z","lastModified":"2026-03-24T09:22:16Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Schemas/urn%3Aietf%3Ascim%3Aschemas%3ATerraform","resourceType":"Schema","version":"7312de80-0f7c-437e-8414-8da7045c778c"}}'
         headers:
             Cache-Control:
                 - private,no-cache,no-store
@@ -45,9 +45,9 @@ interactions:
             Content-Type:
                 - application/scim+json
             Date:
-                - Fri, 29 Aug 2025 09:47:10 GMT
+                - Tue, 24 Mar 2026 09:22:16 GMT
             Etag:
-                - '"8f197078-e4b6-4068-a5c5-bca2747a112c"'
+                - '"7312de80-0f7c-437e-8414-8da7045c778c"'
             Location:
                 - https://iasprovidertestblr.accounts400.ondemand.com/scim/Schemas/urn%3Aietf%3Ascim%3Aschemas%3ATerraform
             Referrer-Policy:
@@ -55,19 +55,19 @@ interactions:
             Server:
                 - SAP
             Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains; preload
+                - max-age=63072000; includeSubDomains; preload
             Vary:
                 - X-CSP-STRIP
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - 7A9D2086-F3F0-4588-9AEC-B7C242C33650
+                - 10B64DFA-154F-4478-8721-E9AB14CB5B8E
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-4nfmn
+                - http-64v2h
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -78,7 +78,7 @@ interactions:
                 - none
         status: '201 '
         code: 201
-        duration: 1.193857085s
+        duration: 1.054287633s
     - id: 1
       request:
         proto: HTTP/1.1
@@ -111,7 +111,7 @@ interactions:
         trailer: {}
         content_length: -1
         uncompressed: true
-        body: '{"id":"urn:ietf:scim:schemas:Terraform","schemas":["urn:ietf:params:scim:schemas:core:2.0:Schema"],"attributes":[{"name":"test_attribute","type":"string","multiValued":true,"description":"Test Attribute","required":true,"canonicalValues":["test","attr"],"caseExact":false,"mutability":"readWrite","returned":"never","uniqueness":"none"}],"name":"Terraform","description":"Test Schema","meta":{"created":"2025-08-29T09:47:10Z","lastModified":"2025-08-29T09:47:10Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Schemas/urn%3Aietf%3Ascim%3Aschemas%3ATerraform","resourceType":"Schema","version":"8f197078-e4b6-4068-a5c5-bca2747a112c"}}'
+        body: '{"id":"urn:ietf:scim:schemas:Terraform","schemas":["urn:ietf:params:scim:schemas:core:2.0:Schema"],"attributes":[{"name":"test_attribute","type":"string","multiValued":true,"description":"Test Attribute","required":true,"canonicalValues":["test","attr"],"caseExact":false,"mutability":"readWrite","returned":"never","uniqueness":"none"}],"name":"Terraform","description":"Test Schema","meta":{"created":"2026-03-24T09:22:16Z","lastModified":"2026-03-24T09:22:16Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Schemas/urn%3Aietf%3Ascim%3Aschemas%3ATerraform","resourceType":"Schema","version":"7312de80-0f7c-437e-8414-8da7045c778c"}}'
         headers:
             Cache-Control:
                 - private,no-cache,no-store
@@ -120,9 +120,9 @@ interactions:
             Content-Type:
                 - application/scim+json
             Date:
-                - Fri, 29 Aug 2025 09:47:11 GMT
+                - Tue, 24 Mar 2026 09:22:17 GMT
             Etag:
-                - '"8f197078-e4b6-4068-a5c5-bca2747a112c-gzip"'
+                - '"7312de80-0f7c-437e-8414-8da7045c778c-gzip"'
             Location:
                 - https://iasprovidertestblr.accounts400.ondemand.com/scim/Schemas/urn%3Aietf%3Ascim%3Aschemas%3ATerraform
             Referrer-Policy:
@@ -130,19 +130,19 @@ interactions:
             Server:
                 - SAP
             Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains; preload
+                - max-age=63072000; includeSubDomains; preload
             Vary:
                 - Accept-Encoding,X-CSP-STRIP
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - 53485455-FA8F-4456-84C0-204302607DC3
+                - 6092C3F7-CED7-4308-83DA-908BACE5D907
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-4nfmn
+                - http-64v2h
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -153,7 +153,7 @@ interactions:
                 - none
         status: '200 '
         code: 200
-        duration: 270.44215ms
+        duration: 212.764163ms
     - id: 2
       request:
         proto: HTTP/1.1
@@ -193,25 +193,25 @@ interactions:
             Content-Security-Policy:
                 - script-src 'none';
             Date:
-                - Fri, 29 Aug 2025 09:47:11 GMT
+                - Tue, 24 Mar 2026 09:22:17 GMT
             Referrer-Policy:
                 - origin
             Server:
                 - SAP
             Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains; preload
+                - max-age=63072000; includeSubDomains; preload
             Vary:
                 - X-CSP-STRIP
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - BF42798E-65E2-43E3-B2BE-D26C92B49E48
+                - DCC03C42-9E16-4388-9485-668E6F85EB5D
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-4nfmn
+                - http-64v2h
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
@@ -222,4 +222,4 @@ interactions:
                 - none
         status: '204 '
         code: 204
-        duration: 258.741288ms
+        duration: 228.048972ms
