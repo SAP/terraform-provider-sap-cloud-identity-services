@@ -9,9 +9,9 @@ type Attribute struct {
 	Type            string   `json:"type,omitempty"`
 	Multivalued     bool     `json:"multiValued"`
 	Description     string   `json:"description,omitempty"`
-	Required        bool     `json:"required"`
+	Required        bool     `json:"required,omitempty"`
 	CanonicalValues []string `json:"canonicalValues,omitempty"`
-	CaseExact       bool     `json:"caseExact"`
+	CaseExact       bool     `json:"caseExact,omitempty"`
 	Mutability      string   `json:"mutability,omitempty"`
 	Returned        string   `json:"returned,omitempty"`
 	Uniqueness      string   `json:"uniqueness,omitempty"`

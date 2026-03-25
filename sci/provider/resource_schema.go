@@ -110,11 +110,13 @@ func (r *schemaResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 							MarkdownDescription: "Configure if the attribute can have more than one value.",
 						},
 						"required": schema.BoolAttribute{
-							Required:            true,
+							Optional:            true,
+							Computed:            true,
 							MarkdownDescription: "Configure if the attribute must be mandatory or not.",
 						},
 						"case_exact": schema.BoolAttribute{
-							Required:            true,
+							Optional:            true,
+							Computed:            true,
 							MarkdownDescription: "Configure if the attribute must be case-sensitive or not.",
 						},
 						"canonical_values": schema.ListAttribute{
