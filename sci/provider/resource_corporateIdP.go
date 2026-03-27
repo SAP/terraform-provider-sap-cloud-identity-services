@@ -622,9 +622,52 @@ func (r *corporateIdPResource) Create(ctx context.Context, req resource.CreateRe
 
 }
 
-// TODO implement the Update operation once the API is available
 func (r *corporateIdPResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	resp.Diagnostics.AddError("Error updating Corporate Identity Provider.", "This resource does not support updates")
+
+	var plan, state corporateIdPData
+
+	diags := req.Plan.Get(ctx, &plan)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	diags = req.State.Get(ctx, &state)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	patchReqs, diags := getCorporateIdPUpdateRequest(ctx, plan, state)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	res, _, err := r.cli.CorporateIdP.Update(ctx, patchReqs, state.Id.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError("Error updating Corporate Identity Provider", fmt.Sprintf("%s", err))
+		return
+	}
+
+	newState, diags := corporateIdPValueFrom(ctx, res)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	if !plan.OidcConfig.IsNull() && !plan.OidcConfig.IsUnknown() {
+		// The client secret must be read from the plan as the GET call on the IdP does not return the configured secret
+		diags = mapOidcClientSecret(ctx, plan, &newState)
+		resp.Diagnostics.Append(diags...)
+	}
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	diags = resp.State.Set(ctx, newState)
+	resp.Diagnostics.Append(diags...)
 }
 
 func (r *corporateIdPResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {

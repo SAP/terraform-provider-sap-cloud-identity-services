@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/corporateIdps"
+	corporateidps "github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/corporateIdps"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/generic"
 )
 
 type CorporateIdPsCli struct {
@@ -55,7 +56,20 @@ func (c *CorporateIdPsCli) Create(ctx context.Context, args *corporateidps.Ident
 	return c.GetByIdPId(ctx, strings.Split(headers["location"], "/")[3])
 }
 
-// TODO update function must be implemented once the API is available
+func (c *CorporateIdPsCli) Update(ctx context.Context, args []generic.PatchRequest, idpId string) (corporateidps.IdentityProvider, string, error) {
+
+	reqBody := corporateidps.PatchRequestBody{
+		Operations: args,
+	}
+
+	_, _, err := c.cliClient.Execute(ctx, "PATCH", fmt.Sprintf("%s%s", c.getUrl(), idpId), nil, reqBody, "", RequestHeader, nil)
+
+	if err != nil {
+		return corporateidps.IdentityProvider{}, "", err
+	}
+
+	return c.GetByIdPId(ctx, idpId)
+}
 
 func (c *CorporateIdPsCli) Delete(ctx context.Context, idpId string) error {
 	_, _, err := c.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", c.getUrl(), idpId), nil, nil, "", RequestHeader, nil)
