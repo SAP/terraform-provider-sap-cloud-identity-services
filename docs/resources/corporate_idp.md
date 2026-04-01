@@ -18,16 +18,16 @@ resource "sci_corporate_idp" "saml2_example" {
   display_name = "My SAML2 Corporate IdP"
 
   # Optional top-level
-  name                   = "my-saml2-idp"
-  type                   = "saml2"
-  logout_url             = "https://idp.example.com/logout"
+  name                     = "my-saml2-idp"
+  type                     = "saml2"
+  logout_url               = "https://idp.example.com/logout"
   forward_all_sso_requests = false
 
   identity_federation = {
-    use_local_user_store             = true
-    allow_local_users_only           = true
-    apply_local_idp_auth_and_checks  = false
-    required_groups                  = ["group-a", "group-b"]
+    use_local_user_store            = true
+    allow_local_users_only          = true
+    apply_local_idp_auth_and_checks = false
+    required_groups                 = ["group-a", "group-b"]
   }
 
   login_hint_config = {
@@ -90,16 +90,16 @@ resource "sci_corporate_idp" "oidc_example" {
   display_name = "My OIDC Corporate IdP"
 
   # Optional top-level
-  name                   = "my-oidc-idp"
-  type                   = "oidc"
-  logout_url             = "https://idp.example.com/oidc/logout"
+  name                     = "my-oidc-idp"
+  type                     = "oidc"
+  logout_url               = "https://idp.example.com/oidc/logout"
   forward_all_sso_requests = false
 
   identity_federation = {
-    use_local_user_store             = false
-    allow_local_users_only           = false
-    apply_local_idp_auth_and_checks  = false
-    required_groups                  = []
+    use_local_user_store            = false
+    allow_local_users_only          = false
+    apply_local_idp_auth_and_checks = false
+    required_groups                 = []
   }
 
   login_hint_config = {
@@ -117,9 +117,9 @@ resource "sci_corporate_idp" "oidc_example" {
     enable_pkce                = true
 
     additional_config = {
-      enforce_nonce                 = true
-      enforce_issuer_check          = true
-      disable_logout_id_token_hint  = false
+      enforce_nonce                = true
+      enforce_issuer_check         = true
+      disable_logout_id_token_hint = false
     }
   }
 }
