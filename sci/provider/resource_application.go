@@ -84,6 +84,17 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 					stringvalidator.LengthBetween(1, 255),
 				},
 			},
+			"display_name": schema.StringAttribute{
+				MarkdownDescription: "Display name of the application shown on the logon screen. Defaults to `name` when not set.",
+				Optional:            true,
+				// Computed:            true,
+				// PlanModifiers: []planmodifier.String{
+				// 	stringplanmodifier.UseStateForUnknown(),
+				// },
+				Validators: []validator.String{
+					stringvalidator.LengthBetween(1, 255),
+				},
+			},
 			"description": schema.StringAttribute{
 				MarkdownDescription: "Free text description of the Application",
 				Optional:            true,
