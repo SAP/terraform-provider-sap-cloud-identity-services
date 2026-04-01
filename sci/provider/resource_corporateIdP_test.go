@@ -210,6 +210,270 @@ func TestResourceCorporateIdP(t *testing.T) {
 		})
 	})
 
+	t.Run("update - saml2 corporate idp - all fields", func(t *testing.T) {
+
+		saml2Initial := corporateIdP
+		saml2Initial.DisplayName = "SAML2 Update- Test Corporate IdP"
+		saml2Initial.Name = "saml2-update-idp-test"
+		saml2Initial.Type = "saml2"
+		saml2Initial.Saml2Configuration = &saml2Config
+		saml2Initial.Saml2Configuration.CertificatesForSigning = []corporateidps.SigningCertificateData{
+			{
+				// Always replace with a valid certificate for recording of fixtures
+				Base64Certificate: "-----BEGIN CERTIFICATE-----\\nredacted\\n-----END CERTIFICATE-----",
+				IsDefault:         true,
+				Dn:                "Test",
+				ValidFrom:         "1999-01-01T00:00:00Z",
+				ValidTo:           "9999-12-31T23:59:59Z",
+			},
+		}
+
+		// Update
+		updated := saml2Initial
+		updated.DisplayName = "SAML2 Update - Updated IdP"
+		updated.LogoutUrl = "https://example.com/updated-logout"
+		updated.ForwardAllSsoRequests = true
+		updated.IdentityFederation = &corporateidps.IdentityFederation{
+			UseLocalUserStore:        true,
+			AllowLocalUsersOnly:      true,
+			ApplyLocalIdPAuthnChecks: true,
+			RequiredGroups:           []string{"Test Group", "test_group_update"},
+		}
+		updated.LoginHintConfiguration = &corporateidps.LoginHintConfiguration{
+			LoginHintType: "mail",
+			SendMethod:    "authRequest",
+		}
+		updatedSaml2 := *saml2Initial.Saml2Configuration
+		updatedSaml2.SamlMetadataUrl = "https://example.com/updated-metadata"
+		updatedSaml2.DigestAlgorithm = "sha256"
+		updatedSaml2.IncludeScoping = true
+		updatedSaml2.DefaultNameIdFormat = "unspecified"
+		updatedSaml2.AllowCreate = "true"
+		updatedSaml2.AssertionAttributes = []corporateidps.AssertionAttribute{
+			{Name: "attr1", Value: "val1"},
+			{Name: "attr2", Value: "val2"},
+		}
+		updatedSaml2.SsoEndpoints = []corporateidps.SAML2SSOEndpoint{
+			{BindingName: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST", Location: "https://sso.example.com", IsDefault: true},
+			{BindingName: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect", Location: "https://sso2.example.com", IsDefault: false},
+		}
+		updatedSaml2.SloEndpoints = []corporateidps.SAML2SLOEndpoint{
+			{BindingName: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST", Location: "https://slo.example.com", ResponseLocation: "https://slo.example.com/response", IsDefault: true},
+			{BindingName: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect", Location: "https://slo2.example.com", ResponseLocation: "https://slo2.example.com/response", IsDefault: false},
+		}
+		updated.Saml2Configuration = &updatedSaml2
+
+		rec, user := setupVCR(t, "fixtures/resource_corporateIdP_saml2_update")
+		defer stopQuietly(rec)
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+			Steps: []resource.TestStep{
+				// Step 1: Create with initial config — verify all fields
+				{
+					Config: providerConfig("", user) + ResourceCorporateIdP("testIdP", saml2Initial),
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestMatchResourceAttr("sci_corporate_idp.testIdP", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "display_name", saml2Initial.DisplayName),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "name", saml2Initial.Name),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "type", saml2Initial.Type),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "logout_url", saml2Initial.LogoutUrl),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "forward_all_sso_requests", fmt.Sprintf("%t", saml2Initial.ForwardAllSsoRequests)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "identity_federation.use_local_user_store", fmt.Sprintf("%t", saml2Initial.IdentityFederation.UseLocalUserStore)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "identity_federation.allow_local_users_only", fmt.Sprintf("%t", saml2Initial.IdentityFederation.AllowLocalUsersOnly)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "identity_federation.apply_local_idp_auth_and_checks", fmt.Sprintf("%t", saml2Initial.IdentityFederation.ApplyLocalIdPAuthnChecks)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "identity_federation.required_groups.0", saml2Initial.IdentityFederation.RequiredGroups[0]),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "login_hint_config.login_hint_type", saml2Initial.LoginHintConfiguration.LoginHintType),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "login_hint_config.send_method", saml2Initial.LoginHintConfiguration.SendMethod),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.saml_metadata_url", saml2Initial.Saml2Configuration.SamlMetadataUrl),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.assertion_attributes.0.name", saml2Initial.Saml2Configuration.AssertionAttributes[0].Name),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.assertion_attributes.0.value", saml2Initial.Saml2Configuration.AssertionAttributes[0].Value),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.digest_algorithm", saml2Initial.Saml2Configuration.DigestAlgorithm),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.include_scoping", fmt.Sprintf("%t", saml2Initial.Saml2Configuration.IncludeScoping)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.name_id_format", saml2Initial.Saml2Configuration.DefaultNameIdFormat),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.allow_create", saml2Initial.Saml2Configuration.AllowCreate),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.signing_certificates.0.dn", saml2Initial.Saml2Configuration.CertificatesForSigning[0].Dn),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.signing_certificates.0.default", fmt.Sprintf("%t", saml2Initial.Saml2Configuration.CertificatesForSigning[0].IsDefault)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.signing_certificates.0.valid_from", saml2Initial.Saml2Configuration.CertificatesForSigning[0].ValidFrom),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.signing_certificates.0.valid_to", saml2Initial.Saml2Configuration.CertificatesForSigning[0].ValidTo),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.sso_endpoints.0.binding_name", saml2Initial.Saml2Configuration.SsoEndpoints[0].BindingName),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.sso_endpoints.0.location", saml2Initial.Saml2Configuration.SsoEndpoints[0].Location),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.sso_endpoints.0.default", fmt.Sprintf("%t", saml2Initial.Saml2Configuration.SsoEndpoints[0].IsDefault)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.slo_endpoints.0.binding_name", saml2Initial.Saml2Configuration.SloEndpoints[0].BindingName),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.slo_endpoints.0.location", saml2Initial.Saml2Configuration.SloEndpoints[0].Location),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.slo_endpoints.0.response_location", saml2Initial.Saml2Configuration.SloEndpoints[0].ResponseLocation),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.slo_endpoints.0.default", fmt.Sprintf("%t", saml2Initial.Saml2Configuration.SloEndpoints[0].IsDefault)),
+					),
+				},
+				// Step 2: Update every possible field — verify all changes
+				{
+					Config: providerConfig("", user) + ResourceCorporateIdP("testIdP", updated),
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "display_name", updated.DisplayName),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "logout_url", updated.LogoutUrl),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "forward_all_sso_requests", fmt.Sprintf("%t", updated.ForwardAllSsoRequests)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "identity_federation.use_local_user_store", fmt.Sprintf("%t", updated.IdentityFederation.UseLocalUserStore)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "identity_federation.allow_local_users_only", fmt.Sprintf("%t", updated.IdentityFederation.AllowLocalUsersOnly)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "identity_federation.apply_local_idp_auth_and_checks", fmt.Sprintf("%t", updated.IdentityFederation.ApplyLocalIdPAuthnChecks)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "identity_federation.required_groups.#", "2"),
+						resource.TestCheckTypeSetElemAttr("sci_corporate_idp.testIdP", "identity_federation.required_groups.*", "Test Group"),
+						resource.TestCheckTypeSetElemAttr("sci_corporate_idp.testIdP", "identity_federation.required_groups.*", "test_group_update"),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "login_hint_config.login_hint_type", updated.LoginHintConfiguration.LoginHintType),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "login_hint_config.send_method", updated.LoginHintConfiguration.SendMethod),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.saml_metadata_url", updated.Saml2Configuration.SamlMetadataUrl),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.digest_algorithm", updated.Saml2Configuration.DigestAlgorithm),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.include_scoping", fmt.Sprintf("%t", updated.Saml2Configuration.IncludeScoping)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.name_id_format", updated.Saml2Configuration.DefaultNameIdFormat),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.allow_create", updated.Saml2Configuration.AllowCreate),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.assertion_attributes.#", "2"),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.assertion_attributes.1.name", updated.Saml2Configuration.AssertionAttributes[1].Name),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.assertion_attributes.1.value", updated.Saml2Configuration.AssertionAttributes[1].Value),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.sso_endpoints.#", "2"),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.sso_endpoints.1.binding_name", updated.Saml2Configuration.SsoEndpoints[1].BindingName),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.sso_endpoints.1.location", updated.Saml2Configuration.SsoEndpoints[1].Location),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.slo_endpoints.#", "2"),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.slo_endpoints.1.binding_name", updated.Saml2Configuration.SloEndpoints[1].BindingName),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.slo_endpoints.1.location", updated.Saml2Configuration.SloEndpoints[1].Location),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.slo_endpoints.1.response_location", updated.Saml2Configuration.SloEndpoints[1].ResponseLocation),
+					),
+				},
+				// Step 3: Remove optional fields — verify removal
+				{
+					Config: providerConfig("", user) + ResourceCorporateIdPSaml2WithoutOptionals("testIdP", updated),
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "display_name", updated.DisplayName),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.assertion_attributes.#", "0"),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.sso_endpoints.#", "0"),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "saml2_config.slo_endpoints.#", "0"),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "identity_federation.required_groups.#", "0"),
+					),
+				},
+			},
+		})
+	})
+
+	t.Run("update - oidc corporate idp - all fields", func(t *testing.T) {
+
+		oidcIdPInitial := corporateIdP
+		oidcIdPInitial.DisplayName = "OIDC Update - Test Corporate IdP"
+		oidcIdPInitial.Name = "oidc-update-idp"
+		oidcIdPInitial.Type = "openIdConnect"
+		oidcIdPInitial.OidcConfiguration = &oidcCoporateIdP
+
+		// Updated: every OIDC field that can change is changed
+		updated := oidcIdPInitial
+		updated.DisplayName = "OIDC Update - Updated IdP"
+		updated.LogoutUrl = "https://example.com/updated-logout"
+		updated.ForwardAllSsoRequests = true
+		updated.IdentityFederation = &corporateidps.IdentityFederation{
+			UseLocalUserStore:        true,
+			AllowLocalUsersOnly:      true,
+			ApplyLocalIdPAuthnChecks: true,
+			RequiredGroups:           []string{"Test Group", "test_group_update"},
+		}
+		updated.LoginHintConfiguration = &corporateidps.LoginHintConfiguration{
+			LoginHintType: "mail",
+			SendMethod:    "authRequest",
+		}
+		updatedOidc := *oidcIdPInitial.OidcConfiguration
+		updatedOidc.DiscoveryUrl = "https://accounts.sap.com"
+		updatedOidc.ClientId = "updated-client-id"
+		updatedOidc.ClientSecret = "updated-client-secret"
+		updatedOidc.SubjectNameIdentifier = "none"
+		updatedOidc.TokenEndpointAuthMethod = "clientSecretBasic"
+		updatedOidc.Scopes = []string{"openid", "email", "profile"}
+		updatedOidc.PkceEnabled = true
+		updatedOidc.AdditionalConfig = &corporateidps.OIDCAdditionalConfig{
+			EnforceNonce:             true,
+			EnforceIssuerCheck:       true,
+			OmitIDTokenHintForLogout: true,
+		}
+		updated.OidcConfiguration = &updatedOidc
+
+		rec, user := setupVCR(t, "fixtures/resource_corporateIdP_oidc_update")
+		defer stopQuietly(rec)
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+			Steps: []resource.TestStep{
+				// Step 1: Create with initial config — verify all fields
+				{
+					Config: providerConfig("", user) + ResourceCorporateIdP("testIdP", oidcIdPInitial),
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestMatchResourceAttr("sci_corporate_idp.testIdP", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "display_name", oidcIdPInitial.DisplayName),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "name", oidcIdPInitial.Name),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "type", oidcIdPInitial.Type),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "logout_url", oidcIdPInitial.LogoutUrl),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "forward_all_sso_requests", fmt.Sprintf("%t", oidcIdPInitial.ForwardAllSsoRequests)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "identity_federation.use_local_user_store", fmt.Sprintf("%t", oidcIdPInitial.IdentityFederation.UseLocalUserStore)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "identity_federation.allow_local_users_only", fmt.Sprintf("%t", oidcIdPInitial.IdentityFederation.AllowLocalUsersOnly)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "identity_federation.apply_local_idp_auth_and_checks", fmt.Sprintf("%t", oidcIdPInitial.IdentityFederation.ApplyLocalIdPAuthnChecks)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "identity_federation.required_groups.0", oidcIdPInitial.IdentityFederation.RequiredGroups[0]),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "login_hint_config.login_hint_type", oidcIdPInitial.LoginHintConfiguration.LoginHintType),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "login_hint_config.send_method", oidcIdPInitial.LoginHintConfiguration.SendMethod),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.discovery_url", oidcIdPInitial.OidcConfiguration.DiscoveryUrl),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.client_id", oidcIdPInitial.OidcConfiguration.ClientId),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.client_secret", oidcIdPInitial.OidcConfiguration.ClientSecret),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.subject_name_identifier", oidcIdPInitial.OidcConfiguration.SubjectNameIdentifier),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.token_endpoint_auth_method", oidcIdPInitial.OidcConfiguration.TokenEndpointAuthMethod),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.scopes.#", "2"),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.enable_pkce", fmt.Sprintf("%t", oidcCoporateIdP.PkceEnabled)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.additional_config.enforce_nonce", fmt.Sprintf("%t", oidcCoporateIdP.AdditionalConfig.EnforceNonce)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.additional_config.enforce_issuer_check", fmt.Sprintf("%t", oidcCoporateIdP.AdditionalConfig.EnforceIssuerCheck)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.additional_config.disable_logout_id_token_hint", fmt.Sprintf("%t", oidcCoporateIdP.AdditionalConfig.EnforceIssuerCheck)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.issuer", oidcCoporateIdP.DiscoveryUrl),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.jwks_uri", oidcCoporateIdP.DiscoveryUrl+"/oauth2/certs"),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.logout_endpoint", oidcCoporateIdP.DiscoveryUrl+"/oauth2/logout"),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.token_endpoint", oidcCoporateIdP.DiscoveryUrl+"/oauth2/token"),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.user_info_endpoint", oidcCoporateIdP.DiscoveryUrl+"/oauth2/userinfo"),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.authorization_endpoint", oidcCoporateIdP.DiscoveryUrl+"/oauth2/authorize"),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.is_client_secret_configured", fmt.Sprintf("%t", len(oidcIdPInitial.OidcConfiguration.ClientSecret) != 0)),
+					),
+				},
+				// Step 2: Update every possible field — verify all changes
+				{
+					Config: providerConfig("", user) + ResourceCorporateIdP("testIdP", updated),
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "display_name", updated.DisplayName),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "logout_url", updated.LogoutUrl),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "forward_all_sso_requests", fmt.Sprintf("%t", updated.ForwardAllSsoRequests)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "identity_federation.use_local_user_store", fmt.Sprintf("%t", updated.IdentityFederation.UseLocalUserStore)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "identity_federation.allow_local_users_only", fmt.Sprintf("%t", updated.IdentityFederation.AllowLocalUsersOnly)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "identity_federation.apply_local_idp_auth_and_checks", fmt.Sprintf("%t", updated.IdentityFederation.ApplyLocalIdPAuthnChecks)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "identity_federation.required_groups.#", "2"),
+						resource.TestCheckTypeSetElemAttr("sci_corporate_idp.testIdP", "identity_federation.required_groups.*", "Test Group"),
+						resource.TestCheckTypeSetElemAttr("sci_corporate_idp.testIdP", "identity_federation.required_groups.*", "test_group_update"),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "login_hint_config.login_hint_type", updated.LoginHintConfiguration.LoginHintType),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "login_hint_config.send_method", updated.LoginHintConfiguration.SendMethod),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.client_id", updated.OidcConfiguration.ClientId),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.client_secret", updated.OidcConfiguration.ClientSecret),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.subject_name_identifier", updated.OidcConfiguration.SubjectNameIdentifier),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.token_endpoint_auth_method", updated.OidcConfiguration.TokenEndpointAuthMethod),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.scopes.#", "3"),
+						resource.TestCheckTypeSetElemAttr("sci_corporate_idp.testIdP", "oidc_config.scopes.*", "profile"),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.enable_pkce", fmt.Sprintf("%t", updated.OidcConfiguration.PkceEnabled)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.additional_config.enforce_nonce", fmt.Sprintf("%t", updated.OidcConfiguration.AdditionalConfig.EnforceNonce)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.additional_config.enforce_issuer_check", fmt.Sprintf("%t", updated.OidcConfiguration.AdditionalConfig.EnforceIssuerCheck)),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.additional_config.disable_logout_id_token_hint", fmt.Sprintf("%t", updated.OidcConfiguration.AdditionalConfig.OmitIDTokenHintForLogout)),
+					),
+				},
+				// Step 3: Remove optional scopes (back to minimum) — verify removal
+				{
+					Config: providerConfig("", user) + ResourceCorporateIdPOidcWithoutOptionals("testIdP", updated),
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "display_name", updated.DisplayName),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "oidc_config.scopes.#", "1"),
+						resource.TestCheckTypeSetElemAttr("sci_corporate_idp.testIdP", "oidc_config.scopes.*", "openid"),
+						resource.TestCheckResourceAttr("sci_corporate_idp.testIdP", "identity_federation.required_groups.#", "0"),
+					),
+				},
+			},
+		})
+	})
+
 	t.Run("error path - display_name is mandatory", func(t *testing.T) {
 		resource.Test(t, resource.TestCase{
 			IsUnitTest:               true,
@@ -711,130 +975,95 @@ func TestResourceCorporateIdP(t *testing.T) {
 }
 
 func ResourceCorporateIdP(resourceName string, idp corporateidps.IdentityProvider) string {
-
 	var groups strings.Builder
 	for _, group := range idp.IdentityFederation.RequiredGroups {
 		fmt.Fprintf(&groups, `"%s",`, group)
 	}
 
 	resourceIdP := fmt.Sprintf(`
-	resource "sci_corporate_idp" "%s" {
-		display_name = "%s"
-		name = "%s"
-		logout_url = "%s"
-		forward_all_sso_requests = %t
-		identity_federation = {
-			use_local_user_store = %t
-			allow_local_users_only = %t
-			apply_local_idp_auth_and_checks = %t
-			required_groups = [%s]
-		}
-		login_hint_config = {
-			login_hint_type = "%s"
-			send_method = "%s"
-		}
-	`, resourceName, idp.DisplayName, idp.Name, idp.LogoutUrl, idp.ForwardAllSsoRequests, idp.IdentityFederation.UseLocalUserStore, idp.IdentityFederation.AllowLocalUsersOnly, idp.IdentityFederation.ApplyLocalIdPAuthnChecks, groups.String(), idp.LoginHintConfiguration.LoginHintType, idp.LoginHintConfiguration.SendMethod)
+    resource "sci_corporate_idp" "%s" {
+        display_name = "%s"
+        name = "%s"
+        logout_url = "%s"
+        forward_all_sso_requests = %t
+        identity_federation = {
+            use_local_user_store = %t
+            allow_local_users_only = %t
+            apply_local_idp_auth_and_checks = %t
+            required_groups = [%s]
+        }
+        login_hint_config = {
+            login_hint_type = "%s"
+            send_method = "%s"
+        }
+    `, resourceName, idp.DisplayName, idp.Name, idp.LogoutUrl, idp.ForwardAllSsoRequests, idp.IdentityFederation.UseLocalUserStore, idp.IdentityFederation.AllowLocalUsersOnly, idp.IdentityFederation.ApplyLocalIdPAuthnChecks, groups.String(), idp.LoginHintConfiguration.LoginHintType, idp.LoginHintConfiguration.SendMethod)
 
 	switch idp.Type {
 	case "openIdConnect":
 		oidcConfig := idp.OidcConfiguration
-
 		var scopes strings.Builder
 		for _, scope := range oidcConfig.Scopes {
-			fmt.Fprintf(&scopes, `
-					"%s",
-				`, scope)
+			fmt.Fprintf(&scopes, `"%s",`, scope)
 		}
 
-		additionalConfig := fmt.Sprintf(`
-				additional_config = {
-					enforce_nonce = %t
-					enforce_issuer_check = %t
-					disable_logout_id_token_hint = %t
-				}
-			`, oidcConfig.AdditionalConfig.EnforceNonce, oidcConfig.AdditionalConfig.EnforceIssuerCheck, oidcConfig.AdditionalConfig.OmitIDTokenHintForLogout)
-
 		resourceIdP += fmt.Sprintf(`
-				type = "%s"
-				oidc_config = {
-					discovery_url = "%s"
-					client_id = "%s"
-					client_secret = "%s"
-					subject_name_identifier = "%s"
-					token_endpoint_auth_method = "%s"
-					scopes = [%s]
-					enable_pkce = %t
-					%s
-				}
-			`, idp.Type, oidcConfig.DiscoveryUrl, oidcConfig.ClientId, oidcConfig.ClientSecret, oidcConfig.SubjectNameIdentifier, oidcConfig.TokenEndpointAuthMethod, scopes.String(), oidcConfig.PkceEnabled, additionalConfig)
+        type = "%s"
+        oidc_config = {
+            discovery_url = "%s"
+            client_id = "%s"
+            client_secret = "%s"
+            subject_name_identifier = "%s"
+            token_endpoint_auth_method = "%s"
+            scopes = [%s]
+            enable_pkce = %t
+            additional_config = {
+                enforce_nonce = %t
+                enforce_issuer_check = %t
+                disable_logout_id_token_hint = %t
+            }
+        }
+        `, idp.Type, oidcConfig.DiscoveryUrl, oidcConfig.ClientId, oidcConfig.ClientSecret, oidcConfig.SubjectNameIdentifier, oidcConfig.TokenEndpointAuthMethod, scopes.String(), oidcConfig.PkceEnabled, oidcConfig.AdditionalConfig.EnforceNonce, oidcConfig.AdditionalConfig.EnforceIssuerCheck, oidcConfig.AdditionalConfig.OmitIDTokenHintForLogout)
 
 	case "saml2", "sapSSO", "microsoftADFS":
 		saml2Config := idp.Saml2Configuration
 
 		var assertionAttributes strings.Builder
 		for _, attribute := range saml2Config.AssertionAttributes {
-			fmt.Fprintf(&assertionAttributes, `
-					{
-						name = "%s"
-						value = "%s"
-					},
-				`, attribute.Name, attribute.Value)
+			fmt.Fprintf(&assertionAttributes, "{ name = \"%s\", value = \"%s\" },\n", attribute.Name, attribute.Value)
 		}
 
 		var certificates strings.Builder
-		for _, certificate := range saml2Config.CertificatesForSigning {
-			fmt.Fprintf(&certificates, `
-					{
-						base64_certificate = "%s"
-						dn = "%s"
-						default = %t
-						valid_from = "%s"
-						valid_to = "%s"
-					}
-				`, certificate.Base64Certificate, certificate.Dn, certificate.IsDefault, certificate.ValidFrom, certificate.ValidTo)
+		for _, cert := range saml2Config.CertificatesForSigning {
+			fmt.Fprintf(&certificates, "{ base64_certificate = \"%s\", dn = \"%s\", default = %t, valid_from = \"%s\", valid_to = \"%s\" },\n", cert.Base64Certificate, cert.Dn, cert.IsDefault, cert.ValidFrom, cert.ValidTo)
 		}
 
 		var ssoEndpoints strings.Builder
 		for _, endpoint := range saml2Config.SsoEndpoints {
-			fmt.Fprintf(&ssoEndpoints, `
-					{
-						binding_name = "%s"
-						location = "%s"
-						default = %t
-					}
-				`, endpoint.BindingName, endpoint.Location, endpoint.IsDefault)
+			fmt.Fprintf(&ssoEndpoints, "{ binding_name = \"%s\", location = \"%s\", default = %t },\n", endpoint.BindingName, endpoint.Location, endpoint.IsDefault)
 		}
 
 		var sloEndpoints strings.Builder
 		for _, endpoint := range saml2Config.SloEndpoints {
-			fmt.Fprintf(&sloEndpoints, `
-					{
-						binding_name = "%s"
-						location = "%s"
-						response_location = "%s"
-						default = %t
-					}
-				`, endpoint.BindingName, endpoint.Location, endpoint.ResponseLocation, endpoint.IsDefault)
+			fmt.Fprintf(&sloEndpoints, "{ binding_name = \"%s\", location = \"%s\", response_location = \"%s\", default = %t },\n", endpoint.BindingName, endpoint.Location, endpoint.ResponseLocation, endpoint.IsDefault)
 		}
 
 		resourceIdP += fmt.Sprintf(`
-				type = "%s"
-				saml2_config = {
-					saml_metadata_url = "%s"
-					assertion_attributes = [%s]
-					digest_algorithm = "%s"
-					include_scoping = %t
-					name_id_format = "%s"
-					allow_create = "%s"
-					signing_certificates = [%s]
-					sso_endpoints = [%s]
-					slo_endpoints = [%s]
-				}
-			`, idp.Type, saml2Config.SamlMetadataUrl, assertionAttributes.String(), saml2Config.DigestAlgorithm, saml2Config.IncludeScoping, saml2Config.DefaultNameIdFormat, saml2Config.AllowCreate, certificates.String(), ssoEndpoints.String(), sloEndpoints.String())
+        type = "%s"
+        saml2_config = {
+            saml_metadata_url = "%s"
+            assertion_attributes = [%s]
+            digest_algorithm = "%s"
+            include_scoping = %t
+            name_id_format = "%s"
+            allow_create = "%s"
+            signing_certificates = [%s]
+            sso_endpoints = [%s]
+            slo_endpoints = [%s]
+        }
+        `, idp.Type, saml2Config.SamlMetadataUrl, assertionAttributes.String(), saml2Config.DigestAlgorithm, saml2Config.IncludeScoping, saml2Config.DefaultNameIdFormat, saml2Config.AllowCreate, certificates.String(), ssoEndpoints.String(), sloEndpoints.String())
 	}
 
-	resourceIdP += `}`
-
+	resourceIdP += "\n}"
 	return resourceIdP
 }
 
@@ -935,4 +1164,109 @@ func ResourceOidcCorporateIdP(resourceName string, idpDisplayName string, idpNam
 			}
 		}
 	`, resourceName, idpDisplayName, idpType, idpName, oidcConfig)
+}
+
+// ResourceCorporateIdPSaml2WithoutOptionals renders a SAML2 IdP config that omits
+// all list-based optional fields (assertion_attributes, sso_endpoints, slo_endpoints,
+// required_groups) so the update step can verify removal/empty-replace operations.
+func ResourceCorporateIdPSaml2WithoutOptionals(resourceName string, idp corporateidps.IdentityProvider) string {
+	saml2Config := idp.Saml2Configuration
+
+	var certificates strings.Builder
+	for _, certificate := range saml2Config.CertificatesForSigning {
+		fmt.Fprintf(&certificates, `
+				{
+					base64_certificate = "%s"
+					dn = "%s"
+					default = %t
+					valid_from = "%s"
+					valid_to = "%s"
+				}
+			`, certificate.Base64Certificate, certificate.Dn, certificate.IsDefault, certificate.ValidFrom, certificate.ValidTo)
+	}
+
+	return fmt.Sprintf(`
+	resource "sci_corporate_idp" "%s" {
+		display_name = "%s"
+		name = "%s"
+		type = "%s"
+		logout_url = "%s"
+		forward_all_sso_requests = %t
+		identity_federation = {
+			use_local_user_store = %t
+			allow_local_users_only = %t
+			apply_local_idp_auth_and_checks = %t
+			required_groups = null
+		}
+		login_hint_config = {
+			login_hint_type = "%s"
+			send_method = "%s"
+		}
+		saml2_config = {
+			saml_metadata_url = "%s"
+			digest_algorithm = "%s"
+			include_scoping = %t
+			name_id_format = "%s"
+			allow_create = "%s"
+			signing_certificates = [%s]
+			assertion_attributes = null
+			sso_endpoints = null
+            slo_endpoints = null
+		}
+	}
+	`, resourceName, idp.DisplayName, idp.Name, idp.Type, idp.LogoutUrl,
+		idp.ForwardAllSsoRequests,
+		idp.IdentityFederation.UseLocalUserStore, idp.IdentityFederation.AllowLocalUsersOnly, idp.IdentityFederation.ApplyLocalIdPAuthnChecks,
+		idp.LoginHintConfiguration.LoginHintType, idp.LoginHintConfiguration.SendMethod,
+		saml2Config.SamlMetadataUrl, saml2Config.DigestAlgorithm, saml2Config.IncludeScoping,
+		saml2Config.DefaultNameIdFormat, saml2Config.AllowCreate, certificates.String())
+}
+
+// ResourceCorporateIdPOidcWithoutOptionals renders an OIDC IdP config with only the
+// mandatory openid scope so the update step can verify scope removal operations.
+func ResourceCorporateIdPOidcWithoutOptionals(resourceName string, idp corporateidps.IdentityProvider) string {
+	oidcConfig := idp.OidcConfiguration
+
+	additionalConfig := fmt.Sprintf(`
+			additional_config = {
+				enforce_nonce = %t
+				enforce_issuer_check = %t
+				disable_logout_id_token_hint = %t
+			}
+		`, oidcConfig.AdditionalConfig.EnforceNonce, oidcConfig.AdditionalConfig.EnforceIssuerCheck, oidcConfig.AdditionalConfig.OmitIDTokenHintForLogout)
+
+	return fmt.Sprintf(`
+	resource "sci_corporate_idp" "%s" {
+		display_name = "%s"
+		name = "%s"
+		type = "%s"
+		logout_url = "%s"
+		forward_all_sso_requests = %t
+		identity_federation = {
+			use_local_user_store = %t
+			allow_local_users_only = %t
+			apply_local_idp_auth_and_checks = %t
+		}
+		login_hint_config = {
+			login_hint_type = "%s"
+			send_method = "%s"
+		}
+		oidc_config = {
+			discovery_url = "%s"
+			client_id = "%s"
+			client_secret = "%s"
+			subject_name_identifier = "%s"
+			token_endpoint_auth_method = "%s"
+			scopes = ["openid"]
+			enable_pkce = %t
+			%s
+		}
+	}
+	`, resourceName, idp.DisplayName, idp.Name, idp.Type, idp.LogoutUrl,
+		idp.ForwardAllSsoRequests,
+		idp.IdentityFederation.UseLocalUserStore, idp.IdentityFederation.AllowLocalUsersOnly, idp.IdentityFederation.ApplyLocalIdPAuthnChecks,
+		idp.LoginHintConfiguration.LoginHintType, idp.LoginHintConfiguration.SendMethod,
+		oidcConfig.DiscoveryUrl, oidcConfig.ClientId, oidcConfig.ClientSecret,
+		oidcConfig.SubjectNameIdentifier, oidcConfig.TokenEndpointAuthMethod,
+		oidcConfig.PkceEnabled, additionalConfig)
 }
