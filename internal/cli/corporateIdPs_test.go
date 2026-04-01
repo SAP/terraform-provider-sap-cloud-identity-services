@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	corporateidps "github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/corporateIdps"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/generic"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -342,6 +343,118 @@ func TestCorporateIdPs_GetByIdPId(t *testing.T) {
 		assert.Zero(t, res)
 		assert.Error(t, err)
 		assert.Equal(t, "error 400 \nget failed : server error", err.Error())
+	})
+}
+
+func TestCorporateIdPs_Update(t *testing.T) {
+
+	saml2IdP = corporateIdPsBody
+	saml2IdP.Saml2Configuration = &saml2ConfigBody
+
+	patchOps := []generic.PatchRequest{
+		{
+			Op:    "replace",
+			Path:  "displayName",
+			Value: "Updated Corporate IdP",
+		},
+	}
+
+	expectedPatchBody := corporateidps.PatchRequestBody{
+		Operations: patchOps,
+	}
+
+	t.Run("validate the API request - success", func(t *testing.T) {
+
+		saml2IdPResponse, _ := json.Marshal(saml2IdP)
+
+		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			_, err := w.Write(saml2IdPResponse)
+			assert.NoError(t, err, "Failed to write response")
+
+			if r.Method != "GET" {
+				assertCall[corporateidps.PatchRequestBody](t, r, fmt.Sprintf("%s%s", corporateIdPsPath, "valid-idp-id"), "PATCH", expectedPatchBody)
+			}
+		}))
+
+		defer srv.Close()
+
+		_, _, err := client.CorporateIdP.Update(context.TODO(), patchOps, "valid-idp-id")
+
+		assert.NoError(t, err)
+	})
+
+	t.Run("validate the API request - error on PATCH", func(t *testing.T) {
+
+		resErr, _ := json.Marshal(struct {
+			Error ResponseError `json:"error"`
+		}{
+			Error: ResponseError{
+				Code:    400,
+				Message: "update failed",
+				Details: []ErrorDetail{
+					{
+						Message: "server error",
+					},
+				},
+			},
+		})
+
+		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusBadRequest)
+			_, err := w.Write(resErr)
+			assert.NoError(t, err, "Failed to write response")
+
+			assertCall[corporateidps.PatchRequestBody](t, r, fmt.Sprintf("%s%s", corporateIdPsPath, "valid-idp-id"), "PATCH", expectedPatchBody)
+		}))
+
+		defer srv.Close()
+
+		res, _, err := client.CorporateIdP.Update(context.TODO(), patchOps, "valid-idp-id")
+
+		assert.Zero(t, res)
+		assert.Error(t, err)
+		assert.Equal(t, "error 400 \nupdate failed : server error", err.Error())
+	})
+
+	t.Run("validate the API request - error on GET after PATCH", func(t *testing.T) {
+
+		saml2IdPResponse, _ := json.Marshal(saml2IdP)
+
+		resErr, _ := json.Marshal(struct {
+			Error ResponseError `json:"error"`
+		}{
+			Error: ResponseError{
+				Code:    400,
+				Message: "get failed",
+				Details: []ErrorDetail{
+					{
+						Message: "server error",
+					},
+				},
+			},
+		})
+
+		callCount := 0
+		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.Method == "PATCH" {
+				_, err := w.Write(saml2IdPResponse)
+				assert.NoError(t, err, "Failed to write response")
+			} else {
+				callCount++
+				w.WriteHeader(http.StatusBadRequest)
+				_, err := w.Write(resErr)
+				assert.NoError(t, err, "Failed to write response")
+			}
+		}))
+
+		defer srv.Close()
+
+		res, _, err := client.CorporateIdP.Update(context.TODO(), patchOps, "valid-idp-id")
+
+		assert.Zero(t, res)
+		assert.Error(t, err)
+		assert.Equal(t, "error 400 \nget failed : server error", err.Error())
+		assert.Equal(t, 1, callCount)
 	})
 }
 
