@@ -48,7 +48,7 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 				Computed:            true,
 			},
 			"display_name": schema.StringAttribute{
-				MarkdownDescription: "Display name of the application shown on the logon screen. Defaults to `name` when not set.",
+				MarkdownDescription: "Display name of the application shown on the logon screen.",
 				Computed:            true,
 			},
 			"description": schema.StringAttribute{
