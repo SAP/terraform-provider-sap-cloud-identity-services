@@ -29,6 +29,7 @@ data "sci_application" "by_id" {
 
 - `authentication_schema` (Attributes) Configure attributes particular to the schema "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication" (see [below for nested schema](#nestedatt--authentication_schema))
 - `description` (String) Free text description of the Application
+- `display_name` (String) Display name of the application shown on the logon screen.
 - `multi_tenant_app` (Boolean) Only for Internal Use
 - `name` (String) Name of the application
 - `parent_application_id` (String) ID of the parent, from which the application will inherit its configurations

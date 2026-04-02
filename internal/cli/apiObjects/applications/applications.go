@@ -23,7 +23,7 @@ type Theme struct {
 }
 
 type Logo struct {
-	ResourceId  string  `json:"resourceId"`
+	ResourceId  string  `json:"resourceId,omitempty"`
 	Version     int     `json:"version,omitempty"`
 	AspectRatio float32 `json:"aspectRatio,omitempty"`
 }
@@ -36,8 +36,8 @@ type Branding struct {
 	RefreshParent                bool   `json:"refreshParent,omitempty"`
 	TokenUrlEmbedCharacter       string `json:"tokenUrlEmbedCharacter,omitempty"`
 	EmailTemplateSet             string `json:"emailTemplateSet,omitempty"`
-	Theme                        Theme  `json:"theme"`
-	Logo                         Logo   `json:"logo"`
+	Theme                        *Theme `json:"theme,omitempty"`
+	Logo                         *Logo  `json:"logo,omitempty"`
 }
 
 type UserAttribute struct {
@@ -252,11 +252,11 @@ type Application struct {
 	MultiTenantApp       bool                  `json:"multiTenantApp,omitempty"` //only for SAP internal use
 	Schemas              []string              `json:"schemas,omitempty"`
 	AuthenticationSchema *AuthenticationSchema `json:"urn:sap:identity:application:schemas:extension:sci:1.0:Authentication"`
+	Branding             *Branding             `json:"branding,omitempty"`
 	// GlobalAccount        string               `json:"globalAccount,omitempty"`
 	// Meta 					Meta 					`json:"meta,omitempty"`
 	// PrivacyPolicy 			string 					`json:"privacyPolicy,omitempty"`
 	// TermsOfUse 				string 					`json:"termsOfUse,omitempty"`
-	// Branding 				Branding 				`json:"branding,omitempty"`
 }
 
 type ApplicationsResponse struct {

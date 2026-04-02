@@ -101,6 +101,10 @@ type proxyConfigData struct {
 	Acrs types.Set `tfsdk:"acrs"`
 }
 
+type brandingData struct {
+	DisplayName types.String `tfsdk:"display_name" json:"displayName"`
+}
+
 type sapManagedAttributesData struct {
 	ServiceInstanceId types.String `tfsdk:"service_instance_id"`
 	SourceAppId       types.String `tfsdk:"source_app_id"`
@@ -116,6 +120,7 @@ type applicationData struct {
 	Id types.String `tfsdk:"id" json:"id"`
 	//OUTPUT
 	Name                 types.String `tfsdk:"name" json:"name"`
+	DisplayName          types.String `tfsdk:"display_name" json:"displayName"`
 	Description          types.String `tfsdk:"description" json:"description"`
 	ParentApplicationId  types.String `tfsdk:"parent_application_id" json:"parentApplicationId"`
 	MultiTenantApp       types.Bool   `tfsdk:"multi_tenant_app" json:"multiTenantApp"`
@@ -134,6 +139,11 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 		Id:             types.StringValue(a.Id),
 		Name:           types.StringValue(a.Name),
 		MultiTenantApp: types.BoolValue(a.MultiTenantApp),
+	}
+
+	// DisplayName from branding
+	if a.Branding != nil && len(a.Branding.DisplayName) > 0 {
+		application.DisplayName = types.StringValue(a.Branding.DisplayName)
 	}
 
 	// Description and Parent Application Id
@@ -506,6 +516,12 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 		MultiTenantApp: plan.MultiTenantApp.ValueBool(),
 	}
 
+	if !plan.DisplayName.IsNull() && !plan.DisplayName.IsUnknown() {
+		args.Branding = &applications.Branding{
+			DisplayName: plan.DisplayName.ValueString(),
+		}
+	}
+
 	if !plan.ParentApplicationId.IsNull() {
 		args.ParentApplicationId = plan.ParentApplicationId.ValueString()
 	}
@@ -800,6 +816,14 @@ func getApplicationUpdateRequest(ctx context.Context, plan applicationData, stat
 
 	if !plan.Name.Equal(state.Name) {
 		patchReq, diags := utils.GetPatchRequest("Name", "", plan.Name.ValueString(), argsType)
+		if diags.HasError() {
+			return []generic.PatchRequest{}, diags
+		}
+		reqs = append(reqs, patchReq)
+	}
+
+	if !plan.DisplayName.Equal(state.DisplayName) {
+		patchReq, diags := utils.GetPatchRequest("DisplayName", "branding", plan.DisplayName.ValueString(), reflect.TypeFor[brandingData]())
 		if diags.HasError() {
 			return []generic.PatchRequest{}, diags
 		}
