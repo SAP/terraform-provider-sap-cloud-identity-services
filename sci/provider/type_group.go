@@ -3,9 +3,12 @@ package provider
 import (
 	"context"
 	"fmt"
+	"reflect"
 
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/groups"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
 
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/generic"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -23,10 +26,10 @@ type memberData struct {
 
 type groupData struct {
 	Id             types.String `tfsdk:"id"`
-	Schemas        types.Set    `tfsdk:"schemas"`
-	DisplayName    types.String `tfsdk:"display_name"`
-	GroupMembers   types.Set    `tfsdk:"group_members"`
-	GroupExtension types.Object `tfsdk:"group_extension"`
+	Schemas        types.Set    `tfsdk:"schemas" json:"schemas"`
+	DisplayName    types.String `tfsdk:"display_name" json:"displayName"`
+	GroupMembers   types.Set    `tfsdk:"group_members" json:"members"`
+	GroupExtension types.Object `tfsdk:"group_extension" json:"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"`
 }
 
 type groupsData struct {
@@ -171,4 +174,124 @@ func (r *groupResource) GetGroupRequest(ctx context.Context, plan groupData) (*g
 	}
 
 	return args, diagnostics
+}
+
+func getGroupUpdateRequest(ctx context.Context, plan groupData, state groupData) ([]generic.PatchRequest, diag.Diagnostics) {
+
+	var diags diag.Diagnostics
+	reqs := []generic.PatchRequest{}
+
+	argsType := reflect.TypeFor[groupData]()
+
+	if !plan.DisplayName.Equal(state.DisplayName) {
+		var displayName string
+		if !plan.DisplayName.IsNull() && !plan.DisplayName.IsUnknown() {
+			displayName = plan.DisplayName.ValueString()
+		}
+
+		patchReq, diags := utils.GetScimPatchRequest("DisplayName", "", displayName, argsType)
+		if diags.HasError() {
+			return reqs, diags
+		}
+		reqs = append(reqs, patchReq)
+	}
+
+	if !plan.Schemas.Equal(state.Schemas) {
+		var schemas []string
+
+		if !plan.Schemas.IsNull() {
+			diags = plan.Schemas.ElementsAs(ctx, &schemas, false)
+			if diags.HasError() {
+				return reqs, diags
+			}
+		}
+
+		patchReq, diags := utils.GetScimPatchRequest("Schemas", "", schemas, argsType)
+		if diags.HasError() {
+			return reqs, diags
+		}
+		reqs = append(reqs, patchReq)
+	}
+
+	if !plan.GroupMembers.Equal(state.GroupMembers) {
+		members := []memberData{}
+
+		if !plan.GroupMembers.IsNull() {
+			diags = plan.GroupMembers.ElementsAs(ctx, &members, true)
+			if diags.HasError() {
+				return reqs, diags
+			}
+		}
+		scimMembers := []map[string]interface{}{}
+
+		for _, m := range members {
+			if m.Value.IsNull() || m.Value.IsUnknown() {
+				continue
+			}
+
+			scimMembers = append(scimMembers, map[string]interface{}{
+				"value": m.Value.ValueString(),
+				"type":  m.Type.ValueString(),
+			})
+		}
+
+		patchReq, diags := utils.GetScimPatchRequest("GroupMembers", "", scimMembers, argsType)
+		if diags.HasError() {
+			return reqs, diags
+		}
+		reqs = append(reqs, patchReq)
+	}
+
+	if !plan.GroupExtension.Equal(state.GroupExtension) {
+
+		groupExtensionPath, diags := utils.GetAttributeTag("GroupExtension", argsType)
+		if diags.HasError() {
+			return reqs, diags
+		}
+
+		groupExtensionArgsType := reflect.TypeFor[groupExtensionData]()
+
+		var planExt, stateExt groupExtensionData
+
+		diags = plan.GroupExtension.As(ctx, &planExt, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty:    true,
+			UnhandledUnknownAsEmpty: true,
+		})
+		if diags.HasError() {
+			return reqs, diags
+		}
+		diags = state.GroupExtension.As(ctx, &stateExt, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty:    true,
+			UnhandledUnknownAsEmpty: true,
+		})
+		if diags.HasError() {
+			return reqs, diags
+		}
+		if !planExt.Name.Equal(stateExt.Name) {
+			var name string
+			if !planExt.Name.IsNull() && !planExt.Name.IsUnknown() {
+				name = planExt.Name.ValueString()
+			}
+
+			patchReq, diags := utils.GetScimPatchRequest("Name", groupExtensionPath, name, groupExtensionArgsType)
+			if diags.HasError() {
+				return reqs, diags
+			}
+			reqs = append(reqs, patchReq)
+		}
+		if !planExt.Description.Equal(stateExt.Description) {
+			var description string
+			if !planExt.Description.IsNull() && !planExt.Description.IsUnknown() {
+				description = planExt.Description.ValueString()
+			}
+
+			patchReq, diags := utils.GetScimPatchRequest("Description", groupExtensionPath, description, groupExtensionArgsType)
+			if diags.HasError() {
+				return reqs, diags
+			}
+			reqs = append(reqs, patchReq)
+		}
+	}
+
+	return reqs, diags
 }

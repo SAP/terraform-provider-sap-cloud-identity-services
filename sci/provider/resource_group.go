@@ -215,17 +215,14 @@ func (r *groupResource) Update(ctx context.Context, req resource.UpdateRequest, 
 		return
 	}
 
-	args, diags := r.GetGroupRequest(ctx, plan)
-	resp.Diagnostics.Append(diags...)
+	args, diag := getGroupUpdateRequest(ctx, plan, state)
+	resp.Diagnostics.Append(diag.Errors()...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
-
-	args.Id = state.Id.ValueString()
-
-	res, _, err := r.cli.Group.Update(ctx, args)
+	res, _, err := r.cli.Group.Update(ctx, args, state.Id.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("Error updating application", fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError("Error updating Group", fmt.Sprintf("%s", err))
 		return
 	}
 

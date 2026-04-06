@@ -3,7 +3,10 @@ package cli
 import (
 	"context"
 	"fmt"
+
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/groups"
+
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/generic"
 )
 
 type GroupsCli struct {
@@ -51,15 +54,20 @@ func (g *GroupsCli) Create(ctx context.Context, args *groups.Group) (groups.Grou
 	return unMarshalResponse[groups.Group](res, false)
 }
 
-func (g *GroupsCli) Update(ctx context.Context, args *groups.Group) (groups.Group, string, error) {
+func (g *GroupsCli) Update(ctx context.Context, args []generic.PatchRequest, groupId string) (groups.Group, string, error) {
 
-	res, _, err := g.cliClient.Execute(ctx, "PUT", fmt.Sprintf("%s%s", g.getUrl(), args.Id), nil, args, "", ScimRequestHeader, nil)
+	reqBody := groups.PatchRequestBody{
+		Schemas:    []string{ScimUpdateSchemas},
+		Operations: args,
+	}
+
+	_, _, err := g.cliClient.Execute(ctx, "PATCH", fmt.Sprintf("%s%s", g.getUrl(), groupId), nil, reqBody, "", ScimRequestHeader, nil)
 
 	if err != nil {
 		return groups.Group{}, "", err
 	}
 
-	return unMarshalResponse[groups.Group](res, false)
+	return g.GetByGroupId(ctx, groupId)
 }
 
 func (g *GroupsCli) Delete(ctx context.Context, groupId string) error {
