@@ -222,14 +222,13 @@ func getGroupUpdateRequest(ctx context.Context, plan groupData, state groupData)
 				return reqs, diags
 			}
 		}
-		scimMembers := []map[string]interface{}{}
+		scimMembers := []map[string]any{}
 
 		for _, m := range members {
 			if m.Value.IsNull() || m.Value.IsUnknown() {
 				continue
 			}
-
-			scimMembers = append(scimMembers, map[string]interface{}{
+			scimMembers = append(scimMembers, map[string]any{
 				"value": m.Value.ValueString(),
 				"type":  m.Type.ValueString(),
 			})
