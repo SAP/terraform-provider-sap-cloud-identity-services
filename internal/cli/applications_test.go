@@ -55,9 +55,9 @@ var applicationsBody = applications.Application{
 		},
 		RestApiAuthentication: &applications.RestApiAuthentication{
 			AllowPublicClientFlows: false,
-			AllApisAccess: false,
-			AllowLocking: true,
-			Unlock: false,
+			AllApisAccess:          false,
+			AllowLocking:           true,
+			Unlock:                 false,
 		},
 		OidcConfig: &applications.OidcConfig{
 			RedirectUris: []string{
