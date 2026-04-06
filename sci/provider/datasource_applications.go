@@ -197,6 +197,7 @@ var appObjType = types.ObjectType{
 	AttrTypes: map[string]attr.Type{
 		"id":                    types.StringType,
 		"name":                  types.StringType,
+		"display_name":          types.StringType,
 		"description":           types.StringType,
 		"parent_application_id": types.StringType,
 		"multi_tenant_app":      types.BoolType,
@@ -234,6 +235,10 @@ func (d *applicationsDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 						},
 						"name": schema.StringAttribute{
 							MarkdownDescription: "Name of the application",
+							Computed:            true,
+						},
+						"display_name": schema.StringAttribute{
+							MarkdownDescription: "Display name of the application shown on the logon screen.",
 							Computed:            true,
 						},
 						"description": schema.StringAttribute{

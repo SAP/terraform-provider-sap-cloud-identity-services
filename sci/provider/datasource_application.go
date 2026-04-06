@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -44,6 +45,10 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 			},
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Name of the application",
+				Computed:            true,
+			},
+			"display_name": schema.StringAttribute{
+				MarkdownDescription: "Display name of the application shown on the logon screen.",
 				Computed:            true,
 			},
 			"description": schema.StringAttribute{
