@@ -24,6 +24,7 @@ type authenticationSchemaData struct {
 	AdvancedAssertionAttributes   types.List   `tfsdk:"advanced_assertion_attributes" json:"advancedAssertionAttributes"`
 	DefaultAuthenticatingIdpId    types.String `tfsdk:"default_authenticating_idp" json:"defaultAuthenticatingIdpId"`
 	AuthenticationRules           types.List   `tfsdk:"conditional_authentication" json:"conditionalAuthentication"`
+	RestApiAuthentication         types.Object `tfsdk:"rest_api_authentication" json:"restApiAuthentication"`
 	OpenIdConnectConfiguration    types.Object `tfsdk:"oidc_config" json:"openIdConnectConfiguration"`
 	Saml2Configuration            types.Object `tfsdk:"saml2_config" json:"saml2Configuration"`
 	SapManagedAttributes          types.Object `tfsdk:"sap_managed_attributes"`
@@ -109,6 +110,13 @@ type sapManagedAttributesData struct {
 	Type              types.String `tfsdk:"type"`
 	PlanName          types.String `tfsdk:"plan_name"`
 	BtpTenantType     types.String `tfsdk:"btp_tenant_type"`
+}
+
+type restApiAuthenticationData struct {
+	AllowPublicClientFlows types.Bool `tfsdk:"allow_public_client_flows"`
+	AllApisAccess          types.Bool `tfsdk:"all_apis_access"`
+	AllowLocking           types.Bool `tfsdk:"allow_locking"`
+	Unlock                 types.Bool `tfsdk:"unlock"`
 }
 
 type applicationData struct {
@@ -270,6 +278,21 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 		authenticationSchema.AuthenticationRules = authRulesData
 	} else {
 		authenticationSchema.AuthenticationRules = types.ListNull(authenticationRulesObjType)
+	}
+
+	// Authentication Schema Rest API Authentication
+	if a.AuthenticationSchema.RestApiAuthentication != nil {
+		restApiAuth := restApiAuthenticationData{
+			AllowPublicClientFlows: types.BoolValue(a.AuthenticationSchema.RestApiAuthentication.AllowPublicClientFlows),
+			AllApisAccess:          types.BoolValue(a.AuthenticationSchema.RestApiAuthentication.AllApisAccess),
+			AllowLocking:           types.BoolValue(a.AuthenticationSchema.RestApiAuthentication.AllowLocking),
+			Unlock:                 types.BoolValue(a.AuthenticationSchema.RestApiAuthentication.Unlock),
+		}
+
+		authenticationSchema.RestApiAuthentication, diags = types.ObjectValueFrom(ctx, restApiAuthenticationObjType, restApiAuth)
+		diagnostics.Append(diags...)
+	} else {
+		authenticationSchema.RestApiAuthentication = types.ObjectNull(restApiAuthenticationObjType)
 	}
 
 	// Authentication Schema OIDC
@@ -617,6 +640,20 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 			}
 
 			args.AuthenticationSchema.ConditionalAuthentication = authrules
+		}
+
+		//REST API AUTHENTICATION
+		if !authenticationSchema.RestApiAuthentication.IsNull() && !authenticationSchema.RestApiAuthentication.IsUnknown() {
+			var restApiAuth applications.RestApiAuthentication
+			diags = authenticationSchema.RestApiAuthentication.As(ctx, &restApiAuth, basetypes.ObjectAsOptions{
+				UnhandledNullAsEmpty:    true,
+				UnhandledUnknownAsEmpty: true,
+			})
+			diagnostics.Append(diags...)
+			if diagnostics.HasError() {
+				return nil, diagnostics
+			}
+			args.AuthenticationSchema.RestApiAuthentication = &restApiAuth
 		}
 
 		//SAML2 CONFIGURATION
@@ -973,6 +1010,26 @@ func getApplicationUpdateRequest(ctx context.Context, plan applicationData, stat
 			}
 
 			patchReq, diags := utils.GetPatchRequest("AuthenticationRules", authSchemaPath, rules, argsType)
+			if diags.HasError() {
+				return reqs, diags
+			}
+			reqs = append(reqs, patchReq)
+		}
+
+		if !planAuthSchema.RestApiAuthentication.Equal(stateAuthSchema.RestApiAuthentication) {
+			val := applications.RestApiAuthentication{}
+
+			if !planAuthSchema.RestApiAuthentication.IsNull() {
+				diags = planAuthSchema.RestApiAuthentication.As(ctx, &val, basetypes.ObjectAsOptions{
+					UnhandledNullAsEmpty:    true,
+					UnhandledUnknownAsEmpty: true,
+				})
+				if diags.HasError() {
+					return reqs, diags
+				}
+			}
+
+			patchReq, diags := utils.GetPatchRequest("RestApiAuthentication", authSchemaPath, &val, argsType)
 			if diags.HasError() {
 				return reqs, diags
 			}

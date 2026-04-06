@@ -52,6 +52,12 @@ func TestResourceApplication(t *testing.T) {
 					IdentityProviderId: "c93f6b04-7a0f-42c1-b3c5-3b30d0ad8910",
 				},
 			},
+			RestApiAuthentication: &applications.RestApiAuthentication{
+				AllowPublicClientFlows: false,
+				AllApisAccess:          false,
+				AllowLocking:           true,
+				Unlock:                 false,
+			},
 		},
 	}
 
@@ -174,6 +180,12 @@ func TestResourceApplication(t *testing.T) {
 					IdentityProviderId: "7b56ab2b-dfc1-4a56-a8c3-830c2697a4d1",
 				},
 			},
+			RestApiAuthentication: &applications.RestApiAuthentication{
+				AllowPublicClientFlows: true,
+				AllApisAccess:          true,
+				AllowLocking:           false,
+				Unlock:                 true,
+			},
 		},
 	}
 
@@ -210,6 +222,10 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.conditional_authentication.0.user_type", application.AuthenticationSchema.ConditionalAuthentication[0].UserType),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.conditional_authentication.0.user_email_domain", application.AuthenticationSchema.ConditionalAuthentication[0].UserEmailDomain),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.conditional_authentication.0.ip_network_range", application.AuthenticationSchema.ConditionalAuthentication[0].IpNetworkRange),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.rest_api_authentication.allow_public_client_flows", fmt.Sprintf("%t", application.AuthenticationSchema.RestApiAuthentication.AllowPublicClientFlows)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.rest_api_authentication.all_apis_access", fmt.Sprintf("%t", application.AuthenticationSchema.RestApiAuthentication.AllApisAccess)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.rest_api_authentication.allow_locking", fmt.Sprintf("%t", application.AuthenticationSchema.RestApiAuthentication.AllowLocking)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.rest_api_authentication.unlock", fmt.Sprintf("%t", application.AuthenticationSchema.RestApiAuthentication.Unlock)),
 					),
 				},
 				{
@@ -218,7 +234,7 @@ func TestResourceApplication(t *testing.T) {
 					ImportStateVerify: true,
 					// Given that the API always returns the internal ID of the IdP, the state verificiation of the attribute can be ignored in this test since it is configured with the UUID as seen above
 					// The mismatch of IDs is expected behaviour and does not indicate an error, as the parameter can be configured with both the UUID and the internal ID of the IdP
-					ImportStateVerifyIgnore: []string{"authentication_schema.default_authenticating_idp"},
+					ImportStateVerifyIgnore: []string{"authentication_schema.default_authenticating_idp", "authentication_schema.conditional_authentication.0.identity_provider_id"},
 				},
 			},
 		})
@@ -254,6 +270,10 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.conditional_authentication.0.user_type", application.AuthenticationSchema.ConditionalAuthentication[0].UserType),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.conditional_authentication.0.user_email_domain", application.AuthenticationSchema.ConditionalAuthentication[0].UserEmailDomain),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.conditional_authentication.0.ip_network_range", application.AuthenticationSchema.ConditionalAuthentication[0].IpNetworkRange),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.rest_api_authentication.allow_public_client_flows", fmt.Sprintf("%t", application.AuthenticationSchema.RestApiAuthentication.AllowPublicClientFlows)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.rest_api_authentication.all_apis_access", fmt.Sprintf("%t", application.AuthenticationSchema.RestApiAuthentication.AllApisAccess)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.rest_api_authentication.allow_locking", fmt.Sprintf("%t", application.AuthenticationSchema.RestApiAuthentication.AllowLocking)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.rest_api_authentication.unlock", fmt.Sprintf("%t", application.AuthenticationSchema.RestApiAuthentication.Unlock)),
 					),
 				},
 				{
@@ -277,6 +297,10 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.conditional_authentication.0.user_type", updatedApplication.AuthenticationSchema.ConditionalAuthentication[0].UserType),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.conditional_authentication.0.user_email_domain", updatedApplication.AuthenticationSchema.ConditionalAuthentication[0].UserEmailDomain),
 						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.conditional_authentication.0.ip_network_range", updatedApplication.AuthenticationSchema.ConditionalAuthentication[0].IpNetworkRange),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.rest_api_authentication.allow_public_client_flows", fmt.Sprintf("%t", updatedApplication.AuthenticationSchema.RestApiAuthentication.AllowPublicClientFlows)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.rest_api_authentication.all_apis_access", fmt.Sprintf("%t", updatedApplication.AuthenticationSchema.RestApiAuthentication.AllApisAccess)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.rest_api_authentication.allow_locking", fmt.Sprintf("%t", updatedApplication.AuthenticationSchema.RestApiAuthentication.AllowLocking)),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.rest_api_authentication.unlock", fmt.Sprintf("%t", updatedApplication.AuthenticationSchema.RestApiAuthentication.Unlock)),
 					),
 				},
 			},
@@ -373,6 +397,10 @@ func TestResourceApplication(t *testing.T) {
 						resource.TestCheckResourceAttr("sci_application.testImportedApp", "authentication_schema.conditional_authentication.0.user_type", updatedApplication.AuthenticationSchema.ConditionalAuthentication[0].UserType),
 						resource.TestCheckResourceAttr("sci_application.testImportedApp", "authentication_schema.conditional_authentication.0.user_email_domain", updatedApplication.AuthenticationSchema.ConditionalAuthentication[0].UserEmailDomain),
 						resource.TestCheckResourceAttr("sci_application.testImportedApp", "authentication_schema.conditional_authentication.0.ip_network_range", updatedApplication.AuthenticationSchema.ConditionalAuthentication[0].IpNetworkRange),
+						resource.TestCheckResourceAttr("sci_application.testImportedApp", "authentication_schema.rest_api_authentication.allow_public_client_flows", fmt.Sprintf("%t", updatedApplication.AuthenticationSchema.RestApiAuthentication.AllowPublicClientFlows)),
+						resource.TestCheckResourceAttr("sci_application.testImportedApp", "authentication_schema.rest_api_authentication.all_apis_access", fmt.Sprintf("%t", updatedApplication.AuthenticationSchema.RestApiAuthentication.AllApisAccess)),
+						resource.TestCheckResourceAttr("sci_application.testImportedApp", "authentication_schema.rest_api_authentication.allow_locking", fmt.Sprintf("%t", updatedApplication.AuthenticationSchema.RestApiAuthentication.AllowLocking)),
+						resource.TestCheckResourceAttr("sci_application.testImportedApp", "authentication_schema.rest_api_authentication.unlock", fmt.Sprintf("%t", updatedApplication.AuthenticationSchema.RestApiAuthentication.Unlock)),
 					),
 				},
 			},
@@ -1273,6 +1301,16 @@ func ResourceApplication(resourceName string, app applications.Application) stri
 					},`, rule.UserType, rule.UserEmailDomain, rule.IpNetworkRange, rule.IdentityProviderId)
 	}
 
+	var restApiAuth strings.Builder
+	if authSchema.RestApiAuthentication != nil {
+		fmt.Fprintf(&restApiAuth, `{
+				allow_public_client_flows = %t
+				all_apis_access = %t
+				allow_locking = %t
+				unlock = %t
+			}`, authSchema.RestApiAuthentication.AllowPublicClientFlows, authSchema.RestApiAuthentication.AllApisAccess, authSchema.RestApiAuthentication.AllowLocking, authSchema.RestApiAuthentication.Unlock)
+	}
+
 	authSchemaConfig := fmt.Sprintf(`
 		subject_name_identifier = {
 			source = "Identity Directory"
@@ -1283,7 +1321,8 @@ func ResourceApplication(resourceName string, app applications.Application) stri
 		advanced_assertion_attributes = [%s]
 		default_authenticating_idp = "%s"
 		conditional_authentication = [%s]
-	`, authSchema.SubjectNameIdentifier, authSchema.SubjectNameIdentifierFunction, assertionAttributes.String(), advancedAssertionAttributes.String(), authSchema.DefaultAuthenticatingIdpId, authenticationRules.String())
+		rest_api_authentication = %s
+	`, authSchema.SubjectNameIdentifier, authSchema.SubjectNameIdentifierFunction, assertionAttributes.String(), advancedAssertionAttributes.String(), authSchema.DefaultAuthenticatingIdpId, authenticationRules.String(), restApiAuth.String())
 
 	application := fmt.Sprintf(`
 	resource "sci_application" "%s" {

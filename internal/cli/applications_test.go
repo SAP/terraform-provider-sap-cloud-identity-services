@@ -53,6 +53,12 @@ var applicationsBody = applications.Application{
 				UserEmailDomain: "test.com",
 			},
 		},
+		RestApiAuthentication: &applications.RestApiAuthentication{
+			AllowPublicClientFlows: false,
+			AllApisAccess: false,
+			AllowLocking: true,
+			Unlock: false,
+		},
 		OidcConfig: &applications.OidcConfig{
 			RedirectUris: []string{
 				"https:redirectUris.com",
@@ -394,6 +400,16 @@ func TestApplications_Update(t *testing.T) {
 		},
 		{
 			Op:   "replace",
+			Path: "/authenticationSchema/restApiAuthentication",
+			Value: &applications.RestApiAuthentication{
+				AllowPublicClientFlows: true,
+				AllApisAccess:          true,
+				AllowLocking:           false,
+				Unlock:                 true,
+			},
+		},
+		{
+			Op:   "replace",
 			Path: "/authenticationSchema/oidcConfig",
 			Value: applications.OidcConfig{
 				RedirectUris: []string{
@@ -435,7 +451,7 @@ func TestApplications_Update(t *testing.T) {
 				err := json.NewDecoder(r.Body).Decode(&actualBody)
 
 				assert.NoError(t, err)
-				assert.Equal(t, 10, len(actualBody.Operations))
+				assert.Equal(t, 11, len(actualBody.Operations))
 			}
 			_, err := w.Write(applicationsResponse)
 			assert.NoError(t, err, "Failed to write response")
