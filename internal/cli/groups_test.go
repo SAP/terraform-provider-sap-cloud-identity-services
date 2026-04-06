@@ -4,9 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/groups"
 	"net/http"
 	"testing"
+
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/generic"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/groups"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -174,19 +176,76 @@ func TestGroups_Update(t *testing.T) {
 
 	groupsBody.Id = "valid-group-id"
 	groupsResponse, _ := json.Marshal(groupsBody)
+	patchRequests := []generic.PatchRequest{
+		{
+			Op:    "replace",
+			Path:  "displayName",
+			Value: "updated-group-name",
+		},
+		{
+			Op:   "replace",
+			Path: "schemas",
+			Value: []string{
+				"urn:ietf:params:scim:schemas:core:2.0:Group",
+				"urn:ietf:params:scim:schemas:extension:custom:2.0:Group",
+			},
+		},
+		{
+			Op:   "replace",
+			Path: "members",
+			Value: []map[string]string{
+				{
+					"value": "user-id-1",
+					"type":  "USER",
+				},
+				{
+					"value": "user-id-2",
+					"type":  "USER",
+				},
+			},
+		},
+		{
+			Op:   "add",
+			Path: "members",
+			Value: map[string]string{
+				"value": "new-user-id",
+				"type":  "USER",
+			},
+		},
+		{
+			Op:   "remove",
+			Path: `members[value eq "old-user-id"]`,
+		},
+		{
+			Op:    "replace",
+			Path:  "urn:ietf:params:scim:schemas:extension:custom:2.0:Group:name",
+			Value: "updated-extension-name",
+		},
+		{
+			Op:    "replace",
+			Path:  "urn:ietf:params:scim:schemas:extension:custom:2.0:Group:description",
+			Value: "updated-description",
+		},
+	}
 
 	t.Run("validate the API request", func(t *testing.T) {
 
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.Method == "PATCH" {
+
+				var actualBody groups.PatchRequestBody
+				err := json.NewDecoder(r.Body).Decode(&actualBody)
+
+				assert.NoError(t, err)
+				assert.Equal(t, 7, len(actualBody.Operations))
+			}
 			_, err := w.Write(groupsResponse)
 			assert.NoError(t, err, "Failed to write response")
-
-			assertCall[groups.Group](t, r, fmt.Sprintf("%s%s", groupsPath, "valid-group-id"), "PUT", groupsBody)
 		}))
 
 		defer srv.Close()
 
-		_, _, err := client.Group.Update(context.TODO(), &groupsBody)
+		_, _, err := client.Group.Update(context.TODO(), patchRequests, "valid-group-id")
 
 		assert.NoError(t, err)
 	})
@@ -202,13 +261,11 @@ func TestGroups_Update(t *testing.T) {
 			w.WriteHeader(http.StatusBadRequest)
 			_, err := w.Write(resErr)
 			assert.NoError(t, err, "Failed to write response")
-
-			assertCall[groups.Group](t, r, fmt.Sprintf("%s%s", groupsPath, "valid-group-id"), "PUT", groupsBody)
 		}))
 
 		defer srv.Close()
 
-		res, _, err := client.Group.Update(context.TODO(), &groupsBody)
+		res, _, err := client.Group.Update(context.TODO(), patchRequests, "valid-group-id")
 
 		assert.Zero(t, res)
 		assert.Error(t, err)
