@@ -349,7 +349,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 								Optional:            true,
 								Computed:            true,
 								PlanModifiers: []planmodifier.Bool{
-									boolplanmodifier.UseStateForUnknown(),
+									boolplanmodifier.UseNonNullStateForUnknown(),
 								},
 							},
 							"all_apis_access": schema.BoolAttribute{
@@ -357,7 +357,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 								Optional:            true,
 								Computed:            true,
 								PlanModifiers: []planmodifier.Bool{
-									boolplanmodifier.UseStateForUnknown(),
+									boolplanmodifier.UseNonNullStateForUnknown(),
 								},
 							},
 							"allow_locking": schema.BoolAttribute{
@@ -365,7 +365,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 								Optional:            true,
 								Computed:            true,
 								PlanModifiers: []planmodifier.Bool{
-									boolplanmodifier.UseStateForUnknown(),
+									boolplanmodifier.UseNonNullStateForUnknown(),
 								},
 							},
 							"unlock": schema.BoolAttribute{
@@ -373,7 +373,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 								Optional:            true,
 								Computed:            true,
 								PlanModifiers: []planmodifier.Bool{
-									boolplanmodifier.UseStateForUnknown(),
+									boolplanmodifier.UseNonNullStateForUnknown(),
 								},
 							},
 						},

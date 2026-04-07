@@ -206,11 +206,11 @@ type SapManagedAttributes struct {
 }
 
 type RestApiAuthentication struct {
-	AllowPublicClientFlows bool `json:"allowPublicClientFlows,omitempty" tfsdk:"allow_public_client_flows"`
+	AllowPublicClientFlows bool `json:"allowPublicClientFlows" tfsdk:"allow_public_client_flows"`
 	// PublicClientApis			[]string	`json:"publicClientApis,omitempty" tfsdk:"public_client_apis"`
-	AllApisAccess bool `json:"allApisAccess,omitempty" tfsdk:"all_apis_access"`
-	AllowLocking  bool `json:"allowLocking,omitempty" tfsdk:"allow_locking"`
-	Unlock        bool `json:"unlock,omitempty" tfsdk:"unlock"`
+	AllApisAccess bool `json:"allApisAccess" tfsdk:"all_apis_access"`
+	AllowLocking  bool `json:"allowLocking" tfsdk:"allow_locking"`
+	Unlock        bool `json:"unlock" tfsdk:"unlock"`
 }
 
 type AuthenticationSchema struct {
