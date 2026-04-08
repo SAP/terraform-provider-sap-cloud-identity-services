@@ -6,14 +6,14 @@ package applications
 import corporateidps "github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/corporateIdps"
 
 type Meta struct {
-	Created          string `json:"created,omitempty"`
-	CreatedBy        string `json:"createdBy,omitempty"`
-	LastModified     string `json:"lastModified,omitempty"`
-	ModifiedBy       string `json:"modifiedBy,omitempty"`
-	ModifiedOnBehalf string `json:"modifiedOnBehalf,omitempty"`
-	Location         string `json:"location,omitempty"`
-	Type             string `json:"type,omitempty"`
-	Version          string `json:"version,omitempty"`
+	Type string `json:"type,omitempty"`
+	// Created          string `json:"created,omitempty"`
+	// CreatedBy        string `json:"createdBy,omitempty"`
+	// LastModified     string `json:"lastModified,omitempty"`
+	// ModifiedBy       string `json:"modifiedBy,omitempty"`
+	// ModifiedOnBehalf string `json:"modifiedOnBehalf,omitempty"`
+	// Location         string `json:"location,omitempty"`
+	// Version          string `json:"version,omitempty"`
 }
 
 type Theme struct {
@@ -261,8 +261,8 @@ type Application struct {
 	Schemas              []string              `json:"schemas,omitempty"`
 	AuthenticationSchema *AuthenticationSchema `json:"urn:sap:identity:application:schemas:extension:sci:1.0:Authentication"`
 	Branding             *Branding             `json:"branding,omitempty"`
+	Meta                 *Meta                 `json:"meta,omitempty"`
 	// GlobalAccount        string               `json:"globalAccount,omitempty"`
-	// Meta 					Meta 					`json:"meta,omitempty"`
 	// PrivacyPolicy 			string 					`json:"privacyPolicy,omitempty"`
 	// TermsOfUse 				string 					`json:"termsOfUse,omitempty"`
 }

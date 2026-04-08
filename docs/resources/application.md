@@ -158,6 +158,7 @@ resource "sci_application" "oidc_application" {
 ### Read-Only
 
 - `id` (String) Id of the application
+- `meta` (Attributes) Contains additional information about the application. (see [below for nested schema](#nestedatt--meta))
 
 <a id="nestedatt--authentication_schema"></a>
 ### Nested Schema for `authentication_schema`
@@ -358,6 +359,18 @@ Read-Only:
 - `source_app_id` (String) The source application ID of the SAP application.
 - `source_tenant_id` (String) The source tenant ID of the SAP application.
 - `type` (String) The type of the SAP application.
+
+
+
+<a id="nestedatt--meta"></a>
+### Nested Schema for `meta`
+
+Read-Only:
+
+- `type` (String) The type of the application. The types supported include:
+							1. "charged" : Applications created by the SAP customers for third-party (non-SAP) solutions
+							2. "bundled" : Applications managed and configured by SAP and can't be deleted
+							3. "system" : Applications predefined with the creation of the tenant. These applications are: Administration Console and User Profile
 
 ## Import
 

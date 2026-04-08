@@ -32,6 +32,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
+const (
+	chargedApplicationType = "charged"
+)
+
 var (
 	sourceValues                        = []string{"Identity Directory", "Corporate Identity Provider", "Expression"}
 	ssoValues                           = []string{"openIdConnect", "saml2", "saml2oidc"}
@@ -851,6 +855,26 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 					},
 				},
 			},
+			"meta": schema.SingleNestedAttribute{
+				MarkdownDescription: "Contains additional information about the application.",
+				Attributes: map[string]schema.Attribute{
+					"type": schema.StringAttribute{
+						MarkdownDescription: `The type of the application. The types supported include:
+							1. "charged" : Applications created by the SAP customers for third-party (non-SAP) solutions
+							2. "bundled" : Applications managed and configured by SAP and can't be deleted
+							3. "system" : Applications predefined with the creation of the tenant. These applications are: Administration Console and User Profile
+						`,
+						Computed: true,
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.UseNonNullStateForUnknown(),
+						},
+					},
+				},
+				Computed: true,
+				PlanModifiers: []planmodifier.Object{
+					objectplanmodifier.UseStateForUnknown(),
+				},
+			},
 		},
 	}
 }
@@ -982,21 +1006,17 @@ func (r *applicationResource) Delete(ctx context.Context, req resource.DeleteReq
 		return
 	}
 
-	if !config.AuthenticationSchema.IsNull() && !config.AuthenticationSchema.IsUnknown() {
-		var stateAuthSchemaData authenticationSchemaData
-		diags = config.AuthenticationSchema.As(ctx, &stateAuthSchemaData, basetypes.ObjectAsOptions{
+	if !config.Meta.IsNull() && !config.Meta.IsUnknown() {
+		var meta metaData
+		diags := config.Meta.As(ctx, &meta, basetypes.ObjectAsOptions{
 			UnhandledNullAsEmpty:    true,
 			UnhandledUnknownAsEmpty: true,
 		})
 		resp.Diagnostics.Append(diags...)
 
-		if resp.Diagnostics.HasError() {
-			return
-		}
-
-		if !stateAuthSchemaData.SapManagedAttributes.IsNull() {
-			resp.Diagnostics.AddWarning("Deletion of SAP-managed applications is not allowed",
-				fmt.Sprintf("The application with id %s is managed by SAP and cannot be deleted. It will be removed from the state.", config.Id.ValueString()))
+		if meta.Type.ValueString() != chargedApplicationType {
+			resp.Diagnostics.AddWarning("Deletion of Bundled or System applications is not allowed",
+				fmt.Sprintf("The application %s with id %s is managed by SAP and cannot be deleted. It will be removed from the state.", config.Name.ValueString(), config.Id.ValueString()))
 			return
 		}
 	}

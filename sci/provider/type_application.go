@@ -123,6 +123,10 @@ type restApiAuthenticationData struct {
 	Unlock                 types.Bool `tfsdk:"unlock"`
 }
 
+type metaData struct {
+	Type types.String `tfsdk:"type"`
+}
+
 type applicationData struct {
 	//INPUT
 	Id types.String `tfsdk:"id" json:"id"`
@@ -133,6 +137,7 @@ type applicationData struct {
 	ParentApplicationId  types.String `tfsdk:"parent_application_id" json:"parentApplicationId"`
 	MultiTenantApp       types.Bool   `tfsdk:"multi_tenant_app" json:"multiTenantApp"`
 	AuthenticationSchema types.Object `tfsdk:"authentication_schema" json:"urn:sap:identity:application:schemas:extension:sci:1.0:Authentication"`
+	Meta                 types.Object `tfsdk:"meta"`
 }
 
 func applicationValueFrom(ctx context.Context, a applications.Application) (applicationData, diag.Diagnostics) {
@@ -519,6 +524,18 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 
 	application.AuthenticationSchema, diags = types.ObjectValueFrom(ctx, authenticationSchemaObjType, authenticationSchema)
 	diagnostics.Append(diags...)
+
+	meta := metaData{
+		Type: types.StringValue(a.Meta.Type),
+	}
+
+	metaData, diags := types.ObjectValueFrom(ctx, metaDataObjType, meta)
+	diagnostics.Append(diags...)
+	if diagnostics.HasError() {
+		return application, diagnostics
+	}
+
+	application.Meta = metaData
 
 	return application, diagnostics
 }

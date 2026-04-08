@@ -30,6 +30,7 @@ data "sci_application" "by_id" {
 - `authentication_schema` (Attributes) Configure attributes particular to the schema "urn:sap:identity:application:schemas:extension:sci:1.0:Authentication" (see [below for nested schema](#nestedatt--authentication_schema))
 - `description` (String) Free text description of the Application
 - `display_name` (String) Display name of the application shown on the logon screen.
+- `meta` (Attributes) Contains additional information about the application. (see [below for nested schema](#nestedatt--meta))
 - `multi_tenant_app` (Boolean) Only for Internal Use
 - `name` (String) Name of the application
 - `parent_application_id` (String) ID of the parent, from which the application will inherit its configurations
@@ -218,3 +219,15 @@ Read-Only:
 
 - `source` (String) Acceptable values are : `Identity Directory`, `Corporate Identity Provider`, `Expression`
 - `value` (String) If the source is Identity Directory, the only acceptable values are " none, uid, mail, loginName, displayName, personnelNumber, userUuid"
+
+
+
+<a id="nestedatt--meta"></a>
+### Nested Schema for `meta`
+
+Read-Only:
+
+- `type` (String) The type of the application. The types supported include:
+									1. "charged" : Applications created by the SAP customers for third-party (non-SAP) solutions
+									2. "bundled" : Applications managed and configured by SAP and can't be deleted
+									3. "system" : Applications predefined with the creation of the tenant. These applications are: Administration Console and User Profile

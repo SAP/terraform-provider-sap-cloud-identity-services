@@ -193,6 +193,10 @@ var restApiAuthenticationObjType = map[string]attr.Type{
 	"unlock":                    types.BoolType,
 }
 
+var metaDataObjType = map[string]attr.Type{
+	"type": types.StringType,
+}
+
 var appObjType = types.ObjectType{
 	AttrTypes: map[string]attr.Type{
 		"id":                    types.StringType,
@@ -203,6 +207,9 @@ var appObjType = types.ObjectType{
 		"multi_tenant_app":      types.BoolType,
 		"authentication_schema": types.ObjectType{
 			AttrTypes: authenticationSchemaObjType,
+		},
+		"meta": types.ObjectType{
+			AttrTypes: metaDataObjType,
 		},
 	},
 }
@@ -629,6 +636,20 @@ func (d *applicationsDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 									},
 								},
 							},
+						},
+						"meta": schema.SingleNestedAttribute{
+							MarkdownDescription: "Contains additional information about the application.",
+							Attributes: map[string]schema.Attribute{
+								"type": schema.StringAttribute{
+									MarkdownDescription: `The type of the application. The types supported include:
+												1. "charged" : Applications created by the SAP customers for third-party (non-SAP) solutions
+												2. "bundled" : Applications managed and configured by SAP and can't be deleted
+												3. "system" : Applications predefined with the creation of the tenant. These applications are: Administration Console and User Profile
+											`,
+									Computed: true,
+								},
+							},
+							Computed: true,
 						},
 					},
 				},
