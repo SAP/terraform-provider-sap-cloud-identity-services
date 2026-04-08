@@ -14,7 +14,6 @@ Creates an application in the SAP Cloud Identity Services.
 ```terraform
 # Create a basic application in SAP Cloud Identity Services
 resource "sci_application" "basic_application" {
-  id                    = "app_1234567890" # Must be a valid and unique UUID
   name                  = "My Basic Application"
   description           = "A basic application in SAP Cloud Identity Services"
   parent_application_id = "app_0987654321" # Must be a valid UUID
@@ -39,16 +38,104 @@ resource "sci_application" "basic_application" {
         attribute_value = "test"
       }
     ]
-    default_authenticating_idp = "idp_1234567890" # Must be a valid UUID
+    default_authenticating_idp = "idp_1234567890" # Must be a valid UUID or the internal ID of the IdP
     conditional_authentication = [
       {
-        identity_provider_id = "idp_0987654321" # Must be a valid UUID
+        identity_provider_id = "idp_0987654321" # Must be a valid UUID or the internal ID of the IdP
         user_email_domain    = "example.com"
         user_type            = "employee"         # Refer to the documentation for valid values
         user_group           = "group_1234567890" # Must be a valid UUID
         ip_network_range     = "10.0.0.8/16"
       }
     ]
+    rest_api_authentication = {
+      allow_public_client_flows = true
+      all_apis_access           = false
+      allow_locking             = true
+      unlock                    = false
+    }
+  }
+}
+
+# Create a SAML2 application in SAP Cloud Identity Services
+resource "sci_application" "saml2_application" {
+  name        = "My Basic SAML2 Application"
+  description = "A basic saml2 application in SAP Cloud Identity Services"
+  authentication_schema = {
+    sso_type = "saml2"
+    saml2_config = {
+      saml_metadata_url = "https://example.com/saml/metadata"
+      acs_endpoints = [
+        {
+          binding  = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" # Refer to the documentation for valid values
+          location = "https://example.com/saml/acs"
+          index    = 0
+          default  = true
+        }
+      ]
+      slo_endpoints = [
+        {
+          binding_name      = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" # Refer to the documentation for valid values
+          location          = "https://example.com/saml/slo"
+          response_location = "https://example.com/saml/slo/response"
+        }
+      ]
+      signing_certificates = [
+        {
+          base64_certificate = "-----BEGIN CERTIFICATE-----<vali-base64-encoded-certificate>-----END CERTIFICATE-----"
+          default            = true
+        }
+      ]
+      encryption_certificate = {
+        base64_certificate = "-----BEGIN CERTIFICATE-----<vali-base64-encoded-certificate>-----END CERTIFICATE-----"
+      }
+      response_elements_to_encrypt = ["attributes"]                                           # Refer to the documentation for valid values
+      default_name_id_format       = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress" # Refer to the documentation for valid values 
+      sign_slo_messages            = true
+      require_signed_slo_messages  = true
+      sign_assertions              = false
+      sign_auth_responses          = false
+      digest_algorithm             = "sha256" # Refer to the documentation for valid values
+    }
+  }
+}
+
+# Create a OIDC application in SAP Cloud Identity Services
+resource "sci_application" "oidc_application" {
+  name        = "My Basic OIDC Application"
+  description = "A basic oidc application in SAP Cloud Identity Services"
+  authentication_schema = {
+    sso_type = "openIdConnect"
+    oidc_config = {
+      redirect_uris = [
+        "https://example.com/oidc/callback"
+      ]
+      post_logout_redirect_uris = [
+        "https://example.com/oidc/logout/callback"
+      ]
+      front_channel_logout_uris = [
+        "https://example.com/oidc/frontchannel-logout"
+      ]
+      back_channel_logout_uris = [
+        "https://example.com/oidc/backchannel-logout"
+      ]
+      token_policy = {
+        jwt_validity                    = 3600
+        refresh_validity                = 7200
+        refresh_parallel                = 5
+        max_exchange_period             = "unlimited" # Refer to the documentation for valid values
+        refresh_token_rotation_scenario = "online"    # Refer to the documentation for valid values
+        access_token_format             = "default"   # Refer to the documentation for valid values
+      }
+      restricted_grant_types = [
+        "authorizationCode" # Refer to the documentation for valid values
+      ]
+      proxy_config = {
+        acrs = [
+          "example_value"
+        ]
+      }
+    }
   }
 }
 ```
@@ -82,6 +169,7 @@ Optional:
 - `conditional_authentication` (Attributes List) Define rules for authenticating identity provider according to email domain, user type, user group, and IP range. Each rule is evaluated by priority until the criteria of a rule are fulfilled. (see [below for nested schema](#nestedatt--authentication_schema--conditional_authentication))
 - `default_authenticating_idp` (String) A default identity provider can be used for users with any user domain, group and type. This identity provider is used when none of the defined authentication rules meets the criteria.
 - `oidc_config` (Attributes) OpenID Connect (OIDC) configuration options for this application. (see [below for nested schema](#nestedatt--authentication_schema--oidc_config))
+- `rest_api_authentication` (Attributes) Configure client authentication information for the application. (see [below for nested schema](#nestedatt--authentication_schema--rest_api_authentication))
 - `saml2_config` (Attributes) Configure a SAML 2.0 service provider by providing the necessary metadata. (see [below for nested schema](#nestedatt--authentication_schema--saml2_config))
 - `sso_type` (String) The preferred protocol for the application. Acceptable values are : `openIdConnect`, `saml2`, `saml2oidc`
 - `subject_name_identifier` (Attributes) The attribute by which the application uses to identify the users. Used by the application to uniquely identify the user during logon.
@@ -166,6 +254,17 @@ Optional:
 - `refresh_token_rotation_scenario` (String) Defines the scenario for refresh token rotation. Acceptable values are : `off`, `online`, `mobile`
 - `refresh_validity` (Number) Refresh token validity in seconds. Can range from 0 to 15552000 seconds (180 days).
 
+
+
+<a id="nestedatt--authentication_schema--rest_api_authentication"></a>
+### Nested Schema for `authentication_schema.rest_api_authentication`
+
+Optional:
+
+- `all_apis_access` (Boolean) Configure if public clients have unrestricted access to all APIs of the applications.
+- `allow_locking` (Boolean) Enable or Disable Client ID locking. This option is enabled by default. Use this feature in cases when the client ID has a limited scope and the client ID secret(s) are automatically generated.
+- `allow_public_client_flows` (Boolean) Allow public client flows for environments where it is difficult to protect the client credential, such as mobile and desktop applications, and clients-side parts of web applications.
+- `unlock` (Boolean) Lock or unlock the Client Id.
 
 
 <a id="nestedatt--authentication_schema--saml2_config"></a>

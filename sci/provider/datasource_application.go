@@ -171,6 +171,28 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 							},
 						},
 					},
+					"rest_api_authentication": schema.SingleNestedAttribute{
+						MarkdownDescription: "Configure client authentication information for the application.",
+						Computed:            true,
+						Attributes: map[string]schema.Attribute{
+							"allow_public_client_flows": schema.BoolAttribute{
+								MarkdownDescription: "Allow public client flows for environments where it is difficult to protect the client credential, such as mobile and desktop applications, and clients-side parts of web applications.",
+								Computed:            true,
+							},
+							"all_apis_access": schema.BoolAttribute{
+								MarkdownDescription: "Configure if public clients have unrestricted access to all APIs of the applications.",
+								Computed:            true,
+							},
+							"allow_locking": schema.BoolAttribute{
+								MarkdownDescription: "Enable or Disable Client ID locking. This option is enabled by default. Use this feature in cases when the client ID has a limited scope and the client ID secret(s) are automatically generated.",
+								Computed:            true,
+							},
+							"unlock": schema.BoolAttribute{
+								MarkdownDescription: "Lock or unlock the Client Id.",
+								Computed:            true,
+							},
+						},
+					},
 					"oidc_config": schema.SingleNestedAttribute{
 						MarkdownDescription: "OpenID Connect (OIDC) configuration options for this application.",
 						Computed:            true,

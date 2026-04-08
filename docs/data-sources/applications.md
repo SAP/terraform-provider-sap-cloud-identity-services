@@ -47,6 +47,7 @@ Read-Only:
 - `conditional_authentication` (Attributes List) Define rules for authenticating identity provider according to email domain, user type, user group, and IP range. Each rule is evaluated by priority until the criteria of a rule are fulfilled. (see [below for nested schema](#nestedatt--values--authentication_schema--conditional_authentication))
 - `default_authenticating_idp` (String) A default identity provider can be used for users with any user domain, group and type. This identity provider is used when none of the defined authentication rules meets the criteria.
 - `oidc_config` (Attributes) OpenID Connect (OIDC) configuration options for this application. (see [below for nested schema](#nestedatt--values--authentication_schema--oidc_config))
+- `rest_api_authentication` (Attributes) Configure client authentication information for the application. (see [below for nested schema](#nestedatt--values--authentication_schema--rest_api_authentication))
 - `saml2_config` (Attributes) Configure a SAML 2.0 service provider by providing the necessary metadata. (see [below for nested schema](#nestedatt--values--authentication_schema--saml2_config))
 - `sap_managed_attributes` (Attributes) List of SAP managed attributes that are sent to the application. (see [below for nested schema](#nestedatt--values--authentication_schema--sap_managed_attributes))
 - `sso_type` (String) The preferred protocol for the application
@@ -122,6 +123,17 @@ Read-Only:
 - `refresh_token_rotation_scenario` (String) Defines the scenario for refresh token rotation.Acceptable values are : `off`, `online`, `mobile`
 - `refresh_validity` (Number) Refresh token validity in seconds. Can range from 0 to 15552000 seconds (180 days).
 
+
+
+<a id="nestedatt--values--authentication_schema--rest_api_authentication"></a>
+### Nested Schema for `values.authentication_schema.rest_api_authentication`
+
+Read-Only:
+
+- `all_apis_access` (Boolean) Configure if public clients have unrestricted access to all APIs of the applications.
+- `allow_locking` (Boolean) Enable or Disable Client ID locking. This option is enabled by default. Use this feature in cases when the client ID has a limited scope and the client ID secret(s) are automatically generated.
+- `allow_public_client_flows` (Boolean) Allow public client flows for environments where it is difficult to protect the client credential, such as mobile and desktop applications, and clients-side parts of web applications.
+- `unlock` (Boolean) Lock or unlock the Client Id.
 
 
 <a id="nestedatt--values--authentication_schema--saml2_config"></a>
