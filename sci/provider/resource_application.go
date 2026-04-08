@@ -747,7 +747,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 						MarkdownDescription: "List of SAP managed attributes that are sent to the application.",
 						Computed:            true,
 						PlanModifiers: []planmodifier.Object{
-							objectplanmodifier.UseNonNullStateForUnknown(),
+							objectplanmodifier.UseStateForUnknown(),
 						},
 						Attributes: map[string]schema.Attribute{
 							"service_instance_id": schema.StringAttribute{
@@ -940,8 +940,26 @@ func (r *applicationResource) Delete(ctx context.Context, req resource.DeleteReq
 		return
 	}
 
-	err := r.cli.Application.Delete(ctx, config.Id.ValueString())
+	if !config.AuthenticationSchema.IsNull() && !config.AuthenticationSchema.IsUnknown() {
+		var stateAuthSchemaData authenticationSchemaData
+		diags = config.AuthenticationSchema.As(ctx, &stateAuthSchemaData, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty:    true,
+			UnhandledUnknownAsEmpty: true,
+		})
+		resp.Diagnostics.Append(diags...)
 
+		if resp.Diagnostics.HasError() {
+			return
+		}
+
+		if !stateAuthSchemaData.SapManagedAttributes.IsNull() {
+			resp.Diagnostics.AddWarning("Deletion of SAP-managed applications is not allowed",
+				fmt.Sprintf("The application with id %s is managed by SAP and cannot be deleted. It will be removed from the state.", config.Id.ValueString()))
+			return
+		}
+	}
+
+	err := r.cli.Application.Delete(ctx, config.Id.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("Error deleting application", fmt.Sprintf("%s", err))
 		return

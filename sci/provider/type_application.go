@@ -454,36 +454,44 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 	}
 
 	if a.AuthenticationSchema.SapManagedAttributes != nil {
-		sapManagedAttributes := sapManagedAttributesData{
-			ServiceInstanceId: types.StringValue(a.AuthenticationSchema.SapManagedAttributes.ServiceInstanceId),
-			SourceAppId:       types.StringValue(a.AuthenticationSchema.SapManagedAttributes.SourceAppId),
-			SourceTenantId:    types.StringValue(a.AuthenticationSchema.SapManagedAttributes.SourceTenantId),
-			AppTenantId:       types.StringValue(a.AuthenticationSchema.SapManagedAttributes.AppTenantId),
-			Type:              types.StringValue(a.AuthenticationSchema.SapManagedAttributes.Type),
-			PlanName:          types.StringValue(a.AuthenticationSchema.SapManagedAttributes.PlanName),
-			BtpTenantType:     types.StringValue(a.AuthenticationSchema.SapManagedAttributes.BtpTenantType),
+
+		sapManagedAttributes := sapManagedAttributesData{}
+
+		if len(a.AuthenticationSchema.SapManagedAttributes.ServiceInstanceId) > 0 {
+			sapManagedAttributes.ServiceInstanceId = types.StringValue(a.AuthenticationSchema.SapManagedAttributes.ServiceInstanceId)
 		}
+
+		if len(a.AuthenticationSchema.SapManagedAttributes.SourceAppId) > 0 {
+			sapManagedAttributes.SourceAppId = types.StringValue(a.AuthenticationSchema.SapManagedAttributes.SourceAppId)
+		}
+
+		if len(a.AuthenticationSchema.SapManagedAttributes.SourceTenantId) > 0 {
+			sapManagedAttributes.SourceTenantId = types.StringValue(a.AuthenticationSchema.SapManagedAttributes.SourceTenantId)
+		}
+
+		if len(a.AuthenticationSchema.SapManagedAttributes.AppTenantId) > 0 {
+			sapManagedAttributes.AppTenantId = types.StringValue(a.AuthenticationSchema.SapManagedAttributes.AppTenantId)
+		}
+
+		if len(a.AuthenticationSchema.SapManagedAttributes.Type) > 0 {
+			sapManagedAttributes.Type = types.StringValue(a.AuthenticationSchema.SapManagedAttributes.Type)
+		}
+
+		if len(a.AuthenticationSchema.SapManagedAttributes.PlanName) > 0 {
+			sapManagedAttributes.PlanName = types.StringValue(a.AuthenticationSchema.SapManagedAttributes.PlanName)
+		}
+
+		if len(a.AuthenticationSchema.SapManagedAttributes.BtpTenantType) > 0 {
+			sapManagedAttributes.BtpTenantType = types.StringValue(a.AuthenticationSchema.SapManagedAttributes.BtpTenantType)
+		}
+
 		authenticationSchema.SapManagedAttributes, diags = types.ObjectValueFrom(ctx, sapManagedAttributesObjType, sapManagedAttributes)
 		diagnostics.Append(diags...)
 		if diagnostics.HasError() {
 			return application, diagnostics
 		}
 	} else {
-		// each attribute is set to null as setting the whole object to null causes in place updates
-		sapManagedAttributes := sapManagedAttributesData{
-			ServiceInstanceId: types.StringNull(),
-			SourceAppId:       types.StringNull(),
-			SourceTenantId:    types.StringNull(),
-			AppTenantId:       types.StringNull(),
-			Type:              types.StringNull(),
-			PlanName:          types.StringNull(),
-			BtpTenantType:     types.StringNull(),
-		}
-		authenticationSchema.SapManagedAttributes, diags = types.ObjectValueFrom(ctx, sapManagedAttributesObjType, sapManagedAttributes)
-		diagnostics.Append(diags...)
-		if diagnostics.HasError() {
-			return application, diagnostics
-		}
+		authenticationSchema.SapManagedAttributes = types.ObjectNull(sapManagedAttributesObjType)
 	}
 
 	application.AuthenticationSchema, diags = types.ObjectValueFrom(ctx, authenticationSchemaObjType, authenticationSchema)
