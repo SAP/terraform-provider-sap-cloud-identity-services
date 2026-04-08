@@ -336,6 +336,48 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 							},
 						},
 					},
+					"rest_api_authentication": schema.SingleNestedAttribute{
+						MarkdownDescription: "Configure client authentication information for the application.",
+						Optional:            true,
+						Computed:            true,
+						PlanModifiers: []planmodifier.Object{
+							objectplanmodifier.UseStateForUnknown(),
+						},
+						Attributes: map[string]schema.Attribute{
+							"allow_public_client_flows": schema.BoolAttribute{
+								MarkdownDescription: "Allow public client flows for environments where it is difficult to protect the client credential, such as mobile and desktop applications, and clients-side parts of web applications.",
+								Optional:            true,
+								Computed:            true,
+								PlanModifiers: []planmodifier.Bool{
+									boolplanmodifier.UseNonNullStateForUnknown(),
+								},
+							},
+							"all_apis_access": schema.BoolAttribute{
+								MarkdownDescription: "Configure if public clients have unrestricted access to all APIs of the applications.",
+								Optional:            true,
+								Computed:            true,
+								PlanModifiers: []planmodifier.Bool{
+									boolplanmodifier.UseNonNullStateForUnknown(),
+								},
+							},
+							"allow_locking": schema.BoolAttribute{
+								MarkdownDescription: "Enable or Disable Client ID locking. This option is enabled by default. Use this feature in cases when the client ID has a limited scope and the client ID secret(s) are automatically generated.",
+								Optional:            true,
+								Computed:            true,
+								PlanModifiers: []planmodifier.Bool{
+									boolplanmodifier.UseNonNullStateForUnknown(),
+								},
+							},
+							"unlock": schema.BoolAttribute{
+								MarkdownDescription: "Lock or unlock the Client Id.",
+								Optional:            true,
+								Computed:            true,
+								PlanModifiers: []planmodifier.Bool{
+									boolplanmodifier.UseNonNullStateForUnknown(),
+								},
+							},
+						},
+					},
 					"oidc_config": schema.SingleNestedAttribute{
 						MarkdownDescription: "OpenID Connect (OIDC) configuration options for this application.",
 						Optional:            true,
@@ -1007,6 +1049,34 @@ func stateModify(ctx context.Context, plan applicationData, state *applicationDa
 				return diags
 			}
 
+		}
+
+		// The Rest API Authentication's Unlock parameter is not returned in the API response as it is a write-only parameter
+		if !planData.RestApiAuthentication.IsNull() && !planData.RestApiAuthentication.IsUnknown() {
+			var planRestApiAuthData restApiAuthenticationData
+			diags = planData.RestApiAuthentication.As(ctx, &planRestApiAuthData, basetypes.ObjectAsOptions{
+				UnhandledNullAsEmpty:    true,
+				UnhandledUnknownAsEmpty: true,
+			})
+			if diags.HasError() {
+				return diags
+			}
+
+			var stateRestApiAuthData restApiAuthenticationData
+			diags = stateData.RestApiAuthentication.As(ctx, &stateRestApiAuthData, basetypes.ObjectAsOptions{
+				UnhandledNullAsEmpty:    true,
+				UnhandledUnknownAsEmpty: true,
+			})
+			if diags.HasError() {
+				return diags
+			}
+
+			stateRestApiAuthData.Unlock = planRestApiAuthData.Unlock
+
+			stateData.RestApiAuthentication, diags = types.ObjectValueFrom(ctx, restApiAuthenticationObjType, stateRestApiAuthData)
+			if diags.HasError() {
+				return diags
+			}
 		}
 
 		state.AuthenticationSchema, diags = types.ObjectValueFrom(ctx, authenticationSchemaObjType, stateData)

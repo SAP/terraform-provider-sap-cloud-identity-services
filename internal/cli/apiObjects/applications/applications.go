@@ -205,6 +205,14 @@ type SapManagedAttributes struct {
 	BtpTenantType     string `json:"btpTenantType,omitempty" tfsdk:"btp_tenant_type"`
 }
 
+type RestApiAuthentication struct {
+	AllowPublicClientFlows bool `json:"allowPublicClientFlows" tfsdk:"allow_public_client_flows"`
+	// PublicClientApis			[]string	`json:"publicClientApis,omitempty" tfsdk:"public_client_apis"`
+	AllApisAccess bool `json:"allApisAccess" tfsdk:"all_apis_access"`
+	AllowLocking  bool `json:"allowLocking" tfsdk:"allow_locking"`
+	Unlock        bool `json:"unlock" tfsdk:"unlock"`
+}
+
 type AuthenticationSchema struct {
 	SsoType                       string                       `json:"ssoType,omitempty" tfsdk:"sso_type"`
 	SubjectNameIdentifier         string                       `json:"subjectNameIdentifier,omitempty" tfsdk:"subject_name_identifier"`
@@ -214,8 +222,9 @@ type AuthenticationSchema struct {
 	DefaultAuthenticatingIdpId    string                       `json:"defaultAuthenticatingIdpId,omitempty" tfsdk:"default_authenticating_idp"`
 	ConditionalAuthentication     []AuthenicationRule          `json:"conditionalAuthentication,omitempty" tfsdk:"conditional_authentication"`
 	OidcConfig                    *OidcConfig                  `json:"openIdConnectConfiguration,omitempty"`
-	Saml2Configuration            *SamlConfiguration           `json:"saml2Configuration,omitempty" tfsdk:""`
+	Saml2Configuration            *SamlConfiguration           `json:"saml2Configuration,omitempty"`
 	SapManagedAttributes          *SapManagedAttributes        `json:"sapManagedAttributes,omitempty"`
+	RestApiAuthentication         *RestApiAuthentication       `json:"restApiAuthentication,omitempty"`
 	// RiskBasedAuthentication       RBAConfiguration            `json:"riskBasedAuthentication"`
 	// HomeUrl								string 							`json:"homeUrl"`
 	// FallbackSubjectNameIdentifier		string 							`json:"fallbackSubjectNameIdentifier,omitempty"`
@@ -241,7 +250,6 @@ type AuthenticationSchema struct {
 	// captchaConfig
 	// openIdConnectConfiguration
 	// idpCertificateSerialNumber
-	// restApiAuthentication
 }
 
 type Application struct {

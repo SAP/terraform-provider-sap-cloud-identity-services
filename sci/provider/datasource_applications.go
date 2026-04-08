@@ -41,6 +41,9 @@ var authenticationSchemaObjType = map[string]attr.Type{
 	"conditional_authentication": types.ListType{
 		ElemType: authenticationRulesObjType,
 	},
+	"rest_api_authentication": types.ObjectType{
+		AttrTypes: restApiAuthenticationObjType,
+	},
 	"oidc_config": types.ObjectType{
 		AttrTypes: openIdConnectConfigurationObjType,
 	},
@@ -181,6 +184,13 @@ var sapManagedAttributesObjType = map[string]attr.Type{
 	"type":                types.StringType,
 	"plan_name":           types.StringType,
 	"btp_tenant_type":     types.StringType,
+}
+
+var restApiAuthenticationObjType = map[string]attr.Type{
+	"allow_public_client_flows": types.BoolType,
+	"all_apis_access":           types.BoolType,
+	"allow_locking":             types.BoolType,
+	"unlock":                    types.BoolType,
 }
 
 var appObjType = types.ObjectType{
@@ -348,6 +358,28 @@ func (d *applicationsDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 												MarkdownDescription: "Valid IP range to be authenticated.",
 												Computed:            true,
 											},
+										},
+									},
+								},
+								"rest_api_authentication": schema.SingleNestedAttribute{
+									MarkdownDescription: "Configure client authentication information for the application.",
+									Computed:            true,
+									Attributes: map[string]schema.Attribute{
+										"allow_public_client_flows": schema.BoolAttribute{
+											MarkdownDescription: "Allow public client flows for environments where it is difficult to protect the client credential, such as mobile and desktop applications, and clients-side parts of web applications.",
+											Computed:            true,
+										},
+										"all_apis_access": schema.BoolAttribute{
+											MarkdownDescription: "Configure if public clients have unrestricted access to all APIs of the applications.",
+											Computed:            true,
+										},
+										"allow_locking": schema.BoolAttribute{
+											MarkdownDescription: "Enable or Disable Client ID locking. This option is enabled by default. Use this feature in cases when the client ID has a limited scope and the client ID secret(s) are automatically generated.",
+											Computed:            true,
+										},
+										"unlock": schema.BoolAttribute{
+											MarkdownDescription: "Lock or unlock the Client Id.",
+											Computed:            true,
 										},
 									},
 								},
