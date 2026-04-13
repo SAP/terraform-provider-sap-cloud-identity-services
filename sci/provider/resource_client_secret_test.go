@@ -15,7 +15,7 @@ func TestResourceApplicationSecret(t *testing.T) {
 	t.Parallel()
 
 	t.Run("happy path - create", func(t *testing.T) {
-		rec, user := setupVCR(t, "fixtures/resource_application_secret")
+		rec, user := setupVCR(t, "fixtures/resource_client_secret")
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{
@@ -50,7 +50,7 @@ func TestResourceApplicationSecret(t *testing.T) {
 	})
 
 	t.Run("happy path - update", func(t *testing.T) {
-		rec, user := setupVCR(t, "fixtures/resource_application_secret_updated")
+		rec, user := setupVCR(t, "fixtures/resource_client_secret_updated")
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{
@@ -79,7 +79,7 @@ func TestResourceApplicationSecret(t *testing.T) {
 	})
 
 	t.Run("error path - application not found", func(t *testing.T) {
-		rec, user := setupVCR(t, "fixtures/resource_application_secret_app_not_found")
+		rec, user := setupVCR(t, "fixtures/resource_client_secret_app_not_found")
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{
