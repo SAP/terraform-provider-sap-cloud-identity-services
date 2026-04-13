@@ -165,7 +165,11 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, qu
 				err = fmt.Errorf("error %d \n%s", responseError.Error.Code, responseError.Error.Message)
 
 				for _, errMessage := range responseError.Error.Details {
-					err = fmt.Errorf("%v : %s %s", err, errMessage.Target, errMessage.Message)
+					if errMessage.Target != "" {
+						err = fmt.Errorf("%v : %s %s", err, errMessage.Target, errMessage.Message)
+					} else {
+						err = fmt.Errorf("%v : %s", err, errMessage.Message)
+					}
 				}
 			} else {
 				err = fmt.Errorf("error %d \n%s", res.StatusCode, string(rawBody))
