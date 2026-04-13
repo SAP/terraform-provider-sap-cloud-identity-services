@@ -28,6 +28,7 @@ type ScimResponseError struct {
 }
 
 type ErrorDetail struct {
+	Target  string `json:"target"`
 	Message string `json:"message"`
 }
 
@@ -126,23 +127,23 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, qu
 
 	if res.StatusCode >= 400 {
 
+		rawBody, _ := io.ReadAll(res.Body)
+
 		if strings.Contains(reqHeader, "scim") {
 
 			var responseError ScimResponseError
 
-			if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
-				// For  users and schemas can never be empty, hence no explicit handling is needed
-				// For groups, the GET call does not throw an error in case of an empty resource list, hence no explicit handling is needed
+			if err = json.Unmarshal(rawBody, &responseError); err == nil && responseError.Detail != "" {
 				err = fmt.Errorf("SCIM error %s \n%s", responseError.Status, responseError.Detail)
 			} else {
-				err = fmt.Errorf("responded with unknown error : %s", responseError.Status)
+				err = fmt.Errorf("SCIM error %d \n%s", res.StatusCode, string(rawBody))
 			}
 
 		} else {
 			var responseError struct {
 				Error ResponseError `json:"error"`
 			}
-			if err = json.NewDecoder(res.Body).Decode(&responseError); err == nil {
+			if err = json.Unmarshal(rawBody, &responseError); err == nil && responseError.Error.Message != "" {
 
 				// check the error message and status code to handle the situation when
 				// an error is thrown on a GET call for returning an empty list of resources
@@ -164,10 +165,10 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, qu
 				err = fmt.Errorf("error %d \n%s", responseError.Error.Code, responseError.Error.Message)
 
 				for _, errMessage := range responseError.Error.Details {
-					err = fmt.Errorf("%v : %s", err, errMessage.Message)
+					err = fmt.Errorf("%v : %s %s", err, errMessage.Target, errMessage.Message)
 				}
 			} else {
-				err = fmt.Errorf("responded with unknown error : %d", responseError.Error.Code)
+				err = fmt.Errorf("error %d \n%s", res.StatusCode, string(rawBody))
 			}
 
 		}
