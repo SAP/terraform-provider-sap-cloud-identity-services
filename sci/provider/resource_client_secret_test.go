@@ -111,9 +111,9 @@ func TestResourceApplicationSecret(t *testing.T) {
 
 // ResourceApplicationSecretByAppName looks up an application by name and creates a secret for it.
 func ResourceApplicationSecretByAppName(resourceName, appID string, scopes []string, description, validTo string) string {
-	scopesList := ""
+	var scopesList strings.Builder
 	for _, s := range scopes {
-		scopesList += fmt.Sprintf(`"%s", `, s)
+		scopesList.WriteString(fmt.Sprintf(`"%s", `, s))
 	}
 
 	return fmt.Sprintf(`
@@ -122,7 +122,7 @@ resource "sci_client_secret" "%s" {
   description          = "%s"
   valid_to             = "%s"
   authorization_scopes = [%s]
-}`, resourceName, appID, description, validTo, scopesList)
+}`, resourceName, appID, description, validTo, scopesList.String())
 }
 
 // ResourceApplicationSecret creates a secret with a hard-coded application_id. Used for error-path tests.
