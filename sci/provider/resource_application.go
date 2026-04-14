@@ -1014,6 +1014,10 @@ func (r *applicationResource) Delete(ctx context.Context, req resource.DeleteReq
 		})
 		resp.Diagnostics.Append(diags...)
 
+		if resp.Diagnostics.HasError() {
+			return
+		}
+
 		if meta.Type.ValueString() != chargedApplicationType {
 			resp.Diagnostics.AddWarning("Deletion of Bundled or System applications is not allowed",
 				fmt.Sprintf("The application %s with id %s is managed by SAP and cannot be deleted. It will be removed from the state.", config.Name.ValueString(), config.Id.ValueString()))
