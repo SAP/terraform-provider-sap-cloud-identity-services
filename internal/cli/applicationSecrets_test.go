@@ -24,15 +24,19 @@ var (
 		Description:         "test",
 		ValidTo:             "2029-10-12T10:00:00Z",
 		AuthorizationScopes: []string{"manageApp", "oAuth"},
-		AllApisAccess:       false,
+		AllApisAccess:       boolPtr(false),
 	}
 	testSecretRequest = applications.ApplicationSecretRequest{
 		Description:         "test",
 		ValidTo:             "2029-10-12T10:00:00Z",
 		AuthorizationScopes: []string{"manageApp", "oAuth"},
-		AllApisAccess:       false,
+		AllApisAccess:       boolPtr(false),
 	}
 )
+
+func boolPtr(b bool) *bool {
+	return &b
+}
 
 func TestApplicationSecrets_Create(t *testing.T) {
 

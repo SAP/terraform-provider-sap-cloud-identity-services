@@ -85,6 +85,7 @@ func (r *applicationSecretResource) Schema(_ context.Context, _ resource.SchemaR
 			"description": schema.StringAttribute{
 				MarkdownDescription: "Human-readable description of the secret.",
 				Optional:            true,
+				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
@@ -119,7 +120,7 @@ func (r *applicationSecretResource) Schema(_ context.Context, _ resource.SchemaR
 				Optional:            true,
 				Computed:            true,
 				PlanModifiers: []planmodifier.Bool{
-					boolplanmodifier.UseStateForUnknown(),
+					boolplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 		},

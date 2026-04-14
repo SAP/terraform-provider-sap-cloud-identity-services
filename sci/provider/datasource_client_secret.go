@@ -46,11 +46,12 @@ func (d *clientSecretDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 				Computed:            true,
 			},
 			"secret": schema.StringAttribute{
-				MarkdownDescription: "Client ID of the application.",
+				MarkdownDescription: "The generated secret value. Not returned by the API after creation — always null in this data source.",
 				Computed:            true,
+				Sensitive:           true,
 			},
 			"hint": schema.StringAttribute{
-				MarkdownDescription: "A short hint (last characters) of the secret value for identification.",
+				MarkdownDescription: "A short hint (first characters) of the secret value for identification.",
 				Computed:            true,
 			},
 			"description": schema.StringAttribute{

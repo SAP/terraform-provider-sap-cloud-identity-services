@@ -38,7 +38,7 @@ Read-Only:
 - `authorization_scopes` (Set of String) API authorization scopes granted to this secret.
 - `client_id` (String) Client ID of the application.
 - `description` (String) Human-readable description of the secret.
-- `hint` (String) A short hint (last characters) of the secret value for identification.
+- `hint` (String) A short hint (first characters) of the secret value for identification.
 - `id` (String) Unique identifier of the secret.
-- `secret` (String) Client ID of the application.
+- `secret` (String, Sensitive) The generated secret value. Not returned by the API after creation — always null in this data source.
 - `valid_to` (String) Expiry date-time of the secret in UTC format (YYYY-MM-DDTHH:MM:SSZ).

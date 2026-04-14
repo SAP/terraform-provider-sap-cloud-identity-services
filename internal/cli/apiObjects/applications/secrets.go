@@ -10,14 +10,14 @@ type ApplicationSecret struct {
 	Description         string   `json:"description,omitempty"`
 	ValidTo             string   `json:"validTo,omitempty"`
 	AuthorizationScopes []string `json:"authorizationScopes,omitempty"`
-	AllApisAccess       bool     `json:"allApisAccess,omitempty"`
+	AllApisAccess       *bool    `json:"allApisAccess,omitempty"`
 }
 
 type ApplicationSecretRequest struct {
 	Description         string   `json:"description,omitempty"`
 	ValidTo             string   `json:"validTo,omitempty"`
 	AuthorizationScopes []string `json:"authorizationScopes,omitempty"`
-	AllApisAccess       bool     `json:"allApisAccess,omitempty"`
+	AllApisAccess       *bool    `json:"allApisAccess,omitempty"`
 }
 
 type ApplicationSecretPatchRequestBody struct {

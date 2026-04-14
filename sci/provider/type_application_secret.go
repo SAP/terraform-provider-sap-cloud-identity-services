@@ -29,6 +29,11 @@ func applicationSecretValueFrom(ctx context.Context, s applications.ApplicationS
 	scopes, d := types.SetValueFrom(ctx, types.StringType, s.AuthorizationScopes)
 	diags.Append(d...)
 
+	allApisAccess := types.BoolNull()
+	if s.AllApisAccess != nil {
+		allApisAccess = types.BoolValue(*s.AllApisAccess)
+	}
+
 	return applicationSecretData{
 		Id:                  types.StringValue(s.Id),
 		ClientId:            types.StringValue(s.ClientId),
@@ -37,7 +42,7 @@ func applicationSecretValueFrom(ctx context.Context, s applications.ApplicationS
 		Description:         types.StringValue(s.Description),
 		ValidTo:             types.StringValue(s.ValidTo),
 		AuthorizationScopes: scopes,
-		AllApisAccess:       types.BoolValue(s.AllApisAccess),
+		AllApisAccess:       allApisAccess,
 	}, diags
 }
 
@@ -47,11 +52,17 @@ func getApplicationSecretRequest(ctx context.Context, plan applicationSecretData
 	var scopes []string
 	diags.Append(plan.AuthorizationScopes.ElementsAs(ctx, &scopes, false)...)
 
+	var allApisAccess *bool
+	if !plan.AllApisAccess.IsNull() && !plan.AllApisAccess.IsUnknown() {
+		v := plan.AllApisAccess.ValueBool()
+		allApisAccess = &v
+	}
+
 	return applications.ApplicationSecretRequest{
 		Description:         plan.Description.ValueString(),
 		ValidTo:             plan.ValidTo.ValueString(),
 		AuthorizationScopes: scopes,
-		AllApisAccess:       plan.AllApisAccess.ValueBool(),
+		AllApisAccess:       allApisAccess,
 	}, diags
 }
 
