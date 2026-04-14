@@ -77,7 +77,7 @@ resource "sci_corporate_idp" "oidc_example" {
 
   # Optional top-level
   name                     = "my-oidc-idp"
-  type                     = "oidc"
+  type                     = "openIdConnect"
   logout_url               = "https://idp.example.com/oidc/logout"
   forward_all_sso_requests = false
 
@@ -97,8 +97,8 @@ resource "sci_corporate_idp" "oidc_example" {
     discovery_url              = "https://idp.example.com/.well-known/openid-configuration"
     client_id                  = "my-client-id"
     client_secret              = "my-client-secret"
-    subject_name_identifier    = "mail"
-    token_endpoint_auth_method = "client_secret_post"
+    subject_name_identifier    = "email"
+    token_endpoint_auth_method = "clientSecretPost"
     scopes                     = ["openid", "email", "profile"]
     enable_pkce                = true
 

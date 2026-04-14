@@ -638,6 +638,11 @@ func (r *corporateIdPResource) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 
+	if state.Id.IsNull() {
+		resp.Diagnostics.AddError("Corporate IdP ID is missing", "Please provide a valid ID")
+		return
+	}
+
 	patchReqs, diags := getCorporateIdPUpdateRequest(ctx, plan, state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
