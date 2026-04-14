@@ -113,7 +113,7 @@ func TestResourceApplicationSecret(t *testing.T) {
 func ResourceApplicationSecretByAppName(resourceName, appID string, scopes []string, description, validTo string) string {
 	var scopesList strings.Builder
 	for _, s := range scopes {
-		scopesList.WriteString(fmt.Sprintf(`"%s", `, s))
+		fmt.Fprintf(&scopesList, `"%s", `, s)
 	}
 
 	return fmt.Sprintf(`
