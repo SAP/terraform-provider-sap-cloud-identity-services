@@ -14,10 +14,7 @@ Creates a Corporate Identity Provider in the SAP Cloud Identity Services.
 ```terraform
 # Example 1: SAML2 Corporate IdP
 resource "sci_corporate_idp" "saml2_example" {
-  # Required
   display_name = "My SAML2 Corporate IdP"
-
-  # Optional top-level
   name                     = "my-saml2-idp"
   type                     = "saml2"
   logout_url               = "https://idp.example.com/logout"
@@ -86,10 +83,7 @@ resource "sci_corporate_idp" "saml2_example" {
 
 # Example 2: OIDC Corporate IdP
 resource "sci_corporate_idp" "oidc_example" {
-  # Required
   display_name = "My OIDC Corporate IdP"
-
-  # Optional top-level
   name                     = "my-oidc-idp"
   type                     = "openIdConnect"
   logout_url               = "https://idp.example.com/oidc/logout"
