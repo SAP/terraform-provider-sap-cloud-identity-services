@@ -32,6 +32,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
+const (
+	chargedApplicationType = "charged"
+)
+
 var (
 	sourceValues                        = []string{"Identity Directory", "Corporate Identity Provider", "Expression"}
 	ssoValues                           = []string{"openIdConnect", "saml2", "saml2oidc"}
@@ -789,7 +793,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 						MarkdownDescription: "List of SAP managed attributes that are sent to the application.",
 						Computed:            true,
 						PlanModifiers: []planmodifier.Object{
-							objectplanmodifier.UseNonNullStateForUnknown(),
+							objectplanmodifier.UseStateForUnknown(),
 						},
 						Attributes: map[string]schema.Attribute{
 							"service_instance_id": schema.StringAttribute{
@@ -849,6 +853,26 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 							},
 						},
 					},
+				},
+			},
+			"meta": schema.SingleNestedAttribute{
+				MarkdownDescription: "Contains additional information about the application.",
+				Attributes: map[string]schema.Attribute{
+					"type": schema.StringAttribute{
+						MarkdownDescription: `The type of the application. The types supported include:
+							1. "charged" : Applications created by the SAP customers for third-party (non-SAP) solutions
+							2. "bundled" : Applications managed and configured by SAP and can't be deleted
+							3. "system" : Applications predefined with the creation of the tenant. These applications are: Administration Console and User Profile
+						`,
+						Computed: true,
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.UseNonNullStateForUnknown(),
+						},
+					},
+				},
+				Computed: true,
+				PlanModifiers: []planmodifier.Object{
+					objectplanmodifier.UseStateForUnknown(),
 				},
 			},
 		},
@@ -982,8 +1006,26 @@ func (r *applicationResource) Delete(ctx context.Context, req resource.DeleteReq
 		return
 	}
 
-	err := r.cli.Application.Delete(ctx, config.Id.ValueString())
+	if !config.Meta.IsNull() && !config.Meta.IsUnknown() {
+		var meta metaData
+		diags := config.Meta.As(ctx, &meta, basetypes.ObjectAsOptions{
+			UnhandledNullAsEmpty:    true,
+			UnhandledUnknownAsEmpty: true,
+		})
+		resp.Diagnostics.Append(diags...)
 
+		if resp.Diagnostics.HasError() {
+			return
+		}
+
+		if meta.Type.ValueString() != chargedApplicationType {
+			resp.Diagnostics.AddWarning("Deletion of Bundled or System applications is not allowed",
+				fmt.Sprintf("The application %s with id %s is managed by SAP and cannot be deleted. It will be removed from the state.", config.Name.ValueString(), config.Id.ValueString()))
+			return
+		}
+	}
+
+	err := r.cli.Application.Delete(ctx, config.Id.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError("Error deleting application", fmt.Sprintf("%s", err))
 		return

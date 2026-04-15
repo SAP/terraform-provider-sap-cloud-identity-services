@@ -27,6 +27,7 @@ func TestDataSourceApplication(t *testing.T) {
 						resource.TestMatchResourceAttr("data.sci_application.testApp", "id", regexpUUID),
 						resource.TestCheckResourceAttr("data.sci_application.testApp", "multi_tenant_app", "false"),
 						resource.TestCheckResourceAttr("data.sci_application.testApp", "name", "oac.accounts.sap.com"),
+						resource.TestCheckResourceAttr("data.sci_application.testApp", "meta.type", "system"),
 						resource.TestCheckResourceAttr("data.sci_application.testApp", "authentication_schema.assertion_attributes.0.attribute_value", "firstName"),
 						resource.TestCheckResourceAttr("data.sci_application.testApp", "authentication_schema.default_authenticating_idp", "664c660e25cff252c5c202dc"),
 						resource.TestCheckResourceAttr("data.sci_application.testApp", "authentication_schema.sso_type", "saml2oidc"),
@@ -80,6 +81,7 @@ func TestDataSourceApplication(t *testing.T) {
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("data.sci_application.testBundledApp", "id", regexpUUID),
 						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "name", "XSUAA_59cd458e-e66e-4b60-b6d8-8f219379f9a5"),
+						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "meta.type", "bundled"),
 						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.type", "xsuaa"),
 						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.app_tenant_id", "59cd458e-e66e-4b60-b6d8-8f219379f9a5"),
 					),
@@ -102,6 +104,7 @@ func TestDataSourceApplication(t *testing.T) {
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("data.sci_application.testBundledApp", "id", regexpUUID),
 						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "name", "identity-subscription-ab2dc547-eb19-4689-adbb-1dfa5f9da6fd-in-59cd458e-e66e-4b60-b6d8-8f219379f9a5"),
+						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "meta.type", "bundled"),
 						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.type", "subscription"),
 						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.app_tenant_id", "59cd458e-e66e-4b60-b6d8-8f219379f9a5"),
 						resource.TestCheckResourceAttr("data.sci_application.testBundledApp", "authentication_schema.sap_managed_attributes.source_app_id", "727a3744-ec0b-4c03-8f3f-693cf16c8748"),
