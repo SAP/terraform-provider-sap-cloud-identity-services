@@ -432,438 +432,287 @@ func (r *corporateIdPResource) getCorporateIdPRequest(ctx context.Context, plan 
 	return corporateIdP, diagnostics
 }
 
-func getCorporateIdPUpdateRequest(ctx context.Context, plan corporateIdPData, state corporateIdPData) ([]generic.PatchRequest, diag.Diagnostics) {
+// appendPatch resolves the JSON path for fieldName, builds a replace patch, and appends it to reqs.
+// On error it records diagnostics and returns reqs unchanged.
+func appendPatch(reqs []generic.PatchRequest, diagnostics *diag.Diagnostics, fieldName, path string, value any, t reflect.Type) []generic.PatchRequest {
+	patchReq, diags := utils.GetPatchRequest(fieldName, path, value, t)
+	diagnostics.Append(diags...)
+	if diagnostics.HasError() {
+		return reqs
+	}
+	return append(reqs, patchReq)
+}
 
+func diffIdentityFederation(ctx context.Context, plan, state corporateIdPData, basePath string) ([]generic.PatchRequest, diag.Diagnostics) {
+	var diagnostics diag.Diagnostics
+	reqs := []generic.PatchRequest{}
+
+	var planIdF, stateIdF identityFederationData
+	diagnostics.Append(plan.IdentityFederation.As(ctx, &planIdF, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})...)
+	diagnostics.Append(state.IdentityFederation.As(ctx, &stateIdF, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})...)
+	if diagnostics.HasError() {
+		return reqs, diagnostics
+	}
+
+	idfType := reflect.TypeFor[identityFederationData]()
+
+	if !planIdF.UseLocalUserStore.Equal(stateIdF.UseLocalUserStore) {
+		reqs = appendPatch(reqs, &diagnostics, "UseLocalUserStore", basePath, planIdF.UseLocalUserStore.ValueBool(), idfType)
+	}
+	if !planIdF.AllowLocalUsersOnly.Equal(stateIdF.AllowLocalUsersOnly) {
+		reqs = appendPatch(reqs, &diagnostics, "AllowLocalUsersOnly", basePath, planIdF.AllowLocalUsersOnly.ValueBool(), idfType)
+	}
+	if !planIdF.ApplyLocalIdPAuthnChecks.Equal(stateIdF.ApplyLocalIdPAuthnChecks) {
+		reqs = appendPatch(reqs, &diagnostics, "ApplyLocalIdPAuthnChecks", basePath, planIdF.ApplyLocalIdPAuthnChecks.ValueBool(), idfType)
+	}
+	if !planIdF.RequiredGroups.Equal(stateIdF.RequiredGroups) {
+		val := []string{}
+		if !planIdF.RequiredGroups.IsNull() {
+			diagnostics.Append(planIdF.RequiredGroups.ElementsAs(ctx, &val, true)...)
+		}
+		reqs = appendPatch(reqs, &diagnostics, "RequiredGroups", basePath, val, idfType)
+	}
+
+	return reqs, diagnostics
+}
+
+func diffLoginHintConfig(ctx context.Context, plan, state corporateIdPData, basePath string) ([]generic.PatchRequest, diag.Diagnostics) {
+	var diagnostics diag.Diagnostics
+	reqs := []generic.PatchRequest{}
+
+	var planLhc, stateLhc loginHintConfigData
+	diagnostics.Append(plan.LoginHintConfig.As(ctx, &planLhc, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})...)
+	diagnostics.Append(state.LoginHintConfig.As(ctx, &stateLhc, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})...)
+	if diagnostics.HasError() {
+		return reqs, diagnostics
+	}
+
+	lhcType := reflect.TypeFor[loginHintConfigData]()
+
+	if !planLhc.LoginHintType.Equal(stateLhc.LoginHintType) {
+		reqs = appendPatch(reqs, &diagnostics, "LoginHintType", basePath, planLhc.LoginHintType.ValueString(), lhcType)
+	}
+	if !planLhc.SendMethod.Equal(stateLhc.SendMethod) {
+		reqs = appendPatch(reqs, &diagnostics, "SendMethod", basePath, planLhc.SendMethod.ValueString(), lhcType)
+	}
+
+	return reqs, diagnostics
+}
+
+func diffSaml2Config(ctx context.Context, plan, state corporateIdPData, basePath string) ([]generic.PatchRequest, diag.Diagnostics) {
+	var diagnostics diag.Diagnostics
+	reqs := []generic.PatchRequest{}
+
+	var planSaml, stateSaml saml2ConfigData
+	diagnostics.Append(plan.Saml2Config.As(ctx, &planSaml, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})...)
+	diagnostics.Append(state.Saml2Config.As(ctx, &stateSaml, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})...)
+	if diagnostics.HasError() {
+		return reqs, diagnostics
+	}
+
+	samlType := reflect.TypeFor[saml2ConfigData]()
+
+	if !planSaml.SamlMetadataUrl.Equal(stateSaml.SamlMetadataUrl) {
+		reqs = appendPatch(reqs, &diagnostics, "SamlMetadataUrl", basePath, planSaml.SamlMetadataUrl.ValueString(), samlType)
+	}
+	if !planSaml.DigestAlgorithm.Equal(stateSaml.DigestAlgorithm) {
+		reqs = appendPatch(reqs, &diagnostics, "DigestAlgorithm", basePath, planSaml.DigestAlgorithm.ValueString(), samlType)
+	}
+	if !planSaml.IncludeScoping.Equal(stateSaml.IncludeScoping) {
+		reqs = appendPatch(reqs, &diagnostics, "IncludeScoping", basePath, planSaml.IncludeScoping.ValueBool(), samlType)
+	}
+	if !planSaml.NameIdFormat.Equal(stateSaml.NameIdFormat) {
+		reqs = appendPatch(reqs, &diagnostics, "NameIdFormat", basePath, planSaml.NameIdFormat.ValueString(), samlType)
+	}
+	if !planSaml.AllowCreate.Equal(stateSaml.AllowCreate) {
+		reqs = appendPatch(reqs, &diagnostics, "AllowCreate", basePath, planSaml.AllowCreate.ValueString(), samlType)
+	}
+
+	if !planSaml.AssertionAttributes.Equal(stateSaml.AssertionAttributes) {
+		val := []corporateidps.AssertionAttribute{}
+		if !planSaml.AssertionAttributes.IsNull() {
+			diagnostics.Append(planSaml.AssertionAttributes.ElementsAs(ctx, &val, true)...)
+		}
+		reqs = appendPatch(reqs, &diagnostics, "AssertionAttributes", basePath, val, samlType)
+	}
+	if !planSaml.SigningCertificates.Equal(stateSaml.SigningCertificates) {
+		val := []corporateidps.SigningCertificateData{}
+		if !planSaml.SigningCertificates.IsNull() {
+			diagnostics.Append(planSaml.SigningCertificates.ElementsAs(ctx, &val, true)...)
+		}
+		reqs = appendPatch(reqs, &diagnostics, "SigningCertificates", basePath, val, samlType)
+	}
+	if !planSaml.SsoEndpoints.Equal(stateSaml.SsoEndpoints) {
+		val := []corporateidps.SAML2SSOEndpoint{}
+		if !planSaml.SsoEndpoints.IsNull() {
+			diagnostics.Append(planSaml.SsoEndpoints.ElementsAs(ctx, &val, true)...)
+		}
+		reqs = appendPatch(reqs, &diagnostics, "SsoEndpoints", basePath, val, samlType)
+	}
+	if !planSaml.SloEndpoints.Equal(stateSaml.SloEndpoints) {
+		val := []corporateidps.SAML2SLOEndpoint{}
+		if !planSaml.SloEndpoints.IsNull() {
+			diagnostics.Append(planSaml.SloEndpoints.ElementsAs(ctx, &val, true)...)
+		}
+		reqs = appendPatch(reqs, &diagnostics, "SloEndpoints", basePath, val, samlType)
+	}
+
+	return reqs, diagnostics
+}
+
+func diffOidcConfig(ctx context.Context, plan, state corporateIdPData, basePath string) ([]generic.PatchRequest, diag.Diagnostics) {
+	var diagnostics diag.Diagnostics
+	reqs := []generic.PatchRequest{}
+
+	var planOidc, stateOidc oidcConfigData
+	diagnostics.Append(plan.OidcConfig.As(ctx, &planOidc, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})...)
+	diagnostics.Append(state.OidcConfig.As(ctx, &stateOidc, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})...)
+	if diagnostics.HasError() {
+		return reqs, diagnostics
+	}
+
+	oidcType := reflect.TypeFor[oidcConfigData]()
+
+	if !planOidc.DiscoveryUrl.Equal(stateOidc.DiscoveryUrl) {
+		reqs = appendPatch(reqs, &diagnostics, "DiscoveryUrl", basePath, planOidc.DiscoveryUrl.ValueString(), oidcType)
+	}
+	if !planOidc.ClientId.Equal(stateOidc.ClientId) {
+		reqs = appendPatch(reqs, &diagnostics, "ClientId", basePath, planOidc.ClientId.ValueString(), oidcType)
+	}
+	if !planOidc.ClientSecret.Equal(stateOidc.ClientSecret) {
+		reqs = appendPatch(reqs, &diagnostics, "ClientSecret", basePath, planOidc.ClientSecret.ValueString(), oidcType)
+	}
+	if !planOidc.SubjectNameIdentifier.Equal(stateOidc.SubjectNameIdentifier) {
+		reqs = appendPatch(reqs, &diagnostics, "SubjectNameIdentifier", basePath, planOidc.SubjectNameIdentifier.ValueString(), oidcType)
+	}
+	if !planOidc.TokenEndpointAuthMethod.Equal(stateOidc.TokenEndpointAuthMethod) {
+		reqs = appendPatch(reqs, &diagnostics, "TokenEndpointAuthMethod", basePath, planOidc.TokenEndpointAuthMethod.ValueString(), oidcType)
+	}
+	if !planOidc.PkceEnabled.Equal(stateOidc.PkceEnabled) {
+		reqs = appendPatch(reqs, &diagnostics, "PkceEnabled", basePath, planOidc.PkceEnabled.ValueBool(), oidcType)
+	}
+
+	if !planOidc.Scopes.Equal(stateOidc.Scopes) {
+		val := []string{}
+		if !planOidc.Scopes.IsNull() {
+			diagnostics.Append(planOidc.Scopes.ElementsAs(ctx, &val, true)...)
+		}
+		reqs = appendPatch(reqs, &diagnostics, "Scopes", basePath, val, oidcType)
+	}
+
+	if !planOidc.AdditionalConfig.Equal(stateOidc.AdditionalConfig) {
+		additionalConfigTag, diags := utils.GetAttributeTag("AdditionalConfig", oidcType)
+		diagnostics.Append(diags...)
+		if diagnostics.HasError() {
+			return reqs, diagnostics
+		}
+		additionalConfigPath := fmt.Sprintf("%s/%s", basePath, additionalConfigTag)
+
+		var planAdditional, stateAdditional oidcAdditionalConfigData
+		diagnostics.Append(planOidc.AdditionalConfig.As(ctx, &planAdditional, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})...)
+		diagnostics.Append(stateOidc.AdditionalConfig.As(ctx, &stateAdditional, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})...)
+		if diagnostics.HasError() {
+			return reqs, diagnostics
+		}
+
+		additionalConfigType := reflect.TypeFor[oidcAdditionalConfigData]()
+
+		if !planAdditional.EnforceNonce.Equal(stateAdditional.EnforceNonce) {
+			reqs = appendPatch(reqs, &diagnostics, "EnforceNonce", additionalConfigPath, planAdditional.EnforceNonce.ValueBool(), additionalConfigType)
+		}
+		if !planAdditional.EnforceIssuerCheck.Equal(stateAdditional.EnforceIssuerCheck) {
+			reqs = appendPatch(reqs, &diagnostics, "EnforceIssuerCheck", additionalConfigPath, planAdditional.EnforceIssuerCheck.ValueBool(), additionalConfigType)
+		}
+		if !planAdditional.DisableLogoutIdTokenHint.Equal(stateAdditional.DisableLogoutIdTokenHint) {
+			reqs = appendPatch(reqs, &diagnostics, "DisableLogoutIdTokenHint", additionalConfigPath, planAdditional.DisableLogoutIdTokenHint.ValueBool(), additionalConfigType)
+		}
+	}
+
+	return reqs, diagnostics
+}
+
+func getCorporateIdPUpdateRequest(ctx context.Context, plan corporateIdPData, state corporateIdPData) ([]generic.PatchRequest, diag.Diagnostics) {
 	var diagnostics diag.Diagnostics
 	reqs := []generic.PatchRequest{}
 
 	idpType := reflect.TypeFor[corporateIdPData]()
 
 	if !plan.DisplayName.Equal(state.DisplayName) {
-		patchReq, diags := utils.GetPatchRequest("DisplayName", "", plan.DisplayName.ValueString(), idpType)
-		diagnostics.Append(diags...)
-		if diagnostics.HasError() {
-			return reqs, diagnostics
-		}
-		reqs = append(reqs, patchReq)
+		reqs = appendPatch(reqs, &diagnostics, "DisplayName", "", plan.DisplayName.ValueString(), idpType)
 	}
 
 	if !plan.Name.Equal(state.Name) {
 		if plan.Name.IsNull() || plan.Name.IsUnknown() {
 			reqs = append(reqs, utils.GenerateDeletePatchRequest("/name"))
 		} else {
-			patchReq, diags := utils.GetPatchRequest("Name", "", plan.Name.ValueString(), idpType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			reqs = append(reqs, patchReq)
+			reqs = appendPatch(reqs, &diagnostics, "Name", "", plan.Name.ValueString(), idpType)
 		}
 	}
 
 	if !plan.Type.Equal(state.Type) {
-		patchReq, diags := utils.GetPatchRequest("Type", "", plan.Type.ValueString(), idpType)
-		diagnostics.Append(diags...)
-		if diagnostics.HasError() {
-			return reqs, diagnostics
-		}
-		reqs = append(reqs, patchReq)
+		reqs = appendPatch(reqs, &diagnostics, "Type", "", plan.Type.ValueString(), idpType)
 	}
 
 	if !plan.LogoutUrl.Equal(state.LogoutUrl) {
 		if plan.LogoutUrl.IsNull() || plan.LogoutUrl.IsUnknown() {
 			reqs = append(reqs, utils.GenerateDeletePatchRequest("/logoutUrl"))
 		} else {
-			patchReq, diags := utils.GetPatchRequest("LogoutUrl", "", plan.LogoutUrl.ValueString(), idpType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			reqs = append(reqs, patchReq)
+			reqs = appendPatch(reqs, &diagnostics, "LogoutUrl", "", plan.LogoutUrl.ValueString(), idpType)
 		}
 	}
 
 	if !plan.ForwardAllSsoRequests.Equal(state.ForwardAllSsoRequests) {
-		patchReq, diags := utils.GetPatchRequest("ForwardAllSsoRequests", "", plan.ForwardAllSsoRequests.ValueBool(), idpType)
-		diagnostics.Append(diags...)
-		if diagnostics.HasError() {
-			return reqs, diagnostics
-		}
-		reqs = append(reqs, patchReq)
+		reqs = appendPatch(reqs, &diagnostics, "ForwardAllSsoRequests", "", plan.ForwardAllSsoRequests.ValueBool(), idpType)
 	}
 
-	// IdentityFederation — drill into leaf fields
-	if !plan.IdentityFederation.Equal(state.IdentityFederation) {
-		idfPath, diags := utils.GetAttributeTag("IdentityFederation", idpType)
-		diagnostics.Append(diags...)
-		if diagnostics.HasError() {
-			return reqs, diagnostics
-		}
-
-		var planIdF, stateIdF identityFederationData
-		diags = plan.IdentityFederation.As(ctx, &planIdF, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})
-		diagnostics.Append(diags...)
-		diags = state.IdentityFederation.As(ctx, &stateIdF, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})
-		diagnostics.Append(diags...)
-		if diagnostics.HasError() {
-			return reqs, diagnostics
-		}
-
-		idfType := reflect.TypeFor[identityFederationData]()
-
-		if !planIdF.UseLocalUserStore.Equal(stateIdF.UseLocalUserStore) {
-			patchReq, diags := utils.GetPatchRequest("UseLocalUserStore", idfPath, planIdF.UseLocalUserStore.ValueBool(), idfType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			reqs = append(reqs, patchReq)
-		}
-
-		if !planIdF.AllowLocalUsersOnly.Equal(stateIdF.AllowLocalUsersOnly) {
-			patchReq, diags := utils.GetPatchRequest("AllowLocalUsersOnly", idfPath, planIdF.AllowLocalUsersOnly.ValueBool(), idfType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			reqs = append(reqs, patchReq)
-		}
-
-		if !planIdF.ApplyLocalIdPAuthnChecks.Equal(stateIdF.ApplyLocalIdPAuthnChecks) {
-			patchReq, diags := utils.GetPatchRequest("ApplyLocalIdPAuthnChecks", idfPath, planIdF.ApplyLocalIdPAuthnChecks.ValueBool(), idfType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			reqs = append(reqs, patchReq)
-		}
-
-		if !planIdF.RequiredGroups.Equal(stateIdF.RequiredGroups) {
-			val := []string{}
-			if !planIdF.RequiredGroups.IsNull() {
-				diags = planIdF.RequiredGroups.ElementsAs(ctx, &val, true)
-				diagnostics.Append(diags...)
-				if diagnostics.HasError() {
-					return reqs, diagnostics
-				}
-			}
-			patchReq, diags := utils.GetPatchRequest("RequiredGroups", idfPath, val, idfType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			reqs = append(reqs, patchReq)
-		}
+	if diagnostics.HasError() {
+		return reqs, diagnostics
 	}
 
-	// LoginHintConfig — drill into leaf fields
-	if !plan.LoginHintConfig.Equal(state.LoginHintConfig) {
-		lhcPath, diags := utils.GetAttributeTag("LoginHintConfig", idpType)
-		diagnostics.Append(diags...)
-		if diagnostics.HasError() {
-			return reqs, diagnostics
-		}
-
-		var planLhc, stateLhc loginHintConfigData
-		diags = plan.LoginHintConfig.As(ctx, &planLhc, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})
-		diagnostics.Append(diags...)
-		diags = state.LoginHintConfig.As(ctx, &stateLhc, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})
-		diagnostics.Append(diags...)
-		if diagnostics.HasError() {
-			return reqs, diagnostics
-		}
-
-		lhcType := reflect.TypeFor[loginHintConfigData]()
-
-		if !planLhc.LoginHintType.Equal(stateLhc.LoginHintType) {
-			patchReq, diags := utils.GetPatchRequest("LoginHintType", lhcPath, planLhc.LoginHintType.ValueString(), lhcType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			reqs = append(reqs, patchReq)
-		}
-
-		if !planLhc.SendMethod.Equal(stateLhc.SendMethod) {
-			patchReq, diags := utils.GetPatchRequest("SendMethod", lhcPath, planLhc.SendMethod.ValueString(), lhcType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			reqs = append(reqs, patchReq)
-		}
+	type subObjDiff struct {
+		changed bool
+		field   string
+		diff    func(path string) ([]generic.PatchRequest, diag.Diagnostics)
 	}
 
-	// Saml2Config — drill into leaf fields
-	if !plan.Saml2Config.Equal(state.Saml2Config) {
-		samlPath, diags := utils.GetAttributeTag("Saml2Config", idpType)
-		diagnostics.Append(diags...)
-		if diagnostics.HasError() {
-			return reqs, diagnostics
-		}
-
-		var planSaml, stateSaml saml2ConfigData
-		diags = plan.Saml2Config.As(ctx, &planSaml, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})
-		diagnostics.Append(diags...)
-		diags = state.Saml2Config.As(ctx, &stateSaml, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})
-		diagnostics.Append(diags...)
-		if diagnostics.HasError() {
-			return reqs, diagnostics
-		}
-
-		samlType := reflect.TypeFor[saml2ConfigData]()
-
-		if !planSaml.SamlMetadataUrl.Equal(stateSaml.SamlMetadataUrl) {
-			patchReq, diags := utils.GetPatchRequest("SamlMetadataUrl", samlPath, planSaml.SamlMetadataUrl.ValueString(), samlType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			reqs = append(reqs, patchReq)
-		}
-
-		if !planSaml.DigestAlgorithm.Equal(stateSaml.DigestAlgorithm) {
-			patchReq, diags := utils.GetPatchRequest("DigestAlgorithm", samlPath, planSaml.DigestAlgorithm.ValueString(), samlType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			reqs = append(reqs, patchReq)
-		}
-
-		if !planSaml.IncludeScoping.Equal(stateSaml.IncludeScoping) {
-			patchReq, diags := utils.GetPatchRequest("IncludeScoping", samlPath, planSaml.IncludeScoping.ValueBool(), samlType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			reqs = append(reqs, patchReq)
-		}
-
-		if !planSaml.NameIdFormat.Equal(stateSaml.NameIdFormat) {
-			patchReq, diags := utils.GetPatchRequest("NameIdFormat", samlPath, planSaml.NameIdFormat.ValueString(), samlType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			reqs = append(reqs, patchReq)
-		}
-
-		if !planSaml.AllowCreate.Equal(stateSaml.AllowCreate) {
-			patchReq, diags := utils.GetPatchRequest("AllowCreate", samlPath, planSaml.AllowCreate.ValueString(), samlType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			reqs = append(reqs, patchReq)
-		}
-
-		if !planSaml.AssertionAttributes.Equal(stateSaml.AssertionAttributes) {
-			val := []corporateidps.AssertionAttribute{}
-			if !planSaml.AssertionAttributes.IsNull() {
-				diags = planSaml.AssertionAttributes.ElementsAs(ctx, &val, true)
-				diagnostics.Append(diags...)
-				if diagnostics.HasError() {
-					return reqs, diagnostics
-				}
-			}
-			patchReq, diags := utils.GetPatchRequest("AssertionAttributes", samlPath, val, samlType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			reqs = append(reqs, patchReq)
-		}
-
-		if !planSaml.SigningCertificates.Equal(stateSaml.SigningCertificates) {
-			val := []corporateidps.SigningCertificateData{}
-			if !planSaml.SigningCertificates.IsNull() {
-				diags = planSaml.SigningCertificates.ElementsAs(ctx, &val, true)
-				diagnostics.Append(diags...)
-				if diagnostics.HasError() {
-					return reqs, diagnostics
-				}
-			}
-			patchReq, diags := utils.GetPatchRequest("SigningCertificates", samlPath, val, samlType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			reqs = append(reqs, patchReq)
-		}
-
-		if !planSaml.SsoEndpoints.Equal(stateSaml.SsoEndpoints) {
-			val := []corporateidps.SAML2SSOEndpoint{}
-			if !planSaml.SsoEndpoints.IsNull() {
-				diags = planSaml.SsoEndpoints.ElementsAs(ctx, &val, true)
-				diagnostics.Append(diags...)
-				if diagnostics.HasError() {
-					return reqs, diagnostics
-				}
-			}
-			patchReq, diags := utils.GetPatchRequest("SsoEndpoints", samlPath, val, samlType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			reqs = append(reqs, patchReq)
-		}
-
-		if !planSaml.SloEndpoints.Equal(stateSaml.SloEndpoints) {
-			val := []corporateidps.SAML2SLOEndpoint{}
-			if !planSaml.SloEndpoints.IsNull() {
-				diags = planSaml.SloEndpoints.ElementsAs(ctx, &val, true)
-				diagnostics.Append(diags...)
-				if diagnostics.HasError() {
-					return reqs, diagnostics
-				}
-			}
-			patchReq, diags := utils.GetPatchRequest("SloEndpoints", samlPath, val, samlType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			reqs = append(reqs, patchReq)
-		}
+	subObjs := []subObjDiff{
+		{
+			changed: !plan.IdentityFederation.Equal(state.IdentityFederation),
+			field:   "IdentityFederation",
+			diff:    func(path string) ([]generic.PatchRequest, diag.Diagnostics) { return diffIdentityFederation(ctx, plan, state, path) },
+		},
+		{
+			changed: !plan.LoginHintConfig.Equal(state.LoginHintConfig),
+			field:   "LoginHintConfig",
+			diff:    func(path string) ([]generic.PatchRequest, diag.Diagnostics) { return diffLoginHintConfig(ctx, plan, state, path) },
+		},
+		{
+			changed: !plan.Saml2Config.Equal(state.Saml2Config),
+			field:   "Saml2Config",
+			diff:    func(path string) ([]generic.PatchRequest, diag.Diagnostics) { return diffSaml2Config(ctx, plan, state, path) },
+		},
+		{
+			changed: !plan.OidcConfig.Equal(state.OidcConfig),
+			field:   "OidcConfig",
+			diff:    func(path string) ([]generic.PatchRequest, diag.Diagnostics) { return diffOidcConfig(ctx, plan, state, path) },
+		},
 	}
 
-	// OidcConfig — drill into leaf fields
-	if !plan.OidcConfig.Equal(state.OidcConfig) {
-		oidcPath, diags := utils.GetAttributeTag("OidcConfig", idpType)
+	for _, s := range subObjs {
+		if !s.changed {
+			continue
+		}
+		path, diags := utils.GetAttributeTag(s.field, idpType)
 		diagnostics.Append(diags...)
 		if diagnostics.HasError() {
 			return reqs, diagnostics
 		}
-
-		var planOidc, stateOidc oidcConfigData
-		diags = plan.OidcConfig.As(ctx, &planOidc, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})
-		diagnostics.Append(diags...)
-		diags = state.OidcConfig.As(ctx, &stateOidc, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})
+		subReqs, diags := s.diff(path)
 		diagnostics.Append(diags...)
 		if diagnostics.HasError() {
 			return reqs, diagnostics
 		}
-
-		oidcType := reflect.TypeFor[oidcConfigData]()
-
-		if !planOidc.DiscoveryUrl.Equal(stateOidc.DiscoveryUrl) {
-			patchReq, diags := utils.GetPatchRequest("DiscoveryUrl", oidcPath, planOidc.DiscoveryUrl.ValueString(), oidcType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			reqs = append(reqs, patchReq)
-		}
-
-		if !planOidc.ClientId.Equal(stateOidc.ClientId) {
-			patchReq, diags := utils.GetPatchRequest("ClientId", oidcPath, planOidc.ClientId.ValueString(), oidcType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			reqs = append(reqs, patchReq)
-		}
-
-		if !planOidc.ClientSecret.Equal(stateOidc.ClientSecret) {
-			patchReq, diags := utils.GetPatchRequest("ClientSecret", oidcPath, planOidc.ClientSecret.ValueString(), oidcType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			reqs = append(reqs, patchReq)
-		}
-
-		if !planOidc.SubjectNameIdentifier.Equal(stateOidc.SubjectNameIdentifier) {
-			patchReq, diags := utils.GetPatchRequest("SubjectNameIdentifier", oidcPath, planOidc.SubjectNameIdentifier.ValueString(), oidcType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			reqs = append(reqs, patchReq)
-		}
-
-		if !planOidc.TokenEndpointAuthMethod.Equal(stateOidc.TokenEndpointAuthMethod) {
-			patchReq, diags := utils.GetPatchRequest("TokenEndpointAuthMethod", oidcPath, planOidc.TokenEndpointAuthMethod.ValueString(), oidcType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			reqs = append(reqs, patchReq)
-		}
-
-		if !planOidc.Scopes.Equal(stateOidc.Scopes) {
-			val := []string{}
-			if !planOidc.Scopes.IsNull() {
-				diags = planOidc.Scopes.ElementsAs(ctx, &val, true)
-				diagnostics.Append(diags...)
-				if diagnostics.HasError() {
-					return reqs, diagnostics
-				}
-			}
-			patchReq, diags := utils.GetPatchRequest("Scopes", oidcPath, val, oidcType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			reqs = append(reqs, patchReq)
-		}
-
-		if !planOidc.PkceEnabled.Equal(stateOidc.PkceEnabled) {
-			patchReq, diags := utils.GetPatchRequest("PkceEnabled", oidcPath, planOidc.PkceEnabled.ValueBool(), oidcType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			reqs = append(reqs, patchReq)
-		}
-
-		// AdditionalConfig — drill one more level
-		if !planOidc.AdditionalConfig.Equal(stateOidc.AdditionalConfig) {
-			additionalConfigTag, diags := utils.GetAttributeTag("AdditionalConfig", oidcType)
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-			additionalConfigPath := fmt.Sprintf("%s/%s", oidcPath, additionalConfigTag)
-
-			var planAdditional, stateAdditional oidcAdditionalConfigData
-			diags = planOidc.AdditionalConfig.As(ctx, &planAdditional, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})
-			diagnostics.Append(diags...)
-			diags = stateOidc.AdditionalConfig.As(ctx, &stateAdditional, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})
-			diagnostics.Append(diags...)
-			if diagnostics.HasError() {
-				return reqs, diagnostics
-			}
-
-			additionalConfigType := reflect.TypeFor[oidcAdditionalConfigData]()
-
-			if !planAdditional.EnforceNonce.Equal(stateAdditional.EnforceNonce) {
-				patchReq, diags := utils.GetPatchRequest("EnforceNonce", additionalConfigPath, planAdditional.EnforceNonce.ValueBool(), additionalConfigType)
-				diagnostics.Append(diags...)
-				if diagnostics.HasError() {
-					return reqs, diagnostics
-				}
-				reqs = append(reqs, patchReq)
-			}
-
-			if !planAdditional.EnforceIssuerCheck.Equal(stateAdditional.EnforceIssuerCheck) {
-				patchReq, diags := utils.GetPatchRequest("EnforceIssuerCheck", additionalConfigPath, planAdditional.EnforceIssuerCheck.ValueBool(), additionalConfigType)
-				diagnostics.Append(diags...)
-				if diagnostics.HasError() {
-					return reqs, diagnostics
-				}
-				reqs = append(reqs, patchReq)
-			}
-
-			if !planAdditional.DisableLogoutIdTokenHint.Equal(stateAdditional.DisableLogoutIdTokenHint) {
-				patchReq, diags := utils.GetPatchRequest("DisableLogoutIdTokenHint", additionalConfigPath, planAdditional.DisableLogoutIdTokenHint.ValueBool(), additionalConfigType)
-				diagnostics.Append(diags...)
-				if diagnostics.HasError() {
-					return reqs, diagnostics
-				}
-				reqs = append(reqs, patchReq)
-			}
-		}
+		reqs = append(reqs, subReqs...)
 	}
 
 	return reqs, diagnostics
