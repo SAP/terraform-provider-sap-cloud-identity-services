@@ -261,7 +261,7 @@ type Application struct {
 	Schemas              []string              `json:"schemas,omitempty"`
 	AuthenticationSchema *AuthenticationSchema `json:"urn:sap:identity:application:schemas:extension:sci:1.0:Authentication"`
 	Branding             *Branding             `json:"branding,omitempty"`
-	Meta                 *Meta                 `json:"meta"`
+	Meta                 *Meta                 `json:"meta,omitempty"`
 	// GlobalAccount        string               `json:"globalAccount,omitempty"`
 	// PrivacyPolicy 			string 					`json:"privacyPolicy,omitempty"`
 	// TermsOfUse 				string 					`json:"termsOfUse,omitempty"`

@@ -525,17 +525,21 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 	application.AuthenticationSchema, diags = types.ObjectValueFrom(ctx, authenticationSchemaObjType, authenticationSchema)
 	diagnostics.Append(diags...)
 
-	meta := metaData{
-		Type: types.StringValue(a.Meta.Type),
-	}
+	if a.Meta != nil {
+		meta := metaData{
+			Type: types.StringValue(a.Meta.Type),
+		}
 
-	metaData, diags := types.ObjectValueFrom(ctx, metaDataObjType, meta)
-	diagnostics.Append(diags...)
-	if diagnostics.HasError() {
-		return application, diagnostics
-	}
+		metaData, diags := types.ObjectValueFrom(ctx, metaDataObjType, meta)
+		diagnostics.Append(diags...)
+		if diagnostics.HasError() {
+			return application, diagnostics
+		}
 
-	application.Meta = metaData
+		application.Meta = metaData
+	} else {
+		application.Meta = types.ObjectNull(metaDataObjType)
+	}
 
 	return application, diagnostics
 }
