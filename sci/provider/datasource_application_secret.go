@@ -10,26 +10,26 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-func newClientSecretDataSource() datasource.DataSource {
-	return &clientSecretDataSource{}
+func newApplicationSecretDataSource() datasource.DataSource {
+	return &applicationSecretDataSource{}
 }
 
-type clientSecretDataSource struct {
+type applicationSecretDataSource struct {
 	cli *cli.SciClient
 }
 
-func (d *clientSecretDataSource) Configure(_ context.Context, req datasource.ConfigureRequest, _ *datasource.ConfigureResponse) {
+func (d *applicationSecretDataSource) Configure(_ context.Context, req datasource.ConfigureRequest, _ *datasource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
 	d.cli = req.ProviderData.(*cli.SciClient)
 }
 
-func (d *clientSecretDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_client_secret"
+func (d *applicationSecretDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_application_secret"
 }
 
-func (d *clientSecretDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *applicationSecretDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Gets a single API secret for a SAP Cloud Identity Services application. Note: the secret value is not returned — it is only available at creation time.",
 		Attributes: map[string]schema.Attribute{
@@ -71,11 +71,16 @@ func (d *clientSecretDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 				MarkdownDescription: "Indicates whether this secret has access to all APIs.",
 				Computed:            true,
 			},
+			"api_names": schema.SetAttribute{
+				MarkdownDescription: "List of API names the secret is authorized to access.",
+				Computed:            true,
+				ElementType:         types.StringType,
+			},
 		},
 	}
 }
 
-func (d *clientSecretDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *applicationSecretDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var config applicationSecretData
 	resp.Diagnostics.Append(req.Config.Get(ctx, &config)...)
 	if resp.Diagnostics.HasError() {

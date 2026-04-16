@@ -39,7 +39,7 @@ func (r *applicationSecretResource) Configure(_ context.Context, req resource.Co
 }
 
 func (r *applicationSecretResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_client_secret"
+	resp.TypeName = req.ProviderTypeName + "_application_secret"
 }
 
 func (r *applicationSecretResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
@@ -91,7 +91,7 @@ func (r *applicationSecretResource) Schema(_ context.Context, _ resource.SchemaR
 				},
 			},
 			"valid_to": schema.StringAttribute{
-				MarkdownDescription: "Expiry date-time of the secret in UTC format (YYYY-MM-DDTHH:MM:SSZ).",
+				MarkdownDescription: "Expiry date of the secret. Accepts full UTC date-time YYYY-MM-DDTHH:MM:SSZ.",
 				Optional:            true,
 				Computed:            true,
 				Validators: []validator.String{
@@ -121,6 +121,15 @@ func (r *applicationSecretResource) Schema(_ context.Context, _ resource.SchemaR
 				Computed:            true,
 				PlanModifiers: []planmodifier.Bool{
 					boolplanmodifier.UseNonNullStateForUnknown(),
+				},
+			},
+			"api_names": schema.SetAttribute{
+				MarkdownDescription: "List of API names the secret is authorized to access.",
+				Optional:            true,
+				Computed:            true,
+				ElementType:         types.StringType,
+				PlanModifiers: []planmodifier.Set{
+					setplanmodifier.UseStateForUnknown(),
 				},
 			},
 		},
@@ -180,7 +189,6 @@ func (r *applicationSecretResource) Read(ctx context.Context, req resource.ReadR
 	// The API does not return the secret value after creation — preserve it from prior state
 	state.Secret = config.Secret
 	state.ClientId = config.ClientId
-	state.Hint = config.Hint
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
@@ -219,7 +227,6 @@ func (r *applicationSecretResource) Update(ctx context.Context, req resource.Upd
 	newState.ApplicationId = state.ApplicationId
 	// Preserve secret value — not returned by the API after creation
 	newState.Secret = state.Secret
-	newState.Hint = state.Hint
 	newState.ClientId = state.ClientId
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &newState)...)

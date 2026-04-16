@@ -269,8 +269,8 @@ func (p *SciProvider) DataSources(_ context.Context) []func() datasource.DataSou
 	return []func() datasource.DataSource{
 		newApplicationDataSource,
 		newApplicationsDataSource,
-		newClientSecretDataSource,
-		newClientSecretsDataSource,
+		newApplicationSecretDataSource,
+		newApplicationSecretsDataSource,
 		newUsersDataSource,
 		newUserDataSource,
 		newSchemasDataSource,

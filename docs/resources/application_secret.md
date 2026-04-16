@@ -1,18 +1,18 @@
 ---
-page_title: "sci_client_secret Resource - sci"
+page_title: "sci_application_secret Resource - sci"
 subcategory: ""
 description: |-
   Creates an API secret for a SAP Cloud Identity Services application. The secret value is available after creation and stored in state as sensitive. It cannot be retrieved again after the initial creation.
 ---
 
-# sci_client_secret (Resource)
+# sci_application_secret (Resource)
 
 Creates an API secret for a SAP Cloud Identity Services application. The secret value is available after creation and stored in state as sensitive. It cannot be retrieved again after the initial creation.
 
 ## Example Usage
 
 ```terraform
-resource "sci_client_secret" "example" {
+resource "sci_application_secret" "example" {
   application_id       = sci_application.example.id
   description          = "My API secret"
   valid_to             = "2029-10-12T10:00:00Z"
@@ -30,9 +30,10 @@ resource "sci_client_secret" "example" {
 ### Optional
 
 - `all_apis_access` (Boolean) If set to true, the secret grants access to all APIs regardless of the authorization_scopes.
+- `api_names` (Set of String) List of API names the secret is authorized to access.
 - `authorization_scopes` (Set of String) API authorization scopes granted to this secret. Acceptable values are : `manageApp`, `oAuth`, `readUserProfile`, `manageUsers`, `manageAMSPolicies`
 - `description` (String) Human-readable description of the secret.
-- `valid_to` (String) Expiry date-time of the secret in UTC format (YYYY-MM-DDTHH:MM:SSZ).
+- `valid_to` (String) Expiry date of the secret. Accepts full UTC date-time YYYY-MM-DDTHH:MM:SSZ.
 
 ### Read-Only
 
@@ -46,7 +47,7 @@ resource "sci_client_secret" "example" {
 Import is supported using the following syntax:
 
 ```terraform
-# terraform import sci_client_secret.<resource_name>  <application_id>,<id>
+# terraform import sci_application_secret.<resource_name>  <application_id>,<id>
 
-terraform import sci_client_secret.my_app_secret dd005d8b-1fee-4e6b-b6ff-cb9a197b7fe0,dd005d8b-1fee-4e6b-b6ff-cb9a197b7fe0
+terraform import sci_application_secret.my_app_secret dd005d8b-1fee-4e6b-b6ff-cb9a197b7fe0,dd005d8b-1fee-4e6b-b6ff-cb9a197b7fe0
 ```

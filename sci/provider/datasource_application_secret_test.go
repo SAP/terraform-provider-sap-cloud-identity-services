@@ -13,7 +13,7 @@ func TestDataSourceClientSecret(t *testing.T) {
 	t.Parallel()
 
 	t.Run("happy path", func(t *testing.T) {
-		rec, user := setupVCR(t, "fixtures/datasource_client_secret")
+		rec, user := setupVCR(t, "fixtures/datasource_application_secret")
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{
@@ -23,10 +23,10 @@ func TestDataSourceClientSecret(t *testing.T) {
 				{
 					Config: providerConfig("", user) + DataSourceClientSecret("testSecret", "5fd22812-53c5-4803-8285-94cd1fb3b301", "6d93947a-6f40-4b62-8c50-a09d2436ef3c"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestCheckResourceAttr("data.sci_client_secret.testSecret", "id", "6d93947a-6f40-4b62-8c50-a09d2436ef3c"),
-						resource.TestCheckResourceAttr("data.sci_client_secret.testSecret", "application_id", "5fd22812-53c5-4803-8285-94cd1fb3b301"),
-						resource.TestCheckResourceAttr("data.sci_client_secret.testSecret", "hint", "=7k1"),
-						resource.TestCheckResourceAttr("data.sci_client_secret.testSecret", "description", "test secret"),
+						resource.TestCheckResourceAttr("data.sci_application_secret.testSecret", "id", "6d93947a-6f40-4b62-8c50-a09d2436ef3c"),
+						resource.TestCheckResourceAttr("data.sci_application_secret.testSecret", "application_id", "5fd22812-53c5-4803-8285-94cd1fb3b301"),
+						resource.TestCheckResourceAttr("data.sci_application_secret.testSecret", "hint", "=7k1"),
+						resource.TestCheckResourceAttr("data.sci_application_secret.testSecret", "description", "test secret"),
 					),
 				},
 			},
@@ -62,7 +62,7 @@ func TestDataSourceClientSecret(t *testing.T) {
 
 func DataSourceClientSecret(datasourceName, appId, secretId string) string {
 	return fmt.Sprintf(`
-data "sci_client_secret" "%s" {
+data "sci_application_secret" "%s" {
   application_id = "%s"
   id             = "%s"
 }`, datasourceName, appId, secretId)
@@ -70,14 +70,14 @@ data "sci_client_secret" "%s" {
 
 func DataSourceClientSecretMissingId(datasourceName, appId string) string {
 	return fmt.Sprintf(`
-data "sci_client_secret" "%s" {
+data "sci_application_secret" "%s" {
   application_id = "%s"
 }`, datasourceName, appId)
 }
 
 func DataSourceClientSecretMissingAppId(datasourceName, secretId string) string {
 	return fmt.Sprintf(`
-data "sci_client_secret" "%s" {
+data "sci_application_secret" "%s" {
   id = "%s"
 }`, datasourceName, secretId)
 }

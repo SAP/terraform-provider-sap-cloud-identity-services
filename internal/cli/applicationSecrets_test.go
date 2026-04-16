@@ -24,13 +24,13 @@ var (
 		Description:         "test",
 		ValidTo:             "2029-10-12T10:00:00Z",
 		AuthorizationScopes: []string{"manageApp", "oAuth"},
-		AllApisAccess:       new(false),
+		AllApisAccess:       new(bool),
 	}
 	testSecretRequest = applications.ApplicationSecretRequest{
 		Description:         "test",
 		ValidTo:             "2029-10-12T10:00:00Z",
 		AuthorizationScopes: []string{"manageApp", "oAuth"},
-		AllApisAccess:       new(false),
+		AllApisAccess:       new(bool),
 	}
 )
 

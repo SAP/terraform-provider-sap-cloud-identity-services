@@ -13,7 +13,7 @@ func TestDataSourceClientSecrets(t *testing.T) {
 	t.Parallel()
 
 	t.Run("happy path", func(t *testing.T) {
-		rec, user := setupVCR(t, "fixtures/datasource_client_secrets")
+		rec, user := setupVCR(t, "fixtures/datasource_application_secrets")
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{
@@ -23,8 +23,8 @@ func TestDataSourceClientSecrets(t *testing.T) {
 				{
 					Config: providerConfig("", user) + DataSourceClientSecrets("testSecrets", "5fd22812-53c5-4803-8285-94cd1fb3b301"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestCheckResourceAttrSet("data.sci_client_secrets.testSecrets", "values.#"),
-						resource.TestCheckResourceAttr("data.sci_client_secrets.testSecrets", "application_id", "5fd22812-53c5-4803-8285-94cd1fb3b301"),
+						resource.TestCheckResourceAttrSet("data.sci_application_secrets.testSecrets", "values.#"),
+						resource.TestCheckResourceAttr("data.sci_application_secrets.testSecrets", "application_id", "5fd22812-53c5-4803-8285-94cd1fb3b301"),
 					),
 				},
 			},
@@ -47,13 +47,13 @@ func TestDataSourceClientSecrets(t *testing.T) {
 
 func DataSourceClientSecrets(datasourceName, appId string) string {
 	return fmt.Sprintf(`
-data "sci_client_secrets" "%s" {
+data "sci_application_secrets" "%s" {
   application_id = "%s"
 }`, datasourceName, appId)
 }
 
 func DataSourceClientSecretsMissingAppId(datasourceName string) string {
 	return fmt.Sprintf(`
-data "sci_client_secrets" "%s" {
+data "sci_application_secrets" "%s" {
 }`, datasourceName)
 }

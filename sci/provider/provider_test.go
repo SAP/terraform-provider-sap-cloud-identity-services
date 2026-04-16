@@ -204,7 +204,7 @@ func stopQuietly(rec *recorder.Recorder) {
 func TestSciProvider_AllResources(t *testing.T) {
 	expectedResources := []string{
 		"sci_application",
-		"sci_client_secret",
+		"sci_application_secret",
 		"sci_user",
 		"sci_group",
 		"sci_schema",
@@ -224,8 +224,8 @@ func TestSciProvider_AllDataSources(t *testing.T) {
 	expectedDataSources := []string{
 		"sci_application",
 		"sci_applications",
-		"sci_client_secret",
-		"sci_client_secrets",
+		"sci_application_secret",
+		"sci_application_secrets",
 		"sci_user",
 		"sci_users",
 		"sci_group",

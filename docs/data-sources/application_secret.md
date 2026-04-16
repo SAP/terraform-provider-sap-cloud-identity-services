@@ -1,18 +1,18 @@
 ---
-page_title: "sci_client_secret Data Source - sci"
+page_title: "sci_application_secret Data Source - sci"
 subcategory: ""
 description: |-
   Gets a single API secret for a SAP Cloud Identity Services application. Note: the secret value is not returned — it is only available at creation time.
 ---
 
-# sci_client_secret (Data Source)
+# sci_application_secret (Data Source)
 
 Gets a single API secret for a SAP Cloud Identity Services application. Note: the secret value is not returned — it is only available at creation time.
 
 ## Example Usage
 
 ```terraform
-data "sci_client_secret" "example" {
+data "sci_application_secret" "example" {
   application_id = sci_application.example.id
   id             = "996cee6e-ca22-4b9e-9e4d-8cad11ad3e10"
 }
@@ -29,6 +29,7 @@ data "sci_client_secret" "example" {
 ### Read-Only
 
 - `all_apis_access` (Boolean) Indicates whether this secret has access to all APIs.
+- `api_names` (Set of String) List of API names the secret is authorized to access.
 - `authorization_scopes` (Set of String) API authorization scopes granted to this secret.
 - `client_id` (String) Client ID of the application.
 - `description` (String) Human-readable description of the secret.

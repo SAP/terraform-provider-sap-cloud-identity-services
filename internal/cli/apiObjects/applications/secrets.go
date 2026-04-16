@@ -11,6 +11,7 @@ type ApplicationSecret struct {
 	ValidTo             string   `json:"validTo,omitempty"`
 	AuthorizationScopes []string `json:"authorizationScopes,omitempty"`
 	AllApisAccess       *bool    `json:"allApisAccess,omitempty"`
+	ApiNames            []string `json:"apiNames,omitempty"`
 }
 
 type ApplicationSecretRequest struct {
@@ -18,6 +19,7 @@ type ApplicationSecretRequest struct {
 	ValidTo             string   `json:"validTo,omitempty"`
 	AuthorizationScopes []string `json:"authorizationScopes,omitempty"`
 	AllApisAccess       *bool    `json:"allApisAccess,omitempty"`
+	ApiNames            []string `json:"apiNames,omitempty"`
 }
 
 type ApplicationSecretPatchRequestBody struct {

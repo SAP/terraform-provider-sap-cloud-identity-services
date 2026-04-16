@@ -15,7 +15,7 @@ func TestResourceApplicationSecret(t *testing.T) {
 	t.Parallel()
 
 	t.Run("happy path - create", func(t *testing.T) {
-		rec, user := setupVCR(t, "fixtures/resource_client_secret")
+		rec, user := setupVCR(t, "fixtures/resource_application_secret")
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{
@@ -25,20 +25,20 @@ func TestResourceApplicationSecret(t *testing.T) {
 				{
 					Config: providerConfig("", user) + ResourceApplicationSecretByAppName("testSecret", "5fd22812-53c5-4803-8285-94cd1fb3b301", []string{"manageApp"}, "test secret", "2029-10-12T10:00:00Z"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestMatchResourceAttr("sci_client_secret.testSecret", "id", regexpUUID),
-						resource.TestMatchResourceAttr("sci_client_secret.testSecret", "application_id", regexpUUID),
-						resource.TestCheckResourceAttr("sci_client_secret.testSecret", "description", "test secret"),
-						resource.TestCheckResourceAttr("sci_client_secret.testSecret", "valid_to", "2029-10-12T10:00:00Z"),
-						resource.TestCheckTypeSetElemAttr("sci_client_secret.testSecret", "authorization_scopes.*", "manageApp"),
-						resource.TestCheckResourceAttrSet("sci_client_secret.testSecret", "secret"),
-						resource.TestCheckResourceAttrSet("sci_client_secret.testSecret", "client_id"),
+						resource.TestMatchResourceAttr("sci_application_secret.testSecret", "id", regexpUUID),
+						resource.TestMatchResourceAttr("sci_application_secret.testSecret", "application_id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_application_secret.testSecret", "description", "test secret"),
+						resource.TestCheckResourceAttr("sci_application_secret.testSecret", "valid_to", "2029-10-12T10:00:00Z"),
+						resource.TestCheckTypeSetElemAttr("sci_application_secret.testSecret", "authorization_scopes.*", "manageApp"),
+						resource.TestCheckResourceAttrSet("sci_application_secret.testSecret", "secret"),
+						resource.TestCheckResourceAttrSet("sci_application_secret.testSecret", "client_id"),
 					),
 				},
 				{
-					ResourceName: "sci_client_secret.testSecret",
+					ResourceName: "sci_application_secret.testSecret",
 					ImportState:  true,
 					ImportStateIdFunc: func(s *terraform.State) (string, error) {
-						rs := s.RootModule().Resources["sci_client_secret.testSecret"]
+						rs := s.RootModule().Resources["sci_application_secret.testSecret"]
 						return rs.Primary.Attributes["application_id"] + "," + rs.Primary.ID, nil
 					},
 					ImportStateVerify: true,
@@ -50,7 +50,7 @@ func TestResourceApplicationSecret(t *testing.T) {
 	})
 
 	t.Run("happy path - update", func(t *testing.T) {
-		rec, user := setupVCR(t, "fixtures/resource_client_secret_updated")
+		rec, user := setupVCR(t, "fixtures/resource_application_secret_updated")
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{
@@ -60,18 +60,18 @@ func TestResourceApplicationSecret(t *testing.T) {
 				{
 					Config: providerConfig("", user) + ResourceApplicationSecretByAppName("testSecret", "5fd22812-53c5-4803-8285-94cd1fb3b301", []string{"manageApp"}, "test secret", "2029-10-12T10:00:00Z"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestMatchResourceAttr("sci_client_secret.testSecret", "id", regexpUUID),
-						resource.TestCheckResourceAttr("sci_client_secret.testSecret", "description", "test secret"),
+						resource.TestMatchResourceAttr("sci_application_secret.testSecret", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_application_secret.testSecret", "description", "test secret"),
 					),
 				},
 				{
 					Config: providerConfig("", user) + ResourceApplicationSecretByAppName("testSecret", "5fd22812-53c5-4803-8285-94cd1fb3b301", []string{"manageApp", "oAuth"}, "updated secret", "2030-01-01T00:00:00Z"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestMatchResourceAttr("sci_client_secret.testSecret", "id", regexpUUID),
-						resource.TestCheckResourceAttr("sci_client_secret.testSecret", "description", "updated secret"),
-						resource.TestCheckResourceAttr("sci_client_secret.testSecret", "valid_to", "2030-01-01T00:00:00Z"),
-						resource.TestCheckTypeSetElemAttr("sci_client_secret.testSecret", "authorization_scopes.*", "manageApp"),
-						resource.TestCheckTypeSetElemAttr("sci_client_secret.testSecret", "authorization_scopes.*", "oAuth"),
+						resource.TestMatchResourceAttr("sci_application_secret.testSecret", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_application_secret.testSecret", "description", "updated secret"),
+						resource.TestCheckResourceAttr("sci_application_secret.testSecret", "valid_to", "2030-01-01T00:00:00Z"),
+						resource.TestCheckTypeSetElemAttr("sci_application_secret.testSecret", "authorization_scopes.*", "manageApp"),
+						resource.TestCheckTypeSetElemAttr("sci_application_secret.testSecret", "authorization_scopes.*", "oAuth"),
 					),
 				},
 			},
@@ -79,7 +79,7 @@ func TestResourceApplicationSecret(t *testing.T) {
 	})
 
 	t.Run("error path - application not found", func(t *testing.T) {
-		rec, user := setupVCR(t, "fixtures/resource_client_secret_app_not_found")
+		rec, user := setupVCR(t, "fixtures/resource_application_secret_app_not_found")
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{
@@ -117,7 +117,7 @@ func ResourceApplicationSecretByAppName(resourceName, appID string, scopes []str
 	}
 
 	return fmt.Sprintf(`
-resource "sci_client_secret" "%s" {
+resource "sci_application_secret" "%s" {
   application_id       = "%s"
   description          = "%s"
   valid_to             = "%s"
@@ -133,7 +133,7 @@ func ResourceApplicationSecret(resourceName, applicationId string, scopes []stri
 	}
 
 	return fmt.Sprintf(`
-resource "sci_client_secret" "%s" {
+resource "sci_application_secret" "%s" {
   application_id       = "%s"
   description          = "%s"
   valid_to             = "%s"

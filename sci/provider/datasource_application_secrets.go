@@ -11,7 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-var clientSecretObjType = types.ObjectType{
+var applicationSecretObjType = types.ObjectType{
 	AttrTypes: map[string]attr.Type{
 		"id":             types.StringType,
 		"application_id": types.StringType,
@@ -24,34 +24,37 @@ var clientSecretObjType = types.ObjectType{
 			ElemType: types.StringType,
 		},
 		"all_apis_access": types.BoolType,
+		"api_names": types.SetType{
+			ElemType: types.StringType,
+		},
 	},
 }
 
-func newClientSecretsDataSource() datasource.DataSource {
-	return &clientSecretsDataSource{}
+func newApplicationSecretsDataSource() datasource.DataSource {
+	return &applicationSecretsDataSource{}
 }
 
-type clientSecretsDataSource struct {
+type applicationSecretsDataSource struct {
 	cli *cli.SciClient
 }
 
-type clientSecretsData struct {
+type applicationSecretsData struct {
 	ApplicationId types.String `tfsdk:"application_id"`
 	Values        types.List   `tfsdk:"values"`
 }
 
-func (d *clientSecretsDataSource) Configure(_ context.Context, req datasource.ConfigureRequest, _ *datasource.ConfigureResponse) {
+func (d *applicationSecretsDataSource) Configure(_ context.Context, req datasource.ConfigureRequest, _ *datasource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
 	d.cli = req.ProviderData.(*cli.SciClient)
 }
 
-func (d *clientSecretsDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_client_secrets"
+func (d *applicationSecretsDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_application_secrets"
 }
 
-func (d *clientSecretsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *applicationSecretsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Gets all API secrets for a SAP Cloud Identity Services application. Note: the secret value is not returned — it is only available at creation time.",
 		Attributes: map[string]schema.Attribute{
@@ -102,6 +105,11 @@ func (d *clientSecretsDataSource) Schema(_ context.Context, _ datasource.SchemaR
 							MarkdownDescription: "Indicates whether this secret has access to all APIs.",
 							Computed:            true,
 						},
+						"api_names": schema.SetAttribute{
+							MarkdownDescription: "API names the secret is authorized to access.",
+							Computed:            true,
+							ElementType:         types.StringType,
+						},
 					},
 				},
 			},
@@ -109,8 +117,8 @@ func (d *clientSecretsDataSource) Schema(_ context.Context, _ datasource.SchemaR
 	}
 }
 
-func (d *clientSecretsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var config clientSecretsData
+func (d *applicationSecretsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+	var config applicationSecretsData
 	resp.Diagnostics.Append(req.Config.Get(ctx, &config)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -136,7 +144,7 @@ func (d *clientSecretsDataSource) Read(ctx context.Context, req datasource.ReadR
 		secretItems = append(secretItems, item)
 	}
 
-	values, diags := types.ListValueFrom(ctx, clientSecretObjType, secretItems)
+	values, diags := types.ListValueFrom(ctx, applicationSecretObjType, secretItems)
 	resp.Diagnostics.Append(diags...)
 
 	config.Values = values
