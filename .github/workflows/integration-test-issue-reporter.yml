@@ -25,18 +25,36 @@ jobs:
         uses: actions/github-script@v9
         with:
           script: |
+          
             const results = `${{ inputs.job_results }}`;
 
             if (!results.includes("failure")) {
               console.log("No failures detected, skipping issue creation.");
               return;
+            }  
+
+            const title = `${{
+                inputs.workflow_name
+              }} - Integration Test Failure`;
+
+            const runUrl = `https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
+
+            const { data: existingIssues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100
+            });
+
+            const duplicate = existingIssues.find(issue => 
+              issue.title === title && issue.body.includes(runUrl)
+            );
+            if (duplicate) {
+              console.log(`Duplicate issue found (#${duplicate.number}), skipping creation.`);
+              return;
             }
 
             const labels = JSON.parse(`${{ inputs.labels }}`);
-
-            const title = `${{
-              inputs.workflow_name
-            }} - Integration Test Failure`;
 
             const body = `
             ## Integration Test Failed
@@ -47,7 +65,7 @@ jobs:
             ${results}
 
             **Run URL:**
-            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            runUrl
 
             **Triggered by:** @${{ github.actor }}
             `;
