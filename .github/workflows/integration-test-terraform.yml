@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Wait
-        run: sleep 30
+        run: sleep 60
 
   canary-stable:
     name: Canary Stable
@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Wait
-        run: sleep 30
+        run: sleep 60
 
   live-main:
     name: Live Main
@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Wait
-        run: sleep 30
+        run: sleep 60
 
   live-stable:
     name: Live Stable
