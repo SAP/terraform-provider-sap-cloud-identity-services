@@ -15,45 +15,21 @@ jobs:
     uses: ./.github/workflows/tf-integration-canary-main.yml
     secrets: inherit
 
-  wait-1:
-    name: Wait before Canary Stable
-    needs: canary-main
-    runs-on: ubuntu-latest
-    steps:
-      - name: Wait
-        run: sleep 60
-
-  canary-stable:
-    name: Canary Stable
-    needs: [canary-main, wait-1]
-    uses: ./.github/workflows/tf-integration-canary-stable.yml
-    secrets: inherit
-
-  wait-2:
-    name: Wait before Live Main
-    needs: canary-stable
-    runs-on: ubuntu-latest
-    steps:
-      - name: Wait
-        run: sleep 60
-
   live-main:
     name: Live Main
-    needs: [canary-stable, wait-2]
+    needs: [canary-main]
     uses: ./.github/workflows/tf-integration-live-main.yml
     secrets: inherit
 
-  wait-3:
-    name: Wait before Live Stable
-    needs: live-main
-    runs-on: ubuntu-latest
-    steps:
-      - name: Wait
-        run: sleep 60
+  canary-stable:
+    name: Canary Stable
+    needs: [live-main]
+    uses: ./.github/workflows/tf-integration-canary-stable.yml
+    secrets: inherit
 
   live-stable:
     name: Live Stable
-    needs: [live-main, wait-3]
+    needs: [canary-stable]
     uses: ./.github/workflows/tf-integration-live-stable.yml
     secrets: inherit
 
