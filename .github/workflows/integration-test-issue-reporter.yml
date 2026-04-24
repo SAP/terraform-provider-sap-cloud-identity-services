@@ -18,54 +18,83 @@ permissions:
   contents: read
 
 jobs:
-  create-issue:
+  check-failures:
+    runs-on: ubuntu-latest
+    outputs:
+      has_failures: ${{ steps.check.outputs.has_failures }}
+    steps:
+      - id: check
+        run: |
+          if echo "${{ inputs.job_results }}" | grep -q "failure"; then
+            echo "has_failures=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_failures=false" >> $GITHUB_OUTPUT
+          fi
+
+  find-issue:
+    needs: check-failures
+    if: needs.check-failures.outputs.has_failures == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      issue_number: ${{ steps.find.outputs.issue-number }}
+      has_found: ${{ steps.find.outputs.has-found }}
+    steps:
+      - id: find
+        uses: micalevisk/last-issue-action@v2
+        with:
+          state: open
+          labels: ${{ inputs.labels }}
+
+  upsert-issue:
+    needs: [check-failures, find-issue]
+    if: needs.check-failures.outputs.has_failures == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: Create failure issue
+      - name: Get existing issue details
+        id: get-existing
+        if: needs.find-issue.outputs.has_found == 'true'
+        uses: actions/github-script@v9
+        with:
+          result-encoding: json
+          script: |
+            const issueNumber = parseInt('${{ needs.find-issue.outputs.issue_number }}');
+            const { data: issue } = await github.rest.issues.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber
+            });
+
+            const runUrl = 'https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}';
+            const title = '${{ inputs.workflow_name }} - Integration Test Failure';
+            const existingRunUrl = issue.body.match(/https:\/\/github\.com\/[^/]+\/[^/]+\/actions\/runs\/\d+/)?.[0];
+
+            return {
+              title_match: issue.title === title,
+              url_match: existingRunUrl === runUrl,
+              issue_number: issueNumber
+            };
+
+      - name: Create new issue
+        if: needs.find-issue.outputs.has_found != 'true' || !fromJson(steps.get-existing.outputs.result).title_match || !fromJson(steps.get-existing.outputs.result).url_match
         uses: actions/github-script@v9
         with:
           script: |
-          
-            const results = `${{ inputs.job_results }}`;
-
-            if (!results.includes("failure")) {
-              console.log("No failures detected, skipping issue creation.");
-              return;
-            }  
-
-            const title = `${{
-                inputs.workflow_name
-              }} - Integration Test Failure`;
-
-            const runUrl = `https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
-
-            const { data: existingIssues } = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'open',
-              per_page: 100
-            });
-
-            const duplicate = existingIssues.find(issue => 
-              issue.title === title && issue.body.includes(runUrl)
-            );
-            if (duplicate) {
-              console.log(`Duplicate issue found (#${duplicate.number}), skipping creation.`);
-              return;
-            }
-
             const labels = JSON.parse(`${{ inputs.labels }}`);
+            const results = `${{ inputs.job_results }}`;
+            const runUrl = `https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
+            const workflowName = `${{ inputs.workflow_name }}`;
 
+            const title = `${workflowName} - Integration Test Failure`;
             const body = `
             ## Integration Test Failed
 
-            **Workflow Group:** ${{ inputs.workflow_name }}
+            **Workflow Group:** ${workflowName}
 
             **Results:**
             ${results}
 
             **Run URL:**
-            runUrl
+            ${runUrl}
 
             **Triggered by:** @${{ github.actor }}
             `;
@@ -77,3 +106,5 @@ jobs:
               body,
               labels
             });
+
+            console.log('Created new issue');
