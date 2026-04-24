@@ -21,9 +21,17 @@ jobs:
     uses: ./.github/workflows/tf-integration-live-main.yml
     secrets: inherit
 
+  wait:
+    name: Wait
+    needs: [live-main]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait between test runs
+        run: sleep 300
+
   canary-stable:
     name: Canary Stable
-    needs: [live-main]
+    needs: [wait]
     uses: ./.github/workflows/tf-integration-canary-stable.yml
     secrets: inherit
 

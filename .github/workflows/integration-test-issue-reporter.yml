@@ -18,12 +18,11 @@ permissions:
   contents: read
 
 jobs:
-  check-failures:
+  check-and-report:
     runs-on: ubuntu-latest
-    outputs:
-      has_failures: ${{ steps.check.outputs.has_failures }}
     steps:
-      - id: check
+      - name: Check for failures
+        id: check
         run: |
           if echo "${{ inputs.job_results }}" | grep -q "failure"; then
             echo "has_failures=true" >> $GITHUB_OUTPUT
@@ -31,33 +30,27 @@ jobs:
             echo "has_failures=false" >> $GITHUB_OUTPUT
           fi
 
-  find-issue:
-    needs: check-failures
-    if: needs.check-failures.outputs.has_failures == 'true'
-    runs-on: ubuntu-latest
-    outputs:
-      issue_number: ${{ steps.find.outputs.issue-number }}
-      has_found: ${{ steps.find.outputs.has-found }}
-    steps:
-      - id: find
+      - name: Find existing issue
+        if: steps.check.outputs.has_failures == 'true'
+        id: find
         uses: micalevisk/last-issue-action@v2
         with:
           state: open
           labels: ${{ inputs.labels }}
 
-  upsert-issue:
-    needs: [check-failures, find-issue]
-    if: needs.check-failures.outputs.has_failures == 'true'
-    runs-on: ubuntu-latest
-    steps:
       - name: Get existing issue details
+        if: steps.check.outputs.has_failures == 'true'
         id: get-existing
-        if: needs.find-issue.outputs.has_found == 'true'
         uses: actions/github-script@v9
         with:
           result-encoding: json
           script: |
-            const issueNumber = parseInt('${{ needs.find-issue.outputs.issue_number }}');
+            const hasFound = '${{ steps.find.outputs.has-found }}' === 'true';
+            if (!hasFound) {
+              return { title_match: false, url_match: false, issue_number: 0 };
+            }
+
+            const issueNumber = parseInt('${{ steps.find.outputs.issue-number }}');
             const { data: issue } = await github.rest.issues.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -74,8 +67,8 @@ jobs:
               issue_number: issueNumber
             };
 
-      - name: Create new issue
-        if: needs.find-issue.outputs.has_found != 'true' || !fromJson(steps.get-existing.outputs.result).title_match || !fromJson(steps.get-existing.outputs.result).url_match
+      - name: Create issue
+        if: steps.check.outputs.has_failures == 'true'
         uses: actions/github-script@v9
         with:
           script: |
@@ -83,28 +76,27 @@ jobs:
             const results = `${{ inputs.job_results }}`;
             const runUrl = `https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
             const workflowName = `${{ inputs.workflow_name }}`;
+            const hasFound = '${{ steps.find.outputs.has-found }}' === 'true';
+            const titleMatch = hasFound && fromJson('${{ steps.get-existing.outputs.result }}').title_match;
+            const urlMatch = hasFound && fromJson('${{ steps.get-existing.outputs.result }}').url_match;
 
             const title = `${workflowName} - Integration Test Failure`;
-            const body = `
-            ## Integration Test Failed
+            const body = "## Integration Test Failed\n\n" +
+              `**Workflow Group:** ${workflowName}\n\n` +
+              "**Results:**\n${results}\n\n" +
+              `**Run URL:**\n${runUrl}\n\n` +
+              `**Triggered by:** @${{ github.actor }}`;
 
-            **Workflow Group:** ${workflowName}
+            if (!hasFound || !titleMatch || !urlMatch) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels
+              });
+              console.log('Created new issue');
+            } else {
+              console.log('Issue already exists with this run URL, skipping');
+            }
 
-            **Results:**
-            ${results}
-
-            **Run URL:**
-            ${runUrl}
-
-            **Triggered by:** @${{ github.actor }}
-            `;
-
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title,
-              body,
-              labels
-            });
-
-            console.log('Created new issue');
