@@ -1,4 +1,4 @@
-name: Integration Test - Terraform (All)
+name: Integration Test - Terraform Stable Provider
 
 on:
   workflow_dispatch:
@@ -10,28 +10,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  canary-main:
-    name: Canary Main
-    uses: ./.github/workflows/tf-integration-canary-main.yml
-    secrets: inherit
-
-  live-main:
-    name: Live Main
-    needs: [canary-main]
-    uses: ./.github/workflows/tf-integration-live-main.yml
-    secrets: inherit
-
-  wait:
-    name: Wait
-    needs: [live-main]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Wait between test runs
-        run: sleep 300
 
   canary-stable:
     name: Canary Stable
-    needs: [wait]
     uses: ./.github/workflows/tf-integration-canary-stable.yml
     secrets: inherit
 
@@ -43,14 +24,12 @@ jobs:
 
   failure-handler:
     name: Handle Failures
-    needs: [canary-main, canary-stable, live-main, live-stable]
+    needs: [canary-stable, live-stable]
     if: always()
     uses: ./.github/workflows/integration-test-issue-reporter.yml
     with:
-      workflow_name: "Terraform Integration Tests"
+      workflow_name: "Terraform Integration Tests - Stable Provider"
       job_results: |
-        canary-main: ${{ needs.canary-main.result }}
         canary-stable: ${{ needs.canary-stable.result }}
-        live-main: ${{ needs.live-main.result }}
         live-stable: ${{ needs.live-stable.result }}
       labels: 'integration-test,terraform,failure'

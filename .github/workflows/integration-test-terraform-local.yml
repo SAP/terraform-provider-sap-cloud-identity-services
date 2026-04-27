@@ -1,0 +1,34 @@
+name: Integration Test - Terraform Local Provider
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * 2,5' # Every Tuesday and Friday at 7:30 AM IST (2:00 AM UTC)
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  canary-main:
+    name: Canary Main
+    uses: ./.github/workflows/tf-integration-canary-main.yml
+    secrets: inherit
+
+  live-main:
+    name: Live Main
+    needs: [canary-main]
+    uses: ./.github/workflows/tf-integration-live-main.yml
+    secrets: inherit
+
+  failure-handler:
+    name: Handle Failures
+    needs: [canary-main, live-main]
+    if: always()
+    uses: ./.github/workflows/integration-test-issue-reporter.yml
+    with:
+      workflow_name: "Terraform Integration Tests - Local Provider"
+      job_results: |
+        canary-main: ${{ needs.canary-main.result }}
+        live-main: ${{ needs.live-main.result }}
+      labels: 'integration-test,terraform,failure'
