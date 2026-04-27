@@ -98,7 +98,7 @@ jobs:
             const hasFound = '${{ steps.find.outputs.has-found }}' === 'true';
             console.log('has-found from find step:', hasFound);
 
-            const getExistingResult = fromJson('${{ steps.get-existing.outputs.result }}');
+            const getExistingResult = JSON.parse('${{ steps.get-existing.outputs.result }}');
             console.log('get-existing result:', JSON.stringify(getExistingResult));
 
             const titleMatch = hasFound && getExistingResult.title_match;
