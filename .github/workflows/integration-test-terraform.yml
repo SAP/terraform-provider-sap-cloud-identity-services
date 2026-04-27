@@ -53,4 +53,4 @@ jobs:
         canary-stable: ${{ needs.canary-stable.result }}
         live-main: ${{ needs.live-main.result }}
         live-stable: ${{ needs.live-stable.result }}
-      labels: '["integration-test","terraform","failure"]'
+      labels: 'integration-test,terraform,failure'
