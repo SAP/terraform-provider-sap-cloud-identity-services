@@ -24,10 +24,15 @@ jobs:
       - name: Check for failures
         id: check
         run: |
+          echo "workflow_name: ${{ inputs.workflow_name }}"
+          echo "labels: ${{ inputs.labels }}"
+          echo "job_results: ${{ inputs.job_results }}"
           if echo "${{ inputs.job_results }}" | grep -q "failure"; then
             echo "has_failures=true" >> $GITHUB_OUTPUT
+            echo "Detected failures in job results"
           else
             echo "has_failures=false" >> $GITHUB_OUTPUT
+            echo "No failures detected"
           fi
 
       - name: Find existing issue
@@ -36,7 +41,9 @@ jobs:
         uses: micalevisk/last-issue-action@v2
         with:
           state: open
-          labels: ${{ inputs.labels }}
+          labels: integration-test,terraform,failure
+        env:
+          DEBUG_INPUTS: "labels: ${{ inputs.labels }}"
 
       - name: Get existing issue details
         if: steps.check.outputs.has_failures == 'true'
@@ -45,40 +52,59 @@ jobs:
         with:
           result-encoding: json
           script: |
+            console.log('Starting get-existing step');
             const hasFound = '${{ steps.find.outputs.has-found }}' === 'true';
+            console.log('has-found value:', hasFound);
             if (!hasFound) {
+              console.log('No existing issue found');
               return { title_match: false, url_match: false, issue_number: 0 };
             }
 
             const issueNumber = parseInt('${{ steps.find.outputs.issue-number }}');
+            console.log('Found issue number:', issueNumber);
             const { data: issue } = await github.rest.issues.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issueNumber
             });
+            console.log('Issue title:', issue.title);
 
             const runUrl = 'https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}';
             const title = '${{ inputs.workflow_name }} - Integration Test Failure';
             const existingRunUrl = issue.body.match(/https:\/\/github\.com\/[^/]+\/[^/]+\/actions\/runs\/\d+/)?.[0];
+            console.log('Run URL from this workflow:', runUrl);
+            console.log('Run URL found in issue:', existingRunUrl);
 
-            return {
+            const result = {
               title_match: issue.title === title,
               url_match: existingRunUrl === runUrl,
               issue_number: issueNumber
             };
+            console.log('Result:', JSON.stringify(result));
+            return result;
 
       - name: Create issue
         if: steps.check.outputs.has_failures == 'true'
         uses: actions/github-script@v9
         with:
           script: |
-            const labels = JSON.parse(`${{ inputs.labels }}`);
+            console.log('Starting create issue step');
+
+            const labels = `${{ inputs.labels }}`.split(',');
             const results = `${{ inputs.job_results }}`;
             const runUrl = `https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
             const workflowName = `${{ inputs.workflow_name }}`;
+
             const hasFound = '${{ steps.find.outputs.has-found }}' === 'true';
-            const titleMatch = hasFound && fromJson('${{ steps.get-existing.outputs.result }}').title_match;
-            const urlMatch = hasFound && fromJson('${{ steps.get-existing.outputs.result }}').url_match;
+            console.log('has-found from find step:', hasFound);
+
+            const getExistingResult = fromJson('${{ steps.get-existing.outputs.result }}');
+            console.log('get-existing result:', JSON.stringify(getExistingResult));
+
+            const titleMatch = hasFound && getExistingResult.title_match;
+            const urlMatch = hasFound && getExistingResult.url_match;
+            console.log('title match:', titleMatch);
+            console.log('url match:', urlMatch);
 
             const title = `${workflowName} - Integration Test Failure`;
             const body = "## Integration Test Failed\n\n" +
@@ -87,7 +113,10 @@ jobs:
               `**Run URL:**\n${runUrl}\n\n` +
               `**Triggered by:** @${{ github.actor }}`;
 
+            console.log('Issue title:', title);
+
             if (!hasFound || !titleMatch || !urlMatch) {
+              console.log('Creating new issue...');
               await github.rest.issues.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
