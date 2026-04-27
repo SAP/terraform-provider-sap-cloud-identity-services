@@ -109,5 +109,5 @@ jobs:
               });
               console.log('Created new issue');
             } else {
-              console.log('Issue already exists with this run URL, skipping');
+              console.log('Issue already exists with this run URL, skipping creation');
             }
