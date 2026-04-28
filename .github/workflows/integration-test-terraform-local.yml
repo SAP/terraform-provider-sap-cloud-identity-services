@@ -25,6 +25,9 @@ jobs:
     name: Handle Failures
     needs: [canary-main, live-main]
     if: always()
+    permissions:
+      contents: read
+      issues: write
     uses: ./.github/workflows/integration-test-issue-reporter.yml
     with:
       workflow_name: "Terraform Integration Tests - Local Provider"

@@ -63,13 +63,10 @@ jobs:
               issue_number: issueNumber
             });
 
-            const runUrl = 'https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}';
             const title = '${{ inputs.workflow_name }} - Integration Test Failure';
-            const existingRunUrl = issue.body.match(/https:\/\/github\.com\/[^/]+\/[^/]+\/actions\/runs\/\d+/)?.[0];
 
             const result = {
               title_match: issue.title === title,
-              url_match: existingRunUrl === runUrl,
               issue_number: issueNumber
             };
             return result;
@@ -87,9 +84,7 @@ jobs:
             const getExistingResult = JSON.parse('${{ steps.get-existing.outputs.result }}');
 
             const titleMatch = hasFound && getExistingResult.title_match;
-            const urlMatch = hasFound && getExistingResult.url_match;
             console.log('title match:', titleMatch);
-            console.log('url match:', urlMatch);
 
             const title = `${workflowName} - Integration Test Failure`;
             const body = "## Integration Test Failed\n\n" +
@@ -98,7 +93,7 @@ jobs:
               `**Run URL:**\n${runUrl}\n\n` +
               `**Triggered by:** @${{ github.actor }}`;
 
-            if (!hasFound || !titleMatch || !urlMatch) {
+            if (!hasFound || !titleMatch ) {
               console.log('Creating new issue...');
               await github.rest.issues.create({
                 owner: context.repo.owner,
@@ -109,5 +104,5 @@ jobs:
               });
               console.log('Created new issue');
             } else {
-              console.log('Issue already exists with this run URL, skipping creation');
+              console.log('Issue already exists, skipping creation');
             }
