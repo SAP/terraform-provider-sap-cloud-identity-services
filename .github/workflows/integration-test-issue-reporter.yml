@@ -1,0 +1,108 @@
+name: Create Issue on Integration Test Failure
+
+on:
+  workflow_call:
+    inputs:
+      workflow_name:
+        required: true
+        type: string
+      job_results:
+        required: true
+        type: string
+      labels:
+        required: true
+        type: string
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  check-and-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for failures
+        id: check
+        run: |
+          if echo "${{ inputs.job_results }}" | grep -q "failure"; then
+            echo "has_failures=true" >> $GITHUB_OUTPUT
+            echo "Detected failures in job results"
+          else
+            echo "has_failures=false" >> $GITHUB_OUTPUT
+            echo "No failures detected"
+          fi
+
+      - name: Find existing issue
+        if: steps.check.outputs.has_failures == 'true'
+        id: find
+        uses: micalevisk/last-issue-action@v2
+        with:
+          state: open
+          labels: ${{ inputs.labels }}
+
+      - name: Get existing issue details
+        if: steps.check.outputs.has_failures == 'true'
+        id: get-existing
+        uses: actions/github-script@v9
+        with:
+          result-encoding: json
+          script: |
+            const hasFound = '${{ steps.find.outputs.has-found }}' === 'true';
+            
+            if (!hasFound) {
+              console.log('No existing issue found');
+              return { title_match: false, url_match: false, issue_number: 0 };
+            }
+
+            console.log('Existing issue found')
+
+            const issueNumber = parseInt('${{ steps.find.outputs.issue-number }}');
+            const { data: issue } = await github.rest.issues.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber
+            });
+
+            const title = '${{ inputs.workflow_name }} - Integration Test Failure';
+
+            const result = {
+              title_match: issue.title === title,
+              issue_number: issueNumber
+            };
+            return result;
+
+      - name: Create issue
+        if: steps.check.outputs.has_failures == 'true'
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const labels = `${{ inputs.labels }}`.split(',');
+            const results = `${{ inputs.job_results }}`;
+            const runUrl = `https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
+            const workflowName = `${{ inputs.workflow_name }}`;
+            const hasFound = '${{ steps.find.outputs.has-found }}' === 'true';
+            const getExistingResult = JSON.parse('${{ steps.get-existing.outputs.result }}');
+
+            const titleMatch = hasFound && getExistingResult.title_match;
+            console.log('title match:', titleMatch);
+
+            const title = `${workflowName} - Integration Test Failure`;
+            const body = "## Integration Test Failed\n\n" +
+              `**Workflow Group:** ${workflowName}\n\n` +
+              "**Results:**\n${results}\n\n" +
+              `**Run URL:**\n${runUrl}\n\n` +
+              `**Triggered by:** @${{ github.actor }}`;
+
+            if (!hasFound || !titleMatch ) {
+              console.log('Creating new issue...');
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels
+              });
+              console.log('Created new issue');
+            } else {
+              console.log('Issue already exists, skipping creation');
+            }
