@@ -89,7 +89,7 @@ jobs:
             const title = `${workflowName} - Integration Test Failure`;
             const body = "## Integration Test Failed\n\n" +
               `**Workflow Group:** ${workflowName}\n\n` +
-              "**Results:**\n${results}\n\n" +
+              `**Results:**\n${results}\n\n` +
               `**Run URL:**\n${runUrl}\n\n` +
               `**Triggered by:** @${{ github.actor }}`;
 

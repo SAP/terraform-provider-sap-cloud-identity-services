@@ -1,9 +1,9 @@
-name: Integration Test - Terraform - Local Provider
+name: Integration Test - OpenTofu - Local Provider
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 2 * * 2,5' # Every Tuesday and Friday at 7:30 AM IST (2:00 AM UTC)
+    - cron: '0 14 * * 2,5' # Every Tuesday and Friday at 7:30 PM IST (2:00 PM UTC)
 
 concurrency:
   group: ${{ github.workflow }}
@@ -12,13 +12,13 @@ concurrency:
 jobs:
   canary-main:
     name: Canary Main
-    uses: ./.github/workflows/tf-integration-canary-main.yml
+    uses: ./.github/workflows/ot-integration-canary-main.yml
     secrets: inherit
 
   live-main:
     name: Live Main
     needs: [canary-main]
-    uses: ./.github/workflows/tf-integration-live-main.yml
+    uses: ./.github/workflows/ot-integration-live-main.yml
     secrets: inherit
 
   failure-handler:
@@ -30,8 +30,8 @@ jobs:
       issues: write
     uses: ./.github/workflows/integration-test-issue-reporter.yml
     with:
-      workflow_name: "Terraform Integration Tests - Local Provider"
+      workflow_name: "OpenTofu Integration Tests - Local Provider"
       job_results: |
         canary-main: ${{ needs.canary-main.result }}
         live-main: ${{ needs.live-main.result }}
-      labels: 'integration-test,terraform,failure'
+      labels: 'integration-test,opentofu,failure'
