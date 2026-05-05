@@ -199,13 +199,7 @@ func (r *corporateIdPResource) Schema(_ context.Context, _ resource.SchemaReques
 					),
 					// The API does not validate the type of the corporate IdP depending on the configuration provided.
 					// When the saml2 configuration is provided but the type of the IdP is set to "openIdConnect", the IdP listed on the Admin Console is of type OIDC.
-					// Although the provided saml2 configuration details are returned in the GET call, this validator ensures the consistency of the type and config provided
-					objectvalidator.All(
-						utils.ValidType(
-							path.MatchRoot("type"),
-							idpTypeValues[:3],
-						),
-					),
+					// The saml2_config.assertion_attributes field is used for Enriched Token Claims which are valid for all IdP types, including OIDC.
 				},
 				Attributes: map[string]schema.Attribute{
 					"saml_metadata_url": schema.StringAttribute{
