@@ -55,10 +55,8 @@ jobs:
           P12_CERTIFICATE_BASE64_STRING: ${{ secrets.CANARY_P12_CERTIFICATE_BASE64_STRING }}
           PATH_TO_TFSCRIPT: ${{ env.PATH_TO_TFSCRIPT }}
         run: |
-          set +e 
-
           echo "$P12_CERTIFICATE_BASE64_STRING" | base64 --decode > $PATH_TO_TFSCRIPT/cert.p12
-          
+
           MAX_RETRIES=3
           RETRY_DELAY=10
 
@@ -72,10 +70,9 @@ jobs:
               -var certificate_file_path="cert.p12" \
               -var certificate_file_password="${{ secrets.P12_CERTIFICATE_PASSWORD }}" \
               -var certificate="${{ secrets.PEM_CERTIFICATE_STRING }}" \
-              -auto-approve -no-color
-            EXIT_CODE=$?
+              -auto-approve -no-color || EXIT_CODE=$?
 
-            if [ $EXIT_CODE -eq 0 ]; then
+            if [ ${EXIT_CODE:-0} -eq 0 ]; then
               echo "Tofu apply succeeded"
               echo "attempts=$i" >> $GITHUB_OUTPUT
               exit 0
@@ -101,8 +98,6 @@ jobs:
           P12_CERTIFICATE_BASE64_STRING: ${{ secrets.CANARY_P12_CERTIFICATE_BASE64_STRING }}
           PATH_TO_TFSCRIPT: ${{ env.PATH_TO_TFSCRIPT }}
         run: |
-          set +e 
-
           echo "$P12_CERTIFICATE_BASE64_STRING" | base64 --decode > $PATH_TO_TFSCRIPT/cert.p12
 
           MAX_RETRIES=3
@@ -118,10 +113,9 @@ jobs:
               -var certificate_file_path="cert.p12" \
               -var certificate_file_password="${{ secrets.P12_CERTIFICATE_PASSWORD }}" \
               -var certificate="${{ secrets.PEM_CERTIFICATE_STRING }}" \
-              -auto-approve -no-color
-            EXIT_CODE=$?
+              -auto-approve -no-color || EXIT_CODE=$?
 
-            if [ $EXIT_CODE -eq 0 ]; then
+            if [ ${EXIT_CODE:-0} -eq 0 ]; then
               echo "Tofu apply succeeded"
               echo "attempts=$i" >> $GITHUB_OUTPUT
               exit 0
