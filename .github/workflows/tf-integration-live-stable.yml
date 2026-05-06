@@ -49,6 +49,8 @@ jobs:
           P12_CERTIFICATE_BASE64_STRING: ${{ secrets.P12_CERTIFICATE_BASE64_STRING }}
           PATH_TO_TFSCRIPT: ${{ env.PATH_TO_TFSCRIPT }}
         run: |
+          set +e
+
           echo "$P12_CERTIFICATE_BASE64_STRING" | base64 --decode > $PATH_TO_TFSCRIPT/cert.p12
 
           MAX_RETRIES=3
@@ -94,6 +96,8 @@ jobs:
           P12_CERTIFICATE_BASE64_STRING: ${{ secrets.P12_CERTIFICATE_BASE64_STRING }}
           PATH_TO_TFSCRIPT: ${{ env.PATH_TO_TFSCRIPT }}
         run: |
+          set +e
+
           echo "$P12_CERTIFICATE_BASE64_STRING" | base64 --decode > $PATH_TO_TFSCRIPT/cert.p12
 
           MAX_RETRIES=3
