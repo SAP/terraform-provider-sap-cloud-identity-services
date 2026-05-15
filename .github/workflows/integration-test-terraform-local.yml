@@ -9,6 +9,10 @@ concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: false
 
+permissions:
+  issues: write
+  contents: read
+  
 jobs:
   canary-main:
     name: Canary Main
