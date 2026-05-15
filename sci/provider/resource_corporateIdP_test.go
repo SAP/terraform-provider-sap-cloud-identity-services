@@ -213,20 +213,10 @@ func TestResourceCorporateIdP(t *testing.T) {
 	t.Run("update - saml2 corporate idp - all fields", func(t *testing.T) {
 
 		saml2Initial := corporateIdP
-		saml2Initial.DisplayName = "SAML2 Update- Test Corporate IdP"
+		saml2Initial.DisplayName = "SAML2 Update - Test Corporate IdP"
 		saml2Initial.Name = "saml2-update-idp-test"
 		saml2Initial.Type = "saml2"
 		saml2Initial.Saml2Configuration = &saml2Config
-		saml2Initial.Saml2Configuration.CertificatesForSigning = []corporateidps.SigningCertificateData{
-			{
-				// Always replace with a valid certificate for recording of fixtures
-				Base64Certificate: "-----BEGIN CERTIFICATE-----\\nredacted\\n-----END CERTIFICATE-----",
-				IsDefault:         true,
-				Dn:                "Test",
-				ValidFrom:         "1999-01-01T00:00:00Z",
-				ValidTo:           "9999-12-31T23:59:59Z",
-			},
-		}
 
 		// Update
 		updated := saml2Initial
@@ -260,6 +250,16 @@ func TestResourceCorporateIdP(t *testing.T) {
 		updatedSaml2.SloEndpoints = []corporateidps.SAML2SLOEndpoint{
 			{BindingName: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST", Location: "https://slo.example.com", ResponseLocation: "https://slo.example.com/response", IsDefault: true},
 			{BindingName: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect", Location: "https://slo2.example.com", ResponseLocation: "https://slo2.example.com/response", IsDefault: false},
+		}
+		updatedSaml2.CertificatesForSigning = []corporateidps.SigningCertificateData{
+			{
+				// Always replace with a valid certificate for recording of fixtures
+				Base64Certificate: "-----BEGIN CERTIFICATE-----\\nredacted\\n-----END CERTIFICATE-----",
+				IsDefault:         true,
+				Dn:                "Test",
+				ValidFrom:         "1999-01-01T00:00:00Z",
+				ValidTo:           "9999-12-31T23:59:59Z",
+			},
 		}
 		updated.Saml2Configuration = &updatedSaml2
 
@@ -381,7 +381,7 @@ func TestResourceCorporateIdP(t *testing.T) {
 		updatedOidc.ClientId = "updated-client-id"
 		updatedOidc.ClientSecret = "updated-client-secret"
 		updatedOidc.SubjectNameIdentifier = "none"
-		updatedOidc.TokenEndpointAuthMethod = "clientSecretBasic"
+		updatedOidc.TokenEndpointAuthMethod = "clientSecretPost"
 		updatedOidc.Scopes = []string{"openid", "email", "profile"}
 		updatedOidc.PkceEnabled = true
 		updatedOidc.AdditionalConfig = &corporateidps.OIDCAdditionalConfig{

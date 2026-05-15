@@ -455,7 +455,7 @@ func (r *corporateIdPResource) Schema(_ context.Context, _ resource.SchemaReques
 						Validators: []validator.String{
 							utils.CheckClientAuthMethod(
 								path.MatchRoot("oidc_config").AtName("token_endpoint_auth_method"),
-								tokenEndpointAuthMethodValues[:2],
+								tokenEndpointAuthMethodValues,
 							),
 						},
 					},
@@ -544,34 +544,58 @@ func (r *corporateIdPResource) Schema(_ context.Context, _ resource.SchemaReques
 					"issuer": schema.StringAttribute{
 						MarkdownDescription: "The unique field that identifies the IdP.",
 						Computed:            true,
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.UseStateForUnknown(),
+						},
 					},
 					"jwks_uri": schema.StringAttribute{
 						MarkdownDescription: "The endpoint called to request JSON Web Keys for JWT validation.",
 						Computed:            true,
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.UseStateForUnknown(),
+						},
 					},
 					"jwks": schema.StringAttribute{
 						MarkdownDescription: "The JSON Web Keys used for the JSON Web Token Validation.",
 						Computed:            true,
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.UseStateForUnknown(),
+						},
 					},
 					"token_endpoint": schema.StringAttribute{
 						MarkdownDescription: "The endpoint called to request the ID token for SSO.",
 						Computed:            true,
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.UseStateForUnknown(),
+						},
 					},
 					"authorization_endpoint": schema.StringAttribute{
 						MarkdownDescription: "The endpoint to which SSO requests are forwarded to, in order to retrieve an authorization code.",
 						Computed:            true,
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.UseStateForUnknown(),
+						},
 					},
 					"logout_endpoint": schema.StringAttribute{
 						MarkdownDescription: "The endpoint called to log out the current user session.",
 						Computed:            true,
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.UseStateForUnknown(),
+						},
 					},
 					"user_info_endpoint": schema.StringAttribute{
 						MarkdownDescription: "The endpoint called to get information about a user.",
 						Computed:            true,
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.UseStateForUnknown(),
+						},
 					},
 					"is_client_secret_configured": schema.BoolAttribute{
 						MarkdownDescription: "Indicates if a client secret is configured or not.",
 						Computed:            true,
+						PlanModifiers: []planmodifier.Bool{
+							boolplanmodifier.UseStateForUnknown(),
+						},
 					},
 				},
 			},

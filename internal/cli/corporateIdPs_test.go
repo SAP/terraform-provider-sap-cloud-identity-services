@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+	"time"
 
 	corporateidps "github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/corporateIdps"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/generic"
@@ -348,13 +349,17 @@ func TestCorporateIdPs_GetByIdPId(t *testing.T) {
 
 func TestCorporateIdPs_Update(t *testing.T) {
 
+	originalInterval := corporateIdPPollInterval
+	defer func() { corporateIdPPollInterval = originalInterval }()
+	corporateIdPPollInterval = time.Millisecond
+
 	saml2IdP = corporateIdPsBody
 	saml2IdP.Saml2Configuration = &saml2ConfigBody
 
 	patchOps := []generic.PatchRequest{
 		{
 			Op:    "replace",
-			Path:  "displayName",
+			Path:  "/displayName",
 			Value: "Updated Corporate IdP",
 		},
 	}
@@ -363,24 +368,56 @@ func TestCorporateIdPs_Update(t *testing.T) {
 		Operations: patchOps,
 	}
 
+	updatedIdP := saml2IdP
+	updatedIdP.DisplayName = "Updated Corporate IdP"
+	updatedIdPResponse, _ := json.Marshal(updatedIdP)
+	oldIdPResponse, _ := json.Marshal(saml2IdP)
+
 	t.Run("validate the API request - success", func(t *testing.T) {
 
-		saml2IdPResponse, _ := json.Marshal(saml2IdP)
-
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			_, err := w.Write(saml2IdPResponse)
-			assert.NoError(t, err, "Failed to write response")
-
-			if r.Method != "GET" {
+			if r.Method == "PATCH" {
 				assertCall[corporateidps.PatchRequestBody](t, r, fmt.Sprintf("%s%s", corporateIdPsPath, "valid-idp-id"), "PATCH", expectedPatchBody)
+				w.WriteHeader(http.StatusOK)
+			} else {
+				_, err := w.Write(updatedIdPResponse)
+				assert.NoError(t, err, "Failed to write response")
 			}
 		}))
 
 		defer srv.Close()
 
-		_, _, err := client.CorporateIdP.Update(context.TODO(), patchOps, "valid-idp-id")
+		res, _, err := client.CorporateIdP.Update(context.TODO(), patchOps, "valid-idp-id")
 
 		assert.NoError(t, err)
+		assert.Equal(t, "Updated Corporate IdP", res.DisplayName)
+	})
+
+	t.Run("validate polling - GET returns updated value on retry", func(t *testing.T) {
+
+		callCount := 0
+		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.Method == "PATCH" {
+				w.WriteHeader(http.StatusOK)
+			} else {
+				callCount++
+				if callCount == 1 {
+					_, err := w.Write(oldIdPResponse)
+					assert.NoError(t, err, "Failed to write response")
+				} else {
+					_, err := w.Write(updatedIdPResponse)
+					assert.NoError(t, err, "Failed to write response")
+				}
+			}
+		}))
+
+		defer srv.Close()
+
+		res, _, err := client.CorporateIdP.Update(context.TODO(), patchOps, "valid-idp-id")
+
+		assert.NoError(t, err)
+		assert.Equal(t, "Updated Corporate IdP", res.DisplayName)
+		assert.Equal(t, 2, callCount)
 	})
 
 	t.Run("validate the API request - error on PATCH", func(t *testing.T) {
@@ -418,8 +455,6 @@ func TestCorporateIdPs_Update(t *testing.T) {
 
 	t.Run("validate the API request - error on GET after PATCH", func(t *testing.T) {
 
-		saml2IdPResponse, _ := json.Marshal(saml2IdP)
-
 		resErr, _ := json.Marshal(struct {
 			Error ResponseError `json:"error"`
 		}{
@@ -437,8 +472,7 @@ func TestCorporateIdPs_Update(t *testing.T) {
 		callCount := 0
 		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.Method == "PATCH" {
-				_, err := w.Write(saml2IdPResponse)
-				assert.NoError(t, err, "Failed to write response")
+				w.WriteHeader(http.StatusOK)
 			} else {
 				callCount++
 				w.WriteHeader(http.StatusBadRequest)
@@ -455,6 +489,31 @@ func TestCorporateIdPs_Update(t *testing.T) {
 		assert.Error(t, err)
 		assert.Equal(t, "error 400 \nget failed : server error", err.Error())
 		assert.Equal(t, 1, callCount)
+	})
+
+	t.Run("validate write-only paths are skipped during polling", func(t *testing.T) {
+
+		secretPatchOps := []generic.PatchRequest{
+			{
+				Op:    "replace",
+				Path:  "/oidcConfiguration/clientSecret",
+				Value: "new-secret",
+			},
+		}
+
+		oidcIdP = corporateIdPsBody
+		oidcIdP.OidcConfiguration = &oidcConfigBody
+		oidcIdPResponse, _ := json.Marshal(oidcIdP)
+
+		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			_, err := w.Write(oidcIdPResponse)
+			assert.NoError(t, err, "Failed to write response")
+		}))
+
+		defer srv.Close()
+
+		_, _, err := client.CorporateIdP.Update(context.TODO(), secretPatchOps, "valid-idp-id")
+		assert.NoError(t, err)
 	})
 }
 

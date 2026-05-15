@@ -679,22 +679,30 @@ func getCorporateIdPUpdateRequest(ctx context.Context, plan corporateIdPData, st
 		{
 			changed: !plan.IdentityFederation.Equal(state.IdentityFederation),
 			field:   "IdentityFederation",
-			diff:    func(path string) ([]generic.PatchRequest, diag.Diagnostics) { return diffIdentityFederation(ctx, plan, state, path) },
+			diff: func(path string) ([]generic.PatchRequest, diag.Diagnostics) {
+				return diffIdentityFederation(ctx, plan, state, path)
+			},
 		},
 		{
 			changed: !plan.LoginHintConfig.Equal(state.LoginHintConfig),
 			field:   "LoginHintConfig",
-			diff:    func(path string) ([]generic.PatchRequest, diag.Diagnostics) { return diffLoginHintConfig(ctx, plan, state, path) },
+			diff: func(path string) ([]generic.PatchRequest, diag.Diagnostics) {
+				return diffLoginHintConfig(ctx, plan, state, path)
+			},
 		},
 		{
 			changed: !plan.Saml2Config.Equal(state.Saml2Config),
 			field:   "Saml2Config",
-			diff:    func(path string) ([]generic.PatchRequest, diag.Diagnostics) { return diffSaml2Config(ctx, plan, state, path) },
+			diff: func(path string) ([]generic.PatchRequest, diag.Diagnostics) {
+				return diffSaml2Config(ctx, plan, state, path)
+			},
 		},
 		{
 			changed: !plan.OidcConfig.Equal(state.OidcConfig),
 			field:   "OidcConfig",
-			diff:    func(path string) ([]generic.PatchRequest, diag.Diagnostics) { return diffOidcConfig(ctx, plan, state, path) },
+			diff: func(path string) ([]generic.PatchRequest, diag.Diagnostics) {
+				return diffOidcConfig(ctx, plan, state, path)
+			},
 		},
 	}
 

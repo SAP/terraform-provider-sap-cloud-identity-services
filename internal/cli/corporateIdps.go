@@ -2,12 +2,16 @@ package cli
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	corporateidps "github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/corporateIdps"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/generic"
 )
+
+var corporateIdPPollInterval = 5 * time.Second
 
 type CorporateIdPsCli struct {
 	cliClient *Client
@@ -68,10 +72,38 @@ func (c *CorporateIdPsCli) Update(ctx context.Context, args []generic.PatchReque
 		return corporateidps.IdentityProvider{}, "", err
 	}
 
-	return c.GetByIdPId(ctx, idpId)
+	return c.pollUntilUpdated(ctx, idpId, args)
 }
 
 func (c *CorporateIdPsCli) Delete(ctx context.Context, idpId string) error {
 	_, _, err := c.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", c.getUrl(), idpId), nil, nil, "", RequestHeader, nil)
 	return err
+}
+
+func (c *CorporateIdPsCli) pollUntilUpdated(ctx context.Context, idpId string, ops []generic.PatchRequest) (corporateidps.IdentityProvider, string, error) {
+	for {
+		select {
+		case <-ctx.Done():
+			return corporateidps.IdentityProvider{}, "", ctx.Err()
+		case <-time.After(corporateIdPPollInterval):
+		}
+
+		res, _, err := c.GetByIdPId(ctx, idpId)
+		if err != nil {
+			return corporateidps.IdentityProvider{}, "", err
+		}
+
+		resBytes, err := json.Marshal(res)
+		if err != nil {
+			return corporateidps.IdentityProvider{}, "", fmt.Errorf("failed to marshal response: %w", err)
+		}
+		var resMap map[string]any
+		if err := json.Unmarshal(resBytes, &resMap); err != nil {
+			return corporateidps.IdentityProvider{}, "", fmt.Errorf("failed to unmarshal response: %w", err)
+		}
+
+		if patchOpsReflected(ops, resMap) {
+			return res, "", nil
+		}
+	}
 }
