@@ -321,7 +321,7 @@ func (r *corporateIdPResource) Schema(_ context.Context, _ resource.SchemaReques
 									Optional:            true,
 									Computed:            true,
 									PlanModifiers: []planmodifier.Bool{
-										boolplanmodifier.UseStateForUnknown(),
+										boolplanmodifier.UseNonNullStateForUnknown(),
 									},
 								},
 							},
@@ -364,7 +364,7 @@ func (r *corporateIdPResource) Schema(_ context.Context, _ resource.SchemaReques
 									Optional:            true,
 									Computed:            true,
 									PlanModifiers: []planmodifier.Bool{
-										boolplanmodifier.UseStateForUnknown(),
+										boolplanmodifier.UseNonNullStateForUnknown(),
 									},
 								},
 							},
@@ -455,7 +455,7 @@ func (r *corporateIdPResource) Schema(_ context.Context, _ resource.SchemaReques
 						Validators: []validator.String{
 							utils.CheckClientAuthMethod(
 								path.MatchRoot("oidc_config").AtName("token_endpoint_auth_method"),
-								tokenEndpointAuthMethodValues[:2],
+								tokenEndpointAuthMethodValues,
 							),
 						},
 					},
@@ -544,34 +544,58 @@ func (r *corporateIdPResource) Schema(_ context.Context, _ resource.SchemaReques
 					"issuer": schema.StringAttribute{
 						MarkdownDescription: "The unique field that identifies the IdP.",
 						Computed:            true,
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.UseStateForUnknown(),
+						},
 					},
 					"jwks_uri": schema.StringAttribute{
 						MarkdownDescription: "The endpoint called to request JSON Web Keys for JWT validation.",
 						Computed:            true,
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.UseStateForUnknown(),
+						},
 					},
 					"jwks": schema.StringAttribute{
 						MarkdownDescription: "The JSON Web Keys used for the JSON Web Token Validation.",
 						Computed:            true,
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.UseStateForUnknown(),
+						},
 					},
 					"token_endpoint": schema.StringAttribute{
 						MarkdownDescription: "The endpoint called to request the ID token for SSO.",
 						Computed:            true,
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.UseStateForUnknown(),
+						},
 					},
 					"authorization_endpoint": schema.StringAttribute{
 						MarkdownDescription: "The endpoint to which SSO requests are forwarded to, in order to retrieve an authorization code.",
 						Computed:            true,
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.UseStateForUnknown(),
+						},
 					},
 					"logout_endpoint": schema.StringAttribute{
 						MarkdownDescription: "The endpoint called to log out the current user session.",
 						Computed:            true,
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.UseStateForUnknown(),
+						},
 					},
 					"user_info_endpoint": schema.StringAttribute{
 						MarkdownDescription: "The endpoint called to get information about a user.",
 						Computed:            true,
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.UseStateForUnknown(),
+						},
 					},
 					"is_client_secret_configured": schema.BoolAttribute{
 						MarkdownDescription: "Indicates if a client secret is configured or not.",
 						Computed:            true,
+						PlanModifiers: []planmodifier.Bool{
+							boolplanmodifier.UseStateForUnknown(),
+						},
 					},
 				},
 			},
@@ -622,9 +646,57 @@ func (r *corporateIdPResource) Create(ctx context.Context, req resource.CreateRe
 
 }
 
-// TODO implement the Update operation once the API is available
 func (r *corporateIdPResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	resp.Diagnostics.AddError("Error updating Corporate Identity Provider.", "This resource does not support updates")
+
+	var plan, state corporateIdPData
+
+	diags := req.Plan.Get(ctx, &plan)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	diags = req.State.Get(ctx, &state)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	if state.Id.IsNull() {
+		resp.Diagnostics.AddError("Corporate IdP ID is missing", "Please provide a valid ID")
+		return
+	}
+
+	patchReqs, diags := getCorporateIdPUpdateRequest(ctx, plan, state)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	res, _, err := r.cli.CorporateIdP.Update(ctx, patchReqs, state.Id.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError("Error updating Corporate Identity Provider", fmt.Sprintf("%s", err))
+		return
+	}
+
+	newState, diags := corporateIdPValueFrom(ctx, res)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	if !plan.OidcConfig.IsNull() && !plan.OidcConfig.IsUnknown() {
+		// The client secret must be read from the plan as the GET call on the IdP does not return the configured secret
+		diags = mapOidcClientSecret(ctx, plan, &newState)
+		resp.Diagnostics.Append(diags...)
+	}
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	diags = resp.State.Set(ctx, newState)
+	resp.Diagnostics.Append(diags...)
 }
 
 func (r *corporateIdPResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {

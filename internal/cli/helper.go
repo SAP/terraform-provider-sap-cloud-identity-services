@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/generic"
 )
 
 func unMarshalResponse[I any](res any, retrieveCustomSchemas bool) (I, string, error) {
@@ -166,4 +168,128 @@ func compareAttributes(key string, csValue map[string]any, rbValue map[string]an
 	}
 
 	return true, ""
+}
+
+// writeOnlyPaths contains PATCH operation paths whose values are never returned
+// by the GET response (e.g. secrets), and must be skipped during polling.
+var writeOnlyPaths = map[string]bool{
+	"/oidcConfiguration/clientSecret": true,
+}
+
+// patchOpsReflected checks whether all replace/add operations are visible in the GET response.
+func patchOpsReflected(ops []generic.PatchRequest, resMap map[string]any) bool {
+	for _, op := range ops {
+		if op.Op == "remove" || writeOnlyPaths[op.Path] {
+			continue
+		}
+		if !pathMatchesValue(op.Path, op.Value, resMap) {
+			return false
+		}
+	}
+	return true
+}
+
+func pathMatchesValue(path string, expected any, resMap map[string]any) bool {
+	segments := strings.Split(strings.TrimPrefix(path, "/"), "/")
+
+	current := resMap
+	for i, seg := range segments {
+		if i == len(segments)-1 {
+			expBytes, err := json.Marshal(expected)
+			if err != nil {
+				return false
+			}
+			var normalizedExpected any
+			if err := json.Unmarshal(expBytes, &normalizedExpected); err != nil {
+				return false
+			}
+
+			actual, ok := current[seg]
+			if !ok {
+				// Field absent from response: omitempty suppressed it because it is a zero
+				// value. Treat as a match only when the expected value is also a zero value.
+				return isJSONZeroValue(normalizedExpected)
+			}
+			return valuesMatch(normalizedExpected, actual)
+		}
+		nested, ok := current[seg]
+		if !ok {
+			return false
+		}
+		nestedMap, ok := nested.(map[string]any)
+		if !ok {
+			return false
+		}
+		current = nestedMap
+	}
+	return true
+}
+
+// isJSONZeroValue reports whether v is a zero value that omitempty would suppress:
+// false for bools, 0 for numbers, "" for strings, nil, empty slices, and empty objects.
+func isJSONZeroValue(v any) bool {
+	switch val := v.(type) {
+	case bool:
+		return !val
+	case float64:
+		return val == 0
+	case string:
+		return val == ""
+	case nil:
+		return true
+	case []any:
+		return len(val) == 0
+	case map[string]any:
+		return len(val) == 0
+	default:
+		return false
+	}
+}
+
+// valuesMatch compares two values recursively.
+// Arrays are compared as unordered sets: every expected element must have a match in actual.
+// Objects are compared as subsets: every expected key must exist in actual with a matching value,
+// tolerating extra fields added by the server.
+// All other values are compared via their JSON representations.
+func valuesMatch(expected, actual any) bool {
+	switch e := expected.(type) {
+	case []any:
+		a, ok := actual.([]any)
+		if !ok || len(e) != len(a) {
+			return false
+		}
+		matched := make([]bool, len(a))
+		for _, expElem := range e {
+			found := false
+			for j, actElem := range a {
+				if !matched[j] && valuesMatch(expElem, actElem) {
+					matched[j] = true
+					found = true
+					break
+				}
+			}
+			if !found {
+				return false
+			}
+		}
+		return true
+
+	case map[string]any:
+		a, ok := actual.(map[string]any)
+		if !ok {
+			return false
+		}
+		for k, expVal := range e {
+			actVal, ok := a[k]
+			if !ok || !valuesMatch(expVal, actVal) {
+				return false
+			}
+		}
+		return true
+
+	default:
+		expBytes, _ := json.Marshal(expected)
+		actBytes, _ := json.Marshal(actual)
+		return string(expBytes) == string(actBytes)
+	}
 }

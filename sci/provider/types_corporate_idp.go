@@ -2,8 +2,12 @@ package provider
 
 import (
 	"context"
+	"fmt"
+	"reflect"
 
 	corporateidps "github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/corporateIdps"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/generic"
+	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -25,59 +29,65 @@ type signingCertificateData struct {
 }
 
 type saml2ConfigData struct {
-	SamlMetadataUrl     types.String `tfsdk:"saml_metadata_url"`
-	DigestAlgorithm     types.String `tfsdk:"digest_algorithm"`
-	IncludeScoping      types.Bool   `tfsdk:"include_scoping"`
-	NameIdFormat        types.String `tfsdk:"name_id_format"`
-	AllowCreate         types.String `tfsdk:"allow_create"`
-	AssertionAttributes types.List   `tfsdk:"assertion_attributes"`
-	SigningCertificates types.List   `tfsdk:"signing_certificates"`
-	SsoEndpoints        types.List   `tfsdk:"sso_endpoints"`
-	SloEndpoints        types.List   `tfsdk:"slo_endpoints"`
+	SamlMetadataUrl     types.String `tfsdk:"saml_metadata_url"    json:"samlMetadataUrl"`
+	DigestAlgorithm     types.String `tfsdk:"digest_algorithm"     json:"digestAlgorithm"`
+	IncludeScoping      types.Bool   `tfsdk:"include_scoping"      json:"includeScoping"`
+	NameIdFormat        types.String `tfsdk:"name_id_format"       json:"defaultNameIdFormat"`
+	AllowCreate         types.String `tfsdk:"allow_create"         json:"allowCreate"`
+	AssertionAttributes types.List   `tfsdk:"assertion_attributes" json:"assertionAttributes"`
+	SigningCertificates types.List   `tfsdk:"signing_certificates" json:"certificatesForSigning"`
+	SsoEndpoints        types.List   `tfsdk:"sso_endpoints"        json:"ssoEndpoints"`
+	SloEndpoints        types.List   `tfsdk:"slo_endpoints"        json:"sloEndpoints"`
+}
+
+type oidcAdditionalConfigData struct {
+	EnforceNonce             types.Bool `tfsdk:"enforce_nonce"               json:"enforceNonce"`
+	EnforceIssuerCheck       types.Bool `tfsdk:"enforce_issuer_check"        json:"enforceIssuerCheck"`
+	DisableLogoutIdTokenHint types.Bool `tfsdk:"disable_logout_id_token_hint" json:"omitIDTokenHintForLogout"`
 }
 
 type oidcConfigData struct {
-	DiscoveryUrl             types.String `tfsdk:"discovery_url"`
-	ClientId                 types.String `tfsdk:"client_id"`
-	ClientSecret             types.String `tfsdk:"client_secret"`
-	SubjectNameIdentifier    types.String `tfsdk:"subject_name_identifier"`
-	TokenEndpointAuthMethod  types.String `tfsdk:"token_endpoint_auth_method"`
-	Scopes                   types.Set    `tfsdk:"scopes"`
-	PkceEnabled              types.Bool   `tfsdk:"enable_pkce"`
-	AdditionalConfig         types.Object `tfsdk:"additional_config"`
-	Issuer                   types.String `tfsdk:"issuer"`
-	JwksUri                  types.String `tfsdk:"jwks_uri"`
-	Jwks                     types.String `tfsdk:"jwks"`
-	TokenEndpoint            types.String `tfsdk:"token_endpoint"`
-	AuthorizationEndpoint    types.String `tfsdk:"authorization_endpoint"`
-	LogoutEndpoint           types.String `tfsdk:"logout_endpoint"`
-	UserInfoEndpoint         types.String `tfsdk:"user_info_endpoint"`
-	IsClientSecretConfigured types.Bool   `tfsdk:"is_client_secret_configured"`
+	DiscoveryUrl             types.String `tfsdk:"discovery_url"               json:"discoveryUrl"`
+	ClientId                 types.String `tfsdk:"client_id"                   json:"clientId"`
+	ClientSecret             types.String `tfsdk:"client_secret"               json:"clientSecret"`
+	SubjectNameIdentifier    types.String `tfsdk:"subject_name_identifier"     json:"subjectNameIdentifier"`
+	TokenEndpointAuthMethod  types.String `tfsdk:"token_endpoint_auth_method"  json:"tokenEndpointAuthMethod"`
+	Scopes                   types.Set    `tfsdk:"scopes"                      json:"scopes"`
+	PkceEnabled              types.Bool   `tfsdk:"enable_pkce"                 json:"pkceEnabled"`
+	AdditionalConfig         types.Object `tfsdk:"additional_config"           json:"additionalConfig"`
+	Issuer                   types.String `tfsdk:"issuer"                      json:"issuer"`
+	JwksUri                  types.String `tfsdk:"jwks_uri"                    json:"jwksUri"`
+	Jwks                     types.String `tfsdk:"jwks"                        json:"jwkSetPlain"`
+	TokenEndpoint            types.String `tfsdk:"token_endpoint"              json:"tokenEndpoint"`
+	AuthorizationEndpoint    types.String `tfsdk:"authorization_endpoint"      json:"authorizationEndpoint"`
+	LogoutEndpoint           types.String `tfsdk:"logout_endpoint"             json:"endSessionEndpoint"`
+	UserInfoEndpoint         types.String `tfsdk:"user_info_endpoint"          json:"userInfoEndpoint"`
+	IsClientSecretConfigured types.Bool   `tfsdk:"is_client_secret_configured" json:"isClientSecretConfigured"`
 }
 
 type loginHintConfigData struct {
-	LoginHintType types.String `tfsdk:"login_hint_type"`
-	SendMethod    types.String `tfsdk:"send_method"`
+	LoginHintType types.String `tfsdk:"login_hint_type" json:"loginHintType"`
+	SendMethod    types.String `tfsdk:"send_method"     json:"sendMethod"`
 }
 
 type identityFederationData struct {
-	UseLocalUserStore        types.Bool `tfsdk:"use_local_user_store"`
-	AllowLocalUsersOnly      types.Bool `tfsdk:"allow_local_users_only"`
-	ApplyLocalIdPAuthnChecks types.Bool `tfsdk:"apply_local_idp_auth_and_checks"`
-	RequiredGroups           types.Set  `tfsdk:"required_groups"`
+	UseLocalUserStore        types.Bool `tfsdk:"use_local_user_store"        json:"useLocalUserStore"`
+	AllowLocalUsersOnly      types.Bool `tfsdk:"allow_local_users_only"      json:"allowLocalUsersOnly"`
+	ApplyLocalIdPAuthnChecks types.Bool `tfsdk:"apply_local_idp_auth_and_checks" json:"applyLocalIdPAuthnChecks"`
+	RequiredGroups           types.Set  `tfsdk:"required_groups"             json:"requiredGroups"`
 }
 
 type corporateIdPData struct {
-	Id                    types.String `tfsdk:"id"`
-	Name                  types.String `tfsdk:"name"`
-	DisplayName           types.String `tfsdk:"display_name"`
-	Type                  types.String `tfsdk:"type"`
-	LogoutUrl             types.String `tfsdk:"logout_url"`
-	ForwardAllSsoRequests types.Bool   `tfsdk:"forward_all_sso_requests"`
-	IdentityFederation    types.Object `tfsdk:"identity_federation"`
-	LoginHintConfig       types.Object `tfsdk:"login_hint_config"`
-	Saml2Config           types.Object `tfsdk:"saml2_config"`
-	OidcConfig            types.Object `tfsdk:"oidc_config"`
+	Id                    types.String `tfsdk:"id"                       json:"id"`
+	Name                  types.String `tfsdk:"name"                     json:"name"`
+	DisplayName           types.String `tfsdk:"display_name"             json:"displayName"`
+	Type                  types.String `tfsdk:"type"                     json:"type"`
+	LogoutUrl             types.String `tfsdk:"logout_url"               json:"logoutUrl"`
+	ForwardAllSsoRequests types.Bool   `tfsdk:"forward_all_sso_requests" json:"forwardAllSsoRequests"`
+	IdentityFederation    types.Object `tfsdk:"identity_federation"      json:"identityFederation"`
+	LoginHintConfig       types.Object `tfsdk:"login_hint_config"        json:"loginHintConfiguration"`
+	Saml2Config           types.Object `tfsdk:"saml2_config"             json:"saml2Configuration"`
+	OidcConfig            types.Object `tfsdk:"oidc_config"              json:"oidcConfiguration"`
 }
 
 func corporateIdPValueFrom(ctx context.Context, c corporateidps.IdentityProvider) (corporateIdPData, diag.Diagnostics) {
@@ -420,6 +430,300 @@ func (r *corporateIdPResource) getCorporateIdPRequest(ctx context.Context, plan 
 	}
 
 	return corporateIdP, diagnostics
+}
+
+// appendPatch resolves the JSON path for fieldName, builds a replace patch, and appends it to reqs.
+// On error it records diagnostics and returns reqs unchanged.
+func appendPatch(reqs []generic.PatchRequest, diagnostics *diag.Diagnostics, fieldName, path string, value any, t reflect.Type) []generic.PatchRequest {
+	patchReq, diags := utils.GetPatchRequest(fieldName, path, value, t)
+	diagnostics.Append(diags...)
+	if diagnostics.HasError() {
+		return reqs
+	}
+	return append(reqs, patchReq)
+}
+
+func diffIdentityFederation(ctx context.Context, plan, state corporateIdPData, basePath string) ([]generic.PatchRequest, diag.Diagnostics) {
+	var diagnostics diag.Diagnostics
+	reqs := []generic.PatchRequest{}
+
+	var planIdF, stateIdF identityFederationData
+	diagnostics.Append(plan.IdentityFederation.As(ctx, &planIdF, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})...)
+	diagnostics.Append(state.IdentityFederation.As(ctx, &stateIdF, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})...)
+	if diagnostics.HasError() {
+		return reqs, diagnostics
+	}
+
+	idfType := reflect.TypeFor[identityFederationData]()
+
+	if !planIdF.UseLocalUserStore.Equal(stateIdF.UseLocalUserStore) {
+		reqs = appendPatch(reqs, &diagnostics, "UseLocalUserStore", basePath, planIdF.UseLocalUserStore.ValueBool(), idfType)
+	}
+	if !planIdF.AllowLocalUsersOnly.Equal(stateIdF.AllowLocalUsersOnly) {
+		reqs = appendPatch(reqs, &diagnostics, "AllowLocalUsersOnly", basePath, planIdF.AllowLocalUsersOnly.ValueBool(), idfType)
+	}
+	if !planIdF.ApplyLocalIdPAuthnChecks.Equal(stateIdF.ApplyLocalIdPAuthnChecks) {
+		reqs = appendPatch(reqs, &diagnostics, "ApplyLocalIdPAuthnChecks", basePath, planIdF.ApplyLocalIdPAuthnChecks.ValueBool(), idfType)
+	}
+	if !planIdF.RequiredGroups.Equal(stateIdF.RequiredGroups) {
+		val := []string{}
+		if !planIdF.RequiredGroups.IsNull() {
+			diagnostics.Append(planIdF.RequiredGroups.ElementsAs(ctx, &val, true)...)
+		}
+		reqs = appendPatch(reqs, &diagnostics, "RequiredGroups", basePath, val, idfType)
+	}
+
+	return reqs, diagnostics
+}
+
+func diffLoginHintConfig(ctx context.Context, plan, state corporateIdPData, basePath string) ([]generic.PatchRequest, diag.Diagnostics) {
+	var diagnostics diag.Diagnostics
+	reqs := []generic.PatchRequest{}
+
+	var planLhc, stateLhc loginHintConfigData
+	diagnostics.Append(plan.LoginHintConfig.As(ctx, &planLhc, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})...)
+	diagnostics.Append(state.LoginHintConfig.As(ctx, &stateLhc, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})...)
+	if diagnostics.HasError() {
+		return reqs, diagnostics
+	}
+
+	lhcType := reflect.TypeFor[loginHintConfigData]()
+
+	if !planLhc.LoginHintType.Equal(stateLhc.LoginHintType) {
+		reqs = appendPatch(reqs, &diagnostics, "LoginHintType", basePath, planLhc.LoginHintType.ValueString(), lhcType)
+	}
+	if !planLhc.SendMethod.Equal(stateLhc.SendMethod) {
+		reqs = appendPatch(reqs, &diagnostics, "SendMethod", basePath, planLhc.SendMethod.ValueString(), lhcType)
+	}
+
+	return reqs, diagnostics
+}
+
+func diffSaml2Config(ctx context.Context, plan, state corporateIdPData, basePath string) ([]generic.PatchRequest, diag.Diagnostics) {
+	var diagnostics diag.Diagnostics
+	reqs := []generic.PatchRequest{}
+
+	var planSaml, stateSaml saml2ConfigData
+	diagnostics.Append(plan.Saml2Config.As(ctx, &planSaml, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})...)
+	diagnostics.Append(state.Saml2Config.As(ctx, &stateSaml, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})...)
+	if diagnostics.HasError() {
+		return reqs, diagnostics
+	}
+
+	samlType := reflect.TypeFor[saml2ConfigData]()
+
+	if !planSaml.SamlMetadataUrl.Equal(stateSaml.SamlMetadataUrl) {
+		reqs = appendPatch(reqs, &diagnostics, "SamlMetadataUrl", basePath, planSaml.SamlMetadataUrl.ValueString(), samlType)
+	}
+	if !planSaml.DigestAlgorithm.Equal(stateSaml.DigestAlgorithm) {
+		reqs = appendPatch(reqs, &diagnostics, "DigestAlgorithm", basePath, planSaml.DigestAlgorithm.ValueString(), samlType)
+	}
+	if !planSaml.IncludeScoping.Equal(stateSaml.IncludeScoping) {
+		reqs = appendPatch(reqs, &diagnostics, "IncludeScoping", basePath, planSaml.IncludeScoping.ValueBool(), samlType)
+	}
+	if !planSaml.NameIdFormat.Equal(stateSaml.NameIdFormat) {
+		reqs = appendPatch(reqs, &diagnostics, "NameIdFormat", basePath, planSaml.NameIdFormat.ValueString(), samlType)
+	}
+	if !planSaml.AllowCreate.Equal(stateSaml.AllowCreate) {
+		reqs = appendPatch(reqs, &diagnostics, "AllowCreate", basePath, planSaml.AllowCreate.ValueString(), samlType)
+	}
+
+	if !planSaml.AssertionAttributes.Equal(stateSaml.AssertionAttributes) {
+		val := []corporateidps.AssertionAttribute{}
+		if !planSaml.AssertionAttributes.IsNull() {
+			diagnostics.Append(planSaml.AssertionAttributes.ElementsAs(ctx, &val, true)...)
+		}
+		reqs = appendPatch(reqs, &diagnostics, "AssertionAttributes", basePath, val, samlType)
+	}
+	if !planSaml.SigningCertificates.Equal(stateSaml.SigningCertificates) {
+		val := []corporateidps.SigningCertificateData{}
+		if !planSaml.SigningCertificates.IsNull() {
+			diagnostics.Append(planSaml.SigningCertificates.ElementsAs(ctx, &val, true)...)
+		}
+		reqs = appendPatch(reqs, &diagnostics, "SigningCertificates", basePath, val, samlType)
+	}
+	if !planSaml.SsoEndpoints.Equal(stateSaml.SsoEndpoints) {
+		val := []corporateidps.SAML2SSOEndpoint{}
+		if !planSaml.SsoEndpoints.IsNull() {
+			diagnostics.Append(planSaml.SsoEndpoints.ElementsAs(ctx, &val, true)...)
+		}
+		reqs = appendPatch(reqs, &diagnostics, "SsoEndpoints", basePath, val, samlType)
+	}
+	if !planSaml.SloEndpoints.Equal(stateSaml.SloEndpoints) {
+		val := []corporateidps.SAML2SLOEndpoint{}
+		if !planSaml.SloEndpoints.IsNull() {
+			diagnostics.Append(planSaml.SloEndpoints.ElementsAs(ctx, &val, true)...)
+		}
+		reqs = appendPatch(reqs, &diagnostics, "SloEndpoints", basePath, val, samlType)
+	}
+
+	return reqs, diagnostics
+}
+
+func diffOidcConfig(ctx context.Context, plan, state corporateIdPData, basePath string) ([]generic.PatchRequest, diag.Diagnostics) {
+	var diagnostics diag.Diagnostics
+	reqs := []generic.PatchRequest{}
+
+	var planOidc, stateOidc oidcConfigData
+	diagnostics.Append(plan.OidcConfig.As(ctx, &planOidc, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})...)
+	diagnostics.Append(state.OidcConfig.As(ctx, &stateOidc, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})...)
+	if diagnostics.HasError() {
+		return reqs, diagnostics
+	}
+
+	oidcType := reflect.TypeFor[oidcConfigData]()
+
+	if !planOidc.DiscoveryUrl.Equal(stateOidc.DiscoveryUrl) {
+		reqs = appendPatch(reqs, &diagnostics, "DiscoveryUrl", basePath, planOidc.DiscoveryUrl.ValueString(), oidcType)
+	}
+	if !planOidc.ClientId.Equal(stateOidc.ClientId) {
+		reqs = appendPatch(reqs, &diagnostics, "ClientId", basePath, planOidc.ClientId.ValueString(), oidcType)
+	}
+	if !planOidc.ClientSecret.Equal(stateOidc.ClientSecret) {
+		reqs = appendPatch(reqs, &diagnostics, "ClientSecret", basePath, planOidc.ClientSecret.ValueString(), oidcType)
+	}
+	if !planOidc.SubjectNameIdentifier.Equal(stateOidc.SubjectNameIdentifier) {
+		reqs = appendPatch(reqs, &diagnostics, "SubjectNameIdentifier", basePath, planOidc.SubjectNameIdentifier.ValueString(), oidcType)
+	}
+	if !planOidc.TokenEndpointAuthMethod.Equal(stateOidc.TokenEndpointAuthMethod) {
+		reqs = appendPatch(reqs, &diagnostics, "TokenEndpointAuthMethod", basePath, planOidc.TokenEndpointAuthMethod.ValueString(), oidcType)
+	}
+	if !planOidc.PkceEnabled.Equal(stateOidc.PkceEnabled) {
+		reqs = appendPatch(reqs, &diagnostics, "PkceEnabled", basePath, planOidc.PkceEnabled.ValueBool(), oidcType)
+	}
+
+	if !planOidc.Scopes.Equal(stateOidc.Scopes) {
+		val := []string{}
+		if !planOidc.Scopes.IsNull() {
+			diagnostics.Append(planOidc.Scopes.ElementsAs(ctx, &val, true)...)
+		}
+		reqs = appendPatch(reqs, &diagnostics, "Scopes", basePath, val, oidcType)
+	}
+
+	if !planOidc.AdditionalConfig.Equal(stateOidc.AdditionalConfig) {
+		additionalConfigTag, diags := utils.GetAttributeTag("AdditionalConfig", oidcType)
+		diagnostics.Append(diags...)
+		if diagnostics.HasError() {
+			return reqs, diagnostics
+		}
+		additionalConfigPath := fmt.Sprintf("%s/%s", basePath, additionalConfigTag)
+
+		var planAdditional, stateAdditional oidcAdditionalConfigData
+		diagnostics.Append(planOidc.AdditionalConfig.As(ctx, &planAdditional, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})...)
+		diagnostics.Append(stateOidc.AdditionalConfig.As(ctx, &stateAdditional, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})...)
+		if diagnostics.HasError() {
+			return reqs, diagnostics
+		}
+
+		additionalConfigType := reflect.TypeFor[oidcAdditionalConfigData]()
+
+		if !planAdditional.EnforceNonce.Equal(stateAdditional.EnforceNonce) {
+			reqs = appendPatch(reqs, &diagnostics, "EnforceNonce", additionalConfigPath, planAdditional.EnforceNonce.ValueBool(), additionalConfigType)
+		}
+		if !planAdditional.EnforceIssuerCheck.Equal(stateAdditional.EnforceIssuerCheck) {
+			reqs = appendPatch(reqs, &diagnostics, "EnforceIssuerCheck", additionalConfigPath, planAdditional.EnforceIssuerCheck.ValueBool(), additionalConfigType)
+		}
+		if !planAdditional.DisableLogoutIdTokenHint.Equal(stateAdditional.DisableLogoutIdTokenHint) {
+			reqs = appendPatch(reqs, &diagnostics, "DisableLogoutIdTokenHint", additionalConfigPath, planAdditional.DisableLogoutIdTokenHint.ValueBool(), additionalConfigType)
+		}
+	}
+
+	return reqs, diagnostics
+}
+
+func getCorporateIdPUpdateRequest(ctx context.Context, plan corporateIdPData, state corporateIdPData) ([]generic.PatchRequest, diag.Diagnostics) {
+	var diagnostics diag.Diagnostics
+	reqs := []generic.PatchRequest{}
+
+	idpType := reflect.TypeFor[corporateIdPData]()
+
+	if !plan.DisplayName.Equal(state.DisplayName) {
+		reqs = appendPatch(reqs, &diagnostics, "DisplayName", "", plan.DisplayName.ValueString(), idpType)
+	}
+
+	if !plan.Name.Equal(state.Name) {
+		if plan.Name.IsNull() || plan.Name.IsUnknown() {
+			reqs = append(reqs, utils.GenerateDeletePatchRequest("/name"))
+		} else {
+			reqs = appendPatch(reqs, &diagnostics, "Name", "", plan.Name.ValueString(), idpType)
+		}
+	}
+
+	if !plan.Type.Equal(state.Type) {
+		reqs = appendPatch(reqs, &diagnostics, "Type", "", plan.Type.ValueString(), idpType)
+	}
+
+	if !plan.LogoutUrl.Equal(state.LogoutUrl) {
+		if plan.LogoutUrl.IsNull() || plan.LogoutUrl.IsUnknown() {
+			reqs = append(reqs, utils.GenerateDeletePatchRequest("/logoutUrl"))
+		} else {
+			reqs = appendPatch(reqs, &diagnostics, "LogoutUrl", "", plan.LogoutUrl.ValueString(), idpType)
+		}
+	}
+
+	if !plan.ForwardAllSsoRequests.Equal(state.ForwardAllSsoRequests) {
+		reqs = appendPatch(reqs, &diagnostics, "ForwardAllSsoRequests", "", plan.ForwardAllSsoRequests.ValueBool(), idpType)
+	}
+
+	if diagnostics.HasError() {
+		return reqs, diagnostics
+	}
+
+	type subObjDiff struct {
+		changed bool
+		field   string
+		diff    func(path string) ([]generic.PatchRequest, diag.Diagnostics)
+	}
+
+	subObjs := []subObjDiff{
+		{
+			changed: !plan.IdentityFederation.Equal(state.IdentityFederation),
+			field:   "IdentityFederation",
+			diff: func(path string) ([]generic.PatchRequest, diag.Diagnostics) {
+				return diffIdentityFederation(ctx, plan, state, path)
+			},
+		},
+		{
+			changed: !plan.LoginHintConfig.Equal(state.LoginHintConfig),
+			field:   "LoginHintConfig",
+			diff: func(path string) ([]generic.PatchRequest, diag.Diagnostics) {
+				return diffLoginHintConfig(ctx, plan, state, path)
+			},
+		},
+		{
+			changed: !plan.Saml2Config.Equal(state.Saml2Config),
+			field:   "Saml2Config",
+			diff: func(path string) ([]generic.PatchRequest, diag.Diagnostics) {
+				return diffSaml2Config(ctx, plan, state, path)
+			},
+		},
+		{
+			changed: !plan.OidcConfig.Equal(state.OidcConfig),
+			field:   "OidcConfig",
+			diff: func(path string) ([]generic.PatchRequest, diag.Diagnostics) {
+				return diffOidcConfig(ctx, plan, state, path)
+			},
+		},
+	}
+
+	for _, s := range subObjs {
+		if !s.changed {
+			continue
+		}
+		path, diags := utils.GetAttributeTag(s.field, idpType)
+		diagnostics.Append(diags...)
+		if diagnostics.HasError() {
+			return reqs, diagnostics
+		}
+		subReqs, diags := s.diff(path)
+		diagnostics.Append(diags...)
+		if diagnostics.HasError() {
+			return reqs, diagnostics
+		}
+		reqs = append(reqs, subReqs...)
+	}
+
+	return reqs, diagnostics
 }
 
 func mapOidcClientSecret(ctx context.Context, plan corporateIdPData, state *corporateIdPData) diag.Diagnostics {

@@ -12,6 +12,8 @@ require (
 	software.sslmate.com/src/go-pkcs12 v0.7.1
 )
 
+require github.com/hashicorp/terraform-plugin-framework-timeouts v0.7.0 // indirect
+
 require (
 	github.com/ProtonMail/go-crypto v1.4.1 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
