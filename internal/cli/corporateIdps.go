@@ -81,6 +81,9 @@ func (c *CorporateIdPsCli) Delete(ctx context.Context, idpId string) error {
 }
 
 func (c *CorporateIdPsCli) pollUntilUpdated(ctx context.Context, idpId string, ops []generic.PatchRequest) (corporateidps.IdentityProvider, string, error) {
+	ctx, cancel := context.WithTimeout(ctx, 20*time.Minute)
+	defer cancel()
+
 	for {
 		select {
 		case <-ctx.Done():

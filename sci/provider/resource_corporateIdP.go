@@ -321,7 +321,7 @@ func (r *corporateIdPResource) Schema(_ context.Context, _ resource.SchemaReques
 									Optional:            true,
 									Computed:            true,
 									PlanModifiers: []planmodifier.Bool{
-										boolplanmodifier.UseStateForUnknown(),
+										boolplanmodifier.UseNonNullStateForUnknown(),
 									},
 								},
 							},
@@ -364,7 +364,7 @@ func (r *corporateIdPResource) Schema(_ context.Context, _ resource.SchemaReques
 									Optional:            true,
 									Computed:            true,
 									PlanModifiers: []planmodifier.Bool{
-										boolplanmodifier.UseStateForUnknown(),
+										boolplanmodifier.UseNonNullStateForUnknown(),
 									},
 								},
 							},
