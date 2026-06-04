@@ -40,6 +40,8 @@ jobs:
     name: Regression Test against Canary Tenant
     needs: build
     runs-on: ubuntu-latest
+    environment:
+          name: sci
 
     steps:
     - name: Check out Git repository
