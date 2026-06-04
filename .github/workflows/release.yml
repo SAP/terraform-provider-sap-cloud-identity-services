@@ -26,6 +26,8 @@ jobs:
   #     issues: write
   goreleaser:
     runs-on: ubuntu-latest
+    environment:
+          name: sci
     needs:
       - call-workflow-test
       # - call-workflow-regression-test

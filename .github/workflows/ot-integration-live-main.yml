@@ -18,6 +18,9 @@ jobs:
   test:
     name: Integration Test for Local Provider against Prod Tenant
     runs-on: ubuntu-latest
+
+    environment:
+      name: sci
     
     steps:
       - name: Check out Git repository
@@ -52,7 +55,7 @@ jobs:
         id: tofu_apply_local
         shell: bash
         env:
-          P12_CERTIFICATE_BASE64_STRING: ${{ secrets.P12_CERTIFICATE_BASE64_STRING }}
+          P12_CERTIFICATE_BASE64_STRING: ${{ secrets.LIVE_P12_CERTIFICATE_BASE64_STRING }}
           PATH_TO_TFSCRIPT: ${{ env.PATH_TO_TFSCRIPT }}
         run: |
           echo "$P12_CERTIFICATE_BASE64_STRING" | base64 --decode > $PATH_TO_TFSCRIPT/cert.p12
@@ -66,7 +69,7 @@ jobs:
             echo "Tofu apply attempt $i..."
 
             tofu -chdir=$PATH_TO_TFSCRIPT apply \
-              -var tenant_url="${{ secrets.TENANT_URL }}" \
+              -var tenant_url="${{ secrets.LIVE_TENANT_URL }}" \
               -var certificate_file_path="cert.p12" \
               -var certificate_file_password="${{ secrets.P12_CERTIFICATE_PASSWORD }}" \
               -var certificate="${{ secrets.PEM_CERTIFICATE_STRING }}" \
@@ -95,7 +98,7 @@ jobs:
         id: tofu_destory
         shell: bash
         env:
-          P12_CERTIFICATE_BASE64_STRING: ${{ secrets.P12_CERTIFICATE_BASE64_STRING }}
+          P12_CERTIFICATE_BASE64_STRING: ${{ secrets.LIVE_P12_CERTIFICATE_BASE64_STRING }}
           PATH_TO_TFSCRIPT: ${{ env.PATH_TO_TFSCRIPT }}
         run: |
           echo "$P12_CERTIFICATE_BASE64_STRING" | base64 --decode > $PATH_TO_TFSCRIPT/cert.p12
@@ -109,7 +112,7 @@ jobs:
             echo "Tofu apply attempt $i..."
 
             tofu -chdir=$PATH_TO_TFSCRIPT destroy \
-              -var tenant_url="${{ secrets.TENANT_URL }}" \
+              -var tenant_url="${{ secrets.LIVE_TENANT_URL }}" \
               -var certificate_file_path="cert.p12" \
               -var certificate_file_password="${{ secrets.P12_CERTIFICATE_PASSWORD }}" \
               -var certificate="${{ secrets.PEM_CERTIFICATE_STRING }}" \
