@@ -4,6 +4,10 @@ terraform {
       source  = "sap/sap-cloud-identity-services"
       version = "0.5.0-beta1"
     }
+    time = {
+      source  = "hashicorp/time"
+      version = "0.14.0"
+    }
   }
 }
 
