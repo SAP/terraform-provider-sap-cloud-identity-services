@@ -45,12 +45,18 @@ jobs:
         run: |
           go mod tidy && make install
 
-      - name: Remove init data and place override
+      - name: Tofu init to fetch 'time' Terraform provider
+        id: tofu_init
+        shell: bash
+        run: |
+          tofu -chdir=${{ env.PATH_TO_TFSCRIPT }} init -no-color
+
+      - name: Remove init data and place override for SCI provider
         id: set_to_override
         shell: bash
         run: |
-          rm -rf .terraform && rm -rf .terraform.lock.hcl && cp ${{ env.DEV_OVERRIDE }} ~/.terraformrc
-
+          rm -rf .terraform/providers/registry.opentofu.org/sap && sed -i '/^provider "registry\.opentofu\.org\/sap\/sap-cloud-identity-services"/,/^}/d' tests/integration-tests/.terraform.lock.hcl && cp ${{ env.DEV_OVERRIDE }} ~/.terraformrc
+      
       - name: Tofu Apply with local provider
         id: tofu_apply_local
         shell: bash
@@ -73,7 +79,7 @@ jobs:
               -var certificate_file_path="cert.p12" \
               -var certificate_file_password="${{ secrets.P12_CERTIFICATE_PASSWORD }}" \
               -var certificate="${{ secrets.PEM_CERTIFICATE_STRING }}" \
-              -parallelism=2 \
+              -parallelism=1 \
               -auto-approve -no-color || EXIT_CODE=$?
 
             if [ ${EXIT_CODE:-0} -eq 0 ]; then
