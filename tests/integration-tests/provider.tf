@@ -2,7 +2,7 @@ terraform {
   required_providers {
     sci = {
       source  = "sap/sap-cloud-identity-services"
-      version = "0.5.0-beta1"
+      version = "0.6.0-beta1"
     }
     time = {
       source  = "hashicorp/time"
