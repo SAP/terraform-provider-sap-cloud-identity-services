@@ -22,7 +22,6 @@ jobs:
 
   live-stable:
     name: Live Stable
-    needs: [canary-stable]
     uses: ./.github/workflows/ot-integration-live-stable.yml
     secrets: inherit
 

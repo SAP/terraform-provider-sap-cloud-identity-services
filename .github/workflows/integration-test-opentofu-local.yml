@@ -21,7 +21,6 @@ jobs:
 
   live-main:
     name: Live Main
-    needs: [canary-main]
     uses: ./.github/workflows/ot-integration-live-main.yml
     secrets: inherit
 
