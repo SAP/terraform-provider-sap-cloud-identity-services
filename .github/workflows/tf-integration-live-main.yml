@@ -57,7 +57,7 @@ jobs:
         id: set_to_override
         shell: bash
         run: |
-          rm -rf .terraform/providers/registry.terraform.io/sap && sed -i '' '/^provider "registry\.terraform\.io\/sap\/sap-cloud-identity-services"/,/^}/d' .terraform.lock.hcl && cp ${{ env.DEV_OVERRIDE }} ~/.terraformrc
+          rm -rf .terraform/providers/registry.terraform.io/sap && sed -i '/^provider "registry\.terraform\.io\/sap\/sap-cloud-identity-services"/,/^}/d' tests/integration-tests/.terraform.lock.hcl && cp ${{ env.DEV_OVERRIDE }} ~/.terraformrc
 
       - name: Terraform Apply with local provider
         id: terraform_apply_local
