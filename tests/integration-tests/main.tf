@@ -166,6 +166,7 @@ resource "sci_corporate_idp" "testSamlIdP" {
 
 resource "time_sleep" "wait_40_seconds_idp" {
   create_duration = "40s"
+  depends_on = [ sci_corporate_idp.testSamlIdP ]
 }
 
 resource "sci_corporate_idp" "testOidcIdP" {
@@ -214,6 +215,7 @@ resource "sci_application" "parentApp" {
 
 resource "time_sleep" "wait_40_seconds_app" {
   create_duration = "40s"
+  depends_on = [ sci_application.parentApp ]
 }
 
 resource "sci_application" "testApp" {
@@ -260,6 +262,7 @@ resource "sci_application" "testApp" {
 
 resource "time_sleep" "wait_40_seconds_basicApp" {
   create_duration = "40s"
+  depends_on = [ sci_application.testApp ]
 }
 
 resource "sci_application" "testSamlApp" {
@@ -309,6 +312,7 @@ resource "sci_application" "testSamlApp" {
 
 resource "time_sleep" "wait_40_seconds_samlApp" {
   create_duration = "40s"
+  depends_on = [ sci_application.testSamlApp ]
 }
 
 resource "sci_application" "testOidcApp" {
