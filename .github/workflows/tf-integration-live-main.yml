@@ -46,7 +46,14 @@ jobs:
         run: |
           go mod tidy && make install
 
-      - name: Remove init data and place override
+      - name: Terraform init to fetch 'time' Terraform provider
+        id: terraform_init
+        shell: bash
+        run: |
+          terraform -chdir=${{ env.PATH_TO_TFSCRIPT }} init -no-color
+          go mod tidy && make install
+
+      - name: Remove init data and place override for SCI provider
         id: set_to_override
         shell: bash
         run: |
