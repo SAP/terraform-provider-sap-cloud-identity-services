@@ -46,11 +46,18 @@ jobs:
         run: |
           go mod tidy && make install
 
-      - name: Remove init data and place override
+      - name: Terraform init to fetch 'time' Terraform provider
+        id: terraform_init
+        shell: bash
+        run: |
+          terraform -chdir=${{ env.PATH_TO_TFSCRIPT }} init -no-color
+          go mod tidy && make install
+
+      - name: Remove init data and place override for SCI provider
         id: set_to_override
         shell: bash
         run: |
-          rm -rf .terraform && rm -rf .terraform.lock.hcl && cp ${{ env.DEV_OVERRIDE }} ~/.terraformrc
+          rm -rf .terraform/providers/registry.terraform.io/sap && sed -i '/^provider "registry\.terraform\.io\/sap\/sap-cloud-identity-services"/,/^}/d' tests/integration-tests/.terraform.lock.hcl && cp ${{ env.DEV_OVERRIDE }} ~/.terraformrc
 
       - name: Terraform Apply with local provider
         id: terraform_apply_local
@@ -74,6 +81,7 @@ jobs:
               -var certificate_file_path="cert.p12" \
               -var certificate_file_password="${{ secrets.P12_CERTIFICATE_PASSWORD }}" \
               -var certificate="${{ secrets.PEM_CERTIFICATE_STRING }}" \
+              -parallelism=2 \
               -auto-approve -no-color || EXIT_CODE=$?
 
             if [ ${EXIT_CODE:-0} -eq 0 ]; then

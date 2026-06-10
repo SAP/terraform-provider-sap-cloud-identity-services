@@ -237,7 +237,7 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		}
 
 		httpClient := &http.Client{
-			Timeout: 30 * time.Second,
+			Timeout: 90 * time.Second,
 			Transport: &http.Transport{
 				TLSClientConfig: tlsConfig,
 			},

@@ -164,6 +164,11 @@ resource "sci_corporate_idp" "testSamlIdP" {
   }
 }
 
+resource "time_sleep" "wait_40_seconds_idp" {
+  create_duration = "40s"
+  depends_on = [ sci_corporate_idp.testSamlIdP ]
+}
+
 resource "sci_corporate_idp" "testOidcIdP" {
   display_name             = local.oidc_idp_display_name
   name                     = local.oidc_idp_unique_name
@@ -199,11 +204,18 @@ resource "sci_corporate_idp" "testOidcIdP" {
       disable_logout_id_token_hint = true
     }
   }
+
+  depends_on = [ time_sleep.wait_40_seconds_idp ]
 }
 
 resource "sci_application" "parentApp" {
   name        = local.parent_app_unique_name
   description = "Integration test parent application"
+}
+
+resource "time_sleep" "wait_40_seconds_app" {
+  create_duration = "40s"
+  depends_on = [ sci_application.parentApp ]
 }
 
 resource "sci_application" "testApp" {
@@ -243,8 +255,14 @@ resource "sci_application" "testApp" {
         ip_network_range     = "10.16.12.12/24"
       }
     ]
-
   }
+
+  depends_on = [ time_sleep.wait_40_seconds_app ]
+}
+
+resource "time_sleep" "wait_40_seconds_basicApp" {
+  create_duration = "40s"
+  depends_on = [ sci_application.testApp ]
 }
 
 resource "sci_application" "testSamlApp" {
@@ -288,6 +306,13 @@ resource "sci_application" "testSamlApp" {
       digest_algorithm             = local.saml_algo
     }
   }
+
+  depends_on = [ time_sleep.wait_40_seconds_basicApp ]
+}
+
+resource "time_sleep" "wait_40_seconds_samlApp" {
+  create_duration = "40s"
+  depends_on = [ sci_application.testSamlApp ]
 }
 
 resource "sci_application" "testOidcApp" {
@@ -326,4 +351,6 @@ resource "sci_application" "testOidcApp" {
       }
     }
   }
+
+  depends_on = [ time_sleep.wait_40_seconds_samlApp ]
 } 
