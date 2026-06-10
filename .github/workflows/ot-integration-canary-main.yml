@@ -79,7 +79,7 @@ jobs:
               -var certificate_file_path="cert.p12" \
               -var certificate_file_password="${{ secrets.P12_CERTIFICATE_PASSWORD }}" \
               -var certificate="${{ secrets.PEM_CERTIFICATE_STRING }}" \
-              -parallelism=1 \
+              -parallelism=2 \
               -auto-approve -no-color || EXIT_CODE=$?
 
             if [ ${EXIT_CODE:-0} -eq 0 ]; then
