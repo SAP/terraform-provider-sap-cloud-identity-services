@@ -126,6 +126,7 @@ func (r *groupResource) Schema(_ context.Context, _ resource.SchemaRequest, resp
 						Computed:            true,
 						PlanModifiers: []planmodifier.String{
 							stringplanmodifier.UseStateForUnknown(),
+							stringplanmodifier.RequiresReplace(),
 						},
 					},
 					"description": schema.StringAttribute{
