@@ -68,7 +68,7 @@ func TestResourceGroup(t *testing.T) {
 			},
 			GroupExtension: &groups.GroupExtension{
 				Name:        "Test-Group",
-				Description: "For testing purposes",
+				Description: "For production purposes",
 			},
 		}
 
