@@ -16,7 +16,7 @@ import (
 
 type groupExtensionData struct {
 	Name        types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
+	Description types.String `tfsdk:"description" json:"description"`
 }
 
 type memberData struct {
