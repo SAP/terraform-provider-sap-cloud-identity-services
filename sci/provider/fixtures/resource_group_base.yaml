@@ -1,0 +1,304 @@
+---
+version: 2
+interactions:
+    - id: 0
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 280
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: |
+            {"meta":{},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Test Base Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"name":"Test-Base-Group","description":"Base group for testing"}}
+        form: {}
+        headers:
+            Accept:
+                - '*/*'
+            Authorization:
+                - REDACTED
+            Content-Type:
+                - application/scim+json
+            Dataserviceversion:
+                - "2.0"
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 621
+        uncompressed: false
+        body: '{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Test Base Group","id":"37a633e1-f528-4a2c-9423-4fdb66a15298","meta":{"created":"2026-07-01T06:34:20Z","lastModified":"2026-07-01T06:34:20Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/37a633e1-f528-4a2c-9423-4fdb66a15298","resourceType":"Group","version":"fe3a44c8-67cf-4909-8864-3d5929dc1b21"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"6a44b4ec6d30701702a89817","name":"Test-Base-Group","description":"Base group for testing"}}'
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+                - private,no-cache,no-store
+            Content-Length:
+                - "621"
+            Content-Security-Policy:
+                - script-src 'none';
+            Content-Type:
+                - application/scim+json
+            Date:
+                - Wed, 01 Jul 2026 06:34:21 GMT
+            Etag:
+                - '"fe3a44c8-67cf-4909-8864-3d5929dc1b21"'
+            Location:
+                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/37a633e1-f528-4a2c-9423-4fdb66a15298
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=63072000; includeSubDomains; preload
+            Vary:
+                - X-CSP-STRIP
+            X-Content-Type-Options:
+                - nosniff
+            X-Ids-Id:
+                - 83EA0E77-D7D4-4337-AC4C-208656833FA6
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-8p9gb
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Ids-Region:
+                - eu-de-1
+            X-Robots-Tag:
+                - none
+        status: '201 '
+        code: 201
+        duration: 942.732937ms
+    - id: 1
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            Accept:
+                - '*/*'
+            Authorization:
+                - REDACTED
+            Content-Type:
+                - application/scim+json
+            Dataserviceversion:
+                - "2.0"
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/37a633e1-f528-4a2c-9423-4fdb66a15298
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: -1
+        uncompressed: true
+        body: '{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Test Base Group","id":"37a633e1-f528-4a2c-9423-4fdb66a15298","meta":{"created":"2026-07-01T06:34:20Z","lastModified":"2026-07-01T06:34:20Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/37a633e1-f528-4a2c-9423-4fdb66a15298","resourceType":"Group","version":"fe3a44c8-67cf-4909-8864-3d5929dc1b21"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"6a44b4ec6d30701702a89817","name":"Test-Base-Group","description":"Base group for testing"}}'
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+                - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
+            Content-Type:
+                - application/scim+json
+            Date:
+                - Wed, 01 Jul 2026 06:34:21 GMT
+            Etag:
+                - '"fe3a44c8-67cf-4909-8864-3d5929dc1b21-gzip"'
+            Location:
+                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/37a633e1-f528-4a2c-9423-4fdb66a15298
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=63072000; includeSubDomains; preload
+            Vary:
+                - Accept-Encoding,X-CSP-STRIP
+            X-Content-Type-Options:
+                - nosniff
+            X-Ids-Id:
+                - 85EA5532-6DBD-4893-8E31-FA19F7DB5C2A
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-8p9gb
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Ids-Region:
+                - eu-de-1
+            X-Robots-Tag:
+                - none
+        status: '200 '
+        code: 200
+        duration: 254.477829ms
+    - id: 2
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            Accept:
+                - '*/*'
+            Authorization:
+                - REDACTED
+            Content-Type:
+                - application/scim+json
+            Dataserviceversion:
+                - "2.0"
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/37a633e1-f528-4a2c-9423-4fdb66a15298
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: -1
+        uncompressed: true
+        body: '{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Test Base Group","id":"37a633e1-f528-4a2c-9423-4fdb66a15298","meta":{"created":"2026-07-01T06:34:20Z","lastModified":"2026-07-01T06:34:20Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/37a633e1-f528-4a2c-9423-4fdb66a15298","resourceType":"Group","version":"fe3a44c8-67cf-4909-8864-3d5929dc1b21"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"6a44b4ec6d30701702a89817","name":"Test-Base-Group","description":"Base group for testing"}}'
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+                - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
+            Content-Type:
+                - application/scim+json
+            Date:
+                - Wed, 01 Jul 2026 06:34:22 GMT
+            Etag:
+                - '"fe3a44c8-67cf-4909-8864-3d5929dc1b21-gzip"'
+            Location:
+                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/37a633e1-f528-4a2c-9423-4fdb66a15298
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=63072000; includeSubDomains; preload
+            Vary:
+                - Accept-Encoding,X-CSP-STRIP
+            X-Content-Type-Options:
+                - nosniff
+            X-Ids-Id:
+                - 7C38E2A7-E186-4908-A4C6-DEC925798EDC
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-8p9gb
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Ids-Region:
+                - eu-de-1
+            X-Robots-Tag:
+                - none
+        status: '200 '
+        code: 200
+        duration: 241.95529ms
+    - id: 3
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            Accept:
+                - '*/*'
+            Authorization:
+                - REDACTED
+            Content-Type:
+                - application/scim+json
+            Dataserviceversion:
+                - "2.0"
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/37a633e1-f528-4a2c-9423-4fdb66a15298
+        method: DELETE
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 0
+        uncompressed: false
+        body: ""
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+                - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
+            Date:
+                - Wed, 01 Jul 2026 06:34:23 GMT
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=63072000; includeSubDomains; preload
+            Vary:
+                - X-CSP-STRIP
+            X-Content-Type-Options:
+                - nosniff
+            X-Ids-Id:
+                - A42644C3-4994-42BD-95A0-82810306937B
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-8p9gb
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Ids-Region:
+                - eu-de-1
+            X-Robots-Tag:
+                - none
+        status: '204 '
+        code: 204
+        duration: 258.623921ms

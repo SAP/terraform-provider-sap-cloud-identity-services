@@ -275,6 +275,10 @@ func (p *SciProvider) DataSources(_ context.Context) []func() datasource.DataSou
 		newSchemaDataSource,
 		newGroupsDataSource,
 		newGroupDataSource,
+		newGroupBaseDataSource,
+		newGroupBasesDataSource,
+		newGroupAssignmentDataSource,
+		newGroupAssignmentsDataSource,
 		newCorporateIdPDataSource,
 		newCorporateIdPsDataSource,
 	}
@@ -286,6 +290,8 @@ func (p *SciProvider) Resources(_ context.Context) []func() resource.Resource {
 		newUserResource,
 		newSchemaResource,
 		newGroupResource,
+		newGroupBaseResource,
+		newGroupAssignmentResource,
 		newCorporateIdPResource,
 	}
 }
