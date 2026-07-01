@@ -89,6 +89,20 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 								MarkdownDescription: "If the source is Identity Directory, the only acceptable values are \" none, uid, mail, loginName, displayName, personnelNumber, userUuid\"",
 								Computed:            true,
 							},
+							"fallback_attribute": schema.SingleNestedAttribute{
+								MarkdownDescription: "The fallback attribute used to identify the user when the primary subject name identifier is not available.",
+								Computed:            true,
+								Attributes: map[string]schema.Attribute{
+									"source": schema.StringAttribute{
+										MarkdownDescription: utils.ValidValuesString(sourceValues),
+										Computed:            true,
+									},
+									"value": schema.StringAttribute{
+										MarkdownDescription: "If the source is Identity Directory, the only acceptable values are \" none, uid, mail, loginName, displayName, personnelNumber, userUuid\"",
+										Computed:            true,
+									},
+								},
+							},
 						},
 					},
 					"subject_name_identifier_function": schema.StringAttribute{

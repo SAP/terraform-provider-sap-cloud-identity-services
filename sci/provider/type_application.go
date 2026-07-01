@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"regexp"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -19,6 +20,7 @@ import (
 type authenticationSchemaData struct {
 	SsoType                       types.String `tfsdk:"sso_type" json:"ssoType"`
 	SubjectNameIdentifier         types.Object `tfsdk:"subject_name_identifier" json:"subjectNameIdentifier"`
+	FallbackSubjectNameIdentifier types.String `tfsdk:"-" json:"fallbackSubjectNameIdentifier"`
 	SubjectNameIdentifierFunction types.String `tfsdk:"subject_name_identifier_function" json:"subjectNameIdentifierFunction"`
 	AssertionAttributes           types.List   `tfsdk:"assertion_attributes" json:"assertionAttributes"`
 	AdvancedAssertionAttributes   types.List   `tfsdk:"advanced_assertion_attributes" json:"advancedAssertionAttributes"`
@@ -74,9 +76,15 @@ type advancedAssertionAttributesData struct {
 	Inherited      types.Bool   `tfsdk:"inherited"`
 }
 
-type subjectNameIdentifierData struct {
+type fallbackSubjectNameIdentifierData struct {
 	Source types.String `tfsdk:"source"`
-	Value  types.String `tfsdk:"value" json:"subjectNameIdentifier"`
+	Value  types.String `tfsdk:"value"`
+}
+
+type subjectNameIdentifierData struct {
+	Source            types.String `tfsdk:"source"`
+	Value             types.String `tfsdk:"value" json:"subjectNameIdentifier"`
+	FallbackAttribute types.Object `tfsdk:"fallback_attribute"`
 }
 
 type openIdConnectConfigurationData struct {
@@ -186,6 +194,24 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 	} else {
 		subjectNameIdentifier.Value = types.StringValue(a.AuthenticationSchema.SubjectNameIdentifier)
 		subjectNameIdentifier.Source = types.StringValue(sourceValues[0])
+	}
+
+	if len(a.AuthenticationSchema.FallbackSubjectNameIdentifier) > 0 && a.AuthenticationSchema.FallbackSubjectNameIdentifier != "none" {
+		fallback := fallbackSubjectNameIdentifierData{
+			Value:  types.StringValue(a.AuthenticationSchema.FallbackSubjectNameIdentifier),
+			Source: types.StringValue(sourceValues[0]),
+		}
+		fallbackObj, fallbackDiags := types.ObjectValueFrom(ctx, fallbackSubjectNameIdentifierObjType, fallback)
+		diagnostics.Append(fallbackDiags...)
+		if diagnostics.HasError() {
+			return application, diagnostics
+		}
+		subjectNameIdentifier.FallbackAttribute = fallbackObj
+	} else {
+		subjectNameIdentifier.FallbackAttribute = types.ObjectNull(map[string]attr.Type{
+			"source": types.StringType,
+			"value":  types.StringType,
+		})
 	}
 
 	subjectNameIdentifierData, diags := types.ObjectValueFrom(ctx, subjectNameIdentitfierObjType, subjectNameIdentifier)
@@ -627,6 +653,19 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 			} else {
 				args.AuthenticationSchema.SubjectNameIdentifier = "${corporateIdP." + subjectNameIdentifier.Value.ValueString() + "}"
 			}
+
+			if !subjectNameIdentifier.FallbackAttribute.IsNull() && !subjectNameIdentifier.FallbackAttribute.IsUnknown() {
+				var fallback fallbackSubjectNameIdentifierData
+				diags = subjectNameIdentifier.FallbackAttribute.As(ctx, &fallback, basetypes.ObjectAsOptions{
+					UnhandledNullAsEmpty:    true,
+					UnhandledUnknownAsEmpty: true,
+				})
+				diagnostics.Append(diags...)
+				if diagnostics.HasError() {
+					return nil, diagnostics
+				}
+				args.AuthenticationSchema.FallbackSubjectNameIdentifier = fallback.Value.ValueString()
+			}
 		}
 
 		//SUBJECT_NAME_IDENTIFIER_FUNCTION
@@ -978,6 +1017,49 @@ func getApplicationUpdateRequest(ctx context.Context, plan applicationData, stat
 					return reqs, diags
 				}
 				reqs = append(reqs, patchReq)
+			}
+		}
+
+		// FALLBACK_SUBJECT_NAME_IDENTIFIER — handled independently so it is patched even when only the fallback changes
+		{
+			var planSubjectNameIdentifier, stateSubjectNameIdentifier subjectNameIdentifierData
+			diags = planAuthSchema.SubjectNameIdentifier.As(ctx, &planSubjectNameIdentifier, basetypes.ObjectAsOptions{
+				UnhandledNullAsEmpty:    true,
+				UnhandledUnknownAsEmpty: true,
+			})
+			if diags.HasError() {
+				return reqs, diags
+			}
+			diags = stateAuthSchema.SubjectNameIdentifier.As(ctx, &stateSubjectNameIdentifier, basetypes.ObjectAsOptions{
+				UnhandledNullAsEmpty:    true,
+				UnhandledUnknownAsEmpty: true,
+			})
+			if diags.HasError() {
+				return reqs, diags
+			}
+
+			if !planSubjectNameIdentifier.FallbackAttribute.Equal(stateSubjectNameIdentifier.FallbackAttribute) {
+				if !planSubjectNameIdentifier.FallbackAttribute.IsNull() && !planSubjectNameIdentifier.FallbackAttribute.IsUnknown() {
+					var fallback fallbackSubjectNameIdentifierData
+					diags = planSubjectNameIdentifier.FallbackAttribute.As(ctx, &fallback, basetypes.ObjectAsOptions{
+						UnhandledNullAsEmpty:    true,
+						UnhandledUnknownAsEmpty: true,
+					})
+					if diags.HasError() {
+						return reqs, diags
+					}
+					patchReq, diags := utils.GetPatchRequest("FallbackSubjectNameIdentifier", authSchemaPath, fallback.Value.ValueString(), argsType)
+					if diags.HasError() {
+						return reqs, diags
+					}
+					reqs = append(reqs, patchReq)
+				} else {
+					patchReq, diags := utils.GetPatchRequest("FallbackSubjectNameIdentifier", authSchemaPath, "none", argsType)
+					if diags.HasError() {
+						return reqs, diags
+					}
+					reqs = append(reqs, patchReq)
+				}
 			}
 		}
 
