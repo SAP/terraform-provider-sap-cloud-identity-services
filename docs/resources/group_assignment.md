@@ -14,7 +14,7 @@ Assign and manage a single member assigned to a group in the SAP Cloud Identity 
 ```terraform
 # Assign a member to a group
 resource "sci_group_assignment" "basic_group_assignment" {
- group_id = "valid-uuid"
+  group_id = "valid-uuid"
   group_members = [
     {
       value = "valid-uuid",
