@@ -11,6 +11,8 @@ import (
 func TestDataSourceGroupBase(t *testing.T) {
 	t.Parallel()
 
+	groupName := "Test Group"
+
 	t.Run("happy path", func(t *testing.T) {
 		rec, user := setupVCR(t, "fixtures/datasource_group_base")
 		defer stopQuietly(rec)
@@ -20,11 +22,11 @@ func TestDataSourceGroupBase(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + DataSourceGroupBase("testGroupBase", "Base Test Group"),
+					Config: providerConfig("", user) + DataSourceGroupBase("testGroupBase", groupName),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("data.sci_group_base.testGroupBase", "id", regexpUUID),
-						resource.TestCheckResourceAttr("data.sci_group_base.testGroupBase", "display_name", "Terraform Test Base Group"),
-						resource.TestCheckResourceAttr("data.sci_group_base.testGroupBase", "group_extension.name", "Base Test Group"),
+						resource.TestCheckResourceAttr("data.sci_group_base.testGroupBase", "display_name", "Terraform Test Group"),
+						resource.TestCheckResourceAttr("data.sci_group_base.testGroupBase", "group_extension.name", "Test Group"),
 					),
 				},
 			},

@@ -25,7 +25,7 @@ func TestDataSourceGroupAssignments(t *testing.T) {
 					Config: providerConfig("", user) + DataSourceGroupAssignments("assignments", groupName),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("data.sci_group_assignments.assignments", "group_id", regexpUUID),
-						resource.TestCheckResourceAttr("data.sci_group_assignments.assignments", "values.#", "2"),
+						resource.TestCheckResourceAttr("data.sci_group_assignments.assignments", "values.#", "1"),
 					),
 				},
 			},

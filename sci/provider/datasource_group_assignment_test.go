@@ -12,7 +12,7 @@ func TestDataSourceGroupAssignment(t *testing.T) {
 	t.Parallel()
 
 	groupName := "Test Group"
-	userName := "Terraform Test"
+	userName := "Terraform User Assignment"
 	mockUuid := "af2f7963-358d-4336-bc51-57099394dee7"
 
 	t.Run("happy path", func(t *testing.T) {
