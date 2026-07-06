@@ -181,6 +181,7 @@ func (r *groupAssignmentResource) Read(ctx context.Context, req resource.ReadReq
 
 func (r *groupAssignmentResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// the resource has to be destroyed and re-created if any parameter is changed
+	resp.Diagnostics.AddError("Resource sci_group_assignment cannot be updated", "Modify either the group_id or the group_member.value to re-create the assignment")
 }
 
 func (r *groupAssignmentResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {

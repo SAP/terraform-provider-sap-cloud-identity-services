@@ -10,7 +10,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -112,21 +111,15 @@ func (d *groupBasesDataSource) Read(ctx context.Context, req datasource.ReadRequ
 		return
 	}
 
-	groupBases := make([]groupBaseData, 0, len(res.Resources))
-	var diagnostics diag.Diagnostics
-	for _, g := range res.Resources {
-		gb, diags := groupBaseValueFrom(ctx, g)
-		diagnostics.Append(diags...)
-		if diagnostics.HasError() {
-			resp.Diagnostics.Append(diagnostics...)
-			return
-		}
-		groupBases = append(groupBases, gb)
+	groups, diags := groupBasesValueFrom(ctx, res)
+	if diags.HasError() {
+		resp.Diagnostics.Append(diags...)
+		return
 	}
 
-	config.Values, diags = types.ListValueFrom(ctx, groupBaseObjType, groupBases)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
+	config.Values, diags = types.ListValueFrom(ctx, groupBaseObjType, groups)
+	if diags.HasError() {
+		resp.Diagnostics.Append(diags...)
 		return
 	}
 
