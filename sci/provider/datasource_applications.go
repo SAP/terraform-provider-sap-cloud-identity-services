@@ -302,11 +302,11 @@ func (d *applicationsDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 											Computed:            true,
 											Attributes: map[string]schema.Attribute{
 												"source": schema.StringAttribute{
-													MarkdownDescription: utils.ValidValuesString(sourceValues),
+													MarkdownDescription: "The source of the fallback attribute.",
 													Computed:            true,
 												},
 												"value": schema.StringAttribute{
-													MarkdownDescription: "If the source is Identity Directory, the only acceptable values are \" none, uid, mail, loginName, displayName, personnelNumber, userUuid\"",
+													MarkdownDescription: "The value of the fallback attribute. Possible values are: `none`, `uid`, `mail`, `loginName`, `displayName`, `personnelNumber`, `userUuid`.",
 													Computed:            true,
 												},
 											},
