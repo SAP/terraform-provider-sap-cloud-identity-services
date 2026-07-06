@@ -184,7 +184,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 										Computed:            true,
 									},
 									"value": schema.StringAttribute{
-										MarkdownDescription: "If the source is Identity Directory, the only acceptable values are `none`, `uid`, `mail`, `loginName`, `displayName`, `personnelNumber`, `userUuid`",
+										MarkdownDescription: "The value of the fallback attribute. Possible values are: `none`, `uid`, `mail`, `loginName`, `displayName`, `personnelNumber`, `userUuid`.",
 										Optional:            true,
 										Validators: []validator.String{
 											stringvalidator.LengthBetween(1, 255),

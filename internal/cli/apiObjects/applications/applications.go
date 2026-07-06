@@ -225,7 +225,7 @@ type AuthenticationSchema struct {
 	Saml2Configuration            *SamlConfiguration           `json:"saml2Configuration,omitempty"`
 	SapManagedAttributes          *SapManagedAttributes        `json:"sapManagedAttributes,omitempty"`
 	RestApiAuthentication         *RestApiAuthentication       `json:"restApiAuthentication,omitempty"`
-	FallbackSubjectNameIdentifier string `json:"fallbackSubjectNameIdentifier,omitempty"`
+	FallbackSubjectNameIdentifier string                       `json:"fallbackSubjectNameIdentifier,omitempty"`
 	// RiskBasedAuthentication       RBAConfiguration            `json:"riskBasedAuthentication"`
 	// HomeUrl								string 							`json:"homeUrl"`
 	// RememberMeExpirationTimeInMonths	string 							`json:"rememberMeExpirationTimeInMonths,omitempty"`
