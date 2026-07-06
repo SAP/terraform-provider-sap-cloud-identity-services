@@ -352,8 +352,11 @@ Optional:
 
 Optional:
 
-- `source` (String) Acceptable values are : `Identity Directory`, `Corporate Identity Provider`, `Expression`
 - `value` (String) If the source is Identity Directory, the only acceptable values are `none`, `uid`, `mail`, `loginName`, `displayName`, `personnelNumber`, `userUuid`
+
+Read-Only:
+
+- `source` (String) The source of the fallback attribute.
 
 
 

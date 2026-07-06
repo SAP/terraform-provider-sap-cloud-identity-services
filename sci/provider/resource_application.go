@@ -174,13 +174,14 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 							"fallback_attribute": schema.SingleNestedAttribute{
 								MarkdownDescription: "The fallback attribute used to identify the user when the primary subject name identifier is not available.",
 								Optional:            true,
+								Computed:            true,
+								PlanModifiers: []planmodifier.Object{
+									objectplanmodifier.UseStateForUnknown(),
+								},
 								Attributes: map[string]schema.Attribute{
 									"source": schema.StringAttribute{
-										MarkdownDescription: utils.ValidValuesString(sourceValues),
-										Optional:            true,
-										Validators: []validator.String{
-											stringvalidator.OneOf(sourceValues...),
-										},
+										MarkdownDescription: "The source of the fallback attribute.",
+										Computed:            true,
 									},
 									"value": schema.StringAttribute{
 										MarkdownDescription: "If the source is Identity Directory, the only acceptable values are `none`, `uid`, `mail`, `loginName`, `displayName`, `personnelNumber`, `userUuid`",
