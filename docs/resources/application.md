@@ -23,6 +23,9 @@ resource "sci_application" "basic_application" {
     subject_name_identifier = {
       source = "Identity Directory" # Refer to the documentation for valid values
       value  = "uid"
+      fallback_attribute = {
+        value = "mail"
+      }
     }
     subject_name_identifier_function = "upperCase" # Refer to the documentation for valid values
     assertion_attributes = [
@@ -343,8 +346,21 @@ Optional:
 
 Optional:
 
+- `fallback_attribute` (Attributes) The fallback attribute used to identify the user when the primary subject name identifier is not available. (see [below for nested schema](#nestedatt--authentication_schema--subject_name_identifier--fallback_attribute))
 - `source` (String) Acceptable values are : `Identity Directory`, `Corporate Identity Provider`, `Expression`
 - `value` (String) If the source is Identity Directory, the only acceptable values are `none`, `uid`, `mail`, `loginName`, `displayName`, `personnelNumber`, `userUuid`
+
+<a id="nestedatt--authentication_schema--subject_name_identifier--fallback_attribute"></a>
+### Nested Schema for `authentication_schema.subject_name_identifier.fallback_attribute`
+
+Optional:
+
+- `value` (String) The value of the fallback attribute. Possible values are: `none`, `uid`, `mail`, `loginName`, `displayName`, `personnelNumber`, `userUuid`.
+
+Read-Only:
+
+- `source` (String) The source of the fallback attribute.
+
 
 
 <a id="nestedatt--authentication_schema--sap_managed_attributes"></a>

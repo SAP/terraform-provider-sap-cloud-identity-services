@@ -972,6 +972,63 @@ func TestResourceApplication(t *testing.T) {
 		})
 	})
 
+	t.Run("happy path - application with fallback_attribute in subject_name_identifier", func(t *testing.T) {
+
+		appWithFallback := applications.Application{
+			Name:        "fallback-test-app",
+			Description: "application for testing fallback subject name identifier",
+			AuthenticationSchema: &applications.AuthenticationSchema{
+				SubjectNameIdentifier:         "mail",
+				FallbackSubjectNameIdentifier: "loginName",
+			},
+		}
+
+		updatedAppWithFallback := applications.Application{
+			Name:        "fallback-test-app",
+			Description: "application for testing fallback subject name identifier",
+			AuthenticationSchema: &applications.AuthenticationSchema{
+				SubjectNameIdentifier:         "mail",
+				FallbackSubjectNameIdentifier: "uid",
+			},
+		}
+
+		rec, user := setupVCR(t, "fixtures/resource_application_with_fallback")
+		defer stopQuietly(rec)
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+			Steps: []resource.TestStep{
+				{
+					Config: providerConfig("", user) + ResourceApplicationWithFallbackAttribute("testApp", appWithFallback, "loginName"),
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_application.testApp", "name", appWithFallback.Name),
+						resource.TestCheckResourceAttr("sci_application.testApp", "description", appWithFallback.Description),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.subject_name_identifier.source", "Identity Directory"),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.subject_name_identifier.value", "mail"),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.subject_name_identifier.fallback_attribute.value", "loginName"),
+					),
+				},
+				{
+					Config: providerConfig("", user) + ResourceApplicationWithFallbackAttribute("testApp", updatedAppWithFallback, "uid"),
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_application.testApp", "name", updatedAppWithFallback.Name),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.subject_name_identifier.source", "Identity Directory"),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.subject_name_identifier.value", "mail"),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.subject_name_identifier.fallback_attribute.value", "uid"),
+					),
+				},
+				{
+					ResourceName:      "sci_application.testApp",
+					ImportState:       true,
+					ImportStateVerify: true,
+				},
+			},
+		})
+	})
+
 	t.Run("error path - name is mandatory", func(t *testing.T) {
 		resource.Test(t, resource.TestCase{
 			IsUnitTest:               true,
@@ -1714,6 +1771,24 @@ func ResourceApplicationWithSubjectNameIdentifier(resourceName string, appName s
 		}
 	}
 	`, resourceName, appName, description, subAttribute)
+}
+
+func ResourceApplicationWithFallbackAttribute(resourceName string, app applications.Application, fallbackValue string) string {
+	return fmt.Sprintf(`
+	resource "sci_application" "%s" {
+		name = "%s"
+		description = "%s"
+		authentication_schema = {
+			subject_name_identifier = {
+				source = "Identity Directory"
+				value  = "%s"
+				fallback_attribute = {
+					value  = "%s"
+				}
+			}
+		}
+	}
+	`, resourceName, app.Name, app.Description, app.AuthenticationSchema.SubjectNameIdentifier, fallbackValue)
 }
 
 func ResourceApplicationWithSubjectNameIdentifierFunction(resourceName string, appName string, description string, functionName string) string {

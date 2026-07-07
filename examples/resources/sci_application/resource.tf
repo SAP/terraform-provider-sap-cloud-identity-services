@@ -9,6 +9,9 @@ resource "sci_application" "basic_application" {
     subject_name_identifier = {
       source = "Identity Directory" # Refer to the documentation for valid values
       value  = "uid"
+      fallback_attribute = {
+        value = "mail"
+      }
     }
     subject_name_identifier_function = "upperCase" # Refer to the documentation for valid values
     assertion_attributes = [

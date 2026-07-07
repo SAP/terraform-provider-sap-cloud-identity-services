@@ -105,9 +105,20 @@ var saml2EncryptionCertificateObjType = types.ObjectType{
 	},
 }
 
+var fallbackSubjectNameIdentifierObjType = map[string]attr.Type{
+	"source": types.StringType,
+	"value":  types.StringType,
+}
+
 var subjectNameIdentitfierObjType = map[string]attr.Type{
 	"source": types.StringType,
 	"value":  types.StringType,
+	"fallback_attribute": types.ObjectType{
+		AttrTypes: map[string]attr.Type{
+			"source": types.StringType,
+			"value":  types.StringType,
+		},
+	},
 }
 
 var advancedAssertionAttributesObjType = types.ObjectType{
@@ -285,6 +296,20 @@ func (d *applicationsDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 										"value": schema.StringAttribute{
 											MarkdownDescription: "If the source is Identity Directory, the only acceptable values are \" none, uid, mail, loginName, displayName, personnelNumber, userUuid\"",
 											Computed:            true,
+										},
+										"fallback_attribute": schema.SingleNestedAttribute{
+											MarkdownDescription: "The fallback attribute used to identify the user when the primary subject name identifier is not available.",
+											Computed:            true,
+											Attributes: map[string]schema.Attribute{
+												"source": schema.StringAttribute{
+													MarkdownDescription: "The source of the fallback attribute.",
+													Computed:            true,
+												},
+												"value": schema.StringAttribute{
+													MarkdownDescription: "The value of the fallback attribute. Possible values are: `none`, `uid`, `mail`, `loginName`, `displayName`, `personnelNumber`, `userUuid`.",
+													Computed:            true,
+												},
+											},
 										},
 									},
 								},

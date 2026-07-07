@@ -171,6 +171,27 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 									stringplanmodifier.UseStateForUnknown(),
 								},
 							},
+							"fallback_attribute": schema.SingleNestedAttribute{
+								MarkdownDescription: "The fallback attribute used to identify the user when the primary subject name identifier is not available.",
+								Optional:            true,
+								Computed:            true,
+								PlanModifiers: []planmodifier.Object{
+									objectplanmodifier.UseStateForUnknown(),
+								},
+								Attributes: map[string]schema.Attribute{
+									"source": schema.StringAttribute{
+										MarkdownDescription: "The source of the fallback attribute.",
+										Computed:            true,
+									},
+									"value": schema.StringAttribute{
+										MarkdownDescription: "The value of the fallback attribute. Possible values are: `none`, `uid`, `mail`, `loginName`, `displayName`, `personnelNumber`, `userUuid`.",
+										Optional:            true,
+										Validators: []validator.String{
+											stringvalidator.LengthBetween(1, 255),
+										},
+									},
+								},
+							},
 						},
 					},
 					"subject_name_identifier_function": schema.StringAttribute{
