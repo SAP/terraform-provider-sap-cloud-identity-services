@@ -7,7 +7,6 @@ import (
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
 
-	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
