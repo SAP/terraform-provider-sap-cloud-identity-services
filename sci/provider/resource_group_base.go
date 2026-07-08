@@ -41,7 +41,17 @@ func (r *groupBaseResource) Metadata(_ context.Context, req resource.MetadataReq
 
 func (r *groupBaseResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: `Create and manage a group without member assignments in the SAP Cloud Identity Services tenant.`,
+		MarkdownDescription: `
+		Create and manage a group without member assignments in the SAP Cloud Identity Services tenant.
+		
+### Conflict Warning
+There are 2 ways to manage members assigned to a group:
+- the **sci_group** resource which manages the group and all its assignments together
+- the **sci_group_base** resource in combination with **sci_group_assignment** which manages the group and individual assignments
+
+If both the monolithic resource and the individual base/assignment resources are used against the same Group, spurious changes and conflicting state updates will occur.
+
+		`,
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:            true,

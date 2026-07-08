@@ -3,11 +3,22 @@ page_title: "sci_group_assignment Resource - sci"
 subcategory: ""
 description: |-
   Assign and manage a single member assigned to a group in the SAP Cloud Identity Services tenant.
+  Conflict Warning
+  There are 2 ways to manage members assigned to a group:
+  the sci_group resource which manages the group and all its assignments togetherthe sci_group_base resource in combination with sci_group_assignment which manages the group and individual assignments
+  If both the monolithic resource and the individual base/assignment resources are used against the same Group, spurious changes and conflicting state updates will occur.
 ---
 
 # sci_group_assignment (Resource)
 
 Assign and manage a single member assigned to a group in the SAP Cloud Identity Services tenant.
+		
+### Conflict Warning
+There are 2 ways to manage members assigned to a group:
+- the **sci_group** resource which manages the group and all its assignments together
+- the **sci_group_base** resource in combination with **sci_group_assignment** which manages the group and individual assignments
+
+If both the monolithic resource and the individual base/assignment resources are used against the same Group, spurious changes and conflicting state updates will occur.
 
 ## Example Usage
 

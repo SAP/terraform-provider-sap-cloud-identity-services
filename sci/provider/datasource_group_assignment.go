@@ -57,9 +57,6 @@ func (d *groupAssignmentDataSource) Schema(_ context.Context, _ datasource.Schem
 					"type": schema.StringAttribute{
 						Computed:            true,
 						MarkdownDescription: "Type of the member. " + utils.ValidValuesString(memberTypeValues),
-						Validators: []validator.String{
-							stringvalidator.OneOf(memberTypeValues...),
-						},
 					},
 				},
 			},
