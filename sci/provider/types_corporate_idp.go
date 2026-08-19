@@ -726,6 +726,61 @@ func getCorporateIdPUpdateRequest(ctx context.Context, plan corporateIdPData, st
 	return reqs, diagnostics
 }
 
+// mapSigningCertificates copies base64_certificate values from plan into state for signing_certificates.
+// The API may return certificates in a different format (e.g. stripped PEM markers), which causes a
+// post-apply inconsistency when the value is derived from a sensitive variable. This mirrors the
+// pattern used by mapOidcClientSecret for client_secret.
+func mapSigningCertificates(ctx context.Context, plan corporateIdPData, state *corporateIdPData) diag.Diagnostics {
+	var samlPlan saml2ConfigData
+	diags := plan.Saml2Config.As(ctx, &samlPlan, basetypes.ObjectAsOptions{
+		UnhandledNullAsEmpty:    true,
+		UnhandledUnknownAsEmpty: true,
+	})
+	if diags.HasError() {
+		return diags
+	}
+
+	if samlPlan.SigningCertificates.IsNull() || samlPlan.SigningCertificates.IsUnknown() {
+		return nil
+	}
+
+	var planCerts []signingCertificateData
+	diags = samlPlan.SigningCertificates.ElementsAs(ctx, &planCerts, true)
+	if diags.HasError() {
+		return diags
+	}
+
+	var samlState saml2ConfigData
+	diags = state.Saml2Config.As(ctx, &samlState, basetypes.ObjectAsOptions{
+		UnhandledNullAsEmpty:    true,
+		UnhandledUnknownAsEmpty: true,
+	})
+	if diags.HasError() {
+		return diags
+	}
+
+	var stateCerts []signingCertificateData
+	diags = samlState.SigningCertificates.ElementsAs(ctx, &stateCerts, true)
+	if diags.HasError() {
+		return diags
+	}
+
+	for i := range stateCerts {
+		if i < len(planCerts) && !planCerts[i].Base64Certificate.IsNull() && !planCerts[i].Base64Certificate.IsUnknown() {
+			stateCerts[i].Base64Certificate = planCerts[i].Base64Certificate
+		}
+	}
+
+	updatedCerts, diags := types.ListValueFrom(ctx, saml2SigningCertificateObjType, stateCerts)
+	if diags.HasError() {
+		return diags
+	}
+
+	samlState.SigningCertificates = updatedCerts
+	state.Saml2Config, diags = types.ObjectValueFrom(ctx, IdPSaml2ConfigObjType.AttrTypes, samlState)
+	return diags
+}
+
 func mapOidcClientSecret(ctx context.Context, plan corporateIdPData, state *corporateIdPData) diag.Diagnostics {
 
 	var oidcPlan oidcConfigData
