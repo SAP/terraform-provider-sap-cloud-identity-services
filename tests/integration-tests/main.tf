@@ -134,10 +134,12 @@ resource "sci_corporate_idp" "testSamlIdP" {
       }
     ]
     signing_certificates = [
-      {
+       {
         base64_certificate = local.cert_pem
         dn                 = local.prefix_unique_name
         default            = true
+        valid_from         = "2026-08-19T10:30:00Z"
+        valid_to           = "2126-07-26T10:30:00Z"
       }
     ]
     sso_endpoints = [
