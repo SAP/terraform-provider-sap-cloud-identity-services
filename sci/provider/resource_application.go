@@ -1142,6 +1142,60 @@ func stateModify(ctx context.Context, plan applicationData, state *applicationDa
 			}
 		}
 
+		// Preserve base64_certificate values from plan for SAML2 signing and encryption certificates.
+		// The API may return certificates in a different format than what was sent; when the value
+		// derives from a sensitive variable this triggers an inconsistent-sensitive-attribute error.
+		if !planData.Saml2Configuration.IsNull() && !planData.Saml2Configuration.IsUnknown() {
+			var planSaml, stateSaml AppSaml2ConfigData
+			diags = planData.Saml2Configuration.As(ctx, &planSaml, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})
+			if diags.HasError() {
+				return diags
+			}
+			diags = stateData.Saml2Configuration.As(ctx, &stateSaml, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true, UnhandledUnknownAsEmpty: true})
+			if diags.HasError() {
+				return diags
+			}
+
+			if !planSaml.CertificatesForSigning.IsNull() && !planSaml.CertificatesForSigning.IsUnknown() {
+				var planCerts, stateCerts []signingCertificateData
+				diags = planSaml.CertificatesForSigning.ElementsAs(ctx, &planCerts, true)
+				if diags.HasError() {
+					return diags
+				}
+				diags = stateSaml.CertificatesForSigning.ElementsAs(ctx, &stateCerts, true)
+				if diags.HasError() {
+					return diags
+				}
+				for i := range stateCerts {
+					if i < len(planCerts) && !planCerts[i].Base64Certificate.IsNull() && !planCerts[i].Base64Certificate.IsUnknown() {
+						stateCerts[i].Base64Certificate = planCerts[i].Base64Certificate
+					}
+				}
+				stateSaml.CertificatesForSigning, diags = types.ListValueFrom(ctx, saml2SigningCertificateObjType, stateCerts)
+				if diags.HasError() {
+					return diags
+				}
+			}
+
+			if !planSaml.CertificateForEncryption.IsNull() && !planSaml.CertificateForEncryption.IsUnknown() &&
+				!stateSaml.CertificateForEncryption.IsNull() && !stateSaml.CertificateForEncryption.IsUnknown() {
+				planEncAttrs := planSaml.CertificateForEncryption.Attributes()
+				stateEncAttrs := stateSaml.CertificateForEncryption.Attributes()
+				if planB64, ok := planEncAttrs["base64_certificate"]; ok && !planB64.IsNull() && !planB64.IsUnknown() {
+					stateEncAttrs["base64_certificate"] = planB64
+				}
+				stateSaml.CertificateForEncryption, diags = types.ObjectValue(saml2EncryptionCertificateObjType.AttrTypes, stateEncAttrs)
+				if diags.HasError() {
+					return diags
+				}
+			}
+
+			stateData.Saml2Configuration, diags = types.ObjectValueFrom(ctx, appSaml2ConfigObjType.AttrTypes, stateSaml)
+			if diags.HasError() {
+				return diags
+			}
+		}
+
 		state.AuthenticationSchema, diags = types.ObjectValueFrom(ctx, authenticationSchemaObjType, stateData)
 		if diags.HasError() {
 			return diags

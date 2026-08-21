@@ -637,6 +637,13 @@ func (r *corporateIdPResource) Create(ctx context.Context, req resource.CreateRe
 		resp.Diagnostics.Append(diags...)
 	}
 
+	if !plan.Saml2Config.IsNull() && !plan.Saml2Config.IsUnknown() {
+		// The API may return certificates in a different format; preserve the plan value to avoid
+		// inconsistent-sensitive-attribute errors when base64_certificate derives from a sensitive variable
+		diags = mapSigningCertificates(ctx, plan, &state)
+		resp.Diagnostics.Append(diags...)
+	}
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -691,6 +698,11 @@ func (r *corporateIdPResource) Update(ctx context.Context, req resource.UpdateRe
 		resp.Diagnostics.Append(diags...)
 	}
 
+	if !plan.Saml2Config.IsNull() && !plan.Saml2Config.IsUnknown() {
+		diags = mapSigningCertificates(ctx, plan, &newState)
+		resp.Diagnostics.Append(diags...)
+	}
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -724,6 +736,11 @@ func (r *corporateIdPResource) Read(ctx context.Context, req resource.ReadReques
 	if !config.OidcConfig.IsNull() && !config.OidcConfig.IsUnknown() {
 		// The client secret must be read from the plan as the GET call on the IdP does not return the configured secret
 		diags = mapOidcClientSecret(ctx, config, &state)
+		resp.Diagnostics.Append(diags...)
+	}
+
+	if !config.Saml2Config.IsNull() && !config.Saml2Config.IsUnknown() {
+		diags = mapSigningCertificates(ctx, config, &state)
 		resp.Diagnostics.Append(diags...)
 	}
 
