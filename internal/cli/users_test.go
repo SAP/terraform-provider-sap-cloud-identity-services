@@ -151,6 +151,39 @@ func TestUsers_Get(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
+	t.Run("validate pagination - fetches all pages", func(t *testing.T) {
+
+		page1, _ := json.Marshal(users.UsersResponse{
+			Resources: allUsers,
+			NextId:    "next-page-id",
+		})
+
+		page2, _ := json.Marshal(users.UsersResponse{
+			Resources: allUsers,
+			NextId:    "end",
+		})
+
+		client, srv := testClient(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, "GET", r.Method)
+
+			if r.URL.Query().Get("startId") == "initial" {
+				_, err := w.Write(page1)
+				assert.NoError(t, err, "Failed to write response")
+			} else {
+				assert.Equal(t, "next-page-id", r.URL.Query().Get("startId"))
+				_, err := w.Write(page2)
+				assert.NoError(t, err, "Failed to write response")
+			}
+		}))
+
+		defer srv.Close()
+
+		res, _, err := client.User.Get(context.TODO())
+
+		assert.NoError(t, err)
+		assert.Len(t, res.Resources, 4)
+	})
+
 	t.Run("validate the API request with error", func(t *testing.T) {
 
 		resErr, _ := json.Marshal(ScimResponseError{
