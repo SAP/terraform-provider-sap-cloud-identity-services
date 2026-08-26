@@ -23,13 +23,33 @@ func (g *GroupsCli) getUrl() string {
 
 func (g *GroupsCli) Get(ctx context.Context) (groups.GroupsResponse, string, error) {
 
-	res, _, err := g.cliClient.Execute(ctx, "GET", g.getUrl(), nil, nil, "", ScimRequestHeader, nil)
+	var allGroups groups.GroupsResponse
+	startId := "initial"
 
-	if err != nil {
-		return groups.GroupsResponse{}, "", err
+	for {
+		queryStrings := map[string]string{
+			"startId": startId,
+		}
+
+		res, _, err := g.cliClient.Execute(ctx, "GET", g.getUrl(), queryStrings, nil, "", ScimRequestHeader, nil)
+		if err != nil {
+			return groups.GroupsResponse{}, "", err
+		}
+
+		resp, _, err := unMarshalResponse[groups.GroupsResponse](res, false)
+		if err != nil {
+			return groups.GroupsResponse{}, "", err
+		}
+
+		allGroups.Resources = append(allGroups.Resources, resp.Resources...)
+
+		if resp.NextId == "" || resp.NextId == "end" {
+			break
+		}
+		startId = resp.NextId
 	}
 
-	return unMarshalResponse[groups.GroupsResponse](res, false)
+	return allGroups, "", nil
 }
 
 func (g *GroupsCli) GetByGroupId(ctx context.Context, groupId string) (groups.Group, string, error) {
