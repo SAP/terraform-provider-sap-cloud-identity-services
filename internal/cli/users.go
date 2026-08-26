@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-
 	"fmt"
 
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/generic"
@@ -23,29 +22,43 @@ func (u *UsersCli) getUrl() string {
 
 func (u *UsersCli) Get(ctx context.Context) (users.UsersResponse, map[int]string, error) {
 
-	res, _, err := u.cliClient.Execute(ctx, "GET", u.getUrl(), nil, nil, "", ScimRequestHeader, nil)
-	if err != nil {
-		return users.UsersResponse{}, map[int]string{}, err
-	}
-
 	usersList := users.UsersResponse{}
-	resMap := res.(map[string]any)["Resources"].([]any)
 	customSchemas := map[int]string{}
+	startId := "initial"
 
-	for i, r := range resMap {
+	for {
+		queryStrings := map[string]string{
+			"startId": startId,
+		}
 
-		// each user is unmarshalled individually and the respective custom schemas are retrieved and added to the map
-		var user users.User
-		user, customSchemas[i], err = unMarshalResponse[users.User](r, true)
-
+		res, _, err := u.cliClient.Execute(ctx, "GET", u.getUrl(), queryStrings, nil, "", ScimRequestHeader, nil)
 		if err != nil {
 			return users.UsersResponse{}, map[int]string{}, err
 		}
-		usersList.Resources = append(usersList.Resources, user)
 
+		resBody := res.(map[string]any)
+		resMap, _ := resBody["Resources"].([]any)
+
+		for _, r := range resMap {
+			// each user is unmarshalled individually and the respective custom schemas are retrieved and added to the map
+			var user users.User
+			var schema string
+			user, schema, err = unMarshalResponse[users.User](r, true)
+			if err != nil {
+				return users.UsersResponse{}, map[int]string{}, err
+			}
+			customSchemas[len(usersList.Resources)] = schema
+			usersList.Resources = append(usersList.Resources, user)
+		}
+
+		nextId, _ := resBody["nextId"].(string)
+		if nextId == "" || nextId == "end" {
+			break
+		}
+		startId = nextId
 	}
 
-	return usersList, customSchemas, err
+	return usersList, customSchemas, nil
 }
 
 func (u *UsersCli) GetByUserId(ctx context.Context, userId string, validateCustomSchemas bool, customSchemas string) (users.User, string, error) {
