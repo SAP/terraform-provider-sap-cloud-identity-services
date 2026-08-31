@@ -95,7 +95,7 @@ interactions:
                 - application/scim+json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/?startId=initial
         method: GET
       response:
         proto: HTTP/1.1
@@ -691,7 +691,7 @@ interactions:
                 - application/scim+json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/?startId=initial
         method: GET
       response:
         proto: HTTP/1.1
@@ -915,7 +915,7 @@ interactions:
                 - application/scim+json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/?startId=initial
         method: GET
       response:
         proto: HTTP/1.1
@@ -1287,7 +1287,7 @@ interactions:
                 - application/scim+json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/?startId=initial
         method: GET
       response:
         proto: HTTP/1.1
