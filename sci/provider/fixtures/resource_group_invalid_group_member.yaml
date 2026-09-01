@@ -6,6 +6,168 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
+        content_length: 126
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: client_id=REDACTED&client_secret=REDACTED&grant_type=client_credentials
+        form:
+            client_id:
+                - REDACTED
+            client_secret:
+                - REDACTED
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+        url: https://iasprovidertestblr.accounts400.ondemand.com/oauth2/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 980
+        uncompressed: false
+        body: '{"access_token":"REDACTED","token_type":"Bearer","expires_in":3600}'
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+                - private,no-cache,no-store
+            Content-Length:
+                - "980"
+            Content-Security-Policy:
+                - script-src 'none';
+            Content-Type:
+                - application/json;charset=UTF-8
+            Date:
+                - Mon, 31 Aug 2026 06:43:13 GMT
+            Expires:
+                - "0"
+            Pragma:
+                - no-cache
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=63072000; includeSubDomains; preload
+            Vary:
+                - Origin,X-CSP-STRIP,Access-Control-Request-Method,Access-Control-Request-Headers
+            X-Content-Type-Options:
+                - nosniff
+                - nosniff
+            X-Ids-Id:
+                - A72695D4-53D7-45BF-AFE9-57AC08B6F233
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-lv8cc
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Ids-Region:
+                - eu-de-1
+            X-Robots-Tag:
+                - none
+            X-Xss-Protection:
+                - 1; mode=block
+        status: '200 '
+        code: 200
+        duration: 189.765001ms
+    - id: 1
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 126
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: client_id=REDACTED&client_secret=REDACTED&grant_type=client_credentials
+        form:
+            client_id:
+                - REDACTED
+            client_secret:
+                - REDACTED
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+        url: https://iasprovidertestblr.accounts400.ondemand.com/oauth2/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 980
+        uncompressed: false
+        body: '{"access_token":"REDACTED","token_type":"Bearer","expires_in":3600}'
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+                - private,no-cache,no-store
+            Content-Length:
+                - "980"
+            Content-Security-Policy:
+                - script-src 'none';
+            Content-Type:
+                - application/json;charset=UTF-8
+            Date:
+                - Mon, 31 Aug 2026 06:43:14 GMT
+            Expires:
+                - "0"
+            Pragma:
+                - no-cache
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=63072000; includeSubDomains; preload
+            Vary:
+                - Origin,X-CSP-STRIP,Access-Control-Request-Method,Access-Control-Request-Headers
+            X-Content-Type-Options:
+                - nosniff
+                - nosniff
+            X-Ids-Id:
+                - BB3B99F1-0F83-4643-B1A0-01585F8736A1
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-lv8cc
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Ids-Region:
+                - eu-de-1
+            X-Robots-Tag:
+                - none
+            X-Xss-Protection:
+                - 1; mode=block
+        status: '200 '
+        code: 200
+        duration: 402.526542ms
+    - id: 2
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
         content_length: 0
         transfer_encoding: []
         trailer: {}
@@ -18,7 +180,7 @@ interactions:
             Accept:
                 - '*/*'
             Authorization:
-                - redacted
+                - REDACTED
             Content-Type:
                 - application/scim+json
             Dataserviceversion:
@@ -37,42 +199,47 @@ interactions:
         headers:
             Cache-Control:
                 - private,no-cache,no-store
+                - private,no-cache,no-store
             Content-Length:
                 - "137"
+            Content-Security-Policy:
+                - script-src 'none';
             Content-Type:
                 - application/scim+json
             Date:
-                - Wed, 14 May 2025 21:18:27 GMT
+                - Mon, 31 Aug 2026 06:43:14 GMT
             Referrer-Policy:
                 - origin
             Server:
                 - SAP
             Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains; preload
+                - max-age=63072000; includeSubDomains; preload
             Vary:
                 - X-CSP-STRIP
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - DAF757AE-7415-44B7-BC06-D115BB024313
+                - 8EF39123-9D57-41EE-9933-6F047507AF98
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-rwhn4
+                - http-lv8cc
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
                 - qa
+            X-Ids-Region:
+                - eu-de-1
             X-Message-Code:
                 - IDS_EXCEPTION
             X-Robots-Tag:
                 - none
         status: '404 '
         code: 404
-        duration: 1.022762907s
-    - id: 1
+        duration: 280.305042ms
+    - id: 3
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -89,7 +256,7 @@ interactions:
             Accept:
                 - '*/*'
             Authorization:
-                - redacted
+                - REDACTED
             Content-Type:
                 - application/scim+json
             Dataserviceversion:
@@ -108,38 +275,43 @@ interactions:
         headers:
             Cache-Control:
                 - private,no-cache,no-store
+                - private,no-cache,no-store
             Content-Length:
                 - "138"
+            Content-Security-Policy:
+                - script-src 'none';
             Content-Type:
                 - application/scim+json
             Date:
-                - Wed, 14 May 2025 21:18:27 GMT
+                - Mon, 31 Aug 2026 06:43:14 GMT
             Referrer-Policy:
                 - origin
             Server:
                 - SAP
             Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains; preload
+                - max-age=63072000; includeSubDomains; preload
             Vary:
                 - X-CSP-STRIP
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - 5C6130B3-4B0A-42B0-B4B5-68A0449374A6
+                - 8497C7D5-927C-42FC-9204-28381AC7D3F0
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-rwhn4
+                - http-lv8cc
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
                 - qa
+            X-Ids-Region:
+                - eu-de-1
             X-Message-Code:
                 - IDS_EXCEPTION
             X-Robots-Tag:
                 - none
         status: '404 '
         code: 404
-        duration: 245.930286ms
+        duration: 236.367458ms

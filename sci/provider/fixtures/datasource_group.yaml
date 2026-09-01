@@ -6,68 +6,82 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 0
+        content_length: 126
         transfer_encoding: []
         trailer: {}
         host: iasprovidertestblr.accounts400.ondemand.com
         remote_addr: ""
         request_uri: ""
-        body: ""
-        form: {}
+        body: client_id=REDACTED&client_secret=REDACTED&grant_type=client_credentials
+        form:
+            client_id:
+                - REDACTED
+            client_secret:
+                - REDACTED
+            grant_type:
+                - client_credentials
         headers:
-            Accept:
-                - '*/*'
-            Authorization:
-                - redacted
             Content-Type:
-                - application/scim+json
-            Dataserviceversion:
-                - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/
-        method: GET
+                - application/x-www-form-urlencoded
+        url: https://iasprovidertestblr.accounts400.ondemand.com/oauth2/token
+        method: POST
       response:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: -1
-        uncompressed: true
-        body: '{"schemas":["urn:ietf:params:scim:api:messages:2.0:ListResponse"],"totalResults":4,"itemsPerPage":100,"startIndex":1,"Resources":[{"id":"59aeb87b-777a-4034-8f3e-709d39fb1a18","meta":{"created":"2025-01-13T13:38:09Z","lastModified":"2025-05-14T20:54:24Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/59aeb87b-777a-4034-8f3e-709d39fb1a18","version":"4c091ebc-2efa-4228-a740-1d04b21b5530","resourceType":"Group"},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Terraform Test Group","members":[{"value":"80f858a3-28ce-437e-ba31-d3358a5bdbfa","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/80f858a3-28ce-437e-ba31-d3358a5bdbfa","type":"User"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"name":"Test Group","additionalId":"6785174139031d4324035b6b"}},{"id":"98a84ac5-fb95-486c-a61c-13db7d77bad1","meta":{"created":"2025-04-20T14:26:50Z","lastModified":"2025-04-20T14:26:50Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/98a84ac5-fb95-486c-a61c-13db7d77bad1","version":"1745159210474328146","resourceType":"Group"},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group","urn:ietf:params:scim:schemas:extension:sap:2.0:Group"],"displayName":"auth_group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"name":"98a84ac5-fb95-486c-a61c-13db7d77bad1","additionalId":"6805042a4511a027500704b0"},"urn:ietf:params:scim:schemas:extension:sap:2.0:Group":{"applicationId":"de9cfc8d-e8e4-4623-891c-85ee28fd6c70","type":"authorization","supportedOperations":"userOnlyMembership"}},{"id":"e701ce1d-3ac3-481b-aa0a-4ce606b75be3","meta":{"created":"2025-04-20T14:27:50Z","lastModified":"2025-04-20T14:42:48Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/e701ce1d-3ac3-481b-aa0a-4ce606b75be3","version":"1745160168793013318","resourceType":"Group"},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group","urn:ietf:params:scim:schemas:extension:sci:2.0:Authorization","urn:ietf:params:scim:schemas:extension:sap:2.0:Group"],"displayName":"auth_group","members":[{"value":"9abeec23-a256-4908-828c-cab554c3d1ac","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/9abeec23-a256-4908-828c-cab554c3d1ac","type":"User"}],"urn:ietf:params:scim:schemas:extension:sci:2.0:Authorization":{"description":"test policy","zoneId":"0ca4cf95-5c87-40e7-aee2-2d5f64ac4254","type":"policy","applicationId":"de9cfc8d-e8e4-4623-891c-85ee28fd6c70","authorizationId":"4eebc4ff-3af1-4965-a706-2aee0b72a982"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"name":"e701ce1d-3ac3-481b-aa0a-4ce606b75be3","additionalId":"680504664ce36b52b454042b"},"urn:ietf:params:scim:schemas:extension:sap:2.0:Group":{"applicationId":"33108480-845b-4922-a486-175c0aba846e","type":"authorization","supportedOperations":"userOnlyMembership"}},{"id":"fad75661-b77a-41b8-b7c7-af8283143172","meta":{"created":"2025-04-20T15:49:02Z","lastModified":"2025-04-20T15:49:02Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/fad75661-b77a-41b8-b7c7-af8283143172","version":"1d713fb0-d125-4405-aba5-f27a07f43313","resourceType":"Group"},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"admin_auth_group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"name":"fad75661-b77a-41b8-b7c7-af8283143172","additionalId":"6805176e4ce36b52b454042c"}}]}'
+        content_length: 980
+        uncompressed: false
+        body: '{"access_token":"REDACTED","token_type":"Bearer","expires_in":3600}'
         headers:
             Cache-Control:
                 - private,no-cache,no-store
+                - private,no-cache,no-store
+            Content-Length:
+                - "980"
+            Content-Security-Policy:
+                - script-src 'none';
             Content-Type:
-                - application/scim+json
+                - application/json;charset=UTF-8
             Date:
-                - Wed, 14 May 2025 21:23:47 GMT
+                - Mon, 31 Aug 2026 06:43:00 GMT
+            Expires:
+                - "0"
+            Pragma:
+                - no-cache
             Referrer-Policy:
                 - origin
             Server:
                 - SAP
             Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains; preload
+                - max-age=63072000; includeSubDomains; preload
             Vary:
-                - Accept-Encoding,X-CSP-STRIP
+                - Origin,X-CSP-STRIP,Access-Control-Request-Method,Access-Control-Request-Headers
             X-Content-Type-Options:
                 - nosniff
+                - nosniff
             X-Ids-Id:
-                - EEB16CD1-130C-49C6-8792-51DBFC6E76CF
+                - 96F753EE-CC0A-403F-A36D-7AC613EFCB0C
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-f6876
+                - http-lpngf
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
                 - qa
+            X-Ids-Region:
+                - eu-de-1
             X-Robots-Tag:
                 - none
+            X-Xss-Protection:
+                - 1; mode=block
         status: '200 '
         code: 200
-        duration: 1.034901542s
+        duration: 228.35775ms
     - id: 1
       request:
         proto: HTTP/1.1
@@ -85,12 +99,12 @@ interactions:
             Accept:
                 - '*/*'
             Authorization:
-                - redacted
+                - REDACTED
             Content-Type:
                 - application/scim+json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/59aeb87b-777a-4034-8f3e-709d39fb1a18
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/
         method: GET
       response:
         proto: HTTP/1.1
@@ -100,45 +114,46 @@ interactions:
         trailer: {}
         content_length: -1
         uncompressed: true
-        body: '{"id":"59aeb87b-777a-4034-8f3e-709d39fb1a18","meta":{"created":"2025-01-13T13:38:09Z","lastModified":"2025-05-14T20:54:24Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/59aeb87b-777a-4034-8f3e-709d39fb1a18","version":"4c091ebc-2efa-4228-a740-1d04b21b5530","resourceType":"Group"},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Terraform Test Group","members":[{"value":"80f858a3-28ce-437e-ba31-d3358a5bdbfa","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/80f858a3-28ce-437e-ba31-d3358a5bdbfa","type":"User"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"name":"Test Group","additionalId":"6785174139031d4324035b6b"}}'
+        body: '{"schemas":["urn:ietf:params:scim:api:messages:2.0:ListResponse"],"totalResults":11,"itemsPerPage":100,"startIndex":1,"Resources":[{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Test Base Group","id":"1a3b3cf4-89ee-4393-922d-f9625a9ff420","meta":{"created":"2026-08-31T06:43:00Z","lastModified":"2026-08-31T06:43:00Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/1a3b3cf4-89ee-4393-922d-f9625a9ff420","resourceType":"Group","version":"b6b2ff77-fc22-42f9-913b-95867269f714"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"6a9522743db419478ccbf477","name":"Test-Base-Group","description":"Base group for testing"}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"CI/CD","id":"1ac7f501-aa83-4e06-8a05-dc6b4251d0b6","meta":{"created":"2025-07-04T08:16:34Z","lastModified":"2026-05-22T07:00:51Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/1ac7f501-aa83-4e06-8a05-dc6b4251d0b6","resourceType":"Group","version":"fe624b75-d7b7-4d13-a13a-cf3ae61ba3ec"},"members":[{"value":"05282952-b334-4078-bd56-dd38b2e771e9","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/05282952-b334-4078-bd56-dd38b2e771e9"},{"value":"288fc004-2128-4701-a0d1-d4ee451eec19","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/288fc004-2128-4701-a0d1-d4ee451eec19"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"68678de25c51250dbd753398","name":"Github"}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Terraform Test Group","id":"38e5c81d-9d42-4f08-a978-3ba77ceb99fd","meta":{"created":"2026-07-01T11:23:53Z","lastModified":"2026-08-31T06:36:56Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/38e5c81d-9d42-4f08-a978-3ba77ceb99fd","resourceType":"Group","version":"124047b1-4f8a-4039-bc94-b54c4ed2b580"},"members":[{"value":"1e5dd627-5220-4691-b5f4-8e061ea57d71","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/1e5dd627-5220-4691-b5f4-8e061ea57d71"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"6a44f8c9fa74a803a5c38b26","name":"Test Group","description":"Used for the SCI provider unit tests. DO NOT DELETE."}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Test Group Update","id":"42611f86-d022-4e8e-81e7-4f34bf45b4da","meta":{"created":"2026-03-30T05:14:55Z","lastModified":"2026-03-30T05:14:55Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/42611f86-d022-4e8e-81e7-4f34bf45b4da","resourceType":"Group","version":"77f279b5-8a51-476f-bd74-6d2a8583601a"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"69ca06cf43def34a3cfac706","name":"test_group_update","description":"This group is for test update functionality."}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group","urn:ietf:params:scim:schemas:extension:sap:2.0:Group"],"displayName":"auth_group","id":"98a84ac5-fb95-486c-a61c-13db7d77bad1","meta":{"created":"2025-04-20T14:26:50Z","lastModified":"2026-04-24T06:18:29Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/98a84ac5-fb95-486c-a61c-13db7d77bad1","resourceType":"Group","version":"1777011509123410481"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"6805042a4511a027500704b0","name":"98a84ac5-fb95-486c-a61c-13db7d77bad1"},"urn:ietf:params:scim:schemas:extension:sap:2.0:Group":{"supportedOperations":"userOnlyMembership","type":"authorization","applicationId":"de9cfc8d-e8e4-4623-891c-85ee28fd6c70"}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group","urn:ietf:params:scim:schemas:extension:sap:2.0:Group"],"displayName":"perses-monika","id":"9cf4ab6c-4a43-4a2f-b761-3918604138f3","meta":{"created":"2026-04-24T06:21:45Z","lastModified":"2026-07-16T10:57:23Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/9cf4ab6c-4a43-4a2f-b761-3918604138f3","resourceType":"Group","version":"1784199443555027321"},"members":[{"value":"09159810-def3-4283-9f04-326c8b2efa94","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/09159810-def3-4283-9f04-326c8b2efa94"},{"value":"26d5c6d3-6fc8-47b9-8d1e-e24b23803e2b","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/26d5c6d3-6fc8-47b9-8d1e-e24b23803e2b"},{"value":"2d069e38-0063-4bf4-8827-a44c7fc82688","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/2d069e38-0063-4bf4-8827-a44c7fc82688"},{"value":"9b7190f8-1d8f-4486-a1ed-d2d8325efc58","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/9b7190f8-1d8f-4486-a1ed-d2d8325efc58"},{"value":"9d315e00-6cf9-405d-bcc7-6c746f1e020e","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/9d315e00-6cf9-405d-bcc7-6c746f1e020e"},{"value":"a2ec49bd-3208-44f0-8808-474e923ae516","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/a2ec49bd-3208-44f0-8808-474e923ae516"},{"value":"b5c46eb3-5617-46b2-97b6-eb842cc50653","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/b5c46eb3-5617-46b2-97b6-eb842cc50653"},{"value":"c24cf641-1c53-4b89-986a-14a5d90166d6","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/c24cf641-1c53-4b89-986a-14a5d90166d6"},{"value":"c535080a-f215-445c-94a9-b153620e7f8f","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/c535080a-f215-445c-94a9-b153620e7f8f"},{"value":"d4bb32fd-585e-455c-acee-ed0641969b02","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/d4bb32fd-585e-455c-acee-ed0641969b02"},{"value":"e27d97f6-d345-44b1-8597-7a15c568a815","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/e27d97f6-d345-44b1-8597-7a15c568a815"},{"value":"fc233593-c623-421b-b497-5667d9c036ce","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/fc233593-c623-421b-b497-5667d9c036ce"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"69eb0bf967bce737a7194920","name":"perses-monika"},"urn:ietf:params:scim:schemas:extension:sap:2.0:Group":{"supportedOperations":"readWrite","type":"userGroup","applicationId":"1e274cd0-c22d-4f86-a06e-c1c7116de5e5"}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group","urn:ietf:params:scim:schemas:extension:sap:2.0:Group"],"displayName":"Monitoring Staging","id":"a63e845f-1a81-46ee-9186-b2f9a8a832ff","meta":{"created":"2026-05-12T06:33:02Z","lastModified":"2026-07-16T10:57:35Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/a63e845f-1a81-46ee-9186-b2f9a8a832ff","resourceType":"Group","version":"1784199455494822198"},"members":[{"value":"09159810-def3-4283-9f04-326c8b2efa94","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/09159810-def3-4283-9f04-326c8b2efa94"},{"value":"26d5c6d3-6fc8-47b9-8d1e-e24b23803e2b","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/26d5c6d3-6fc8-47b9-8d1e-e24b23803e2b"},{"value":"2d069e38-0063-4bf4-8827-a44c7fc82688","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/2d069e38-0063-4bf4-8827-a44c7fc82688"},{"value":"9b7190f8-1d8f-4486-a1ed-d2d8325efc58","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/9b7190f8-1d8f-4486-a1ed-d2d8325efc58"},{"value":"9d315e00-6cf9-405d-bcc7-6c746f1e020e","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/9d315e00-6cf9-405d-bcc7-6c746f1e020e"},{"value":"a2ec49bd-3208-44f0-8808-474e923ae516","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/a2ec49bd-3208-44f0-8808-474e923ae516"},{"value":"b5c46eb3-5617-46b2-97b6-eb842cc50653","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/b5c46eb3-5617-46b2-97b6-eb842cc50653"},{"value":"c24cf641-1c53-4b89-986a-14a5d90166d6","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/c24cf641-1c53-4b89-986a-14a5d90166d6"},{"value":"c535080a-f215-445c-94a9-b153620e7f8f","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/c535080a-f215-445c-94a9-b153620e7f8f"},{"value":"d4bb32fd-585e-455c-acee-ed0641969b02","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/d4bb32fd-585e-455c-acee-ed0641969b02"},{"value":"e27d97f6-d345-44b1-8597-7a15c568a815","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/e27d97f6-d345-44b1-8597-7a15c568a815"},{"value":"fc233593-c623-421b-b497-5667d9c036ce","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/fc233593-c623-421b-b497-5667d9c036ce"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"6a02c99e92df1d7d545e9de7","name":"preses-monika-stg"},"urn:ietf:params:scim:schemas:extension:sap:2.0:Group":{"supportedOperations":"readWrite","externalName":"Monitoring Staging","type":"userGroup","applicationId":"ddbf28d2-bc4d-48fe-99a8-2ff85f027f8a"}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Terraform Test Base Group","id":"b2cd886a-3642-4510-b07a-bdacc4013cc3","meta":{"created":"2026-06-24T09:25:36Z","lastModified":"2026-08-31T06:37:01Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/b2cd886a-3642-4510-b07a-bdacc4013cc3","resourceType":"Group","version":"31fca07e-4584-4068-86e9-c23dc3d34997"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"6a3ba290a225e100578f96d1","name":"Base Test Group","description":"Used for the SCI provider unit tests. DO NOT DELETE."}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Test Group","id":"d0fe652c-5b50-4ba5-9489-9f6a7f75ee2b","meta":{"created":"2025-08-29T06:35:10Z","lastModified":"2026-03-24T09:34:32Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/d0fe652c-5b50-4ba5-9489-9f6a7f75ee2b","resourceType":"Group","version":"c4bae660-d084-4263-84e3-37d6f2955fdf"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"68b14a1e67ca5514616bdb81","name":"test_group"}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group","urn:ietf:params:scim:schemas:extension:sci:2.0:Authorization","urn:ietf:params:scim:schemas:extension:sap:2.0:Group"],"displayName":"auth_group","id":"e701ce1d-3ac3-481b-aa0a-4ce606b75be3","meta":{"created":"2025-04-20T14:27:50Z","lastModified":"2025-08-29T09:25:13Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/e701ce1d-3ac3-481b-aa0a-4ce606b75be3","resourceType":"Group","version":"1756459513019849992"},"members":[{"value":"9abeec23-a256-4908-828c-cab554c3d1ac","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/9abeec23-a256-4908-828c-cab554c3d1ac"}],"urn:ietf:params:scim:schemas:extension:sci:2.0:Authorization":{"authorizationId":"4eebc4ff-3af1-4965-a706-2aee0b72a982","type":"policy"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"680504664ce36b52b454042b","name":"e701ce1d-3ac3-481b-aa0a-4ce606b75be3"},"urn:ietf:params:scim:schemas:extension:sap:2.0:Group":{"supportedOperations":"userOnlyMembership","type":"authorization","applicationId":"33108480-845b-4922-a486-175c0aba846e"}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"admin_auth_group","id":"fad75661-b77a-41b8-b7c7-af8283143172","meta":{"created":"2025-04-20T15:49:02Z","lastModified":"2026-04-24T06:18:29Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/fad75661-b77a-41b8-b7c7-af8283143172","resourceType":"Group","version":"b4846004-3d10-4977-81a4-0b190a1b3074"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"6805176e4ce36b52b454042c","name":"fad75661-b77a-41b8-b7c7-af8283143172"}}]}'
         headers:
             Cache-Control:
                 - private,no-cache,no-store
+                - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
             Content-Type:
                 - application/scim+json
             Date:
-                - Wed, 14 May 2025 21:23:47 GMT
-            Etag:
-                - '"4c091ebc-2efa-4228-a740-1d04b21b5530-gzip"'
-            Location:
-                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/59aeb87b-777a-4034-8f3e-709d39fb1a18
+                - Mon, 31 Aug 2026 06:43:00 GMT
             Referrer-Policy:
                 - origin
             Server:
                 - SAP
             Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains; preload
+                - max-age=63072000; includeSubDomains; preload
             Vary:
                 - Accept-Encoding,X-CSP-STRIP
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - 5053029B-CA60-4BC7-9C2A-6ABAE6A58C72
+                - FE6D0B6D-E702-4A0D-89D6-85D0267ACEE8
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-f6876
+                - http-dvw72
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
                 - qa
+            X-Ids-Region:
+                - eu-de-1
             X-Robots-Tag:
                 - none
         status: '200 '
         code: 200
-        duration: 257.559408ms
+        duration: 327.889084ms
     - id: 2
       request:
         proto: HTTP/1.1
@@ -156,12 +171,12 @@ interactions:
             Accept:
                 - '*/*'
             Authorization:
-                - redacted
+                - REDACTED
             Content-Type:
                 - application/scim+json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/38e5c81d-9d42-4f08-a978-3ba77ceb99fd
         method: GET
       response:
         proto: HTTP/1.1
@@ -171,179 +186,212 @@ interactions:
         trailer: {}
         content_length: -1
         uncompressed: true
-        body: '{"schemas":["urn:ietf:params:scim:api:messages:2.0:ListResponse"],"totalResults":4,"itemsPerPage":100,"startIndex":1,"Resources":[{"id":"59aeb87b-777a-4034-8f3e-709d39fb1a18","meta":{"created":"2025-01-13T13:38:09Z","lastModified":"2025-05-14T20:54:24Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/59aeb87b-777a-4034-8f3e-709d39fb1a18","version":"4c091ebc-2efa-4228-a740-1d04b21b5530","resourceType":"Group"},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Terraform Test Group","members":[{"value":"80f858a3-28ce-437e-ba31-d3358a5bdbfa","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/80f858a3-28ce-437e-ba31-d3358a5bdbfa","type":"User"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"name":"Test Group","additionalId":"6785174139031d4324035b6b"}},{"id":"98a84ac5-fb95-486c-a61c-13db7d77bad1","meta":{"created":"2025-04-20T14:26:50Z","lastModified":"2025-04-20T14:26:50Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/98a84ac5-fb95-486c-a61c-13db7d77bad1","version":"1745159210474328146","resourceType":"Group"},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group","urn:ietf:params:scim:schemas:extension:sap:2.0:Group"],"displayName":"auth_group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"name":"98a84ac5-fb95-486c-a61c-13db7d77bad1","additionalId":"6805042a4511a027500704b0"},"urn:ietf:params:scim:schemas:extension:sap:2.0:Group":{"applicationId":"de9cfc8d-e8e4-4623-891c-85ee28fd6c70","type":"authorization","supportedOperations":"userOnlyMembership"}},{"id":"e701ce1d-3ac3-481b-aa0a-4ce606b75be3","meta":{"created":"2025-04-20T14:27:50Z","lastModified":"2025-04-20T14:42:48Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/e701ce1d-3ac3-481b-aa0a-4ce606b75be3","version":"1745160168793013318","resourceType":"Group"},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group","urn:ietf:params:scim:schemas:extension:sci:2.0:Authorization","urn:ietf:params:scim:schemas:extension:sap:2.0:Group"],"displayName":"auth_group","members":[{"value":"9abeec23-a256-4908-828c-cab554c3d1ac","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/9abeec23-a256-4908-828c-cab554c3d1ac","type":"User"}],"urn:ietf:params:scim:schemas:extension:sci:2.0:Authorization":{"description":"test policy","zoneId":"0ca4cf95-5c87-40e7-aee2-2d5f64ac4254","type":"policy","applicationId":"de9cfc8d-e8e4-4623-891c-85ee28fd6c70","authorizationId":"4eebc4ff-3af1-4965-a706-2aee0b72a982"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"name":"e701ce1d-3ac3-481b-aa0a-4ce606b75be3","additionalId":"680504664ce36b52b454042b"},"urn:ietf:params:scim:schemas:extension:sap:2.0:Group":{"applicationId":"33108480-845b-4922-a486-175c0aba846e","type":"authorization","supportedOperations":"userOnlyMembership"}},{"id":"fad75661-b77a-41b8-b7c7-af8283143172","meta":{"created":"2025-04-20T15:49:02Z","lastModified":"2025-04-20T15:49:02Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/fad75661-b77a-41b8-b7c7-af8283143172","version":"1d713fb0-d125-4405-aba5-f27a07f43313","resourceType":"Group"},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"admin_auth_group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"name":"fad75661-b77a-41b8-b7c7-af8283143172","additionalId":"6805176e4ce36b52b454042c"}}]}'
+        body: '{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Terraform Test Group","id":"38e5c81d-9d42-4f08-a978-3ba77ceb99fd","meta":{"created":"2026-07-01T11:23:53Z","lastModified":"2026-08-31T06:36:56Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/38e5c81d-9d42-4f08-a978-3ba77ceb99fd","resourceType":"Group","version":"124047b1-4f8a-4039-bc94-b54c4ed2b580"},"members":[{"value":"1e5dd627-5220-4691-b5f4-8e061ea57d71","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/1e5dd627-5220-4691-b5f4-8e061ea57d71"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"6a44f8c9fa74a803a5c38b26","name":"Test Group","description":"Used for the SCI provider unit tests. DO NOT DELETE."}}'
         headers:
             Cache-Control:
                 - private,no-cache,no-store
+                - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
             Content-Type:
                 - application/scim+json
             Date:
-                - Wed, 14 May 2025 21:23:48 GMT
+                - Mon, 31 Aug 2026 06:43:01 GMT
+            Etag:
+                - '"124047b1-4f8a-4039-bc94-b54c4ed2b580-gzip"'
+            Location:
+                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/38e5c81d-9d42-4f08-a978-3ba77ceb99fd
             Referrer-Policy:
                 - origin
             Server:
                 - SAP
             Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains; preload
+                - max-age=63072000; includeSubDomains; preload
             Vary:
                 - Accept-Encoding,X-CSP-STRIP
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - D981D364-E890-4368-B0EC-5A9D71C6589D
+                - 049DA41A-F3AC-483F-8450-44A679B7575D
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-f6876
+                - http-q85qc
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
                 - qa
+            X-Ids-Region:
+                - eu-de-1
             X-Robots-Tag:
                 - none
         status: '200 '
         code: 200
-        duration: 263.560635ms
+        duration: 248.521292ms
     - id: 3
       request:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 0
+        content_length: 126
         transfer_encoding: []
         trailer: {}
         host: iasprovidertestblr.accounts400.ondemand.com
         remote_addr: ""
         request_uri: ""
-        body: ""
-        form: {}
+        body: client_id=REDACTED&client_secret=REDACTED&grant_type=client_credentials
+        form:
+            client_id:
+                - REDACTED
+            client_secret:
+                - REDACTED
+            grant_type:
+                - client_credentials
         headers:
-            Accept:
-                - '*/*'
-            Authorization:
-                - redacted
             Content-Type:
-                - application/scim+json
-            Dataserviceversion:
-                - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/59aeb87b-777a-4034-8f3e-709d39fb1a18
-        method: GET
+                - application/x-www-form-urlencoded
+        url: https://iasprovidertestblr.accounts400.ondemand.com/oauth2/token
+        method: POST
       response:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: -1
-        uncompressed: true
-        body: '{"id":"59aeb87b-777a-4034-8f3e-709d39fb1a18","meta":{"created":"2025-01-13T13:38:09Z","lastModified":"2025-05-14T20:54:24Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/59aeb87b-777a-4034-8f3e-709d39fb1a18","version":"4c091ebc-2efa-4228-a740-1d04b21b5530","resourceType":"Group"},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Terraform Test Group","members":[{"value":"80f858a3-28ce-437e-ba31-d3358a5bdbfa","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/80f858a3-28ce-437e-ba31-d3358a5bdbfa","type":"User"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"name":"Test Group","additionalId":"6785174139031d4324035b6b"}}'
+        content_length: 980
+        uncompressed: false
+        body: '{"access_token":"REDACTED","token_type":"Bearer","expires_in":3600}'
         headers:
             Cache-Control:
                 - private,no-cache,no-store
+                - private,no-cache,no-store
+            Content-Length:
+                - "980"
+            Content-Security-Policy:
+                - script-src 'none';
             Content-Type:
-                - application/scim+json
+                - application/json;charset=UTF-8
             Date:
-                - Wed, 14 May 2025 21:23:48 GMT
-            Etag:
-                - '"4c091ebc-2efa-4228-a740-1d04b21b5530-gzip"'
-            Location:
-                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/59aeb87b-777a-4034-8f3e-709d39fb1a18
+                - Mon, 31 Aug 2026 06:43:01 GMT
+            Expires:
+                - "0"
+            Pragma:
+                - no-cache
             Referrer-Policy:
                 - origin
             Server:
                 - SAP
             Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains; preload
+                - max-age=63072000; includeSubDomains; preload
             Vary:
-                - Accept-Encoding,X-CSP-STRIP
+                - Origin,X-CSP-STRIP,Access-Control-Request-Method,Access-Control-Request-Headers
             X-Content-Type-Options:
                 - nosniff
+                - nosniff
             X-Ids-Id:
-                - D8CCFBE7-BA8F-4AC2-997A-38AA821B4D99
+                - 1DD718FB-2A53-4DB8-AE2A-684CF3794E0E
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-f6876
+                - http-q85qc
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
                 - qa
+            X-Ids-Region:
+                - eu-de-1
             X-Robots-Tag:
                 - none
+            X-Xss-Protection:
+                - 1; mode=block
         status: '200 '
         code: 200
-        duration: 240.133349ms
+        duration: 203.460083ms
     - id: 4
       request:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 0
+        content_length: 126
         transfer_encoding: []
         trailer: {}
         host: iasprovidertestblr.accounts400.ondemand.com
         remote_addr: ""
         request_uri: ""
-        body: ""
-        form: {}
+        body: client_id=REDACTED&client_secret=REDACTED&grant_type=client_credentials
+        form:
+            client_id:
+                - REDACTED
+            client_secret:
+                - REDACTED
+            grant_type:
+                - client_credentials
         headers:
-            Accept:
-                - '*/*'
-            Authorization:
-                - redacted
             Content-Type:
-                - application/scim+json
-            Dataserviceversion:
-                - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/
-        method: GET
+                - application/x-www-form-urlencoded
+        url: https://iasprovidertestblr.accounts400.ondemand.com/oauth2/token
+        method: POST
       response:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: -1
-        uncompressed: true
-        body: '{"schemas":["urn:ietf:params:scim:api:messages:2.0:ListResponse"],"totalResults":4,"itemsPerPage":100,"startIndex":1,"Resources":[{"id":"59aeb87b-777a-4034-8f3e-709d39fb1a18","meta":{"created":"2025-01-13T13:38:09Z","lastModified":"2025-05-14T20:54:24Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/59aeb87b-777a-4034-8f3e-709d39fb1a18","version":"4c091ebc-2efa-4228-a740-1d04b21b5530","resourceType":"Group"},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Terraform Test Group","members":[{"value":"80f858a3-28ce-437e-ba31-d3358a5bdbfa","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/80f858a3-28ce-437e-ba31-d3358a5bdbfa","type":"User"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"name":"Test Group","additionalId":"6785174139031d4324035b6b"}},{"id":"98a84ac5-fb95-486c-a61c-13db7d77bad1","meta":{"created":"2025-04-20T14:26:50Z","lastModified":"2025-04-20T14:26:50Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/98a84ac5-fb95-486c-a61c-13db7d77bad1","version":"1745159210474328146","resourceType":"Group"},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group","urn:ietf:params:scim:schemas:extension:sap:2.0:Group"],"displayName":"auth_group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"name":"98a84ac5-fb95-486c-a61c-13db7d77bad1","additionalId":"6805042a4511a027500704b0"},"urn:ietf:params:scim:schemas:extension:sap:2.0:Group":{"applicationId":"de9cfc8d-e8e4-4623-891c-85ee28fd6c70","type":"authorization","supportedOperations":"userOnlyMembership"}},{"id":"e701ce1d-3ac3-481b-aa0a-4ce606b75be3","meta":{"created":"2025-04-20T14:27:50Z","lastModified":"2025-04-20T14:42:48Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/e701ce1d-3ac3-481b-aa0a-4ce606b75be3","version":"1745160168793013318","resourceType":"Group"},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group","urn:ietf:params:scim:schemas:extension:sci:2.0:Authorization","urn:ietf:params:scim:schemas:extension:sap:2.0:Group"],"displayName":"auth_group","members":[{"value":"9abeec23-a256-4908-828c-cab554c3d1ac","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/9abeec23-a256-4908-828c-cab554c3d1ac","type":"User"}],"urn:ietf:params:scim:schemas:extension:sci:2.0:Authorization":{"description":"test policy","zoneId":"0ca4cf95-5c87-40e7-aee2-2d5f64ac4254","type":"policy","applicationId":"de9cfc8d-e8e4-4623-891c-85ee28fd6c70","authorizationId":"4eebc4ff-3af1-4965-a706-2aee0b72a982"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"name":"e701ce1d-3ac3-481b-aa0a-4ce606b75be3","additionalId":"680504664ce36b52b454042b"},"urn:ietf:params:scim:schemas:extension:sap:2.0:Group":{"applicationId":"33108480-845b-4922-a486-175c0aba846e","type":"authorization","supportedOperations":"userOnlyMembership"}},{"id":"fad75661-b77a-41b8-b7c7-af8283143172","meta":{"created":"2025-04-20T15:49:02Z","lastModified":"2025-04-20T15:49:02Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/fad75661-b77a-41b8-b7c7-af8283143172","version":"1d713fb0-d125-4405-aba5-f27a07f43313","resourceType":"Group"},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"admin_auth_group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"name":"fad75661-b77a-41b8-b7c7-af8283143172","additionalId":"6805176e4ce36b52b454042c"}}]}'
+        content_length: 980
+        uncompressed: false
+        body: '{"access_token":"REDACTED","token_type":"Bearer","expires_in":3600}'
         headers:
             Cache-Control:
                 - private,no-cache,no-store
+                - private,no-cache,no-store
+            Content-Length:
+                - "980"
+            Content-Security-Policy:
+                - script-src 'none';
             Content-Type:
-                - application/scim+json
+                - application/json;charset=UTF-8
             Date:
-                - Wed, 14 May 2025 21:23:48 GMT
+                - Mon, 31 Aug 2026 06:43:01 GMT
+            Expires:
+                - "0"
+            Pragma:
+                - no-cache
             Referrer-Policy:
                 - origin
             Server:
                 - SAP
             Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains; preload
+                - max-age=63072000; includeSubDomains; preload
             Vary:
-                - Accept-Encoding,X-CSP-STRIP
+                - Origin,X-CSP-STRIP,Access-Control-Request-Method,Access-Control-Request-Headers
             X-Content-Type-Options:
                 - nosniff
+                - nosniff
             X-Ids-Id:
-                - 71CC9404-16FF-4E9A-8833-516C497C3340
+                - 79D7BBC9-F36B-47A9-83FC-CEC3C8800580
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-f6876
+                - http-b6lv7
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
                 - qa
+            X-Ids-Region:
+                - eu-de-1
             X-Robots-Tag:
                 - none
+            X-Xss-Protection:
+                - 1; mode=block
         status: '200 '
         code: 200
-        duration: 267.400435ms
+        duration: 200.529834ms
     - id: 5
       request:
         proto: HTTP/1.1
@@ -361,12 +409,12 @@ interactions:
             Accept:
                 - '*/*'
             Authorization:
-                - redacted
+                - REDACTED
             Content-Type:
                 - application/scim+json
             Dataserviceversion:
                 - "2.0"
-        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/59aeb87b-777a-4034-8f3e-709d39fb1a18
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/
         method: GET
       response:
         proto: HTTP/1.1
@@ -376,42 +424,429 @@ interactions:
         trailer: {}
         content_length: -1
         uncompressed: true
-        body: '{"id":"59aeb87b-777a-4034-8f3e-709d39fb1a18","meta":{"created":"2025-01-13T13:38:09Z","lastModified":"2025-05-14T20:54:24Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/59aeb87b-777a-4034-8f3e-709d39fb1a18","version":"4c091ebc-2efa-4228-a740-1d04b21b5530","resourceType":"Group"},"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Terraform Test Group","members":[{"value":"80f858a3-28ce-437e-ba31-d3358a5bdbfa","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/80f858a3-28ce-437e-ba31-d3358a5bdbfa","type":"User"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"name":"Test Group","additionalId":"6785174139031d4324035b6b"}}'
+        body: '{"schemas":["urn:ietf:params:scim:api:messages:2.0:ListResponse"],"totalResults":11,"itemsPerPage":100,"startIndex":1,"Resources":[{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Test Base Group","id":"1a3b3cf4-89ee-4393-922d-f9625a9ff420","meta":{"created":"2026-08-31T06:43:00Z","lastModified":"2026-08-31T06:43:00Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/1a3b3cf4-89ee-4393-922d-f9625a9ff420","resourceType":"Group","version":"b6b2ff77-fc22-42f9-913b-95867269f714"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"6a9522743db419478ccbf477","name":"Test-Base-Group","description":"Base group for testing"}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"CI/CD","id":"1ac7f501-aa83-4e06-8a05-dc6b4251d0b6","meta":{"created":"2025-07-04T08:16:34Z","lastModified":"2026-05-22T07:00:51Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/1ac7f501-aa83-4e06-8a05-dc6b4251d0b6","resourceType":"Group","version":"fe624b75-d7b7-4d13-a13a-cf3ae61ba3ec"},"members":[{"value":"05282952-b334-4078-bd56-dd38b2e771e9","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/05282952-b334-4078-bd56-dd38b2e771e9"},{"value":"288fc004-2128-4701-a0d1-d4ee451eec19","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/288fc004-2128-4701-a0d1-d4ee451eec19"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"68678de25c51250dbd753398","name":"Github"}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Terraform Test Group","id":"38e5c81d-9d42-4f08-a978-3ba77ceb99fd","meta":{"created":"2026-07-01T11:23:53Z","lastModified":"2026-08-31T06:43:01Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/38e5c81d-9d42-4f08-a978-3ba77ceb99fd","resourceType":"Group","version":"67ea9c52-eda5-4b49-92c7-ebf8d9532986"},"members":[{"value":"1e5dd627-5220-4691-b5f4-8e061ea57d71","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/1e5dd627-5220-4691-b5f4-8e061ea57d71"},{"value":"80f858a3-28ce-437e-ba31-d3358a5bdbfa","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/80f858a3-28ce-437e-ba31-d3358a5bdbfa"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"6a44f8c9fa74a803a5c38b26","name":"Test Group","description":"Used for the SCI provider unit tests. DO NOT DELETE."}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Test Group Update","id":"42611f86-d022-4e8e-81e7-4f34bf45b4da","meta":{"created":"2026-03-30T05:14:55Z","lastModified":"2026-03-30T05:14:55Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/42611f86-d022-4e8e-81e7-4f34bf45b4da","resourceType":"Group","version":"77f279b5-8a51-476f-bd74-6d2a8583601a"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"69ca06cf43def34a3cfac706","name":"test_group_update","description":"This group is for test update functionality."}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group","urn:ietf:params:scim:schemas:extension:sap:2.0:Group"],"displayName":"auth_group","id":"98a84ac5-fb95-486c-a61c-13db7d77bad1","meta":{"created":"2025-04-20T14:26:50Z","lastModified":"2026-04-24T06:18:29Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/98a84ac5-fb95-486c-a61c-13db7d77bad1","resourceType":"Group","version":"1777011509123410481"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"6805042a4511a027500704b0","name":"98a84ac5-fb95-486c-a61c-13db7d77bad1"},"urn:ietf:params:scim:schemas:extension:sap:2.0:Group":{"supportedOperations":"userOnlyMembership","type":"authorization","applicationId":"de9cfc8d-e8e4-4623-891c-85ee28fd6c70"}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group","urn:ietf:params:scim:schemas:extension:sap:2.0:Group"],"displayName":"perses-monika","id":"9cf4ab6c-4a43-4a2f-b761-3918604138f3","meta":{"created":"2026-04-24T06:21:45Z","lastModified":"2026-07-16T10:57:23Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/9cf4ab6c-4a43-4a2f-b761-3918604138f3","resourceType":"Group","version":"1784199443555027321"},"members":[{"value":"09159810-def3-4283-9f04-326c8b2efa94","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/09159810-def3-4283-9f04-326c8b2efa94"},{"value":"26d5c6d3-6fc8-47b9-8d1e-e24b23803e2b","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/26d5c6d3-6fc8-47b9-8d1e-e24b23803e2b"},{"value":"2d069e38-0063-4bf4-8827-a44c7fc82688","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/2d069e38-0063-4bf4-8827-a44c7fc82688"},{"value":"9b7190f8-1d8f-4486-a1ed-d2d8325efc58","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/9b7190f8-1d8f-4486-a1ed-d2d8325efc58"},{"value":"9d315e00-6cf9-405d-bcc7-6c746f1e020e","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/9d315e00-6cf9-405d-bcc7-6c746f1e020e"},{"value":"a2ec49bd-3208-44f0-8808-474e923ae516","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/a2ec49bd-3208-44f0-8808-474e923ae516"},{"value":"b5c46eb3-5617-46b2-97b6-eb842cc50653","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/b5c46eb3-5617-46b2-97b6-eb842cc50653"},{"value":"c24cf641-1c53-4b89-986a-14a5d90166d6","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/c24cf641-1c53-4b89-986a-14a5d90166d6"},{"value":"c535080a-f215-445c-94a9-b153620e7f8f","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/c535080a-f215-445c-94a9-b153620e7f8f"},{"value":"d4bb32fd-585e-455c-acee-ed0641969b02","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/d4bb32fd-585e-455c-acee-ed0641969b02"},{"value":"e27d97f6-d345-44b1-8597-7a15c568a815","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/e27d97f6-d345-44b1-8597-7a15c568a815"},{"value":"fc233593-c623-421b-b497-5667d9c036ce","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/fc233593-c623-421b-b497-5667d9c036ce"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"69eb0bf967bce737a7194920","name":"perses-monika"},"urn:ietf:params:scim:schemas:extension:sap:2.0:Group":{"supportedOperations":"readWrite","type":"userGroup","applicationId":"1e274cd0-c22d-4f86-a06e-c1c7116de5e5"}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group","urn:ietf:params:scim:schemas:extension:sap:2.0:Group"],"displayName":"Monitoring Staging","id":"a63e845f-1a81-46ee-9186-b2f9a8a832ff","meta":{"created":"2026-05-12T06:33:02Z","lastModified":"2026-07-16T10:57:35Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/a63e845f-1a81-46ee-9186-b2f9a8a832ff","resourceType":"Group","version":"1784199455494822198"},"members":[{"value":"09159810-def3-4283-9f04-326c8b2efa94","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/09159810-def3-4283-9f04-326c8b2efa94"},{"value":"26d5c6d3-6fc8-47b9-8d1e-e24b23803e2b","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/26d5c6d3-6fc8-47b9-8d1e-e24b23803e2b"},{"value":"2d069e38-0063-4bf4-8827-a44c7fc82688","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/2d069e38-0063-4bf4-8827-a44c7fc82688"},{"value":"9b7190f8-1d8f-4486-a1ed-d2d8325efc58","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/9b7190f8-1d8f-4486-a1ed-d2d8325efc58"},{"value":"9d315e00-6cf9-405d-bcc7-6c746f1e020e","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/9d315e00-6cf9-405d-bcc7-6c746f1e020e"},{"value":"a2ec49bd-3208-44f0-8808-474e923ae516","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/a2ec49bd-3208-44f0-8808-474e923ae516"},{"value":"b5c46eb3-5617-46b2-97b6-eb842cc50653","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/b5c46eb3-5617-46b2-97b6-eb842cc50653"},{"value":"c24cf641-1c53-4b89-986a-14a5d90166d6","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/c24cf641-1c53-4b89-986a-14a5d90166d6"},{"value":"c535080a-f215-445c-94a9-b153620e7f8f","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/c535080a-f215-445c-94a9-b153620e7f8f"},{"value":"d4bb32fd-585e-455c-acee-ed0641969b02","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/d4bb32fd-585e-455c-acee-ed0641969b02"},{"value":"e27d97f6-d345-44b1-8597-7a15c568a815","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/e27d97f6-d345-44b1-8597-7a15c568a815"},{"value":"fc233593-c623-421b-b497-5667d9c036ce","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/fc233593-c623-421b-b497-5667d9c036ce"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"6a02c99e92df1d7d545e9de7","name":"preses-monika-stg"},"urn:ietf:params:scim:schemas:extension:sap:2.0:Group":{"supportedOperations":"readWrite","externalName":"Monitoring Staging","type":"userGroup","applicationId":"ddbf28d2-bc4d-48fe-99a8-2ff85f027f8a"}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Terraform Test Base Group","id":"b2cd886a-3642-4510-b07a-bdacc4013cc3","meta":{"created":"2026-06-24T09:25:36Z","lastModified":"2026-08-31T06:37:01Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/b2cd886a-3642-4510-b07a-bdacc4013cc3","resourceType":"Group","version":"31fca07e-4584-4068-86e9-c23dc3d34997"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"6a3ba290a225e100578f96d1","name":"Base Test Group","description":"Used for the SCI provider unit tests. DO NOT DELETE."}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Test Group","id":"d0fe652c-5b50-4ba5-9489-9f6a7f75ee2b","meta":{"created":"2025-08-29T06:35:10Z","lastModified":"2026-03-24T09:34:32Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/d0fe652c-5b50-4ba5-9489-9f6a7f75ee2b","resourceType":"Group","version":"c4bae660-d084-4263-84e3-37d6f2955fdf"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"68b14a1e67ca5514616bdb81","name":"test_group"}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group","urn:ietf:params:scim:schemas:extension:sci:2.0:Authorization","urn:ietf:params:scim:schemas:extension:sap:2.0:Group"],"displayName":"auth_group","id":"e701ce1d-3ac3-481b-aa0a-4ce606b75be3","meta":{"created":"2025-04-20T14:27:50Z","lastModified":"2025-08-29T09:25:13Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/e701ce1d-3ac3-481b-aa0a-4ce606b75be3","resourceType":"Group","version":"1756459513019849992"},"members":[{"value":"9abeec23-a256-4908-828c-cab554c3d1ac","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/9abeec23-a256-4908-828c-cab554c3d1ac"}],"urn:ietf:params:scim:schemas:extension:sci:2.0:Authorization":{"authorizationId":"4eebc4ff-3af1-4965-a706-2aee0b72a982","type":"policy"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"680504664ce36b52b454042b","name":"e701ce1d-3ac3-481b-aa0a-4ce606b75be3"},"urn:ietf:params:scim:schemas:extension:sap:2.0:Group":{"supportedOperations":"userOnlyMembership","type":"authorization","applicationId":"33108480-845b-4922-a486-175c0aba846e"}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"admin_auth_group","id":"fad75661-b77a-41b8-b7c7-af8283143172","meta":{"created":"2025-04-20T15:49:02Z","lastModified":"2026-04-24T06:18:29Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/fad75661-b77a-41b8-b7c7-af8283143172","resourceType":"Group","version":"b4846004-3d10-4977-81a4-0b190a1b3074"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"6805176e4ce36b52b454042c","name":"fad75661-b77a-41b8-b7c7-af8283143172"}}]}'
         headers:
             Cache-Control:
                 - private,no-cache,no-store
+                - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
             Content-Type:
                 - application/scim+json
             Date:
-                - Wed, 14 May 2025 21:23:49 GMT
-            Etag:
-                - '"4c091ebc-2efa-4228-a740-1d04b21b5530-gzip"'
-            Location:
-                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/59aeb87b-777a-4034-8f3e-709d39fb1a18
+                - Mon, 31 Aug 2026 06:43:01 GMT
             Referrer-Policy:
                 - origin
             Server:
                 - SAP
             Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains; preload
+                - max-age=63072000; includeSubDomains; preload
             Vary:
                 - Accept-Encoding,X-CSP-STRIP
             X-Content-Type-Options:
                 - nosniff
             X-Ids-Id:
-                - F6557406-CAAA-499D-8B53-1FFC237D8CEC
+                - F53DD4FA-0A08-4D45-9A0F-A013E2A0CAA6
             X-Ids-Landscape:
                 - cc3-eu-de-2-a1
             X-Ids-Namespace:
                 - ias
             X-Ids-Node:
-                - http-f6876
+                - http-b6lv7
             X-Ids-Pool:
                 - a1
             X-Ids-Project:
                 - qa
+            X-Ids-Region:
+                - eu-de-1
             X-Robots-Tag:
                 - none
         status: '200 '
         code: 200
-        duration: 246.341956ms
+        duration: 274.509792ms
+    - id: 6
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            Accept:
+                - '*/*'
+            Authorization:
+                - REDACTED
+            Content-Type:
+                - application/scim+json
+            Dataserviceversion:
+                - "2.0"
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/38e5c81d-9d42-4f08-a978-3ba77ceb99fd
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: -1
+        uncompressed: true
+        body: '{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Terraform Test Group","id":"38e5c81d-9d42-4f08-a978-3ba77ceb99fd","meta":{"created":"2026-07-01T11:23:53Z","lastModified":"2026-08-31T06:43:01Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/38e5c81d-9d42-4f08-a978-3ba77ceb99fd","resourceType":"Group","version":"67ea9c52-eda5-4b49-92c7-ebf8d9532986"},"members":[{"value":"1e5dd627-5220-4691-b5f4-8e061ea57d71","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/1e5dd627-5220-4691-b5f4-8e061ea57d71"},{"value":"80f858a3-28ce-437e-ba31-d3358a5bdbfa","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/80f858a3-28ce-437e-ba31-d3358a5bdbfa"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"6a44f8c9fa74a803a5c38b26","name":"Test Group","description":"Used for the SCI provider unit tests. DO NOT DELETE."}}'
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+                - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
+            Content-Type:
+                - application/scim+json
+            Date:
+                - Mon, 31 Aug 2026 06:43:02 GMT
+            Etag:
+                - '"67ea9c52-eda5-4b49-92c7-ebf8d9532986-gzip"'
+            Location:
+                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/38e5c81d-9d42-4f08-a978-3ba77ceb99fd
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=63072000; includeSubDomains; preload
+            Vary:
+                - Accept-Encoding,X-CSP-STRIP
+            X-Content-Type-Options:
+                - nosniff
+            X-Ids-Id:
+                - EF1419CB-B496-4DB6-800D-F0160D295C7C
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-b6lv7
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Ids-Region:
+                - eu-de-1
+            X-Robots-Tag:
+                - none
+        status: '200 '
+        code: 200
+        duration: 243.763584ms
+    - id: 7
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 126
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: client_id=REDACTED&client_secret=REDACTED&grant_type=client_credentials
+        form:
+            client_id:
+                - REDACTED
+            client_secret:
+                - REDACTED
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+        url: https://iasprovidertestblr.accounts400.ondemand.com/oauth2/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 980
+        uncompressed: false
+        body: '{"access_token":"REDACTED","token_type":"Bearer","expires_in":3600}'
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+                - private,no-cache,no-store
+            Content-Length:
+                - "980"
+            Content-Security-Policy:
+                - script-src 'none';
+            Content-Type:
+                - application/json;charset=UTF-8
+            Date:
+                - Mon, 31 Aug 2026 06:43:02 GMT
+            Expires:
+                - "0"
+            Pragma:
+                - no-cache
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=63072000; includeSubDomains; preload
+            Vary:
+                - Origin,X-CSP-STRIP,Access-Control-Request-Method,Access-Control-Request-Headers
+            X-Content-Type-Options:
+                - nosniff
+                - nosniff
+            X-Ids-Id:
+                - 2424C9F9-FF96-4FD5-B4E1-A4C844B1E067
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-nm27t
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Ids-Region:
+                - eu-de-1
+            X-Robots-Tag:
+                - none
+            X-Xss-Protection:
+                - 1; mode=block
+        status: '200 '
+        code: 200
+        duration: 201.488958ms
+    - id: 8
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            Accept:
+                - '*/*'
+            Authorization:
+                - REDACTED
+            Content-Type:
+                - application/scim+json
+            Dataserviceversion:
+                - "2.0"
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: -1
+        uncompressed: true
+        body: '{"schemas":["urn:ietf:params:scim:api:messages:2.0:ListResponse"],"totalResults":11,"itemsPerPage":100,"startIndex":1,"Resources":[{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Test Base Group","id":"1a3b3cf4-89ee-4393-922d-f9625a9ff420","meta":{"created":"2026-08-31T06:43:00Z","lastModified":"2026-08-31T06:43:00Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/1a3b3cf4-89ee-4393-922d-f9625a9ff420","resourceType":"Group","version":"b6b2ff77-fc22-42f9-913b-95867269f714"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"6a9522743db419478ccbf477","name":"Test-Base-Group","description":"Base group for testing"}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"CI/CD","id":"1ac7f501-aa83-4e06-8a05-dc6b4251d0b6","meta":{"created":"2025-07-04T08:16:34Z","lastModified":"2026-05-22T07:00:51Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/1ac7f501-aa83-4e06-8a05-dc6b4251d0b6","resourceType":"Group","version":"fe624b75-d7b7-4d13-a13a-cf3ae61ba3ec"},"members":[{"value":"05282952-b334-4078-bd56-dd38b2e771e9","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/05282952-b334-4078-bd56-dd38b2e771e9"},{"value":"288fc004-2128-4701-a0d1-d4ee451eec19","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/288fc004-2128-4701-a0d1-d4ee451eec19"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"68678de25c51250dbd753398","name":"Github"}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Terraform Test Group","id":"38e5c81d-9d42-4f08-a978-3ba77ceb99fd","meta":{"created":"2026-07-01T11:23:53Z","lastModified":"2026-08-31T06:43:01Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/38e5c81d-9d42-4f08-a978-3ba77ceb99fd","resourceType":"Group","version":"67ea9c52-eda5-4b49-92c7-ebf8d9532986"},"members":[{"value":"1e5dd627-5220-4691-b5f4-8e061ea57d71","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/1e5dd627-5220-4691-b5f4-8e061ea57d71"},{"value":"80f858a3-28ce-437e-ba31-d3358a5bdbfa","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/80f858a3-28ce-437e-ba31-d3358a5bdbfa"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"6a44f8c9fa74a803a5c38b26","name":"Test Group","description":"Used for the SCI provider unit tests. DO NOT DELETE."}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Test Group Update","id":"42611f86-d022-4e8e-81e7-4f34bf45b4da","meta":{"created":"2026-03-30T05:14:55Z","lastModified":"2026-03-30T05:14:55Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/42611f86-d022-4e8e-81e7-4f34bf45b4da","resourceType":"Group","version":"77f279b5-8a51-476f-bd74-6d2a8583601a"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"69ca06cf43def34a3cfac706","name":"test_group_update","description":"This group is for test update functionality."}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group","urn:ietf:params:scim:schemas:extension:sap:2.0:Group"],"displayName":"auth_group","id":"98a84ac5-fb95-486c-a61c-13db7d77bad1","meta":{"created":"2025-04-20T14:26:50Z","lastModified":"2026-04-24T06:18:29Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/98a84ac5-fb95-486c-a61c-13db7d77bad1","resourceType":"Group","version":"1777011509123410481"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"6805042a4511a027500704b0","name":"98a84ac5-fb95-486c-a61c-13db7d77bad1"},"urn:ietf:params:scim:schemas:extension:sap:2.0:Group":{"supportedOperations":"userOnlyMembership","type":"authorization","applicationId":"de9cfc8d-e8e4-4623-891c-85ee28fd6c70"}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group","urn:ietf:params:scim:schemas:extension:sap:2.0:Group"],"displayName":"perses-monika","id":"9cf4ab6c-4a43-4a2f-b761-3918604138f3","meta":{"created":"2026-04-24T06:21:45Z","lastModified":"2026-07-16T10:57:23Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/9cf4ab6c-4a43-4a2f-b761-3918604138f3","resourceType":"Group","version":"1784199443555027321"},"members":[{"value":"09159810-def3-4283-9f04-326c8b2efa94","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/09159810-def3-4283-9f04-326c8b2efa94"},{"value":"26d5c6d3-6fc8-47b9-8d1e-e24b23803e2b","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/26d5c6d3-6fc8-47b9-8d1e-e24b23803e2b"},{"value":"2d069e38-0063-4bf4-8827-a44c7fc82688","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/2d069e38-0063-4bf4-8827-a44c7fc82688"},{"value":"9b7190f8-1d8f-4486-a1ed-d2d8325efc58","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/9b7190f8-1d8f-4486-a1ed-d2d8325efc58"},{"value":"9d315e00-6cf9-405d-bcc7-6c746f1e020e","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/9d315e00-6cf9-405d-bcc7-6c746f1e020e"},{"value":"a2ec49bd-3208-44f0-8808-474e923ae516","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/a2ec49bd-3208-44f0-8808-474e923ae516"},{"value":"b5c46eb3-5617-46b2-97b6-eb842cc50653","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/b5c46eb3-5617-46b2-97b6-eb842cc50653"},{"value":"c24cf641-1c53-4b89-986a-14a5d90166d6","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/c24cf641-1c53-4b89-986a-14a5d90166d6"},{"value":"c535080a-f215-445c-94a9-b153620e7f8f","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/c535080a-f215-445c-94a9-b153620e7f8f"},{"value":"d4bb32fd-585e-455c-acee-ed0641969b02","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/d4bb32fd-585e-455c-acee-ed0641969b02"},{"value":"e27d97f6-d345-44b1-8597-7a15c568a815","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/e27d97f6-d345-44b1-8597-7a15c568a815"},{"value":"fc233593-c623-421b-b497-5667d9c036ce","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/fc233593-c623-421b-b497-5667d9c036ce"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"69eb0bf967bce737a7194920","name":"perses-monika"},"urn:ietf:params:scim:schemas:extension:sap:2.0:Group":{"supportedOperations":"readWrite","type":"userGroup","applicationId":"1e274cd0-c22d-4f86-a06e-c1c7116de5e5"}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group","urn:ietf:params:scim:schemas:extension:sap:2.0:Group"],"displayName":"Monitoring Staging","id":"a63e845f-1a81-46ee-9186-b2f9a8a832ff","meta":{"created":"2026-05-12T06:33:02Z","lastModified":"2026-07-16T10:57:35Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/a63e845f-1a81-46ee-9186-b2f9a8a832ff","resourceType":"Group","version":"1784199455494822198"},"members":[{"value":"09159810-def3-4283-9f04-326c8b2efa94","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/09159810-def3-4283-9f04-326c8b2efa94"},{"value":"26d5c6d3-6fc8-47b9-8d1e-e24b23803e2b","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/26d5c6d3-6fc8-47b9-8d1e-e24b23803e2b"},{"value":"2d069e38-0063-4bf4-8827-a44c7fc82688","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/2d069e38-0063-4bf4-8827-a44c7fc82688"},{"value":"9b7190f8-1d8f-4486-a1ed-d2d8325efc58","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/9b7190f8-1d8f-4486-a1ed-d2d8325efc58"},{"value":"9d315e00-6cf9-405d-bcc7-6c746f1e020e","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/9d315e00-6cf9-405d-bcc7-6c746f1e020e"},{"value":"a2ec49bd-3208-44f0-8808-474e923ae516","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/a2ec49bd-3208-44f0-8808-474e923ae516"},{"value":"b5c46eb3-5617-46b2-97b6-eb842cc50653","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/b5c46eb3-5617-46b2-97b6-eb842cc50653"},{"value":"c24cf641-1c53-4b89-986a-14a5d90166d6","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/c24cf641-1c53-4b89-986a-14a5d90166d6"},{"value":"c535080a-f215-445c-94a9-b153620e7f8f","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/c535080a-f215-445c-94a9-b153620e7f8f"},{"value":"d4bb32fd-585e-455c-acee-ed0641969b02","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/d4bb32fd-585e-455c-acee-ed0641969b02"},{"value":"e27d97f6-d345-44b1-8597-7a15c568a815","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/e27d97f6-d345-44b1-8597-7a15c568a815"},{"value":"fc233593-c623-421b-b497-5667d9c036ce","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/fc233593-c623-421b-b497-5667d9c036ce"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"6a02c99e92df1d7d545e9de7","name":"preses-monika-stg"},"urn:ietf:params:scim:schemas:extension:sap:2.0:Group":{"supportedOperations":"readWrite","externalName":"Monitoring Staging","type":"userGroup","applicationId":"ddbf28d2-bc4d-48fe-99a8-2ff85f027f8a"}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Terraform Test Base Group","id":"b2cd886a-3642-4510-b07a-bdacc4013cc3","meta":{"created":"2026-06-24T09:25:36Z","lastModified":"2026-08-31T06:37:01Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/b2cd886a-3642-4510-b07a-bdacc4013cc3","resourceType":"Group","version":"31fca07e-4584-4068-86e9-c23dc3d34997"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"6a3ba290a225e100578f96d1","name":"Base Test Group","description":"Used for the SCI provider unit tests. DO NOT DELETE."}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Test Group","id":"d0fe652c-5b50-4ba5-9489-9f6a7f75ee2b","meta":{"created":"2025-08-29T06:35:10Z","lastModified":"2026-03-24T09:34:32Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/d0fe652c-5b50-4ba5-9489-9f6a7f75ee2b","resourceType":"Group","version":"c4bae660-d084-4263-84e3-37d6f2955fdf"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"68b14a1e67ca5514616bdb81","name":"test_group"}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group","urn:ietf:params:scim:schemas:extension:sci:2.0:Authorization","urn:ietf:params:scim:schemas:extension:sap:2.0:Group"],"displayName":"auth_group","id":"e701ce1d-3ac3-481b-aa0a-4ce606b75be3","meta":{"created":"2025-04-20T14:27:50Z","lastModified":"2025-08-29T09:25:13Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/e701ce1d-3ac3-481b-aa0a-4ce606b75be3","resourceType":"Group","version":"1756459513019849992"},"members":[{"value":"9abeec23-a256-4908-828c-cab554c3d1ac","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/9abeec23-a256-4908-828c-cab554c3d1ac"}],"urn:ietf:params:scim:schemas:extension:sci:2.0:Authorization":{"authorizationId":"4eebc4ff-3af1-4965-a706-2aee0b72a982","type":"policy"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"680504664ce36b52b454042b","name":"e701ce1d-3ac3-481b-aa0a-4ce606b75be3"},"urn:ietf:params:scim:schemas:extension:sap:2.0:Group":{"supportedOperations":"userOnlyMembership","type":"authorization","applicationId":"33108480-845b-4922-a486-175c0aba846e"}},{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"admin_auth_group","id":"fad75661-b77a-41b8-b7c7-af8283143172","meta":{"created":"2025-04-20T15:49:02Z","lastModified":"2026-04-24T06:18:29Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/fad75661-b77a-41b8-b7c7-af8283143172","resourceType":"Group","version":"b4846004-3d10-4977-81a4-0b190a1b3074"},"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"6805176e4ce36b52b454042c","name":"fad75661-b77a-41b8-b7c7-af8283143172"}}]}'
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+                - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
+            Content-Type:
+                - application/scim+json
+            Date:
+                - Mon, 31 Aug 2026 06:43:02 GMT
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=63072000; includeSubDomains; preload
+            Vary:
+                - Accept-Encoding,X-CSP-STRIP
+            X-Content-Type-Options:
+                - nosniff
+            X-Ids-Id:
+                - 77150966-3C18-4672-A070-B0F929EAFD6C
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-dvw72
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Ids-Region:
+                - eu-de-1
+            X-Robots-Tag:
+                - none
+        status: '200 '
+        code: 200
+        duration: 312.957667ms
+    - id: 9
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            Accept:
+                - '*/*'
+            Authorization:
+                - REDACTED
+            Content-Type:
+                - application/scim+json
+            Dataserviceversion:
+                - "2.0"
+        url: https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/38e5c81d-9d42-4f08-a978-3ba77ceb99fd
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: -1
+        uncompressed: true
+        body: '{"schemas":["urn:ietf:params:scim:schemas:core:2.0:Group","urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"],"displayName":"Terraform Test Group","id":"38e5c81d-9d42-4f08-a978-3ba77ceb99fd","meta":{"created":"2026-07-01T11:23:53Z","lastModified":"2026-08-31T06:43:01Z","location":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/38e5c81d-9d42-4f08-a978-3ba77ceb99fd","resourceType":"Group","version":"67ea9c52-eda5-4b49-92c7-ebf8d9532986"},"members":[{"value":"1e5dd627-5220-4691-b5f4-8e061ea57d71","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/1e5dd627-5220-4691-b5f4-8e061ea57d71"},{"value":"80f858a3-28ce-437e-ba31-d3358a5bdbfa","type":"User","$ref":"https://iasprovidertestblr.accounts400.ondemand.com/scim/Users/80f858a3-28ce-437e-ba31-d3358a5bdbfa"}],"urn:sap:cloud:scim:schemas:extension:custom:2.0:Group":{"additionalId":"6a44f8c9fa74a803a5c38b26","name":"Test Group","description":"Used for the SCI provider unit tests. DO NOT DELETE."}}'
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+                - private,no-cache,no-store
+            Content-Security-Policy:
+                - script-src 'none';
+            Content-Type:
+                - application/scim+json
+            Date:
+                - Mon, 31 Aug 2026 06:43:02 GMT
+            Etag:
+                - '"67ea9c52-eda5-4b49-92c7-ebf8d9532986-gzip"'
+            Location:
+                - https://iasprovidertestblr.accounts400.ondemand.com/scim/Groups/38e5c81d-9d42-4f08-a978-3ba77ceb99fd
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=63072000; includeSubDomains; preload
+            Vary:
+                - Accept-Encoding,X-CSP-STRIP
+            X-Content-Type-Options:
+                - nosniff
+            X-Ids-Id:
+                - 986A5F72-3299-4C79-A094-4CFC70001A19
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-lv8cc
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Ids-Region:
+                - eu-de-1
+            X-Robots-Tag:
+                - none
+        status: '200 '
+        code: 200
+        duration: 258.851625ms
+    - id: 10
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 126
+        transfer_encoding: []
+        trailer: {}
+        host: iasprovidertestblr.accounts400.ondemand.com
+        remote_addr: ""
+        request_uri: ""
+        body: client_id=REDACTED&client_secret=REDACTED&grant_type=client_credentials
+        form:
+            client_id:
+                - REDACTED
+            client_secret:
+                - REDACTED
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+        url: https://iasprovidertestblr.accounts400.ondemand.com/oauth2/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 980
+        uncompressed: false
+        body: '{"access_token":"REDACTED","token_type":"Bearer","expires_in":3600}'
+        headers:
+            Cache-Control:
+                - private,no-cache,no-store
+                - private,no-cache,no-store
+            Content-Length:
+                - "980"
+            Content-Security-Policy:
+                - script-src 'none';
+            Content-Type:
+                - application/json;charset=UTF-8
+            Date:
+                - Mon, 31 Aug 2026 06:43:03 GMT
+            Expires:
+                - "0"
+            Pragma:
+                - no-cache
+            Referrer-Policy:
+                - origin
+            Server:
+                - SAP
+            Strict-Transport-Security:
+                - max-age=63072000; includeSubDomains; preload
+            Vary:
+                - Origin,X-CSP-STRIP,Access-Control-Request-Method,Access-Control-Request-Headers
+            X-Content-Type-Options:
+                - nosniff
+                - nosniff
+            X-Ids-Id:
+                - 7DB7D4C3-47EB-4FF5-AF55-0B9656544793
+            X-Ids-Landscape:
+                - cc3-eu-de-2-a1
+            X-Ids-Namespace:
+                - ias
+            X-Ids-Node:
+                - http-vx88g
+            X-Ids-Pool:
+                - a1
+            X-Ids-Project:
+                - qa
+            X-Ids-Region:
+                - eu-de-1
+            X-Robots-Tag:
+                - none
+            X-Xss-Protection:
+                - 1; mode=block
+        status: '200 '
+        code: 200
+        duration: 352.443792ms
