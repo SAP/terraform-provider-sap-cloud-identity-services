@@ -25,7 +25,7 @@ go test -v -run TestResourceUser_Create -tags=all -timeout=900s ./sci/provider/
 
 **Re-record VCR cassettes** (requires live SCI tenant credentials):
 ```bash
-TEST_RECORD=true SCI_USERNAME=<user> SCI_PASSWORD=<pass> go test -v -run TestResourceUser_Create -tags=all -timeout=900s ./sci/provider/
+TEST_RECORD=true SCI_CLIENT_ID=<client_id> SCI_CLIENT_SECRET=<client_secret> go test -v -run TestResourceUser_Create -tags=all -timeout=900s ./sci/provider/
 ```
 
 ## Architecture
@@ -72,7 +72,7 @@ Tests with `getTestProviders(nil)` are pure validation tests (no API calls). Tes
 Three mutually exclusive methods, resolved in this priority order in `provider.go`:
 1. **OAuth2 Client Credentials** — `client_id` + `client_secret` (or `SCI_CLIENT_ID`/`SCI_CLIENT_SECRET` env vars)
 2. **X.509 Certificate** — `p12_certificate_content` + `p12_certificate_password` (or `SCI_P12_CERTIFICATE_PASSWORD` env var)
-3. **Basic Auth** — `username` + `password` (or `SCI_USERNAME`/`SCI_PASSWORD` env vars)
+3. **Basic Auth** — removed (no longer supported)
 
 ## Development Conventions
 
