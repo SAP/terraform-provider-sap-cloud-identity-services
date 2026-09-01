@@ -1,6 +1,6 @@
 ### <u> Basic Authentication (Deprecated) </u>
 
-> **⚠️ Deprecated:** Basic Authentication (username/password) is deprecated and will be removed in a future release. It is no longer listed as a supported authentication method in the [SAP Cloud Identity Services API Authentication documentation](https://help.sap.com/docs/cloud-identity-services/cloud-identity-services/dev-api-authentication). Please migrate to [OAuth2 Client Authentication](./secret_auth.md) or [X.509 Certificate Authentication](./cert_auth.md).
+~> **Deprecated:** Basic Authentication (username/password) is deprecated and will be removed in a future release. It is no longer listed as a supported authentication method in the [SAP Cloud Identity Services API Authentication documentation](https://help.sap.com/docs/cloud-identity-services/cloud-identity-services/dev-api-authentication). Please migrate to [OAuth2 Client Authentication](./secret_auth.md) or [X.509 Certificate Authentication](./cert_auth.md).
 
 You would require a valid **username** and **password** of a [User Administrator](https://help.sap.com/docs/cloud-identity-services/cloud-identity-services/add-administrators?version=Cloud#add-user-as-administrator) to get authenticated.
 
