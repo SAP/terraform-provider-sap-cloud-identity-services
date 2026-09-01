@@ -28,5 +28,6 @@ type GroupsResponse struct {
 	Schemas      []string `json:"schemas,omitempty"`
 	TotalResults int      `json:"totalResults,omitempty"`
 	ItemsPerPage int      `json:"itemsPerPage,omitempty"`
-	//startIndex, startId, nextId, nextCursor
+	StartId      string   `json:"startId,omitempty"`
+	NextId       string   `json:"nextId,omitempty"`
 }
