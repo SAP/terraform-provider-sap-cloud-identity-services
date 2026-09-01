@@ -193,6 +193,11 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 								MarkdownDescription: "Allow public client flows for environments where it is difficult to protect the client credential, such as mobile and desktop applications, and clients-side parts of web applications.",
 								Computed:            true,
 							},
+							"public_client_apis": schema.SetAttribute{
+								MarkdownDescription: "List of API names accessible to public clients.",
+								ElementType:         types.StringType,
+								Computed:            true,
+							},
 							"all_apis_access": schema.BoolAttribute{
 								MarkdownDescription: "Configure if public clients have unrestricted access to all APIs of the applications.",
 								Computed:            true,
@@ -204,6 +209,22 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 							"unlock": schema.BoolAttribute{
 								MarkdownDescription: "Lock or unlock the Client Id.",
 								Computed:            true,
+							},
+						},
+					},
+					"provided_apis": schema.ListNestedAttribute{
+						MarkdownDescription: "APIs provided by this application.",
+						Computed:            true,
+						NestedObject: schema.NestedAttributeObject{
+							Attributes: map[string]schema.Attribute{
+								"name": schema.StringAttribute{
+									MarkdownDescription: "The name of the provided API.",
+									Computed:            true,
+								},
+								"description": schema.StringAttribute{
+									MarkdownDescription: "A description of the provided API.",
+									Computed:            true,
+								},
 							},
 						},
 					},

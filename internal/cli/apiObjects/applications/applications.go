@@ -148,8 +148,8 @@ type ConsumedService struct {
 }
 
 type ProvidedApi struct {
-	Name        string `json:"name,omitempty"`
-	Description string `json:"description,omitempty"`
+	Name        string `json:"name,omitempty" tfsdk:"name"`
+	Description string `json:"description,omitempty" tfsdk:"description"`
 }
 
 type ConsumedApi struct {
@@ -206,11 +206,11 @@ type SapManagedAttributes struct {
 }
 
 type RestApiAuthentication struct {
-	AllowPublicClientFlows bool `json:"allowPublicClientFlows" tfsdk:"allow_public_client_flows"`
-	// PublicClientApis			[]string	`json:"publicClientApis,omitempty" tfsdk:"public_client_apis"`
-	AllApisAccess bool `json:"allApisAccess" tfsdk:"all_apis_access"`
-	AllowLocking  bool `json:"allowLocking" tfsdk:"allow_locking"`
-	Unlock        bool `json:"unlock" tfsdk:"unlock"`
+	AllowPublicClientFlows bool     `json:"allowPublicClientFlows" tfsdk:"allow_public_client_flows"`
+	PublicClientApis       []string `json:"publicClientApis,omitempty" tfsdk:"public_client_apis"`
+	AllApisAccess          bool     `json:"allApisAccess" tfsdk:"all_apis_access"`
+	AllowLocking           bool     `json:"allowLocking" tfsdk:"allow_locking"`
+	Unlock                 bool     `json:"unlock" tfsdk:"unlock"`
 }
 
 type AuthenticationSchema struct {
@@ -244,7 +244,7 @@ type AuthenticationSchema struct {
 	// TrustAllCorporateIdentityProviders	bool 							`json:"trustAllCorporateIdentityProviders,omitempty"`
 	// AllowSciUsers						bool 							`json:"allowIaUsers,omitempty"`
 	// ConsumedServices					[]ConsumedService				`json:"consumedServices,omitempty"`
-	// ProvidedApis						[]ProvidedApi 					`json:"providedApis,omitempty"`
+	ProvidedApis []ProvidedApi `json:"providedApis,omitempty"`
 	// ConsumedApis						[]ConsumedApi 					`json:"consumedApis,omitempty"`
 	// smsVerificationConfig
 	// captchaConfig

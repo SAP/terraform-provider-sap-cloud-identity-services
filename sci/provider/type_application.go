@@ -27,6 +27,7 @@ type authenticationSchemaData struct {
 	DefaultAuthenticatingIdpId    types.String `tfsdk:"default_authenticating_idp" json:"defaultAuthenticatingIdpId"`
 	AuthenticationRules           types.List   `tfsdk:"conditional_authentication" json:"conditionalAuthentication"`
 	RestApiAuthentication         types.Object `tfsdk:"rest_api_authentication" json:"restApiAuthentication"`
+	ProvidedApis                  types.List   `tfsdk:"provided_apis" json:"providedApis"`
 	OpenIdConnectConfiguration    types.Object `tfsdk:"oidc_config" json:"openIdConnectConfiguration"`
 	Saml2Configuration            types.Object `tfsdk:"saml2_config" json:"saml2Configuration"`
 	SapManagedAttributes          types.Object `tfsdk:"sap_managed_attributes"`
@@ -126,6 +127,7 @@ type sapManagedAttributesData struct {
 
 type restApiAuthenticationData struct {
 	AllowPublicClientFlows types.Bool `tfsdk:"allow_public_client_flows"`
+	PublicClientApis       types.Set  `tfsdk:"public_client_apis"`
 	AllApisAccess          types.Bool `tfsdk:"all_apis_access"`
 	AllowLocking           types.Bool `tfsdk:"allow_locking"`
 	Unlock                 types.Bool `tfsdk:"unlock"`
@@ -329,12 +331,26 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 			AllowLocking:           types.BoolValue(a.AuthenticationSchema.RestApiAuthentication.AllowLocking),
 			Unlock:                 types.BoolValue(a.AuthenticationSchema.RestApiAuthentication.Unlock),
 		}
+		publicClientApis := a.AuthenticationSchema.RestApiAuthentication.PublicClientApis
+		if publicClientApis == nil {
+			publicClientApis = []string{}
+		}
+		restApiAuth.PublicClientApis, diags = types.SetValueFrom(ctx, types.StringType, publicClientApis)
+		diagnostics.Append(diags...)
 
 		authenticationSchema.RestApiAuthentication, diags = types.ObjectValueFrom(ctx, restApiAuthenticationObjType, restApiAuth)
 		diagnostics.Append(diags...)
 	} else {
 		authenticationSchema.RestApiAuthentication = types.ObjectNull(restApiAuthenticationObjType)
 	}
+
+	// Authentication Schema Provided APIs
+	providedApis := a.AuthenticationSchema.ProvidedApis
+	if providedApis == nil {
+		providedApis = []applications.ProvidedApi{}
+	}
+	authenticationSchema.ProvidedApis, diags = types.ListValueFrom(ctx, types.ObjectType{AttrTypes: providedApiObjType}, providedApis)
+	diagnostics.Append(diags...)
 
 	// Authentication Schema OIDC
 	// the mapping is done manually in order to handle the null values
@@ -738,6 +754,17 @@ func getApplicationRequest(ctx context.Context, plan applicationData) (*applicat
 				return nil, diagnostics
 			}
 			args.AuthenticationSchema.RestApiAuthentication = &restApiAuth
+		}
+
+		//PROVIDED APIS
+		if !authenticationSchema.ProvidedApis.IsNull() && !authenticationSchema.ProvidedApis.IsUnknown() {
+			var providedApis []applications.ProvidedApi
+			diags = authenticationSchema.ProvidedApis.ElementsAs(ctx, &providedApis, true)
+			diagnostics.Append(diags...)
+			if diagnostics.HasError() {
+				return nil, diagnostics
+			}
+			args.AuthenticationSchema.ProvidedApis = providedApis
 		}
 
 		//SAML2 CONFIGURATION
@@ -1145,6 +1172,23 @@ func getApplicationUpdateRequest(ctx context.Context, plan applicationData, stat
 			}
 
 			patchReq, diags := utils.GetPatchRequest("AuthenticationRules", authSchemaPath, rules, argsType)
+			if diags.HasError() {
+				return reqs, diags
+			}
+			reqs = append(reqs, patchReq)
+		}
+
+		if !planAuthSchema.ProvidedApis.Equal(stateAuthSchema.ProvidedApis) {
+			planProvidedApis := []applications.ProvidedApi{}
+
+			if !planAuthSchema.ProvidedApis.IsNull() {
+				diags = planAuthSchema.ProvidedApis.ElementsAs(ctx, &planProvidedApis, true)
+				if diags.HasError() {
+					return reqs, diags
+				}
+			}
+
+			patchReq, diags := utils.GetPatchRequest("ProvidedApis", authSchemaPath, planProvidedApis, argsType)
 			if diags.HasError() {
 				return reqs, diags
 			}

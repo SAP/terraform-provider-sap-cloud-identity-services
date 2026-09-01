@@ -44,6 +44,9 @@ var authenticationSchemaObjType = map[string]attr.Type{
 	"rest_api_authentication": types.ObjectType{
 		AttrTypes: restApiAuthenticationObjType,
 	},
+	"provided_apis": types.ListType{
+		ElemType: types.ObjectType{AttrTypes: providedApiObjType},
+	},
 	"oidc_config": types.ObjectType{
 		AttrTypes: openIdConnectConfigurationObjType,
 	},
@@ -199,9 +202,15 @@ var sapManagedAttributesObjType = map[string]attr.Type{
 
 var restApiAuthenticationObjType = map[string]attr.Type{
 	"allow_public_client_flows": types.BoolType,
+	"public_client_apis":        types.SetType{ElemType: types.StringType},
 	"all_apis_access":           types.BoolType,
 	"allow_locking":             types.BoolType,
 	"unlock":                    types.BoolType,
+}
+
+var providedApiObjType = map[string]attr.Type{
+	"name":        types.StringType,
+	"description": types.StringType,
 }
 
 var metaDataObjType = map[string]attr.Type{
@@ -401,6 +410,11 @@ func (d *applicationsDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 											MarkdownDescription: "Allow public client flows for environments where it is difficult to protect the client credential, such as mobile and desktop applications, and clients-side parts of web applications.",
 											Computed:            true,
 										},
+										"public_client_apis": schema.SetAttribute{
+											MarkdownDescription: "List of API names accessible to public clients.",
+											ElementType:         types.StringType,
+											Computed:            true,
+										},
 										"all_apis_access": schema.BoolAttribute{
 											MarkdownDescription: "Configure if public clients have unrestricted access to all APIs of the applications.",
 											Computed:            true,
@@ -412,6 +426,22 @@ func (d *applicationsDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 										"unlock": schema.BoolAttribute{
 											MarkdownDescription: "Lock or unlock the Client Id.",
 											Computed:            true,
+										},
+									},
+								},
+								"provided_apis": schema.ListNestedAttribute{
+									MarkdownDescription: "APIs provided by this application.",
+									Computed:            true,
+									NestedObject: schema.NestedAttributeObject{
+										Attributes: map[string]schema.Attribute{
+											"name": schema.StringAttribute{
+												MarkdownDescription: "The name of the provided API.",
+												Computed:            true,
+											},
+											"description": schema.StringAttribute{
+												MarkdownDescription: "A description of the provided API.",
+												Computed:            true,
+											},
 										},
 									},
 								},

@@ -377,6 +377,15 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 									boolplanmodifier.UseNonNullStateForUnknown(),
 								},
 							},
+							"public_client_apis": schema.SetAttribute{
+								MarkdownDescription: "List of API names (from provided_apis) that are accessible to public clients. Only valid when allow_public_client_flows is true and all_apis_access is false.",
+								Optional:            true,
+								Computed:            true,
+								ElementType:         types.StringType,
+								PlanModifiers: []planmodifier.Set{
+									setplanmodifier.UseStateForUnknown(),
+								},
+							},
 							"all_apis_access": schema.BoolAttribute{
 								MarkdownDescription: "Configure if public clients have unrestricted access to all APIs of the applications.",
 								Optional:            true,
@@ -399,6 +408,27 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 								Computed:            true,
 								PlanModifiers: []planmodifier.Bool{
 									boolplanmodifier.UseNonNullStateForUnknown(),
+								},
+							},
+						},
+					},
+					"provided_apis": schema.ListNestedAttribute{
+						MarkdownDescription: "APIs provided by this application that can be consumed by other applications or referenced in public_client_apis.",
+						Optional:            true,
+						Computed:            true,
+						PlanModifiers: []planmodifier.List{
+							listplanmodifier.UseNonNullStateForUnknown(),
+						},
+						NestedObject: schema.NestedAttributeObject{
+							Attributes: map[string]schema.Attribute{
+								"name": schema.StringAttribute{
+									MarkdownDescription: "The name of the provided API.",
+									Required:            true,
+								},
+								"description": schema.StringAttribute{
+									MarkdownDescription: "A description of the provided API.",
+									Optional:            true,
+									Computed:            true,
 								},
 							},
 						},
