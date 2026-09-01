@@ -1029,6 +1029,89 @@ func TestResourceApplication(t *testing.T) {
 		})
 	})
 
+	t.Run("happy path - application with provided_apis and public_client_apis", func(t *testing.T) {
+
+		appWithProvidedApis := applications.Application{
+			Name:        "oidcEntity",
+			Description: "application for testing provided_apis and public_client_apis",
+			AuthenticationSchema: &applications.AuthenticationSchema{
+				SsoType: "openIdConnect",
+				RestApiAuthentication: &applications.RestApiAuthentication{
+					AllowPublicClientFlows: false,
+					PublicClientApis:       []string{"api name"},
+					AllApisAccess:          false,
+					AllowLocking:           true,
+					Unlock:                 false,
+				},
+				ProvidedApis: []applications.ProvidedApi{
+					{
+						Name:        "api name",
+						Description: "Sample description",
+					},
+				},
+			},
+		}
+
+		updatedAppWithProvidedApis := applications.Application{
+			Name:        "oidcEntity",
+			Description: "application for testing provided_apis and public_client_apis",
+			AuthenticationSchema: &applications.AuthenticationSchema{
+				SsoType: "openIdConnect",
+				RestApiAuthentication: &applications.RestApiAuthentication{
+					AllowPublicClientFlows: false,
+					PublicClientApis:       []string{"test"},
+					AllApisAccess:          false,
+					AllowLocking:           true,
+					Unlock:                 false,
+				},
+				ProvidedApis: []applications.ProvidedApi{
+					{
+						Name:        "test",
+						Description: "Updated description",
+					},
+				},
+			},
+		}
+
+		rec, user := setupVCR(t, "fixtures/resource_application_with_provided_apis")
+		defer stopQuietly(rec)
+
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+			Steps: []resource.TestStep{
+				{
+					Config: providerConfig("", user) + ResourceApplicationWithProvidedApis("testApp", appWithProvidedApis),
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_application.testApp", "name", appWithProvidedApis.Name),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.provided_apis.0.name", appWithProvidedApis.AuthenticationSchema.ProvidedApis[0].Name),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.provided_apis.0.description", appWithProvidedApis.AuthenticationSchema.ProvidedApis[0].Description),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.rest_api_authentication.allow_public_client_flows", fmt.Sprintf("%t", appWithProvidedApis.AuthenticationSchema.RestApiAuthentication.AllowPublicClientFlows)),
+						resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.rest_api_authentication.public_client_apis.*", appWithProvidedApis.AuthenticationSchema.RestApiAuthentication.PublicClientApis[0]),
+					),
+				},
+				{
+					// validates PATCH ordering: provided_apis is patched before restApiAuthentication
+					// so the new API name exists before it is referenced in public_client_apis
+					Config: providerConfig("", user) + ResourceApplicationWithProvidedApis("testApp", updatedAppWithProvidedApis),
+					Check: resource.ComposeAggregateTestCheckFunc(
+						resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
+						resource.TestCheckResourceAttr("sci_application.testApp", "name", updatedAppWithProvidedApis.Name),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.provided_apis.0.name", updatedAppWithProvidedApis.AuthenticationSchema.ProvidedApis[0].Name),
+						resource.TestCheckResourceAttr("sci_application.testApp", "authentication_schema.provided_apis.0.description", updatedAppWithProvidedApis.AuthenticationSchema.ProvidedApis[0].Description),
+						resource.TestCheckTypeSetElemAttr("sci_application.testApp", "authentication_schema.rest_api_authentication.public_client_apis.*", updatedAppWithProvidedApis.AuthenticationSchema.RestApiAuthentication.PublicClientApis[0]),
+					),
+				},
+				{
+					ResourceName:      "sci_application.testApp",
+					ImportState:       true,
+					ImportStateVerify: true,
+				},
+			},
+		})
+	})
+
 	t.Run("error path - name is mandatory", func(t *testing.T) {
 		resource.Test(t, resource.TestCase{
 			IsUnitTest:               true,
@@ -1513,12 +1596,26 @@ func ResourceApplication(resourceName string, app applications.Application) stri
 
 	var restApiAuth strings.Builder
 	if authSchema.RestApiAuthentication != nil {
+		var publicClientApis strings.Builder
+		for _, api := range authSchema.RestApiAuthentication.PublicClientApis {
+			fmt.Fprintf(&publicClientApis, `"%s",`, api)
+		}
 		fmt.Fprintf(&restApiAuth, `{
 				allow_public_client_flows = %t
+				public_client_apis = [%s]
 				all_apis_access = %t
 				allow_locking = %t
 				unlock = %t
-			}`, authSchema.RestApiAuthentication.AllowPublicClientFlows, authSchema.RestApiAuthentication.AllApisAccess, authSchema.RestApiAuthentication.AllowLocking, authSchema.RestApiAuthentication.Unlock)
+			}`, authSchema.RestApiAuthentication.AllowPublicClientFlows, publicClientApis.String(), authSchema.RestApiAuthentication.AllApisAccess, authSchema.RestApiAuthentication.AllowLocking, authSchema.RestApiAuthentication.Unlock)
+	}
+
+	var providedApis strings.Builder
+	for _, api := range authSchema.ProvidedApis {
+		fmt.Fprintf(&providedApis, `
+				{
+					name = "%s"
+					description = "%s"
+				},`, api.Name, api.Description)
 	}
 
 	authSchemaConfig := fmt.Sprintf(`
@@ -1532,7 +1629,8 @@ func ResourceApplication(resourceName string, app applications.Application) stri
 		default_authenticating_idp = "%s"
 		conditional_authentication = [%s]
 		rest_api_authentication = %s
-	`, authSchema.SubjectNameIdentifier, authSchema.SubjectNameIdentifierFunction, assertionAttributes.String(), advancedAssertionAttributes.String(), authSchema.DefaultAuthenticatingIdpId, authenticationRules.String(), restApiAuth.String())
+		provided_apis = [%s]
+	`, authSchema.SubjectNameIdentifier, authSchema.SubjectNameIdentifierFunction, assertionAttributes.String(), advancedAssertionAttributes.String(), authSchema.DefaultAuthenticatingIdpId, authenticationRules.String(), restApiAuth.String(), providedApis.String())
 
 	application := fmt.Sprintf(`
 	resource "sci_application" "%s" {
@@ -2096,4 +2194,45 @@ func ResourceApplicationWithSaml2DigestAlgorithm(resourceName string, appName st
         }
     }
     `, resourceName, appName, digestAlgorithm)
+}
+
+func ResourceApplicationWithProvidedApis(resourceName string, app applications.Application) string {
+	var publicClientApis strings.Builder
+	if app.AuthenticationSchema.RestApiAuthentication != nil {
+		for _, api := range app.AuthenticationSchema.RestApiAuthentication.PublicClientApis {
+			fmt.Fprintf(&publicClientApis, `"%s",`, api)
+		}
+	}
+
+	var providedApis strings.Builder
+	for _, api := range app.AuthenticationSchema.ProvidedApis {
+		fmt.Fprintf(&providedApis, `
+			{
+				name        = "%s"
+				description = "%s"
+			},`, api.Name, api.Description)
+	}
+
+	restApiAuth := ""
+	if app.AuthenticationSchema.RestApiAuthentication != nil {
+		ra := app.AuthenticationSchema.RestApiAuthentication
+		restApiAuth = fmt.Sprintf(`
+		rest_api_authentication = {
+			allow_public_client_flows = %t
+			public_client_apis        = [%s]
+			all_apis_access           = %t
+			allow_locking             = %t
+			unlock                    = %t
+		}`, ra.AllowPublicClientFlows, publicClientApis.String(), ra.AllApisAccess, ra.AllowLocking, ra.Unlock)
+	}
+
+	return fmt.Sprintf(`
+	resource "sci_application" "%s" {
+		name = "%s"
+		authentication_schema = {
+			sso_type = "%s"
+			%s
+			provided_apis = [%s]
+		}
+	}`, resourceName, app.Name, app.AuthenticationSchema.SsoType, restApiAuth, providedApis.String())
 }

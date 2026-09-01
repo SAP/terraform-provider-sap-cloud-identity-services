@@ -45,6 +45,7 @@ Read-Only:
 - `conditional_authentication` (Attributes List) Define rules for authenticating identity provider according to email domain, user type, user group, and IP range. Each rule is evaluated by priority until the criteria of a rule are fulfilled. (see [below for nested schema](#nestedatt--authentication_schema--conditional_authentication))
 - `default_authenticating_idp` (String) A default identity provider can be used for users with any user domain, group and type. This identity provider is used when none of the defined authentication rules meets the criteria.
 - `oidc_config` (Attributes) OpenID Connect (OIDC) configuration options for this application. (see [below for nested schema](#nestedatt--authentication_schema--oidc_config))
+- `provided_apis` (Attributes List) APIs provided by this application. (see [below for nested schema](#nestedatt--authentication_schema--provided_apis))
 - `rest_api_authentication` (Attributes) Configure client authentication information for the application. (see [below for nested schema](#nestedatt--authentication_schema--rest_api_authentication))
 - `saml2_config` (Attributes) Configure a SAML 2.0 service provider by providing the necessary metadata. (see [below for nested schema](#nestedatt--authentication_schema--saml2_config))
 - `sap_managed_attributes` (Attributes) List of SAP managed attributes that are sent to the application. (see [below for nested schema](#nestedatt--authentication_schema--sap_managed_attributes))
@@ -123,6 +124,15 @@ Read-Only:
 
 
 
+<a id="nestedatt--authentication_schema--provided_apis"></a>
+### Nested Schema for `authentication_schema.provided_apis`
+
+Read-Only:
+
+- `description` (String) A description of the provided API.
+- `name` (String) The name of the provided API.
+
+
 <a id="nestedatt--authentication_schema--rest_api_authentication"></a>
 ### Nested Schema for `authentication_schema.rest_api_authentication`
 
@@ -131,6 +141,7 @@ Read-Only:
 - `all_apis_access` (Boolean) Configure if public clients have unrestricted access to all APIs of the applications.
 - `allow_locking` (Boolean) Enable or Disable Client ID locking. This option is enabled by default. Use this feature in cases when the client ID has a limited scope and the client ID secret(s) are automatically generated.
 - `allow_public_client_flows` (Boolean) Allow public client flows for environments where it is difficult to protect the client credential, such as mobile and desktop applications, and clients-side parts of web applications.
+- `public_client_apis` (Set of String) List of API names accessible to public clients.
 - `unlock` (Boolean) Lock or unlock the Client Id.
 
 
