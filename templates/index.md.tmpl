@@ -24,27 +24,8 @@ For the best experience using the {{.RenderedProviderName}} provider, we recomme
 
 In order to get authenticated, the credentials of an [administrator](https://help.sap.com/docs/cloud-identity-services/cloud-identity-services/activate-your-account?locale=en-US) are required. The SAP Cloud Identity Services Provider supports the following authentication flows:
 
-1. [Basic Authentication](#basic-auth) 
-2. [X.509 Certificate Authentication](#cert-auth)
-3. [OAuth2 Client Authentication](#secret-auth)
-
-<br>
-
-### <u><a id="basic-auth" >Basic Authentication</a></u>
-
-You would require a valid **username** and **password** of a [User Administrator](https://help.sap.com/docs/cloud-identity-services/cloud-identity-services/add-administrators?version=Cloud#add-user-as-administrator) to get authenticated.
- 
-You can configure your credentials as part of the provider configuration as shown below:
-
-```hcl
-    provider "sci" {
-        tenant_url = <your_tenant_url>
-        username = <your_username>
-        password = <your_password>
-    }
-```
-It is recommended to securely set your credentials as environment variables ```SCI_USERNAME``` and ```SCI_PASSWORD```. In case you want to provide the username and password via variables make sure to follow the guidance given in the [Hashicorp documentation](https://developer.hashicorp.com/terraform/tutorials/configuration-language/sensitive-variables) 
-and never commit the values to a source code management system.
+1. [X.509 Certificate Authentication](#cert-auth)
+2. [OAuth2 Client Authentication](#secret-auth)
 
 <br>
 
