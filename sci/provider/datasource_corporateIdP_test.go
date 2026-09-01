@@ -81,7 +81,7 @@ func TestDataSourceCorporateIdP(t *testing.T) {
 						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "identity_federation.use_local_user_store", fmt.Sprintf("%t", true)),
 						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "identity_federation.allow_local_users_only", fmt.Sprintf("%t", true)),
 						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "identity_federation.apply_local_idp_auth_and_checks", fmt.Sprintf("%t", false)),
-						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "identity_federation.required_groups.0", "Test Group"),
+						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "identity_federation.required_groups.0", "Github"),
 						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "login_hint_config.login_hint_type", "mail"),
 						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "login_hint_config.send_method", "urlParam"),
 						resource.TestCheckResourceAttr("data.sci_corporate_idp.testIdP", "oidc_config.client_id", "Oidc - Test"),

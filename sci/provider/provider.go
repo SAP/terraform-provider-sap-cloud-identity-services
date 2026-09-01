@@ -28,21 +28,11 @@ import (
 )
 
 var (
-	basicAuthConflicts = []path.Expression{
-		path.MatchRoot("client_id"),
-		path.MatchRoot("client_secret"),
-		path.MatchRoot("p12_certificate_content"),
-		path.MatchRoot("p12_certificate_password"),
-	}
 	oauthConflicts = []path.Expression{
-		path.MatchRoot("username"),
-		path.MatchRoot("password"),
 		path.MatchRoot("p12_certificate_content"),
 		path.MatchRoot("p12_certificate_password"),
 	}
 	x509Conflicts = []path.Expression{
-		path.MatchRoot("username"),
-		path.MatchRoot("password"),
 		path.MatchRoot("client_id"),
 		path.MatchRoot("client_secret"),
 	}
@@ -64,8 +54,6 @@ type SciProvider struct {
 
 type SciProviderData struct {
 	TenantUrl              types.String `tfsdk:"tenant_url"`
-	Username               types.String `tfsdk:"username"`
-	Password               types.String `tfsdk:"password"`
 	ClientID               types.String `tfsdk:"client_id"`
 	ClientSecret           types.String `tfsdk:"client_secret"`
 	P12CertificateContent  types.String `tfsdk:"p12_certificate_content"`
@@ -84,24 +72,6 @@ func (p *SciProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *
 			"tenant_url": schema.StringAttribute{
 				MarkdownDescription: "The URL of the SCI tenant.",
 				Required:            true,
-			},
-			// Basic Authentication
-			"username": schema.StringAttribute{
-				Optional:            true,
-				MarkdownDescription: "Your user name for Basic Authentication.",
-				Validators: []validator.String{
-					stringvalidator.ConflictsWith(basicAuthConflicts...),
-					stringvalidator.AlsoRequires(path.MatchRoot("password")),
-				},
-			},
-			"password": schema.StringAttribute{
-				Optional:            true,
-				Sensitive:           true,
-				MarkdownDescription: "Your password for Basic Authentication.",
-				Validators: []validator.String{
-					stringvalidator.ConflictsWith(basicAuthConflicts...),
-					stringvalidator.AlsoRequires(path.MatchRoot("username")),
-				},
 			},
 
 			// OAuth2 Client Credentials
@@ -182,18 +152,6 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 
 	p12CertificateContent := config.P12CertificateContent.ValueString()
 
-	// Basic Auth (username + password)
-	username := config.Username.ValueString()
-	password := config.Password.ValueString()
-
-	if username == "" {
-		username = os.Getenv("SCI_USERNAME")
-	}
-
-	if password == "" {
-		password = os.Getenv("SCI_PASSWORD")
-	}
-
 	client := cli.NewSciClient(cli.NewClient(p.httpClient, parsedUrl))
 
 	switch {
@@ -245,19 +203,15 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 
 		client = cli.NewSciClient(cli.NewClient(httpClient, parsedUrl))
 
-	case len(username) != 0 && len(password) != 0:
-		// Basic authentication will be handled below
-		client.AuthorizationToken = "Basic " + base64.StdEncoding.EncodeToString([]byte(username+":"+password))
-
 	default:
-		incompleteCreds, err := checkIncompleteCredentials(username, password, clientID, clientSecret, p12CertificateContent, p12CertificatePassword)
+		incompleteCreds, err := checkIncompleteCredentials(clientID, clientSecret, p12CertificateContent, p12CertificatePassword)
 
 		if incompleteCreds {
 			resp.Diagnostics.AddError("Incomplete Authentication Credentials", err)
 			return
 		}
 
-		resp.Diagnostics.AddError("Authentication Details Missing", "Please provide either : \n- client_id and client_secret for OAuth2 Authentication \n- p12_certificate_content and p12_certificate_password for X.509 Authentication \n- username and password for Basic Authentication")
+		resp.Diagnostics.AddError("Authentication Details Missing", "Please provide either : \n- client_id and client_secret for OAuth2 Authentication \n- p12_certificate_content and p12_certificate_password for X.509 Authentication")
 		return
 	}
 
@@ -322,15 +276,13 @@ func fetchOAuthToken(httpClient *http.Client, tenantURL, clientID, clientSecret 
 	return token.AccessToken, nil
 }
 
-func checkIncompleteCredentials(username, password, clientID, clientSecret, p12CertificateContent, p12CertificatePassword string) (bool, string) {
+func checkIncompleteCredentials(clientID, clientSecret, p12CertificateContent, p12CertificatePassword string) (bool, string) {
 
 	switch {
 	case len(clientID) != 0 || len(clientSecret) != 0:
 		return true, "Please provide the required OAuth Credentials : Client ID and Client Secret"
 	case len(p12CertificateContent) != 0 || len(p12CertificatePassword) != 0:
 		return true, "Please provide the required X.509 Authentication Credentials : P12 Certificate and P12 Certificate Password"
-	case len(username) != 0 || len(password) != 0:
-		return true, "Please provide the required Basic Authentication Credentials : Username and Password"
 	default:
 		return false, ""
 	}

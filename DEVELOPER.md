@@ -14,7 +14,7 @@ First, you need to setup your development environment. The following sections de
 
 The following variant is supported for the GitHub Codespace:
 
-* "Terraform provider for SAP Cloud Identity Services - Development" - the configuration in [.devcontainer/default/devcontainer.json](.devcontainer/default/devcontainer.json) contains the development override for the Terraform provider so that the local build is used. You must set the environment variables `SCI_USERNAME` and `SCI_PASSWORD` yourself.
+* "Terraform provider for SAP Cloud Identity Services - Development" - the configuration in [.devcontainer/default/devcontainer.json](.devcontainer/default/devcontainer.json) contains the development override for the Terraform provider so that the local build is used. You must set the environment variables `SCI_CLIENT_ID` and `SCI_CLIENT_SECRET` yourself.
 
 ## Dev Container
 
@@ -36,10 +36,10 @@ Then open the cloned repository in [Visual Studio Code](https://code.visualstudi
 
 This will trigger the start of the dev container. You can choose to open a dev container with two configurations:
 
-* "Terraform provider for SAP Cloud Identity Services - Development" - the configuration in [.devcontainer/default/devcontainer.json](.devcontainer/default/devcontainer.json) contains the development override for the Terraform provider so that the local build is used. You must set the environment variables `SCI_USERNAME` and `SCI_PASSWORD` yourself.
-* Terraform provider for SAP Cloud Identity Services - Development (with env file) - the configuration in [.devcontainer/withenvfile/devcontainer.json](.devcontainer/withenvfile/devcontainer.json) enhances the "Terraform provider for SAP Cloud Identity Services - Development" to load environment variables (like username and password) when the container is started. This configuration expects a file called `devcontainer.env` in the folder `.devcontainer`.
+* "Terraform provider for SAP Cloud Identity Services - Development" - the configuration in [.devcontainer/default/devcontainer.json](.devcontainer/default/devcontainer.json) contains the development override for the Terraform provider so that the local build is used. You must set the environment variables `SCI_CLIENT_ID` and `SCI_CLIENT_SECRET` yourself.
+* Terraform provider for SAP Cloud Identity Services - Development (with env file) - the configuration in [.devcontainer/withenvfile/devcontainer.json](.devcontainer/withenvfile/devcontainer.json) enhances the "Terraform provider for SAP Cloud Identity Services - Development" to load environment variables (like client ID and client secret) when the container is started. This configuration expects a file called `devcontainer.env` in the folder `.devcontainer`.
 
-> **Note**: `.env` files are excluded from git via `.gitignore`. You can use the file to store the environment variables `SCI_USERNAME` and `SCI_PASSWORD` that are needed when developing tests.
+> **Note**: `.env` files are excluded from git via `.gitignore`. You can use the file to store the environment variables `SCI_CLIENT_ID` and `SCI_CLIENT_SECRET` that are needed when developing tests.
 
 > **Note**: In the first run, the download of the container might take a while, so maybe time to grab a cup of coffee ☕.
 

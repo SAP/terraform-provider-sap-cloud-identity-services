@@ -12,9 +12,8 @@ To follow along with this tutorial, ensure you have access to a [SAP Cloud Ident
 
 In order to run the scripts, you need the credentials of an [admin](https://help.sap.com/docs/cloud-identity-services/cloud-identity-services/activate-your-account?locale=en-US) on the tenant. Terraform Provider for SAP Cloud Identity Services supports the following authentication methods:
 
-1. [Basic Authentication](./basic_auth.md) 
-2. [X.509 Certificate Authentication](cert_auth.md)
-3. [OAuth2 Client Authentication](./secret_auth.md)
+1. [X.509 Certificate Authentication](cert_auth.md)
+2. [OAuth2 Client Authentication](./secret_auth.md)
 
 Refer to the link corresponding to the chosen authentication method.
 

@@ -46,7 +46,7 @@ func TestResourceCorporateIdP(t *testing.T) {
 		CertificatesForSigning: []corporateidps.SigningCertificateData{
 			{
 				// Always replace with a valid certificate for recording of fixtures
-				Base64Certificate: "-----BEGIN CERTIFICATE-----\\nredacted\\n-----END CERTIFICATE-----",
+				Base64Certificate: "-----BEGIN CERTIFICATE-----\nredacted\n-----END CERTIFICATE-----",
 				IsDefault:         true,
 				Dn:                "Test",
 				ValidFrom:         "1999-01-01T00:00:00Z",
@@ -254,7 +254,7 @@ func TestResourceCorporateIdP(t *testing.T) {
 		updatedSaml2.CertificatesForSigning = []corporateidps.SigningCertificateData{
 			{
 				// Always replace with a valid certificate for recording of fixtures
-				Base64Certificate: "-----BEGIN CERTIFICATE-----\\nredacted\\n-----END CERTIFICATE-----",
+				Base64Certificate: "-----BEGIN CERTIFICATE-----\nredacted\n-----END CERTIFICATE-----",
 				IsDefault:         true,
 				Dn:                "Test",
 				ValidFrom:         "1999-01-01T00:00:00Z",
@@ -1034,7 +1034,7 @@ func ResourceCorporateIdP(resourceName string, idp corporateidps.IdentityProvide
 
 		var certificates strings.Builder
 		for _, cert := range saml2Config.CertificatesForSigning {
-			fmt.Fprintf(&certificates, "{ base64_certificate = \"%s\", dn = \"%s\", default = %t, valid_from = \"%s\", valid_to = \"%s\" },\n", cert.Base64Certificate, cert.Dn, cert.IsDefault, cert.ValidFrom, cert.ValidTo)
+			fmt.Fprintf(&certificates, "{ base64_certificate = \"%s\", dn = \"%s\", default = %t, valid_from = \"%s\", valid_to = \"%s\" },\n", strings.ReplaceAll(cert.Base64Certificate, "\n", "\\n"), cert.Dn, cert.IsDefault, cert.ValidFrom, cert.ValidTo)
 		}
 
 		var ssoEndpoints strings.Builder
@@ -1182,7 +1182,7 @@ func ResourceCorporateIdPSaml2WithoutOptionals(resourceName string, idp corporat
 					valid_from = "%s"
 					valid_to = "%s"
 				}
-			`, certificate.Base64Certificate, certificate.Dn, certificate.IsDefault, certificate.ValidFrom, certificate.ValidTo)
+			`, strings.ReplaceAll(certificate.Base64Certificate, "\n", "\\n"), certificate.Dn, certificate.IsDefault, certificate.ValidFrom, certificate.ValidTo)
 	}
 
 	return fmt.Sprintf(`

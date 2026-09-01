@@ -39,8 +39,6 @@ provider "sci" {
 - `client_secret` (String, Sensitive) The client secret for OAuth2 authentication.
 - `p12_certificate_content` (String, Sensitive) Base64-encoded content of the `.p12` (PKCS#12) certificate bundle file used for x509 authentication. For example you can use `filebase64("certifiacte.p12")` to load the file content, But any source that provides a valid .p12 certificate base64 string is accepted.
 - `p12_certificate_password` (String, Sensitive) Password to decrypt the `.p12` certificate content.
-- `password` (String, Sensitive) Your password for Basic Authentication.
-- `username` (String) Your user name for Basic Authentication.
 
 ## Best Practices
 
@@ -50,27 +48,8 @@ For the best experience using the SAP Cloud Identity Services provider, we recom
 
 In order to get authenticated, the credentials of an [administrator](https://help.sap.com/docs/cloud-identity-services/cloud-identity-services/activate-your-account?locale=en-US) are required. The SAP Cloud Identity Services Provider supports the following authentication flows:
 
-1. [Basic Authentication](#basic-auth) 
-2. [X.509 Certificate Authentication](#cert-auth)
-3. [OAuth2 Client Authentication](#secret-auth)
-
-<br>
-
-### <u><a id="basic-auth" >Basic Authentication</a></u>
-
-You would require a valid **username** and **password** of a [User Administrator](https://help.sap.com/docs/cloud-identity-services/cloud-identity-services/add-administrators?version=Cloud#add-user-as-administrator) to get authenticated.
- 
-You can configure your credentials as part of the provider configuration as shown below:
-
-```hcl
-    provider "sci" {
-        tenant_url = <your_tenant_url>
-        username = <your_username>
-        password = <your_password>
-    }
-```
-It is recommended to securely set your credentials as environment variables ```SCI_USERNAME``` and ```SCI_PASSWORD```. In case you want to provide the username and password via variables make sure to follow the guidance given in the [Hashicorp documentation](https://developer.hashicorp.com/terraform/tutorials/configuration-language/sensitive-variables) 
-and never commit the values to a source code management system.
+1. [X.509 Certificate Authentication](#cert-auth)
+2. [OAuth2 Client Authentication](#secret-auth)
 
 <br>
 

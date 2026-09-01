@@ -23,7 +23,7 @@ func TestResourceApplicationSecret(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + ResourceApplicationSecretByAppName("testSecret", "5fd22812-53c5-4803-8285-94cd1fb3b301", []string{"manageApp"}, "test secret", "2029-10-12T10:00:00Z"),
+					Config: providerConfig("", user) + ResourceApplicationSecretByAppName("testSecret", "ca60ce62-efcf-4a04-8ce7-86405c7d1926", []string{"manageApp"}, "test secret", "2029-10-12T10:00:00Z"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("sci_application_secret.testSecret", "id", regexpUUID),
 						resource.TestMatchResourceAttr("sci_application_secret.testSecret", "application_id", regexpUUID),
@@ -58,14 +58,14 @@ func TestResourceApplicationSecret(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + ResourceApplicationSecretByAppName("testSecret", "5fd22812-53c5-4803-8285-94cd1fb3b301", []string{"manageApp"}, "test secret", "2029-10-12T10:00:00Z"),
+					Config: providerConfig("", user) + ResourceApplicationSecretByAppName("testSecret", "ca60ce62-efcf-4a04-8ce7-86405c7d1926", []string{"manageApp"}, "test secret", "2029-10-12T10:00:00Z"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("sci_application_secret.testSecret", "id", regexpUUID),
 						resource.TestCheckResourceAttr("sci_application_secret.testSecret", "description", "test secret"),
 					),
 				},
 				{
-					Config: providerConfig("", user) + ResourceApplicationSecretByAppName("testSecret", "5fd22812-53c5-4803-8285-94cd1fb3b301", []string{"manageApp", "oAuth"}, "updated secret", "2030-01-01T00:00:00Z"),
+					Config: providerConfig("", user) + ResourceApplicationSecretByAppName("testSecret", "ca60ce62-efcf-4a04-8ce7-86405c7d1926", []string{"manageApp", "oAuth"}, "updated secret", "2030-01-01T00:00:00Z"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("sci_application_secret.testSecret", "id", regexpUUID),
 						resource.TestCheckResourceAttr("sci_application_secret.testSecret", "description", "updated secret"),
