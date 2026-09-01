@@ -23,18 +23,16 @@ func TestDataSourceSchema(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + DataSourceSchema("testSchema", "Schema"),
+					Config: providerConfig("", user) + DataSourceSchema("testSchema", "ServiceProviderConfig"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						//add a regex check
-						resource.TestCheckResourceAttr("data.sci_schema.testSchema", "description", "Specifies the schema that describes a SCIM schema"),
-						resource.TestCheckResourceAttr("data.sci_schema.testSchema", "name", "Schema"),
-						resource.TestCheckResourceAttr("data.sci_schema.testSchema", "attributes.0.name", "name"),
-						resource.TestCheckResourceAttr("data.sci_schema.testSchema", "attributes.0.description", "The schemas human-readable name. When applicable, service providers MUST specify the name, e.g., User."),
+						resource.TestCheckResourceAttr("data.sci_schema.testSchema", "name", "ServiceProviderConfig"),
+						resource.TestCheckResourceAttr("data.sci_schema.testSchema", "attributes.0.name", "bulk"),
+						resource.TestCheckResourceAttr("data.sci_schema.testSchema", "attributes.0.description", "A complex type that specifies bulk configuration options."),
 						resource.TestCheckResourceAttr("data.sci_schema.testSchema", "attributes.0.multivalued", "false"),
 						resource.TestCheckResourceAttr("data.sci_schema.testSchema", "attributes.0.mutability", "readOnly"),
 						resource.TestCheckResourceAttr("data.sci_schema.testSchema", "attributes.0.required", "true"),
 						resource.TestCheckResourceAttr("data.sci_schema.testSchema", "attributes.0.returned", "default"),
-						resource.TestCheckResourceAttr("data.sci_schema.testSchema", "attributes.0.type", "string"),
+						resource.TestCheckResourceAttr("data.sci_schema.testSchema", "attributes.0.type", "complex"),
 						resource.TestCheckResourceAttr("data.sci_schema.testSchema", "attributes.0.uniqueness", "none"),
 					),
 				},

@@ -21,7 +21,7 @@ func TestDataSourceCorporateIdPs(t *testing.T) {
 				{
 					Config: providerConfig("", user) + DataSourceCorporateIdPs("testIdPs"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestCheckResourceAttr("data.sci_corporate_idps.testIdPs", "values.#", "5"),
+						resource.TestCheckResourceAttr("data.sci_corporate_idps.testIdPs", "values.#", "6"),
 					),
 				},
 			},

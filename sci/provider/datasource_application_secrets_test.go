@@ -21,10 +21,10 @@ func TestDataSourceClientSecrets(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + DataSourceClientSecrets("testSecrets", "5fd22812-53c5-4803-8285-94cd1fb3b301"),
+					Config: providerConfig("", user) + DataSourceClientSecrets("testSecrets", "ca60ce62-efcf-4a04-8ce7-86405c7d1926"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestCheckResourceAttrSet("data.sci_application_secrets.testSecrets", "values.#"),
-						resource.TestCheckResourceAttr("data.sci_application_secrets.testSecrets", "application_id", "5fd22812-53c5-4803-8285-94cd1fb3b301"),
+						resource.TestCheckResourceAttr("data.sci_application_secrets.testSecrets", "application_id", "ca60ce62-efcf-4a04-8ce7-86405c7d1926"),
 					),
 				},
 			},

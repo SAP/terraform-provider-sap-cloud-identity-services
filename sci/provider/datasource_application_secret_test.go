@@ -21,12 +21,12 @@ func TestDataSourceClientSecret(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + DataSourceClientSecret("testSecret", "5fd22812-53c5-4803-8285-94cd1fb3b301", "6d93947a-6f40-4b62-8c50-a09d2436ef3c"),
+					Config: providerConfig("", user) + DataSourceClientSecret("testSecret", "ca60ce62-efcf-4a04-8ce7-86405c7d1926", "88e88cc8-e6a8-4b19-be68-a6ea3f8c3e5e"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestCheckResourceAttr("data.sci_application_secret.testSecret", "id", "6d93947a-6f40-4b62-8c50-a09d2436ef3c"),
-						resource.TestCheckResourceAttr("data.sci_application_secret.testSecret", "application_id", "5fd22812-53c5-4803-8285-94cd1fb3b301"),
-						resource.TestCheckResourceAttr("data.sci_application_secret.testSecret", "hint", "=7k1"),
-						resource.TestCheckResourceAttr("data.sci_application_secret.testSecret", "description", "test secret"),
+						resource.TestCheckResourceAttr("data.sci_application_secret.testSecret", "id", "88e88cc8-e6a8-4b19-be68-a6ea3f8c3e5e"),
+						resource.TestCheckResourceAttr("data.sci_application_secret.testSecret", "application_id", "ca60ce62-efcf-4a04-8ce7-86405c7d1926"),
+						resource.TestCheckResourceAttr("data.sci_application_secret.testSecret", "hint", "7SA:"),
+						resource.TestCheckResourceAttr("data.sci_application_secret.testSecret", "description", "terraform-test"),
 					),
 				},
 			},

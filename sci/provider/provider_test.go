@@ -29,13 +29,13 @@ import (
 )
 
 type User struct {
-	Username string
-	Password string
+	ClientID     string
+	ClientSecret string
 }
 
 var redactedTestUser = User{
-	Username: "test-user",
-	Password: "test-password",
+	ClientID:     "test-client-id",
+	ClientSecret: "test-client-secret",
 }
 
 type RoundTripperFunc func(req *http.Request) (*http.Response, error)
@@ -47,11 +47,11 @@ func (f RoundTripperFunc) RoundTrip(req *http.Request) (*http.Response, error) {
 func providerConfig(_ string, testUser User) string {
 	return fmt.Sprintf(`
 	provider "sci" {
-	  tenant_url = "https://iasprovidertestblr.accounts400.ondemand.com/"
-	  username   = "%s"
-	  password   = "%s"
+	  tenant_url    = "https://iasprovidertestblr.accounts400.ondemand.com/"
+	  client_id     = "%s"
+	  client_secret = "%s"
 	}
-	`, testUser.Username, testUser.Password)
+	`, testUser.ClientID, testUser.ClientSecret)
 }
 
 func getTestProviders(httpClient *http.Client) map[string]func() (tfprotov6.ProviderServer, error) {
@@ -80,10 +80,10 @@ func setupVCR(t *testing.T, cassetteName string) (*recorder.Recorder, User) {
 	testUser := redactedTestUser
 	if rec.IsRecording() {
 		t.Logf("Recording new interactions in '%s'", cassetteName)
-		testUser.Username = os.Getenv("SCI_USERNAME")
-		testUser.Password = os.Getenv("SCI_PASSWORD")
-		if testUser.Username == "" || testUser.Password == "" {
-			t.Fatal("SCI_USERNAME and SCI_PASSWORD must be set for recording")
+		testUser.ClientID = os.Getenv("SCI_CLIENT_ID")
+		testUser.ClientSecret = os.Getenv("SCI_CLIENT_SECRET")
+		if testUser.ClientID == "" || testUser.ClientSecret == "" {
+			t.Fatal("SCI_CLIENT_ID and SCI_CLIENT_SECRET must be set for recording")
 		}
 	} else {
 		t.Logf("Replaying cassette '%s'", cassetteName)
@@ -107,6 +107,11 @@ func requestMatcher(t *testing.T) cassette.MatcherFunc {
 
 		r.Body = io.NopCloser(bytes.NewBuffer(body))
 
+		// skip body comparison for OAuth2 token requests — credentials differ between record and replay
+		if isOAuthTokenRequest(r) {
+			return true
+		}
+
 		// for PATCH requests to the SCIM Users endpoint, the comparison of the requests must be carried out by first sorting the operations
 		// this is to avoid false negatives due to the non-deterministic ordering of the patch operations in the request body, as the provider currently does not enforce a specific ordering of patch operations in its implementation
 		if isScimPatchRequest(r) {
@@ -115,6 +120,10 @@ func requestMatcher(t *testing.T) cassette.MatcherFunc {
 
 		return string(body) == i.Body
 	}
+}
+
+func isOAuthTokenRequest(r *http.Request) bool {
+	return r.Method == http.MethodPost && strings.HasSuffix(r.URL.Path, "/oauth2/token")
 }
 
 func isScimPatchRequest(r *http.Request) bool {
@@ -180,6 +189,22 @@ func redactCredentials() recorder.HookFunc {
 		}
 		redact(i.Request.Headers)
 		redact(i.Response.Headers)
+
+		// redact OAuth2 token request body (contains client_id and client_secret)
+		if strings.Contains(i.Request.URL, "/oauth2/token") {
+			i.Request.Body = "client_id=REDACTED&client_secret=REDACTED&grant_type=client_credentials"
+			i.Request.Form = map[string][]string{
+				"client_id":     {"REDACTED"},
+				"client_secret": {"REDACTED"},
+				"grant_type":    {"client_credentials"},
+			}
+		}
+
+		// redact access tokens from OAuth2 token responses
+		if strings.Contains(i.Response.Body, "access_token") {
+			reToken := regexp.MustCompile(`"access_token"\s*:\s*"[^"]*"`)
+			i.Response.Body = reToken.ReplaceAllString(i.Response.Body, `"access_token":"REDACTED"`)
+		}
 
 		if strings.Contains(i.Response.Body, "base64Certificate") {
 			reBindingSecret := regexp.MustCompile(`"base64Certificate" : "(.*?)"`)
@@ -254,8 +279,8 @@ func TestSciProvider_AllDataSources(t *testing.T) {
 func TestProviderConfig_MissingTenantURL(t *testing.T) {
 	config := `
 		provider "sci" {
-			username = "test"
-			password = "test"
+			client_id     = "test"
+			client_secret = "test"
 		}
 
 		data "sci_users" "test" {}
@@ -283,7 +308,7 @@ func TestProviderConfig_MissingAuthCredentials(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      config,
-				ExpectError: regexp.MustCompile("Please provide either : \n- client_id and client_secret for OAuth2 Authentication \n- p12_certificate_content and p12_certificate_password for X.509\nAuthentication \n- username and password for Basic Authentication"),
+				ExpectError: regexp.MustCompile("Please provide either : \n- client_id and client_secret for OAuth2 Authentication \n- p12_certificate_content and p12_certificate_password for X.509\nAuthentication"),
 			},
 		},
 	})
@@ -324,27 +349,6 @@ func TestProviderConfig_IncompleteAuthCredentials(t *testing.T) {
 				PreConfig: func() {
 					t.Setenv("SCI_CLIENT_ID", "")
 					t.Setenv("SCI_CLIENT_SECRET", "")
-					t.Setenv("SCI_USERNAME", "username")
-				},
-				Config:      config,
-				ExpectError: regexp.MustCompile("Please provide the required Basic Authentication Credentials : Username and\nPassword"),
-			},
-			{
-				PreConfig: func() {
-					t.Setenv("SCI_CLIENT_ID", "")
-					t.Setenv("SCI_CLIENT_SECRET", "")
-					t.Setenv("SCI_USERNAME", "")
-					t.Setenv("SCI_PASSWORD", "password")
-				},
-				Config:      config,
-				ExpectError: regexp.MustCompile("Please provide the required Basic Authentication Credentials : Username and\nPassword"),
-			},
-			{
-				PreConfig: func() {
-					t.Setenv("SCI_CLIENT_ID", "")
-					t.Setenv("SCI_CLIENT_SECRET", "")
-					t.Setenv("SCI_USERNAME", "")
-					t.Setenv("SCI_PASSWORD", "")
 					t.Setenv("SCI_P12_CERTIFICATE_PASSWORD", "password")
 				},
 				Config:      config,
@@ -354,8 +358,6 @@ func TestProviderConfig_IncompleteAuthCredentials(t *testing.T) {
 				PreConfig: func() {
 					t.Setenv("SCI_CLIENT_ID", "")
 					t.Setenv("SCI_CLIENT_SECRET", "")
-					t.Setenv("SCI_USERNAME", "")
-					t.Setenv("SCI_PASSWORD", "")
 					t.Setenv("SCI_P12_CERTIFICATE_PASSWORD", "")
 				},
 				Config: `
@@ -420,6 +422,10 @@ func TestAuthentication_withOAuth2(t *testing.T) {
 
 			// Test the credentials as schema parameters
 			{
+				PreConfig: func() {
+					t.Setenv("SCI_CLIENT_ID", "")
+					t.Setenv("SCI_CLIENT_SECRET", "")
+				},
 				Config: fmt.Sprintf(`
 					provider "sci" {
 						tenant_url = "%s"
@@ -543,6 +549,8 @@ func TestAuthentication_withX509Auth(t *testing.T) {
 			// Test the certificate content as schema parameter and password as env variable
 			{
 				PreConfig: func() {
+					t.Setenv("SCI_CLIENT_ID", "")
+					t.Setenv("SCI_CLIENT_SECRET", "")
 					t.Setenv("SCI_P12_CERTIFICATE_PASSWORD", p12Password)
 				},
 				Config: fmt.Sprintf(`
