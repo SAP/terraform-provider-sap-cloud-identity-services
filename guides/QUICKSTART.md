@@ -14,6 +14,7 @@ In order to run the scripts, you need the credentials of an [admin](https://help
 
 1. [X.509 Certificate Authentication](cert_auth.md)
 2. [OAuth2 Client Authentication](./secret_auth.md)
+3. [Basic Authentication](./basic_auth.md) *(Deprecated — will be removed in a future release)*
 
 Refer to the link corresponding to the chosen authentication method.
 
