@@ -308,7 +308,7 @@ func TestProviderConfig_MissingAuthCredentials(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      config,
-				ExpectError: regexp.MustCompile("Please provide either : \n- client_id and client_secret for OAuth2 Authentication \n- p12_certificate_content and p12_certificate_password for X.509\nAuthentication"),
+				ExpectError: regexp.MustCompile("Please provide either : \n- client_id and client_secret for OAuth2 Authentication \n- p12_certificate_content and p12_certificate_password for X.509\nAuthentication \n- username and password for Basic Authentication"),
 			},
 		},
 	})
@@ -349,6 +349,29 @@ func TestProviderConfig_IncompleteAuthCredentials(t *testing.T) {
 				PreConfig: func() {
 					t.Setenv("SCI_CLIENT_ID", "")
 					t.Setenv("SCI_CLIENT_SECRET", "")
+					t.Setenv("SCI_P12_CERTIFICATE_PASSWORD", "")
+					t.Setenv("SCI_USERNAME", "username")
+				},
+				Config:      config,
+				ExpectError: regexp.MustCompile("Please provide the required Basic Authentication Credentials : Username and\nPassword"),
+			},
+			{
+				PreConfig: func() {
+					t.Setenv("SCI_CLIENT_ID", "")
+					t.Setenv("SCI_CLIENT_SECRET", "")
+					t.Setenv("SCI_P12_CERTIFICATE_PASSWORD", "")
+					t.Setenv("SCI_USERNAME", "")
+					t.Setenv("SCI_PASSWORD", "password")
+				},
+				Config:      config,
+				ExpectError: regexp.MustCompile("Please provide the required Basic Authentication Credentials : Username and\nPassword"),
+			},
+			{
+				PreConfig: func() {
+					t.Setenv("SCI_CLIENT_ID", "")
+					t.Setenv("SCI_CLIENT_SECRET", "")
+					t.Setenv("SCI_USERNAME", "")
+					t.Setenv("SCI_PASSWORD", "")
 					t.Setenv("SCI_P12_CERTIFICATE_PASSWORD", "password")
 				},
 				Config:      config,
@@ -358,6 +381,8 @@ func TestProviderConfig_IncompleteAuthCredentials(t *testing.T) {
 				PreConfig: func() {
 					t.Setenv("SCI_CLIENT_ID", "")
 					t.Setenv("SCI_CLIENT_SECRET", "")
+					t.Setenv("SCI_USERNAME", "")
+					t.Setenv("SCI_PASSWORD", "")
 					t.Setenv("SCI_P12_CERTIFICATE_PASSWORD", "")
 				},
 				Config: `
@@ -615,6 +640,43 @@ func TestAuthenticationFailure_withX509Auth(t *testing.T) {
 					data "sci_users" "test" {}
 				`, invalidP12),
 				ExpectError: regexp.MustCompile("Invalid .p12 certificate"),
+			},
+		},
+	})
+}
+
+func TestAuthentication_withBasicAuth_deprecationWarning(t *testing.T) {
+
+	// Setup mock server handling Basic Auth
+	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/scim/Users/" && r.Method == http.MethodGet {
+			w.Header().Set("Content-Type", "application/scim+json")
+			_, _ = w.Write([]byte(`{"Resources": [], "totalResults": 0}`))
+			return
+		}
+		http.NotFound(w, r)
+	}))
+	defer mockServer.Close()
+
+	resource.Test(t, resource.TestCase{
+		IsUnitTest:               true,
+		ProtoV6ProviderFactories: getTestProviders(mockServer.Client()),
+		Steps: []resource.TestStep{
+			{
+				PreConfig: func() {
+					t.Setenv("SCI_CLIENT_ID", "")
+					t.Setenv("SCI_CLIENT_SECRET", "")
+				},
+				Config: fmt.Sprintf(`
+					provider "sci" {
+						tenant_url = "%s"
+						username   = "test-user"
+						password   = "test-password"
+					}
+
+					data "sci_users" "test" {}
+				`, mockServer.URL),
+				ExpectNonEmptyPlan: false,
 			},
 		},
 	})

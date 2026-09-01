@@ -39,6 +39,8 @@ provider "sci" {
 - `client_secret` (String, Sensitive) The client secret for OAuth2 authentication.
 - `p12_certificate_content` (String, Sensitive) Base64-encoded content of the `.p12` (PKCS#12) certificate bundle file used for x509 authentication. For example you can use `filebase64("certifiacte.p12")` to load the file content, But any source that provides a valid .p12 certificate base64 string is accepted.
 - `p12_certificate_password` (String, Sensitive) Password to decrypt the `.p12` certificate content.
+- `password` (String, Sensitive, Deprecated) **Deprecated:** Basic Authentication will be removed in a future release. Use `client_id` and `client_secret` for OAuth2 Authentication or `p12_certificate_content` and `p12_certificate_password` for X.509 Authentication instead. Your password for Basic Authentication.
+- `username` (String, Deprecated) **Deprecated:** Basic Authentication will be removed in a future release. Use `client_id` and `client_secret` for OAuth2 Authentication or `p12_certificate_content` and `p12_certificate_password` for X.509 Authentication instead. Your user name for Basic Authentication.
 
 ## Best Practices
 
@@ -50,6 +52,7 @@ In order to get authenticated, the credentials of an [administrator](https://hel
 
 1. [X.509 Certificate Authentication](#cert-auth)
 2. [OAuth2 Client Authentication](#secret-auth)
+3. [Basic Authentication](#basic-auth) *(Deprecated — will be removed in a future release)*
 
 <br>
 
@@ -90,5 +93,25 @@ You can configure them as part of the provider configuration as shown below:
     }
 ```
 
-It is recommended to securely set your credentials as environment variables ```SCI_CLIENT_ID``` and ```SCI_CLIENT_SECRET```. In case you want to provide the Client ID and Secret via variables make sure to follow the guidance given in the [Hashicorp documentation](https://developer.hashicorp.com/terraform/tutorials/configuration-language/sensitive-variables) 
+It is recommended to securely set your credentials as environment variables ```SCI_CLIENT_ID``` and ```SCI_CLIENT_SECRET```. In case you want to provide the Client ID and Secret via variables make sure to follow the guidance given in the [Hashicorp documentation](https://developer.hashicorp.com/terraform/tutorials/configuration-language/sensitive-variables)
 and never commit the values to a source code management system.
+
+<br>
+
+### <u><a id="basic-auth"> Basic Authentication (Deprecated) </a></u>
+
+~> **Deprecated:** Basic Authentication (username/password) is deprecated and will be removed in a future release. It is no longer listed as a supported authentication method in the [SAP Cloud Identity Services API Authentication documentation](https://help.sap.com/docs/cloud-identity-services/cloud-identity-services/dev-api-authentication). Please migrate to [OAuth2 Client Authentication](#secret-auth) or [X.509 Certificate Authentication](#cert-auth).
+
+You would require a valid **username** and **password** of a [User Administrator](https://help.sap.com/docs/cloud-identity-services/cloud-identity-services/add-administrators?version=Cloud#add-user-as-administrator) to get authenticated.
+
+You can configure your credentials as part of the provider configuration as shown below:
+
+```hcl
+    provider "sci" {
+        tenant_url = <your_tenant_url>
+        username = <your_username>
+        password = <your_password>
+    }
+```
+
+It is recommended to securely set your credentials as environment variables ```SCI_USERNAME``` and ```SCI_PASSWORD```.
