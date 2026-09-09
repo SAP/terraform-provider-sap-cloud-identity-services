@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 env:
-  LATEST_VERSION: 1.10.*
+  LATEST_VERSION: 1.12.*
 
 jobs:
   # Ensure project builds before running testing matrix
@@ -38,7 +38,7 @@ jobs:
 
   # Run acceptance tests in a matrix with OpenTofu CLI versions
   test:
-    name: Terraform Provider Acceptance Tests for OpenTofu
+    name: OpenTofu Provider Acceptance Tests
     needs: build
     runs-on: ubuntu-latest
     # Timeout for tests set to 25 minutes to safeguard long running tests (specifically for service instances)
@@ -46,14 +46,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # List of OpenTofu versions to be tested - last three versions are in scope
+        # List of OpenTofu versions to be tested - maintained versions are in scope
         # Check https://endoflife.date/opentofu for end of support dates
-        # '1.6.*' end of security support 09 Jan 2025
         opentofu:
-          - '1.7.*'
-          - '1.8.*'
-          - '1.9.*'
           - '1.10.*'
+          - '1.12.*'
+
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
@@ -66,9 +64,9 @@ jobs:
           tofu_wrapper: false
       - run: |
          go mod download
-         go mod tidyy
+         go mod tidy
       - run: go test -v -timeout=1800s -parallel=4 ./...
-        if: ${{ matrix.opentofu }} != ${{ env.LATEST_VERSION }}
+        if: ${{ matrix.opentofu != env.LATEST_VERSION }}
         env:
           TF_ACC: "1"
         timeout-minutes: 20
