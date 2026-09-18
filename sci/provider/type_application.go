@@ -1098,7 +1098,8 @@ func getApplicationUpdateRequest(ctx context.Context, plan applicationData, stat
 			reqs = append(reqs, patchReq)
 		}
 
-		if !planAuthSchema.AssertionAttributes.Equal(stateAuthSchema.AssertionAttributes) {
+		// An unknown plan value carries no intent, and marshals to a null patch value which the API rejects.
+		if !planAuthSchema.AssertionAttributes.IsUnknown() && !planAuthSchema.AssertionAttributes.Equal(stateAuthSchema.AssertionAttributes) {
 
 			planAssertionAttributes := []applications.AssertionAttribute{}
 
