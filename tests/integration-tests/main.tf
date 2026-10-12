@@ -205,7 +205,6 @@ resource "sci_corporate_idp" "testOidcIdP" {
     }
   }
 
-  depends_on = [ time_sleep.wait_40_seconds_idp ]
 }
 
 resource "sci_application" "parentApp" {
@@ -310,10 +309,11 @@ resource "time_sleep" "wait_40_seconds_basicApp" {
 #   depends_on = [ time_sleep.wait_40_seconds_basicApp ]
 # }
 
-resource "time_sleep" "wait_40_seconds_samlApp" {
-  create_duration = "40s"
-  depends_on = [ sci_application.testSamlApp ]
-}
+// This resource will be tested post v0.8.0-beta1 release (depends on testSamlApp which is commented out)
+# resource "time_sleep" "wait_40_seconds_samlApp" {
+#   create_duration = "40s"
+#   depends_on = [ sci_application.testSamlApp ]
+# }
 
 resource "sci_application" "testOidcApp" {
   name        = local.oidc_app_unique_name
@@ -352,5 +352,5 @@ resource "sci_application" "testOidcApp" {
     }
   }
 
-  depends_on = [ time_sleep.wait_40_seconds_samlApp ]
+  depends_on = [ time_sleep.wait_40_seconds_basicApp ]
 } 
