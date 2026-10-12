@@ -107,67 +107,67 @@ resource "sci_group" "testGroup" {
     description = "Application created for integration tests"
   }
 }
+// This resource will be tested post v0.8.0-beta1 release
+# resource "sci_corporate_idp" "testSamlIdP" {
+#   display_name             = local.saml_idp_display_name
+#   name                     = local.saml_idp_unique_name
+#   type                     = local.saml_type
+#   logout_url               = local.idp_logout_url
+#   forward_all_sso_requests = true
+#   identity_federation = {
+#     use_local_user_store            = true
+#     allow_local_users_only          = true
+#     apply_local_idp_auth_and_checks = true
+#     required_groups = [
+#       sci_group.testGroup.group_extension.name
+#     ]
+#   }
+#   login_hint_config = {
+#     login_hint_type = local.idp_login_type
+#     send_method     = local.idp_send_method
+#   }
+#   saml2_config = {
+#     assertion_attributes = [
+#       {
+#         name  = "uid"
+#         value = "uid"
+#       }
+#     ]
+#     signing_certificates = [
+#       {
+#         base64_certificate = local.cert_pem
+#         dn                 = local.prefix_unique_name
+#         default            = true
+#         valid_from         = "2025-08-25T10:30:00Z"
+#         valid_to           = "2026-08-25T10:30:00Z"
+#       }
+#     ]
+#     sso_endpoints = [
+#       {
+#         binding_name = local.saml_idp_binding_name
+#         location     = local.saml_sso_endpoint
+#         default      = true
+#       }
+#     ]
+#     slo_endpoints = [
+#       {
+#         binding_name      = local.saml_idp_binding_name
+#         location          = local.saml_slo_endpoint
+#         response_location = local.saml_slo_response_endpoint
+#         default           = true
+#       }
+#     ]
+#     digest_algorithm = local.saml_algo
+#     include_scoping  = true
+#     name_id_format   = "unspecified"
+#     allow_create     = "true"
+#   }
+# }
 
-resource "sci_corporate_idp" "testSamlIdP" {
-  display_name             = local.saml_idp_display_name
-  name                     = local.saml_idp_unique_name
-  type                     = local.saml_type
-  logout_url               = local.idp_logout_url
-  forward_all_sso_requests = true
-  identity_federation = {
-    use_local_user_store            = true
-    allow_local_users_only          = true
-    apply_local_idp_auth_and_checks = true
-    required_groups = [
-      sci_group.testGroup.group_extension.name
-    ]
-  }
-  login_hint_config = {
-    login_hint_type = local.idp_login_type
-    send_method     = local.idp_send_method
-  }
-  saml2_config = {
-    assertion_attributes = [
-      {
-        name  = "uid"
-        value = "uid"
-      }
-    ]
-    signing_certificates = [
-      {
-        base64_certificate = local.cert_pem
-        dn                 = local.prefix_unique_name
-        default            = true
-        valid_from         = "2025-08-25T10:30:00Z"
-        valid_to           = "2026-08-25T10:30:00Z"
-      }
-    ]
-    sso_endpoints = [
-      {
-        binding_name = local.saml_idp_binding_name
-        location     = local.saml_sso_endpoint
-        default      = true
-      }
-    ]
-    slo_endpoints = [
-      {
-        binding_name      = local.saml_idp_binding_name
-        location          = local.saml_slo_endpoint
-        response_location = local.saml_slo_response_endpoint
-        default           = true
-      }
-    ]
-    digest_algorithm = local.saml_algo
-    include_scoping  = true
-    name_id_format   = "unspecified"
-    allow_create     = "true"
-  }
-}
-
-resource "time_sleep" "wait_40_seconds_idp" {
-  create_duration = "40s"
-  depends_on = [ sci_corporate_idp.testSamlIdP ]
-}
+# resource "time_sleep" "wait_40_seconds_idp" {
+#   create_duration = "40s"
+#   depends_on = [ sci_corporate_idp.testSamlIdP ]
+# }
 
 resource "sci_corporate_idp" "testOidcIdP" {
   display_name             = local.oidc_idp_display_name
@@ -264,51 +264,51 @@ resource "time_sleep" "wait_40_seconds_basicApp" {
   create_duration = "40s"
   depends_on = [ sci_application.testApp ]
 }
+// This resource will be tested post v0.8.0-beta1 release
+# resource "sci_application" "testSamlApp" {
+#   name        = local.saml_app_unique_name
+#   description = "SAML Application created for integration tests"
+#   authentication_schema = {
+#     sso_type                   = local.saml_type
+#     default_authenticating_idp = sci_corporate_idp.testSamlIdP.id
+#     saml2_config = {
+#       acs_endpoints = [
+#         {
+#           binding_name = local.saml_app_binding_name
+#           location     = local.saml_sso_endpoint
+#           index        = 1
+#           default      = true
+#         }
+#       ]
+#       slo_endpoints = [
+#         {
+#           binding_name      = local.saml_app_binding_name
+#           location          = local.saml_slo_endpoint
+#           response_location = local.saml_slo_response_endpoint
+#         }
+#       ]
+#       signing_certificates = [
+#         {
+#           base64_certificate = local.cert_pem
+#           default            = true
+#         }
+#       ]
+#       encryption_certificate = {
+#         base64_certificate = local.cert_pem
+#       }
+#       response_elements_to_encrypt = "attributes"
+#       default_name_id_format       = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
+#       sign_slo_messages            = true
+#       require_signed_slo_messages  = true
+#       require_signed_auth_requests = true
+#       sign_assertions              = true
+#       sign_auth_responses          = true
+#       digest_algorithm             = local.saml_algo
+#     }
+#   }
 
-resource "sci_application" "testSamlApp" {
-  name        = local.saml_app_unique_name
-  description = "SAML Application created for integration tests"
-  authentication_schema = {
-    sso_type                   = local.saml_type
-    default_authenticating_idp = sci_corporate_idp.testSamlIdP.id
-    saml2_config = {
-      acs_endpoints = [
-        {
-          binding_name = local.saml_app_binding_name
-          location     = local.saml_sso_endpoint
-          index        = 1
-          default      = true
-        }
-      ]
-      slo_endpoints = [
-        {
-          binding_name      = local.saml_app_binding_name
-          location          = local.saml_slo_endpoint
-          response_location = local.saml_slo_response_endpoint
-        }
-      ]
-      signing_certificates = [
-        {
-          base64_certificate = local.cert_pem
-          default            = true
-        }
-      ]
-      encryption_certificate = {
-        base64_certificate = local.cert_pem
-      }
-      response_elements_to_encrypt = "attributes"
-      default_name_id_format       = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
-      sign_slo_messages            = true
-      require_signed_slo_messages  = true
-      require_signed_auth_requests = true
-      sign_assertions              = true
-      sign_auth_responses          = true
-      digest_algorithm             = local.saml_algo
-    }
-  }
-
-  depends_on = [ time_sleep.wait_40_seconds_basicApp ]
-}
+#   depends_on = [ time_sleep.wait_40_seconds_basicApp ]
+# }
 
 resource "time_sleep" "wait_40_seconds_samlApp" {
   create_duration = "40s"
