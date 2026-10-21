@@ -61,6 +61,15 @@ func getTestProviders(httpClient *http.Client) map[string]func() (tfprotov6.Prov
 	}
 }
 
+// getTestProvidersAllowHTTP returns a provider factory that accepts HTTP tenant URLs.
+// Only for unit tests that use httptest.NewServer().
+func getTestProvidersAllowHTTP(httpClient *http.Client) map[string]func() (tfprotov6.ProviderServer, error) {
+	sciProvider := newWithClientAllowHTTP(httpClient)
+	return map[string]func() (tfprotov6.ProviderServer, error){
+		"sci": providerserver.NewProtocol6WithError(sciProvider),
+	}
+}
+
 func setupVCR(t *testing.T, cassetteName string) (*recorder.Recorder, User) {
 	t.Helper()
 	mode := recorder.ModeRecordOnce
@@ -178,6 +187,108 @@ func getString(m map[string]any, key string) string {
 	return ""
 }
 
+// testUserNamesToPreserve lists VCR test account names whose PII must not be redacted
+// when recording SCIM /Users responses.
+var testUserNamesToPreserve = map[string]bool{
+	"Terraform Test":           true,
+	"Terraform Custom Schemas": true,
+}
+
+// redactScimUserListBody replaces real user PII in a SCIM ListResponse body with
+// deterministic fake values derived from each user's UUID. Test user accounts
+// (matched by userName) are left unchanged so recorded test assertions still pass.
+func redactScimUserListBody(body string) string {
+	var parsed map[string]json.RawMessage
+	if err := json.Unmarshal([]byte(body), &parsed); err != nil {
+		return body
+	}
+	resourcesRaw, ok := parsed["Resources"]
+	if !ok {
+		return body
+	}
+	var resources []map[string]json.RawMessage
+	if err := json.Unmarshal(resourcesRaw, &resources); err != nil {
+		return body
+	}
+
+	for i, user := range resources {
+		var userName string
+		if raw, ok := user["userName"]; ok {
+			_ = json.Unmarshal(raw, &userName)
+		}
+		if testUserNamesToPreserve[userName] {
+			continue
+		}
+
+		var userID string
+		if raw, ok := user["id"]; ok {
+			_ = json.Unmarshal(raw, &userID)
+		}
+		shortID := userID
+		if len(shortID) > 8 {
+			shortID = shortID[:8]
+		}
+		fakeEmail := shortID + "@example.com"
+
+		if userName != "" {
+			resources[i]["userName"], _ = json.Marshal("user-" + shortID)
+		}
+		if raw, ok := user["name"]; ok {
+			var name map[string]json.RawMessage
+			if err := json.Unmarshal(raw, &name); err == nil {
+				if _, ok := name["familyName"]; ok {
+					name["familyName"], _ = json.Marshal("User-" + shortID)
+				}
+				if _, ok := name["givenName"]; ok {
+					name["givenName"], _ = json.Marshal("Test")
+				}
+				if _, ok := name["honorificPrefix"]; ok {
+					name["honorificPrefix"], _ = json.Marshal("")
+				}
+				resources[i]["name"], _ = json.Marshal(name)
+			}
+		}
+		if raw, ok := user["displayName"]; ok {
+			var display string
+			if err := json.Unmarshal(raw, &display); err == nil && display != "None" {
+				resources[i]["displayName"], _ = json.Marshal("None")
+			}
+		}
+		if raw, ok := user["emails"]; ok {
+			var emails []map[string]json.RawMessage
+			if err := json.Unmarshal(raw, &emails); err == nil {
+				for j := range emails {
+					emails[j]["value"], _ = json.Marshal(fakeEmail)
+				}
+				resources[i]["emails"], _ = json.Marshal(emails)
+			}
+		}
+		const sapExtKey = "urn:ietf:params:scim:schemas:extension:sap:2.0:User"
+		if raw, ok := user[sapExtKey]; ok {
+			var sapExt map[string]json.RawMessage
+			if err := json.Unmarshal(raw, &sapExt); err == nil {
+				if extRaw, ok := sapExt["emails"]; ok {
+					var extEmails []map[string]json.RawMessage
+					if err := json.Unmarshal(extRaw, &extEmails); err == nil {
+						for j := range extEmails {
+							extEmails[j]["value"], _ = json.Marshal(fakeEmail)
+						}
+						sapExt["emails"], _ = json.Marshal(extEmails)
+					}
+				}
+				resources[i][sapExtKey], _ = json.Marshal(sapExt)
+			}
+		}
+	}
+
+	parsed["Resources"], _ = json.Marshal(resources)
+	newBody, err := json.Marshal(parsed)
+	if err != nil {
+		return body
+	}
+	return string(newBody)
+}
+
 func redactCredentials() recorder.HookFunc {
 	return func(i *cassette.Interaction) error {
 		redact := func(headers map[string][]string) {
@@ -214,6 +325,12 @@ func redactCredentials() recorder.HookFunc {
 		if strings.Contains(i.Request.Body, "base64Certificate") {
 			reBindingSecret := regexp.MustCompile(`"base64Certificate":"(.*?)"`)
 			i.Request.Body = reBindingSecret.ReplaceAllString(i.Request.Body, `"base64Certificate":"-----BEGIN CERTIFICATE-----\nredacted\n-----END CERTIFICATE-----"`)
+		}
+
+		// redact real user PII from SCIM /Users list responses
+		if strings.Contains(i.Response.Body, `"urn:ietf:params:scim:api:messages:2.0:ListResponse"`) &&
+			strings.Contains(i.Response.Body, `"urn:ietf:params:scim:schemas:core:2.0:User"`) {
+			i.Response.Body = redactScimUserListBody(i.Response.Body)
 		}
 
 		return nil
@@ -426,7 +543,7 @@ func TestAuthentication_withOAuth2(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		IsUnitTest:               true,
-		ProtoV6ProviderFactories: getTestProviders(mockServer.Client()),
+		ProtoV6ProviderFactories: getTestProvidersAllowHTTP(mockServer.Client()),
 		Steps: []resource.TestStep{
 
 			// Test the credentials as env variables
@@ -516,7 +633,7 @@ func TestAuthenticationFailure_withOAuth2(t *testing.T) {
 			}),
 		}
 
-		token, err := fetchOAuthToken(httpClient, tenantURL, clientID, clientSecret)
+		token, err := fetchOAuthToken(context.Background(), httpClient, tenantURL, clientID, clientSecret)
 
 		assert.Empty(t, token, "Expected token to be empty for invalid credentials")
 		assert.Error(t, err, "Expected error for invalid credentials")
@@ -568,7 +685,7 @@ func TestAuthentication_withX509Auth(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		IsUnitTest:               true,
-		ProtoV6ProviderFactories: getTestProviders(mockServer.Client()),
+		ProtoV6ProviderFactories: getTestProvidersAllowHTTP(mockServer.Client()),
 		Steps: []resource.TestStep{
 
 			// Test the certificate content as schema parameter and password as env variable
@@ -660,7 +777,7 @@ func TestAuthentication_withBasicAuth_deprecationWarning(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		IsUnitTest:               true,
-		ProtoV6ProviderFactories: getTestProviders(mockServer.Client()),
+		ProtoV6ProviderFactories: getTestProvidersAllowHTTP(mockServer.Client()),
 		Steps: []resource.TestStep{
 			{
 				PreConfig: func() {

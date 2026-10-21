@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"fmt"
+	"net/url"
 
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/generic"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/users"
@@ -25,8 +26,10 @@ func (u *UsersCli) Get(ctx context.Context) (users.UsersResponse, map[int]string
 	usersList := users.UsersResponse{}
 	customSchemas := map[int]string{}
 	startId := "initial"
+	const maxPages = 10000
+	done := false
 
-	for {
+	for page := 0; page < maxPages; page++ {
 		queryStrings := map[string]string{
 			"startId": startId,
 		}
@@ -36,7 +39,10 @@ func (u *UsersCli) Get(ctx context.Context) (users.UsersResponse, map[int]string
 			return users.UsersResponse{}, map[int]string{}, err
 		}
 
-		resBody := res.(map[string]any)
+		resBody, ok := res.(map[string]any)
+		if !ok {
+			return users.UsersResponse{}, map[int]string{}, fmt.Errorf("unexpected response type for users list: %T", res)
+		}
 		resMap, _ := resBody["Resources"].([]any)
 
 		for _, r := range resMap {
@@ -53,9 +59,14 @@ func (u *UsersCli) Get(ctx context.Context) (users.UsersResponse, map[int]string
 
 		nextId, _ := resBody["nextId"].(string)
 		if nextId == "" || nextId == "end" {
+			done = true
 			break
 		}
 		startId = nextId
+	}
+
+	if !done {
+		return users.UsersResponse{}, map[int]string{}, fmt.Errorf("users pagination exceeded %d pages", maxPages)
 	}
 
 	return usersList, customSchemas, nil
@@ -63,7 +74,7 @@ func (u *UsersCli) Get(ctx context.Context) (users.UsersResponse, map[int]string
 
 func (u *UsersCli) GetByUserId(ctx context.Context, userId string, validateCustomSchemas bool, customSchemas string) (users.User, string, error) {
 
-	res, _, err := u.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", u.getUrl(), userId), nil, nil, "", ScimRequestHeader, nil)
+	res, _, err := u.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", u.getUrl(), url.PathEscape(userId)), nil, nil, "", ScimRequestHeader, nil)
 
 	if err != nil {
 		return users.User{}, "", err
@@ -101,7 +112,7 @@ func (u *UsersCli) Update(ctx context.Context, id string, args []generic.PatchRe
 		Operations: args,
 	}
 
-	_, _, err := u.cliClient.Execute(ctx, "PATCH", fmt.Sprintf("%s%s", u.getUrl(), id), nil, reqBody, "", ScimRequestHeader, nil)
+	_, _, err := u.cliClient.Execute(ctx, "PATCH", fmt.Sprintf("%s%s", u.getUrl(), url.PathEscape(id)), nil, reqBody, "", ScimRequestHeader, nil)
 
 	if err != nil {
 		return users.User{}, "", err
@@ -117,7 +128,7 @@ func (u *UsersCli) Update(ctx context.Context, id string, args []generic.PatchRe
 
 func (u *UsersCli) Delete(ctx context.Context, userId string) error {
 
-	_, _, err := u.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", u.getUrl(), userId), nil, nil, "", ScimRequestHeader, nil)
+	_, _, err := u.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", u.getUrl(), url.PathEscape(userId)), nil, nil, "", ScimRequestHeader, nil)
 
 	return err
 }

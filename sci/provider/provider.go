@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -58,8 +59,18 @@ func NewWithClient(httpClient *http.Client) *SciProvider {
 	}
 }
 
+// newWithClientAllowHTTP creates a provider that accepts HTTP tenant URLs.
+// Only intended for unit tests that use httptest.NewServer().
+func newWithClientAllowHTTP(httpClient *http.Client) *SciProvider {
+	return &SciProvider{
+		httpClient: httpClient,
+		allowHTTP:  true,
+	}
+}
+
 type SciProvider struct {
 	httpClient *http.Client
+	allowHTTP  bool // disables HTTPS-only enforcement; for unit tests only
 }
 
 type SciProviderData struct {
@@ -165,6 +176,14 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		return
 	}
 
+	if parsedUrl.Scheme != "https" && !p.allowHTTP {
+		resp.Diagnostics.AddError(
+			"Insecure tenant_url",
+			"The tenant_url must use HTTPS to protect credentials and data in transit. Plaintext HTTP is not permitted.",
+		)
+		return
+	}
+
 	// OAuth2 Authentication using client_id and client_secret
 	clientID := config.ClientID.ValueString()
 	clientSecret := config.ClientSecret.ValueString()
@@ -202,7 +221,7 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 	switch {
 	case len(clientID) != 0 && len(clientSecret) != 0:
 		// OAuth2 authentication
-		token, err := fetchOAuthToken(p.httpClient, parsedUrl.String(), clientID, clientSecret)
+		token, err := fetchOAuthToken(ctx, p.httpClient, parsedUrl.String(), clientID, clientSecret)
 		if err != nil {
 			resp.Diagnostics.AddError("OAuth2 Authentication Failed", err.Error())
 			return
@@ -308,7 +327,7 @@ func (p *SciProvider) Resources(_ context.Context) []func() resource.Resource {
 	}
 }
 
-func fetchOAuthToken(httpClient *http.Client, tenantURL, clientID, clientSecret string) (string, error) {
+func fetchOAuthToken(ctx context.Context, httpClient *http.Client, tenantURL, clientID, clientSecret string) (string, error) {
 	config := &clientcredentials.Config{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
@@ -316,11 +335,25 @@ func fetchOAuthToken(httpClient *http.Client, tenantURL, clientID, clientSecret 
 		AuthStyle:    oauth2.AuthStyleInParams,
 	}
 
-	ctx := context.Background()
 	ctx = context.WithValue(ctx, oauth2.HTTPClient, httpClient)
 
 	token, err := config.Token(ctx)
 	if err != nil {
+		// Avoid echoing large or sensitive raw HTTP response bodies into diagnostics.
+		// If the error is a structured OAuth2 error, report only its parsed fields.
+		var retrieveErr *oauth2.RetrieveError
+		if errors.As(err, &retrieveErr) {
+			if retrieveErr.ErrorCode != "" {
+				return "", fmt.Errorf("failed to retrieve token: %s: %s", retrieveErr.ErrorCode, retrieveErr.ErrorDescription)
+			}
+			// Non-OAuth2-formatted body: truncate to avoid PII/large-body disclosure
+			const maxBodyDisplay = 256
+			body := string(retrieveErr.Body)
+			if len(body) > maxBodyDisplay {
+				body = body[:maxBodyDisplay] + "... [truncated]"
+			}
+			return "", fmt.Errorf("failed to retrieve token: HTTP %d: %s", retrieveErr.Response.StatusCode, body)
+		}
 		return "", fmt.Errorf("failed to retrieve token: %w", err)
 	}
 

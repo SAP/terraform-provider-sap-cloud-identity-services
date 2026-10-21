@@ -210,7 +210,7 @@ func (r *groupAssignmentResource) Delete(ctx context.Context, req resource.Delet
 	}
 
 	removeOp := utils.GenerateDeletePatchRequest(
-		fmt.Sprintf(`members[value eq "%s"]`, member.Value.ValueString()),
+		fmt.Sprintf(`members[value eq "%s"]`, strings.ReplaceAll(member.Value.ValueString(), `"`, `\"`)),
 	)
 
 	_, _, err := r.cli.Group.Update(ctx, []generic.PatchRequest{removeOp}, config.GroupId.ValueString())

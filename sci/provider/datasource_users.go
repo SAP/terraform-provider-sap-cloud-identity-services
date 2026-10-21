@@ -192,6 +192,7 @@ func (d *usersDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, 
 						},
 						"custom_schemas": schema.StringAttribute{
 							Computed:            true,
+							Sensitive:           true,
 							MarkdownDescription: "Furthur enhance your user with custom schemas.",
 							Validators: []validator.String{
 								utils.ValidJSON(),

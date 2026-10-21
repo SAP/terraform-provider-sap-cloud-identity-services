@@ -1132,6 +1132,9 @@ func stateModify(ctx context.Context, plan applicationData, state *applicationDa
 			}
 
 			for i, rule := range planAuthRulesData {
+				if i >= len(stateAuthRulesData) {
+					break
+				}
 				if !rule.IdentityProviderId.IsNull() && !rule.IdentityProviderId.IsUnknown() {
 					stateAuthRulesData[i].IdentityProviderId = rule.IdentityProviderId
 				}

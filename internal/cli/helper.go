@@ -38,7 +38,10 @@ func getCustomSchemas[I any](res any) (string, error) {
 	var obj I
 
 	reflectType := reflect.TypeOf(obj)
-	resMap := res.(map[string]any)
+	resMap, ok := res.(map[string]any)
+	if !ok {
+		return "", fmt.Errorf("unexpected response type: %T", res)
+	}
 
 	for field := range reflectType.Fields() {
 		key := strings.Split(field.Tag.Get("json"), ",")[0]
@@ -63,6 +66,11 @@ func validateCustomSchemasResponse(res any, customSchemas string) (bool, error) 
 		resBody = string(marshaledRes)
 	} else {
 		return false, err
+	}
+
+	// guard against malformed custom schemas (e.g. single-byte valid JSON)
+	if len(customSchemas) < 2 {
+		return false, fmt.Errorf("custom_schemas value is not a valid JSON object")
 	}
 
 	//remove the beginning and ending characters from the custom schemas string
@@ -128,7 +136,7 @@ func compareAttributes(key string, csValue map[string]any, rbValue map[string]an
 			rRes := rval.(string)
 			cRes := cval.(string)
 			if result = (rRes == cRes); !result {
-				err = fmt.Sprintf("mismatch between response and request in attribute %s.%s, request sent: \"%s\" but response received: \"%s\"", key, ckey, cRes, rRes)
+				err = fmt.Sprintf("mismatch between response and request in attribute %s.%s", key, ckey)
 				break
 			}
 
@@ -136,7 +144,7 @@ func compareAttributes(key string, csValue map[string]any, rbValue map[string]an
 			rRes := rval.(float64)
 			cRes := cval.(float64)
 			if result = (rRes == cRes); !result {
-				err = fmt.Sprintf("mismatch between response and request in attribute %s.%s, request sent: \"%.2f\" but response received: \"%.2f\"", key, ckey, cRes, rRes)
+				err = fmt.Sprintf("mismatch between response and request in attribute %s.%s", key, ckey)
 				break
 			}
 
@@ -144,7 +152,7 @@ func compareAttributes(key string, csValue map[string]any, rbValue map[string]an
 			rRes := rval.(bool)
 			cRes := cval.(bool)
 			if result = (rRes == cRes); !result {
-				err = fmt.Sprintf("mismatch between response and request in attribute %s.%s, request sent: \"%t\" but response received: \"%t\"", key, ckey, cRes, rRes)
+				err = fmt.Sprintf("mismatch between response and request in attribute %s.%s", key, ckey)
 				break
 			}
 

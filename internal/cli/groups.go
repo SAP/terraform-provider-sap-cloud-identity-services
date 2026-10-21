@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"fmt"
+	"net/url"
 
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/groups"
 
@@ -25,8 +26,10 @@ func (g *GroupsCli) Get(ctx context.Context) (groups.GroupsResponse, string, err
 
 	var allGroups groups.GroupsResponse
 	startId := "initial"
+	const maxPages = 10000
+	done := false
 
-	for {
+	for page := 0; page < maxPages; page++ {
 		queryStrings := map[string]string{
 			"startId": startId,
 		}
@@ -44,9 +47,14 @@ func (g *GroupsCli) Get(ctx context.Context) (groups.GroupsResponse, string, err
 		allGroups.Resources = append(allGroups.Resources, resp.Resources...)
 
 		if resp.NextId == "" || resp.NextId == "end" {
+			done = true
 			break
 		}
 		startId = resp.NextId
+	}
+
+	if !done {
+		return groups.GroupsResponse{}, "", fmt.Errorf("groups pagination exceeded %d pages", 10000)
 	}
 
 	return allGroups, "", nil
@@ -54,7 +62,7 @@ func (g *GroupsCli) Get(ctx context.Context) (groups.GroupsResponse, string, err
 
 func (g *GroupsCli) GetByGroupId(ctx context.Context, groupId string) (groups.Group, string, error) {
 
-	res, _, err := g.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", g.getUrl(), groupId), nil, nil, "", ScimRequestHeader, nil)
+	res, _, err := g.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", g.getUrl(), url.PathEscape(groupId)), nil, nil, "", ScimRequestHeader, nil)
 
 	if err != nil {
 		return groups.Group{}, "", err
@@ -81,7 +89,7 @@ func (g *GroupsCli) Update(ctx context.Context, args []generic.PatchRequest, gro
 		Operations: args,
 	}
 
-	_, _, err := g.cliClient.Execute(ctx, "PATCH", fmt.Sprintf("%s%s", g.getUrl(), groupId), nil, reqBody, "", ScimRequestHeader, nil)
+	_, _, err := g.cliClient.Execute(ctx, "PATCH", fmt.Sprintf("%s%s", g.getUrl(), url.PathEscape(groupId)), nil, reqBody, "", ScimRequestHeader, nil)
 
 	if err != nil {
 		return groups.Group{}, "", err
@@ -92,7 +100,7 @@ func (g *GroupsCli) Update(ctx context.Context, args []generic.PatchRequest, gro
 
 func (g *GroupsCli) Delete(ctx context.Context, groupId string) error {
 
-	_, _, err := g.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", g.getUrl(), groupId), nil, nil, "", ScimRequestHeader, nil)
+	_, _, err := g.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", g.getUrl(), url.PathEscape(groupId)), nil, nil, "", ScimRequestHeader, nil)
 
 	return err
 }

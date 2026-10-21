@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"strings"
 
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/applications"
@@ -24,8 +25,10 @@ func (a *ApplicationsCli) getUrl() string {
 func (a *ApplicationsCli) Get(ctx context.Context, cursor string) (applications.ApplicationsResponse, string, error) {
 
 	var allApps applications.ApplicationsResponse
+	const maxPages = 10000
+	done := false
 
-	for {
+	for page := 0; page < maxPages; page++ {
 		queryStrings := map[string]string{
 			"cursor": cursor,
 		}
@@ -43,10 +46,15 @@ func (a *ApplicationsCli) Get(ctx context.Context, cursor string) (applications.
 		allApps.Applications = append(allApps.Applications, resp.Applications...)
 
 		if resp.NextCursor == "" {
+			done = true
 			break
 		}
 
 		cursor = resp.NextCursor
+	}
+
+	if !done {
+		return applications.ApplicationsResponse{}, "", fmt.Errorf("applications pagination exceeded %d pages", 10000)
 	}
 
 	allApps.NextCursor = cursor
@@ -56,7 +64,7 @@ func (a *ApplicationsCli) Get(ctx context.Context, cursor string) (applications.
 
 func (a *ApplicationsCli) GetByAppId(ctx context.Context, appId string) (applications.Application, string, error) {
 
-	res, _, err := a.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", a.getUrl(), appId), nil, nil, "", RequestHeader, nil)
+	res, _, err := a.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", a.getUrl(), url.PathEscape(appId)), nil, nil, "", RequestHeader, nil)
 
 	if err != nil {
 		return applications.Application{}, "", err
@@ -87,7 +95,7 @@ func (a *ApplicationsCli) Update(ctx context.Context, args []generic.PatchReques
 		Operations: args,
 	}
 
-	_, _, err := a.cliClient.Execute(ctx, "PATCH", fmt.Sprintf("%s%s", a.getUrl(), appId), nil, reqBody, "", RequestHeader, nil)
+	_, _, err := a.cliClient.Execute(ctx, "PATCH", fmt.Sprintf("%s%s", a.getUrl(), url.PathEscape(appId)), nil, reqBody, "", RequestHeader, nil)
 
 	if err != nil {
 		return applications.Application{}, "", err
@@ -97,6 +105,6 @@ func (a *ApplicationsCli) Update(ctx context.Context, args []generic.PatchReques
 }
 
 func (a *ApplicationsCli) Delete(ctx context.Context, appId string) error {
-	_, _, err := a.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", a.getUrl(), appId), nil, nil, "", RequestHeader, nil)
+	_, _, err := a.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", a.getUrl(), url.PathEscape(appId)), nil, nil, "", RequestHeader, nil)
 	return err
 }

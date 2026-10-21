@@ -70,6 +70,13 @@ func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, 
 		}
 
 		if len(customSchemas) > 0 {
+			// Validate that customSchemas is a JSON object before merging.
+			// json.Valid alone accepts non-object JSON (numbers, arrays, strings).
+			var csCheck map[string]json.RawMessage
+			if err := json.Unmarshal([]byte(customSchemas), &csCheck); err != nil {
+				return nil, fmt.Errorf("custom_schemas must be a JSON object: %w", err)
+			}
+
 			// remove the ending characters '}\n' from the encoded buffer
 			body := encodedBody.String()[:len(encodedBody.String())-2]
 			// remove the beginning character '{' from the custom schemas string
@@ -129,6 +136,13 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, qu
 
 		rawBody, _ := io.ReadAll(res.Body)
 
+		// Truncate raw body to avoid echoing large or sensitive server responses verbatim
+		const maxDisplayBytes = 512
+		displayBody := string(rawBody)
+		if len(displayBody) > maxDisplayBytes {
+			displayBody = displayBody[:maxDisplayBytes] + "... [truncated]"
+		}
+
 		if strings.Contains(reqHeader, "scim") {
 
 			var responseError ScimResponseError
@@ -136,7 +150,7 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, qu
 			if err = json.Unmarshal(rawBody, &responseError); err == nil && responseError.Detail != "" {
 				err = fmt.Errorf("SCIM error %s \n%s", responseError.Status, responseError.Detail)
 			} else {
-				err = fmt.Errorf("SCIM error %d \n%s", res.StatusCode, string(rawBody))
+				err = fmt.Errorf("SCIM error %d \n%s", res.StatusCode, displayBody)
 			}
 
 		} else {
@@ -172,7 +186,7 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, qu
 					}
 				}
 			} else {
-				err = fmt.Errorf("error %d \n%s", res.StatusCode, string(rawBody))
+				err = fmt.Errorf("error %d \n%s", res.StatusCode, displayBody)
 			}
 
 		}
