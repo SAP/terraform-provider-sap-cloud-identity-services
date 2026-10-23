@@ -22,6 +22,8 @@ For the best experience using the {{.RenderedProviderName}} provider, we recomme
 
 ## Authentication
 
+-> **Note:** `tenant_url` must use the `https` scheme. The provider will reject any `http://` URL with a configuration error to prevent credentials from being transmitted over an unencrypted connection.
+
 In order to get authenticated, the credentials of an [administrator](https://help.sap.com/docs/cloud-identity-services/cloud-identity-services/activate-your-account?locale=en-US) are required. The SAP Cloud Identity Services Provider supports the following authentication flows:
 
 1. [X.509 Certificate Authentication](#cert-auth)

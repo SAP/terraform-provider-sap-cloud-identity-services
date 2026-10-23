@@ -92,7 +92,7 @@ func (p *SciProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *
 		Attributes: map[string]schema.Attribute{
 
 			"tenant_url": schema.StringAttribute{
-				MarkdownDescription: "The URL of the SCI tenant.",
+				MarkdownDescription: "The URL of the SCI tenant. Must use the `https` scheme — the provider rejects any `http://` URL to prevent credentials from being transmitted over an unencrypted connection.",
 				Required:            true,
 			},
 
