@@ -173,7 +173,7 @@ Optional:
 
 - `additional_config` (Attributes) Configure additional settings of the corporate IdP. (see [below for nested schema](#nestedatt--oidc_config--additional_config))
 - `client_id` (String) Configure the Client ID for Client Authentication.
-- `client_secret` (String) Configure the Client Secret for Client Authentication.
+- `client_secret` (String, Sensitive) Configure the Client Secret for Client Authentication.
 - `discovery_url` (String) Specify the Issuer or Metadata URL
 - `enable_pkce` (Boolean) Configure Proof Key for Code Exchange (PKCE) for the corporate IdP. This is an enhancement of the authorization code flow to prevent the interception of authorization code. This feature is recommended only if the corporate IdP supports PKCE and you have public applications that aren't capable of keeping client secrets.
 - `scopes` (Set of String) Configure additional scopes required by the Identity Provider. By default, the "openid" scope is added.

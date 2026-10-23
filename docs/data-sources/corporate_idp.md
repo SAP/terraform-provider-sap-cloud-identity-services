@@ -70,7 +70,7 @@ Read-Only:
 - `additional_config` (Attributes) Configure additional settings of the corporate IdP. (see [below for nested schema](#nestedatt--oidc_config--additional_config))
 - `authorization_endpoint` (String) The endpoint to which SSO requests are forwarded to, in order to retrieve an authorization code.
 - `client_id` (String) Configure the Client ID for Client Authentication.
-- `client_secret` (String) Configure the Client Secret for Client Authentication.
+- `client_secret` (String, Sensitive) Configure the Client Secret for Client Authentication.
 - `discovery_url` (String) Specify the Issuer or Metadata URL
 - `enable_pkce` (Boolean) Configure Proof Key for Code Exchange (PKCE) for the corporate IdP. This is an enhancement of the authorization code flow to prevent the interception of authorization code. This feature is recommended only if the corporate IdP supports PKCE and you have public applications that aren't capable of keeping client secrets.
 - `is_client_secret_configured` (Boolean) Indicates if a client secret is configured or not.
