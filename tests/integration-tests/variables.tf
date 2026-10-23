@@ -6,7 +6,7 @@ variable "tenant_url" {
 variable "password" {
   description = "Test password for the user."
   type        = string
-  default     = "Abc12345@"
+  sensitive   = true
 }
 
 variable "certificate" {

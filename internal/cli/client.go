@@ -70,14 +70,30 @@ func (c *Client) DoRequest(ctx context.Context, method string, endpoint string, 
 		}
 
 		if len(customSchemas) > 0 {
-			// remove the ending characters '}\n' from the encoded buffer
-			body := encodedBody.String()[:len(encodedBody.String())-2]
-			// remove the beginning character '{' from the custom schemas string
-			customSchemas = customSchemas[1:]
-
-			// reset the encoded buffer and concatenate the custom schemas with the rest of the request body
+			// Validate customSchemas is a well-formed JSON object (not an array, string, etc.)
+			var extra map[string]json.RawMessage
+			if err := json.Unmarshal([]byte(customSchemas), &extra); err != nil {
+				return nil, fmt.Errorf("custom_schemas is not a valid JSON object: %w", err)
+			}
+			// Merge by appending extra fields into the base JSON body.
+			// We operate on bytes rather than re-encoding through a map so that
+			// the field order from the Go struct is preserved (required for VCR cassette replay).
+			base := bytes.TrimRight(encodedBody.Bytes(), "\n")
+			lastBrace := bytes.LastIndexByte(base, '}')
+			if lastBrace < 0 {
+				return nil, fmt.Errorf("request body is not a valid JSON object")
+			}
+			inner := bytes.TrimSpace([]byte(customSchemas))
+			inner = bytes.TrimSpace(inner[1 : len(inner)-1]) // strip outer { }
 			encodedBody.Reset()
-			encodedBody.WriteString(body + "," + customSchemas)
+			if len(inner) == 0 {
+				encodedBody.Write(base[:lastBrace+1])
+			} else {
+				encodedBody.Write(base[:lastBrace])
+				encodedBody.WriteByte(',')
+				encodedBody.Write(inner)
+				encodedBody.WriteByte('}')
+			}
 		}
 	}
 
@@ -127,7 +143,14 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, qu
 
 	if res.StatusCode >= 400 {
 
-		rawBody, _ := io.ReadAll(res.Body)
+		rawBody, _ := io.ReadAll(io.LimitReader(res.Body, 10*1024*1024))
+
+		// Truncate raw body to avoid echoing large or sensitive server responses verbatim.
+		const maxDisplayBytes = 512
+		displayBody := string(rawBody)
+		if len(displayBody) > maxDisplayBytes {
+			displayBody = displayBody[:maxDisplayBytes] + "... [truncated]"
+		}
 
 		if strings.Contains(reqHeader, "scim") {
 
@@ -136,7 +159,7 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, qu
 			if err = json.Unmarshal(rawBody, &responseError); err == nil && responseError.Detail != "" {
 				err = fmt.Errorf("SCIM error %s \n%s", responseError.Status, responseError.Detail)
 			} else {
-				err = fmt.Errorf("SCIM error %d \n%s", res.StatusCode, string(rawBody))
+				err = fmt.Errorf("SCIM error %d \n%s", res.StatusCode, displayBody)
 			}
 
 		} else {
@@ -172,7 +195,7 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, qu
 					}
 				}
 			} else {
-				err = fmt.Errorf("error %d \n%s", res.StatusCode, string(rawBody))
+				err = fmt.Errorf("error %d \n%s", res.StatusCode, displayBody)
 			}
 
 		}
@@ -184,7 +207,7 @@ func (c *Client) Execute(ctx context.Context, method string, endpoint string, qu
 		out[header] = res.Header.Get(header)
 	}
 
-	if err = json.NewDecoder(res.Body).Decode(&O); err == nil || err == io.EOF {
+	if err = json.NewDecoder(io.LimitReader(res.Body, 50*1024*1024)).Decode(&O); err == nil || err == io.EOF {
 		return O, out, nil
 	} else {
 		return nil, out, err

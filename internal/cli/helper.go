@@ -38,7 +38,10 @@ func getCustomSchemas[I any](res any) (string, error) {
 	var obj I
 
 	reflectType := reflect.TypeOf(obj)
-	resMap := res.(map[string]any)
+	resMap, ok := res.(map[string]any)
+	if !ok {
+		return "", fmt.Errorf("response is not a JSON object")
+	}
 
 	for field := range reflectType.Fields() {
 		key := strings.Split(field.Tag.Get("json"), ",")[0]
@@ -65,6 +68,9 @@ func validateCustomSchemasResponse(res any, customSchemas string) (bool, error) 
 		return false, err
 	}
 
+	if len(customSchemas) < 2 {
+		return false, fmt.Errorf("custom_schemas value too short to be a valid JSON object")
+	}
 	//remove the beginning and ending characters from the custom schemas string
 	modifiedCustomSchemas := customSchemas[1:][:len(customSchemas[1:])-1]
 
@@ -98,7 +104,16 @@ func compare(cS map[string]any, rB map[string]any) (bool, error) {
 			return false, err
 		}
 
-		result, err := compareAttributes(k, csValue.(map[string]any), rbValue.(map[string]any))
+		csMap, ok := csValue.(map[string]any)
+		if !ok {
+			return false, fmt.Errorf("attribute %s in request is not an object", k)
+		}
+		rbMap, ok := rbValue.(map[string]any)
+		if !ok {
+			return false, fmt.Errorf("attribute %s in response is not an object", k)
+		}
+
+		result, err := compareAttributes(k, csMap, rbMap)
 
 		if !result {
 			return false, fmt.Errorf("%s", err)
@@ -126,25 +141,37 @@ func compareAttributes(key string, csValue map[string]any, rbValue map[string]an
 
 		case string:
 			rRes := rval.(string)
-			cRes := cval.(string)
+			cRes, ok := cval.(string)
+			if !ok {
+				err = fmt.Sprintf("mismatch between response and request in attribute %s.%s, type mismatch", key, ckey)
+				break
+			}
 			if result = (rRes == cRes); !result {
-				err = fmt.Sprintf("mismatch between response and request in attribute %s.%s, request sent: \"%s\" but response received: \"%s\"", key, ckey, cRes, rRes)
+				err = fmt.Sprintf("mismatch between response and request in attribute %s.%s", key, ckey)
 				break
 			}
 
 		case float64:
 			rRes := rval.(float64)
-			cRes := cval.(float64)
+			cRes, ok := cval.(float64)
+			if !ok {
+				err = fmt.Sprintf("mismatch between response and request in attribute %s.%s, type mismatch", key, ckey)
+				break
+			}
 			if result = (rRes == cRes); !result {
-				err = fmt.Sprintf("mismatch between response and request in attribute %s.%s, request sent: \"%.2f\" but response received: \"%.2f\"", key, ckey, cRes, rRes)
+				err = fmt.Sprintf("mismatch between response and request in attribute %s.%s", key, ckey)
 				break
 			}
 
 		case bool:
 			rRes := rval.(bool)
-			cRes := cval.(bool)
+			cRes, ok := cval.(bool)
+			if !ok {
+				err = fmt.Sprintf("mismatch between response and request in attribute %s.%s, type mismatch", key, ckey)
+				break
+			}
 			if result = (rRes == cRes); !result {
-				err = fmt.Sprintf("mismatch between response and request in attribute %s.%s, request sent: \"%t\" but response received: \"%t\"", key, ckey, cRes, rRes)
+				err = fmt.Sprintf("mismatch between response and request in attribute %s.%s", key, ckey)
 				break
 			}
 
@@ -152,7 +179,11 @@ func compareAttributes(key string, csValue map[string]any, rbValue map[string]an
 		// API allows only one level of nesting
 		case map[string]any:
 			rRes := rval.(map[string]any)
-			cRes := cval.(map[string]any)
+			cRes, ok := cval.(map[string]any)
+			if !ok {
+				err = fmt.Sprintf("mismatch between response and request in attribute %s.%s, type mismatch", key, ckey)
+				break
+			}
 			result, err = compareAttributes(ckey, cRes, rRes)
 			if !result {
 				err = err[:51] + key + "." + err[51:]

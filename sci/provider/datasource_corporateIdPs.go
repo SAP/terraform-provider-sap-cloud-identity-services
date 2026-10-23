@@ -357,6 +357,7 @@ func (d *corporateIdPsDataSource) Schema(_ context.Context, _ datasource.SchemaR
 								"client_secret": schema.StringAttribute{
 									MarkdownDescription: "Configure the Client Secret for Client Authentication.",
 									Computed:            true,
+									Sensitive:           true,
 								},
 								"token_endpoint_auth_method": schema.StringAttribute{
 									MarkdownDescription: "Configure the Client Authentication Method.",
