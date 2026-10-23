@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"fmt"
+	"net/url"
 
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/applications"
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/generic"
@@ -17,7 +18,7 @@ func NewApplicationSecretCli(cliClient *Client) ApplicationSecretsCli {
 }
 
 func (a *ApplicationSecretsCli) getUrl(appId string) string {
-	return fmt.Sprintf("Applications/v1/%s/apiSecrets", appId)
+	return fmt.Sprintf("Applications/v1/%s/apiSecrets", url.PathEscape(appId))
 }
 
 func (a *ApplicationSecretsCli) Create(ctx context.Context, appId string, args applications.ApplicationSecretRequest) (applications.ApplicationSecret, error) {
@@ -60,7 +61,7 @@ func (a *ApplicationSecretsCli) Update(ctx context.Context, appId, secretId stri
 		Operations: ops,
 	}
 
-	_, _, err := a.cliClient.Execute(ctx, "PATCH", fmt.Sprintf("%s/%s", a.getUrl(appId), secretId), nil, reqBody, "", RequestHeader, nil)
+	_, _, err := a.cliClient.Execute(ctx, "PATCH", fmt.Sprintf("%s/%s", a.getUrl(appId), url.PathEscape(secretId)), nil, reqBody, "", RequestHeader, nil)
 	if err != nil {
 		return applications.ApplicationSecret{}, err
 	}
@@ -69,6 +70,6 @@ func (a *ApplicationSecretsCli) Update(ctx context.Context, appId, secretId stri
 }
 
 func (a *ApplicationSecretsCli) Delete(ctx context.Context, appId, secretId string) error {
-	_, _, err := a.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s?id=%s", a.getUrl(appId), secretId), nil, nil, "", RequestHeader, nil)
+	_, _, err := a.cliClient.Execute(ctx, "DELETE", a.getUrl(appId), map[string]string{"id": secretId}, nil, "", RequestHeader, nil)
 	return err
 }

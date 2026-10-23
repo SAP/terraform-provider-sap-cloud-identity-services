@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"strings"
 	"time"
 
@@ -38,7 +39,7 @@ func (c *CorporateIdPsCli) Get(ctx context.Context) (corporateidps.IdentityProvi
 
 func (c *CorporateIdPsCli) GetByIdPId(ctx context.Context, idpId string) (corporateidps.IdentityProvider, string, error) {
 
-	res, _, err := c.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", c.getUrl(), idpId), nil, nil, "", RequestHeader, nil)
+	res, _, err := c.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", c.getUrl(), url.PathEscape(idpId)), nil, nil, "", RequestHeader, nil)
 
 	if err != nil {
 		return corporateidps.IdentityProvider{}, "", err
@@ -57,7 +58,12 @@ func (c *CorporateIdPsCli) Create(ctx context.Context, args *corporateidps.Ident
 		return corporateidps.IdentityProvider{}, "", err
 	}
 
-	return c.GetByIdPId(ctx, strings.Split(headers["location"], "/")[3])
+	// The retrieved header is returned as a string in the form "/IdentityProviders/v1/ID"
+	parts := strings.Split(headers["location"], "/")
+	if len(parts) < 4 {
+		return corporateidps.IdentityProvider{}, "", fmt.Errorf("unexpected Location header format: %q", headers["location"])
+	}
+	return c.GetByIdPId(ctx, parts[3])
 }
 
 func (c *CorporateIdPsCli) Update(ctx context.Context, args []generic.PatchRequest, idpId string) (corporateidps.IdentityProvider, string, error) {
@@ -66,7 +72,7 @@ func (c *CorporateIdPsCli) Update(ctx context.Context, args []generic.PatchReque
 		Operations: args,
 	}
 
-	_, _, err := c.cliClient.Execute(ctx, "PATCH", fmt.Sprintf("%s%s", c.getUrl(), idpId), nil, reqBody, "", RequestHeader, nil)
+	_, _, err := c.cliClient.Execute(ctx, "PATCH", fmt.Sprintf("%s%s", c.getUrl(), url.PathEscape(idpId)), nil, reqBody, "", RequestHeader, nil)
 
 	if err != nil {
 		return corporateidps.IdentityProvider{}, "", err
@@ -76,7 +82,7 @@ func (c *CorporateIdPsCli) Update(ctx context.Context, args []generic.PatchReque
 }
 
 func (c *CorporateIdPsCli) Delete(ctx context.Context, idpId string) error {
-	_, _, err := c.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", c.getUrl(), idpId), nil, nil, "", RequestHeader, nil)
+	_, _, err := c.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", c.getUrl(), url.PathEscape(idpId)), nil, nil, "", RequestHeader, nil)
 	return err
 }
 

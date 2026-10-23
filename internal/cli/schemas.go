@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"fmt"
+	"net/url"
 
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/schemas"
 )
@@ -32,7 +33,7 @@ func (s *SchemasCli) Get(ctx context.Context) (schemas.SchemasResponse, string, 
 
 func (s *SchemasCli) GetBySchemaId(ctx context.Context, schemaId string) (schemas.Schema, string, error) {
 
-	res, _, err := s.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", s.getUrl(), schemaId), nil, nil, "", ScimRequestHeader, nil)
+	res, _, err := s.cliClient.Execute(ctx, "GET", fmt.Sprintf("%s%s", s.getUrl(), url.PathEscape(schemaId)), nil, nil, "", ScimRequestHeader, nil)
 
 	if err != nil {
 		return schemas.Schema{}, "", err
@@ -53,7 +54,7 @@ func (s *SchemasCli) Create(ctx context.Context, args *schemas.Schema) (schemas.
 
 func (s *SchemasCli) Delete(ctx context.Context, schemaId string) error {
 
-	_, _, err := s.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", s.getUrl(), schemaId), nil, nil, "", ScimRequestHeader, nil)
+	_, _, err := s.cliClient.Execute(ctx, "DELETE", fmt.Sprintf("%s%s", s.getUrl(), url.PathEscape(schemaId)), nil, nil, "", ScimRequestHeader, nil)
 
 	return err
 }

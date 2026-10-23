@@ -61,6 +61,15 @@ func getTestProviders(httpClient *http.Client) map[string]func() (tfprotov6.Prov
 	}
 }
 
+// getTestProvidersHTTP is used only for tests whose mock server runs on http://.
+// It bypasses the HTTPS enforcement that would otherwise reject non-https tenant_url values.
+func getTestProvidersHTTP(httpClient *http.Client) map[string]func() (tfprotov6.ProviderServer, error) {
+	sciProvider := newWithClientAllowHTTP(httpClient)
+	return map[string]func() (tfprotov6.ProviderServer, error){
+		"sci": providerserver.NewProtocol6WithError(sciProvider),
+	}
+}
+
 func setupVCR(t *testing.T, cassetteName string) (*recorder.Recorder, User) {
 	t.Helper()
 	mode := recorder.ModeRecordOnce
@@ -216,8 +225,145 @@ func redactCredentials() recorder.HookFunc {
 			i.Request.Body = reBindingSecret.ReplaceAllString(i.Request.Body, `"base64Certificate":"-----BEGIN CERTIFICATE-----\nredacted\n-----END CERTIFICATE-----"`)
 		}
 
+		// redact application secret response fields that may contain live credentials
+		if strings.Contains(i.Response.Body, `"secret"`) {
+			reSecret := regexp.MustCompile(`"secret"\s*:\s*"[^"]*"`)
+			i.Response.Body = reSecret.ReplaceAllString(i.Response.Body, `"secret" : "REDACTED"`)
+		}
+		if strings.Contains(i.Response.Body, `"clientId"`) {
+			reClientId := regexp.MustCompile(`"clientId"\s*:\s*"[^"]*"`)
+			i.Response.Body = reClientId.ReplaceAllString(i.Response.Body, `"clientId" : "REDACTED"`)
+		}
+		if strings.Contains(i.Response.Body, `"hint"`) {
+			reHint := regexp.MustCompile(`"hint"\s*:\s*"[^"]*"`)
+			i.Response.Body = reHint.ReplaceAllString(i.Response.Body, `"hint" : "REDACTED"`)
+		}
+
+		// redact real user PII from SCIM user-list responses
+		if strings.Contains(i.Response.Body, `"familyName"`) && strings.Contains(i.Response.Body, `"Resources"`) {
+			i.Response.Body = redactScimUserListBody(i.Response.Body)
+		}
+
 		return nil
 	}
+}
+
+// redactScimUserListBody replaces PII fields (familyName, givenName, displayName, email
+// addresses) for non-test users in a SCIM ListResponse body with deterministic fake values
+// derived from each user's UUID. Known test-account UUIDs are left untouched.
+// This is called from redactCredentials() so re-recordings never commit real user PII.
+func redactScimUserListBody(body string) string {
+	// UUIDs of permanently-kept test accounts — their PII fields are not replaced.
+	testUUIDs := map[string]bool{
+		"0b35d8cf-722c-4151-951e-176b623c0b78": true, // Terraform Custom Schemas
+		"1e5dd627-5220-4691-b5f4-8e061ea57d71": true, // Terraform User Assignment
+		"80f858a3-28ce-437e-ba31-d3358a5bdbfa": true, // Terraform Test
+		"b0264a43-3360-4042-9cbe-9ba846ec3240": true, // test_user_imported
+		"f1a012b2-f556-40cf-96c5-6a0bf31a5d6f": true, // jdoe custom-schemas test user
+	}
+
+	var root map[string]json.RawMessage
+	if err := json.Unmarshal([]byte(body), &root); err != nil {
+		return body
+	}
+	rawResources, ok := root["Resources"]
+	if !ok {
+		return body
+	}
+	var resources []map[string]json.RawMessage
+	if err := json.Unmarshal(rawResources, &resources); err != nil {
+		return body
+	}
+
+	const sapExt = "urn:ietf:params:scim:schemas:extension:sap:2.0:User"
+	for i, u := range resources {
+		var uid string
+		if err := json.Unmarshal(u["id"], &uid); err != nil || testUUIDs[uid] {
+			continue
+		}
+		suffix := strings.ReplaceAll(uid, "-", "")
+		if len(suffix) > 8 {
+			suffix = suffix[:8]
+		}
+		fakeEmail := "user-" + suffix + "@example.com"
+
+		// name.familyName / givenName / formatted
+		if raw, exists := u["name"]; exists {
+			var name map[string]json.RawMessage
+			if err := json.Unmarshal(raw, &name); err == nil {
+				if _, has := name["familyName"]; has {
+					name["familyName"], _ = json.Marshal("user-" + suffix)
+				}
+				if _, has := name["givenName"]; has {
+					name["givenName"], _ = json.Marshal("test")
+				}
+				if _, has := name["formatted"]; has {
+					name["formatted"], _ = json.Marshal("test user-" + suffix)
+				}
+				u["name"], _ = json.Marshal(name)
+			}
+		}
+
+		// displayName — skip if absent or already the string "None"
+		if raw, exists := u["displayName"]; exists {
+			var dn string
+			if err := json.Unmarshal(raw, &dn); err == nil && dn != "" && dn != "None" {
+				u["displayName"], _ = json.Marshal("user-" + suffix)
+			}
+		}
+
+		// userName — blank out non-empty non-test names
+		if raw, exists := u["userName"]; exists {
+			var un string
+			if err := json.Unmarshal(raw, &un); err == nil && un != "" {
+				u["userName"], _ = json.Marshal("")
+			}
+		}
+
+		// top-level emails
+		if raw, exists := u["emails"]; exists {
+			var emails []map[string]json.RawMessage
+			if err := json.Unmarshal(raw, &emails); err == nil {
+				for j := range emails {
+					emails[j]["value"], _ = json.Marshal(fakeEmail)
+				}
+				u["emails"], _ = json.Marshal(emails)
+			}
+		}
+
+		// SAP extension emails + userId
+		if raw, exists := u[sapExt]; exists {
+			var ext map[string]json.RawMessage
+			if err := json.Unmarshal(raw, &ext); err == nil {
+				if rawEmails, hasEmails := ext["emails"]; hasEmails {
+					var emails []map[string]json.RawMessage
+					if err := json.Unmarshal(rawEmails, &emails); err == nil {
+						for j := range emails {
+							emails[j]["value"], _ = json.Marshal(fakeEmail)
+						}
+						ext["emails"], _ = json.Marshal(emails)
+					}
+				}
+				if _, hasUID := ext["userId"]; hasUID {
+					ext["userId"], _ = json.Marshal("P" + strings.ToUpper(suffix[:6]))
+				}
+				u[sapExt], _ = json.Marshal(ext)
+			}
+		}
+
+		resources[i] = u
+	}
+
+	encoded, err := json.Marshal(resources)
+	if err != nil {
+		return body
+	}
+	root["Resources"] = encoded
+	result, err := json.Marshal(root)
+	if err != nil {
+		return body
+	}
+	return string(result)
 }
 
 func stopQuietly(rec *recorder.Recorder) {
@@ -400,6 +546,26 @@ func TestProviderConfig_IncompleteAuthCredentials(t *testing.T) {
 
 }
 
+func TestProviderConfig_InsecureTenantURL(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: getTestProviders(nil),
+		Steps: []resource.TestStep{
+			{
+				Config: `
+					provider "sci" {
+						tenant_url    = "http://example.com/"
+						client_id     = "test"
+						client_secret = "test"
+					}
+
+					data "sci_users" "test" {}
+				`,
+				ExpectError: regexp.MustCompile("Insecure tenant URL"),
+			},
+		},
+	})
+}
+
 func TestAuthentication_withOAuth2(t *testing.T) {
 
 	// Setup mock OAuth2 server
@@ -426,7 +592,7 @@ func TestAuthentication_withOAuth2(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		IsUnitTest:               true,
-		ProtoV6ProviderFactories: getTestProviders(mockServer.Client()),
+		ProtoV6ProviderFactories: getTestProvidersHTTP(mockServer.Client()),
 		Steps: []resource.TestStep{
 
 			// Test the credentials as env variables
@@ -516,7 +682,7 @@ func TestAuthenticationFailure_withOAuth2(t *testing.T) {
 			}),
 		}
 
-		token, err := fetchOAuthToken(httpClient, tenantURL, clientID, clientSecret)
+		token, err := fetchOAuthToken(context.Background(), httpClient, tenantURL, clientID, clientSecret)
 
 		assert.Empty(t, token, "Expected token to be empty for invalid credentials")
 		assert.Error(t, err, "Expected error for invalid credentials")
@@ -568,7 +734,7 @@ func TestAuthentication_withX509Auth(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		IsUnitTest:               true,
-		ProtoV6ProviderFactories: getTestProviders(mockServer.Client()),
+		ProtoV6ProviderFactories: getTestProvidersHTTP(mockServer.Client()),
 		Steps: []resource.TestStep{
 
 			// Test the certificate content as schema parameter and password as env variable
@@ -660,7 +826,7 @@ func TestAuthentication_withBasicAuth_deprecationWarning(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		IsUnitTest:               true,
-		ProtoV6ProviderFactories: getTestProviders(mockServer.Client()),
+		ProtoV6ProviderFactories: getTestProvidersHTTP(mockServer.Client()),
 		Steps: []resource.TestStep{
 			{
 				PreConfig: func() {

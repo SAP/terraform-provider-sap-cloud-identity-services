@@ -452,6 +452,7 @@ func (r *corporateIdPResource) Schema(_ context.Context, _ resource.SchemaReques
 					"client_secret": schema.StringAttribute{
 						MarkdownDescription: "Configure the Client Secret for Client Authentication.",
 						Optional:            true,
+						Sensitive:           true,
 						Validators: []validator.String{
 							utils.CheckClientAuthMethod(
 								path.MatchRoot("oidc_config").AtName("token_endpoint_auth_method"),
