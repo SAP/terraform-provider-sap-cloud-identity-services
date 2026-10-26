@@ -204,7 +204,8 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 				},
 			},
 			"custom_schemas": schema.StringAttribute{
-				Optional: true,
+				Optional:  true,
+				Sensitive: true,
 				MarkdownDescription: "Further enhance your user with custom schemas. The attribute must be configured as a valid JSON string.\n" +
 					"For custom schema attributes of type `complex`, overwriting specific attributes of the object to null is not supported.\n" +
 					"\n\tFor example, if a custom schema has an attribute `address` of type `complex` with sub-attributes `street`, `postalCode`, and `city`, setting the value of `street` to null will not remove the street information from the user.\n" +

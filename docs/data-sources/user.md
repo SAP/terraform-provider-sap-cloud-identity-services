@@ -28,7 +28,7 @@ data "sci_user" "by_id" {
 ### Read-Only
 
 - `active` (Boolean) Determines whether the user is active or not. The default value for the attribute is false.
-- `custom_schemas` (String) Furthur enhance your user with custom schemas.
+- `custom_schemas` (String, Sensitive) Furthur enhance your user with custom schemas.
 - `display_name` (String) The name to be displayed for the user.
 - `emails` (Attributes Set) Emails of the user. (see [below for nested schema](#nestedatt--emails))
 - `groups` (Attributes List) The list of Groups that the user belongs to. (see [below for nested schema](#nestedatt--groups))

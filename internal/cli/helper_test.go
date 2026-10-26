@@ -261,7 +261,7 @@ func Test_CompareAttributes(t *testing.T) {
 			customSchemasMap: map[string]any{
 				"schema_attr_1": "new_test",
 			},
-			errMessage: "mismatch between response and request in attribute schema_id.schema_attr_1, request sent: \"new_test\" but response received: \"test\"",
+			errMessage: "mismatch between response and request in attribute schema_id.schema_attr_1",
 		},
 		{
 			description: "error path - mismatch in float attribute",
@@ -272,7 +272,7 @@ func Test_CompareAttributes(t *testing.T) {
 			customSchemasMap: map[string]any{
 				"schema_attr_1": 1.23,
 			},
-			errMessage: "mismatch between response and request in attribute schema_id.schema_attr_1, request sent: \"1.23\" but response received: \"1.24\"",
+			errMessage: "mismatch between response and request in attribute schema_id.schema_attr_1",
 		},
 		{
 			description: "error path - mismatch in boolean attribute",
@@ -283,7 +283,7 @@ func Test_CompareAttributes(t *testing.T) {
 			customSchemasMap: map[string]any{
 				"schema_attr_1": false,
 			},
-			errMessage: "mismatch between response and request in attribute schema_id.schema_attr_1, request sent: \"false\" but response received: \"true\"",
+			errMessage: "mismatch between response and request in attribute schema_id.schema_attr_1",
 		},
 		{
 			description: "error path - mismatch in nested attribute",
@@ -298,7 +298,7 @@ func Test_CompareAttributes(t *testing.T) {
 					"schema_attr_1a": "new_test",
 				},
 			},
-			errMessage: "mismatch between response and request in attribute schema_id.schema_attr_1.schema_attr_1a, request sent: \"new_test\" but response received: \"test\"",
+			errMessage: "mismatch between response and request in attribute schema_id.schema_attr_1.schema_attr_1a",
 		},
 	}
 

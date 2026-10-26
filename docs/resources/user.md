@@ -72,7 +72,7 @@ resource "sci_user" "new_user" {
 ### Optional
 
 - `active` (Boolean) Determines whether the user is active or not. The default value for the attribute is false.
-- `custom_schemas` (String) Further enhance your user with custom schemas. The attribute must be configured as a valid JSON string.
+- `custom_schemas` (String, Sensitive) Further enhance your user with custom schemas. The attribute must be configured as a valid JSON string.
 For custom schema attributes of type `complex`, overwriting specific attributes of the object to null is not supported.
 
 	For example, if a custom schema has an attribute `address` of type `complex` with sub-attributes `street`, `postalCode`, and `city`, setting the value of `street` to null will not remove the street information from the user.

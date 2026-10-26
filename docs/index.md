@@ -31,7 +31,7 @@ provider "sci" {
 
 ### Required
 
-- `tenant_url` (String) The URL of the SCI tenant.
+- `tenant_url` (String) The URL of the SCI tenant. Must use the `https` scheme — the provider rejects any `http://` URL to prevent credentials from being transmitted over an unencrypted connection.
 
 ### Optional
 
@@ -47,6 +47,8 @@ provider "sci" {
 For the best experience using the SAP Cloud Identity Services provider, we recommend applying the common best practices for Terraform adoption as described in the Hashicorp documentation. For example, see [Phases of Terraform Adoption](https://developer.hashicorp.com/well-architected-framework/operational-excellence/operational-excellence-terraform-maturity).
 
 ## Authentication
+
+-> **Note:** `tenant_url` must use the `https` scheme. The provider will reject any `http://` URL with a configuration error to prevent credentials from being transmitted over an unencrypted connection.
 
 In order to get authenticated, the credentials of an [administrator](https://help.sap.com/docs/cloud-identity-services/cloud-identity-services/activate-your-account?locale=en-US) are required. The SAP Cloud Identity Services Provider supports the following authentication flows:
 

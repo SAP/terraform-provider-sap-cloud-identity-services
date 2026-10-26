@@ -58,8 +58,18 @@ func NewWithClient(httpClient *http.Client) *SciProvider {
 	}
 }
 
+// newWithClientAllowHTTP is a test-only constructor that bypasses the HTTPS
+// scheme check in Configure(), allowing httptest.NewServer (http://) targets.
+func newWithClientAllowHTTP(httpClient *http.Client) *SciProvider {
+	return &SciProvider{
+		httpClient: httpClient,
+		allowHTTP:  true,
+	}
+}
+
 type SciProvider struct {
 	httpClient *http.Client
+	allowHTTP  bool // true only in tests using http:// mock servers
 }
 
 type SciProviderData struct {
@@ -82,7 +92,7 @@ func (p *SciProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *
 		Attributes: map[string]schema.Attribute{
 
 			"tenant_url": schema.StringAttribute{
-				MarkdownDescription: "The URL of the SCI tenant.",
+				MarkdownDescription: "The URL of the SCI tenant. Must use the `https` scheme — the provider rejects any `http://` URL to prevent credentials from being transmitted over an unencrypted connection.",
 				Required:            true,
 			},
 
@@ -165,6 +175,15 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		return
 	}
 
+	if !p.allowHTTP && parsedUrl.Scheme != "https" {
+		resp.Diagnostics.AddError(
+			"Insecure tenant URL",
+			"tenant_url must use HTTPS to protect credentials in transit. "+
+				"Received scheme: \""+parsedUrl.Scheme+"\".",
+		)
+		return
+	}
+
 	// OAuth2 Authentication using client_id and client_secret
 	clientID := config.ClientID.ValueString()
 	clientSecret := config.ClientSecret.ValueString()
@@ -202,9 +221,14 @@ func (p *SciProvider) Configure(ctx context.Context, req provider.ConfigureReque
 	switch {
 	case len(clientID) != 0 && len(clientSecret) != 0:
 		// OAuth2 authentication
-		token, err := fetchOAuthToken(p.httpClient, parsedUrl.String(), clientID, clientSecret)
+		token, err := fetchOAuthToken(ctx, p.httpClient, parsedUrl.String(), clientID, clientSecret)
 		if err != nil {
-			resp.Diagnostics.AddError("OAuth2 Authentication Failed", err.Error())
+			errMsg := err.Error()
+			const maxErrLen = 512
+			if len(errMsg) > maxErrLen {
+				errMsg = errMsg[:maxErrLen] + "... [truncated]"
+			}
+			resp.Diagnostics.AddError("OAuth2 Authentication Failed", errMsg)
 			return
 		}
 		client.AuthorizationToken = "Bearer " + token
@@ -308,7 +332,7 @@ func (p *SciProvider) Resources(_ context.Context) []func() resource.Resource {
 	}
 }
 
-func fetchOAuthToken(httpClient *http.Client, tenantURL, clientID, clientSecret string) (string, error) {
+func fetchOAuthToken(ctx context.Context, httpClient *http.Client, tenantURL, clientID, clientSecret string) (string, error) {
 	config := &clientcredentials.Config{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
@@ -316,10 +340,13 @@ func fetchOAuthToken(httpClient *http.Client, tenantURL, clientID, clientSecret 
 		AuthStyle:    oauth2.AuthStyleInParams,
 	}
 
-	ctx := context.Background()
-	ctx = context.WithValue(ctx, oauth2.HTTPClient, httpClient)
+	// Cap the token fetch at 30 s while still honouring early cancellation from
+	// the caller (e.g. user Ctrl-C during terraform init/apply).
+	tokenCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+	tokenCtx = context.WithValue(tokenCtx, oauth2.HTTPClient, httpClient)
 
-	token, err := config.Token(ctx)
+	token, err := config.Token(tokenCtx)
 	if err != nil {
 		return "", fmt.Errorf("failed to retrieve token: %w", err)
 	}
