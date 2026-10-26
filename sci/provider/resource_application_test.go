@@ -11,6 +11,9 @@ import (
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/knownvalue"
+	"github.com/hashicorp/terraform-plugin-testing/plancheck"
+	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 )
 
 var regexpUUID = utils.UuidRegexp
@@ -1001,6 +1004,11 @@ func TestResourceApplication(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config: providerConfig("", user) + ResourceApplicationWithFallbackAttribute("testApp", appWithFallback, "loginName"),
+					ConfigPlanChecks: resource.ConfigPlanChecks{
+						PreApply: []plancheck.PlanCheck{
+							plancheck.ExpectKnownValue("sci_application.testApp", tfjsonpath.New("authentication_schema").AtMapKey("subject_name_identifier").AtMapKey("fallback_attribute").AtMapKey("source"), knownvalue.StringExact("Identity Directory")),
+						},
+					},
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
 						resource.TestCheckResourceAttr("sci_application.testApp", "name", appWithFallback.Name),
@@ -1012,6 +1020,11 @@ func TestResourceApplication(t *testing.T) {
 				},
 				{
 					Config: providerConfig("", user) + ResourceApplicationWithFallbackAttribute("testApp", updatedAppWithFallback, "uid"),
+					ConfigPlanChecks: resource.ConfigPlanChecks{
+						PreApply: []plancheck.PlanCheck{
+							plancheck.ExpectKnownValue("sci_application.testApp", tfjsonpath.New("authentication_schema").AtMapKey("subject_name_identifier").AtMapKey("fallback_attribute").AtMapKey("source"), knownvalue.StringExact("Identity Directory")),
+						},
+					},
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestMatchResourceAttr("sci_application.testApp", "id", regexpUUID),
 						resource.TestCheckResourceAttr("sci_application.testApp", "name", updatedAppWithFallback.Name),

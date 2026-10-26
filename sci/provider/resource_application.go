@@ -27,6 +27,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -182,6 +183,7 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 									"source": schema.StringAttribute{
 										MarkdownDescription: "The source of the fallback attribute.",
 										Computed:            true,
+										Default:             stringdefault.StaticString(sourceValues[0]),
 									},
 									"value": schema.StringAttribute{
 										MarkdownDescription: "The value of the fallback attribute. Possible values are: `none`, `uid`, `mail`, `loginName`, `displayName`, `personnelNumber`, `userUuid`.",
