@@ -2,10 +2,10 @@ package provider
 
 import (
 	"context"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/applications"
 )
@@ -33,21 +33,28 @@ func TestGetApplicationUpdateRequest_OidcAndSaml2Changed(t *testing.T) {
 	state, diags := applicationValueFrom(ctx, saml2TestApplication(
 		[]applications.GrantType{applications.AUTHORIZATION_CODE_GrantType},
 		"urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"))
-	assert.False(t, diags.HasError(), "state: %v", diags)
+	require.False(t, diags.HasError(), "state: %v", diags)
 
 	plan, diags := applicationValueFrom(ctx, saml2TestApplication(
 		[]applications.GrantType{applications.AUTHORIZATION_CODE_GrantType, applications.REFRESH_TOKEN_GrantType},
 		"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"))
-	assert.False(t, diags.HasError(), "plan: %v", diags)
+	require.False(t, diags.HasError(), "plan: %v", diags)
 
 	reqs, diags := getApplicationUpdateRequest(ctx, plan, state)
-	assert.False(t, diags.HasError(), "update request: %v", diags)
+	require.False(t, diags.HasError(), "update request: %v", diags)
 
-	var oidcPatched, saml2Patched bool
-	for _, req := range reqs {
-		oidcPatched = oidcPatched || strings.Contains(req.Path, "openIdConnectConfiguration")
-		saml2Patched = saml2Patched || strings.Contains(req.Path, "saml2Configuration")
-	}
-	assert.True(t, oidcPatched, "expected a patch for the OIDC configuration")
-	assert.True(t, saml2Patched, "expected a patch for the SAML 2.0 configuration")
+	// one patch per changed field, each with the path of its own nesting level
+	const authSchemaPath = "/urn:sap:identity:application:schemas:extension:sci:1.0:Authentication"
+	require.Len(t, reqs, 2)
+
+	assert.Equal(t, "replace", reqs[0].Op)
+	assert.Equal(t, authSchemaPath+"/openIdConnectConfiguration/restrictedGrantTypes", reqs[0].Path)
+	assert.ElementsMatch(t, []string{
+		string(applications.AUTHORIZATION_CODE_GrantType),
+		string(applications.REFRESH_TOKEN_GrantType),
+	}, reqs[0].Value)
+
+	assert.Equal(t, "replace", reqs[1].Op)
+	assert.Equal(t, authSchemaPath+"/saml2Configuration/defaultNameIdFormat", reqs[1].Path)
+	assert.Equal(t, "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress", reqs[1].Value)
 }

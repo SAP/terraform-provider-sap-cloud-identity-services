@@ -993,7 +993,7 @@ func getApplicationUpdateRequest(ctx context.Context, plan applicationData, stat
 			return reqs, diags
 		}
 
-		argsType = reflect.TypeFor[authenticationSchemaData]()
+		argsType := reflect.TypeFor[authenticationSchemaData]()
 
 		var planAuthSchema, stateAuthSchema authenticationSchemaData
 
