@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/SAP/terraform-provider-sap-cloud-identity-services/internal/cli/apiObjects/applications"
 )
@@ -24,13 +25,13 @@ func TestApplicationValueFrom_NoAssertionAttributes(t *testing.T) {
 	}
 
 	application, diags := applicationValueFrom(ctx, app)
-	assert.False(t, diags.HasError(), "value from: %v", diags)
+	require.False(t, diags.HasError(), "value from: %v", diags)
 
 	var schema authenticationSchemaData
 	diags = application.AuthenticationSchema.As(ctx, &schema, basetypes.ObjectAsOptions{})
-	assert.False(t, diags.HasError(), "authentication schema: %v", diags)
+	require.False(t, diags.HasError(), "authentication schema: %v", diags)
 
-	// must match a configured empty list, otherwise apply fails with "inconsistent result"
+	// a null list would not match a configured empty list and apply would fail with "inconsistent result"
 	assert.False(t, schema.AssertionAttributes.IsNull(), "assertion_attributes must not be null")
 	assert.Empty(t, schema.AssertionAttributes.Elements())
 }

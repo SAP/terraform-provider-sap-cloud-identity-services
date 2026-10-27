@@ -231,7 +231,7 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 	}
 
 	// Authentication Schema Assertion Attributes
-	// the API omits the attribute when the list is empty, map it to an empty list so that a configured empty list stays consistent
+	// the API omits the attribute when the list is empty, so it is mapped to an empty list to match a configured empty list
 	assertionAttributes := a.AuthenticationSchema.AssertionAttributes
 	if assertionAttributes == nil {
 		assertionAttributes = []applications.AssertionAttribute{}
