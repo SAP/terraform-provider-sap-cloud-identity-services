@@ -993,7 +993,7 @@ func getApplicationUpdateRequest(ctx context.Context, plan applicationData, stat
 			return reqs, diags
 		}
 
-		argsType = reflect.TypeFor[authenticationSchemaData]()
+		argsType := reflect.TypeFor[authenticationSchemaData]()
 
 		var planAuthSchema, stateAuthSchema authenticationSchemaData
 
@@ -1224,7 +1224,7 @@ func getApplicationUpdateRequest(ctx context.Context, plan applicationData, stat
 			}
 
 			oidcPath := fmt.Sprintf("%s/%s", authSchemaPath, path)
-			argsType = reflect.TypeFor[openIdConnectConfigurationData]()
+			argsType := reflect.TypeFor[openIdConnectConfigurationData]()
 
 			var planOidcSchema, stateOidcSchema openIdConnectConfigurationData
 
@@ -1378,7 +1378,7 @@ func getApplicationUpdateRequest(ctx context.Context, plan applicationData, stat
 
 			samlPath := fmt.Sprintf("%s/%s", authSchemaPath, path)
 
-			argsType = reflect.TypeFor[AppSaml2ConfigData]()
+			argsType := reflect.TypeFor[AppSaml2ConfigData]()
 
 			var planSaml2Schema, stateSaml2Schema AppSaml2ConfigData
 
