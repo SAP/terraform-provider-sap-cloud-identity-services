@@ -67,6 +67,7 @@ jobs:
           PATH_TO_TFSCRIPT: ${{ env.PATH_TO_TFSCRIPT }}
           TF_VAR_certificate_file_password: ${{ secrets.P12_CERTIFICATE_PASSWORD }}
           TF_VAR_certificate: ${{ secrets.PEM_CERTIFICATE_STRING }}
+          TF_VAR_password: ${{ secrets.SCI_USER_PASSWORD }}
         run: |
           echo "$P12_CERTIFICATE_BASE64_STRING" | base64 --decode > $PATH_TO_TFSCRIPT/cert.p12
 
@@ -111,6 +112,7 @@ jobs:
           PATH_TO_TFSCRIPT: ${{ env.PATH_TO_TFSCRIPT }}
           TF_VAR_certificate_file_password: ${{ secrets.P12_CERTIFICATE_PASSWORD }}
           TF_VAR_certificate: ${{ secrets.PEM_CERTIFICATE_STRING }}
+          TF_VAR_password: ${{ secrets.SCI_USER_PASSWORD }}
         run: |
           echo "$P12_CERTIFICATE_BASE64_STRING" | base64 --decode > $PATH_TO_TFSCRIPT/cert.p12
 
