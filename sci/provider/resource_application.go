@@ -173,12 +173,8 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 								},
 							},
 							"fallback_attribute": schema.SingleNestedAttribute{
-								MarkdownDescription: "The fallback attribute used to identify the user when the primary subject name identifier is not available.",
+								MarkdownDescription: "The fallback attribute used to identify the user when the primary subject name identifier is not available. To remove the fallback attribute, remove this block.",
 								Optional:            true,
-								Computed:            true,
-								PlanModifiers: []planmodifier.Object{
-									objectplanmodifier.UseStateForUnknown(),
-								},
 								Attributes: map[string]schema.Attribute{
 									"source": schema.StringAttribute{
 										MarkdownDescription: "The source of the fallback attribute.",
@@ -186,10 +182,11 @@ func (r *applicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 										Default:             stringdefault.StaticString(sourceValues[0]),
 									},
 									"value": schema.StringAttribute{
-										MarkdownDescription: "The value of the fallback attribute. Possible values are: `none`, `uid`, `mail`, `loginName`, `displayName`, `personnelNumber`, `userUuid`.",
-										Optional:            true,
+										MarkdownDescription: "The value of the fallback attribute. Possible values are: `uid`, `mail`, `loginName`, `displayName`, `personnelNumber`, `userUuid`.",
+										Required:            true,
 										Validators: []validator.String{
 											stringvalidator.LengthBetween(1, 255),
+											stringvalidator.NoneOfCaseInsensitive("none"),
 										},
 									},
 								},

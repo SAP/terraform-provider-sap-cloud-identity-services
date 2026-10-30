@@ -98,7 +98,7 @@ func (d *applicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 										Computed:            true,
 									},
 									"value": schema.StringAttribute{
-										MarkdownDescription: "The value of the fallback attribute. Possible values are: `none`, `uid`, `mail`, `loginName`, `displayName`, `personnelNumber`, `userUuid`.",
+										MarkdownDescription: "The value of the fallback attribute. Possible values are: `uid`, `mail`, `loginName`, `displayName`, `personnelNumber`, `userUuid`.",
 										Computed:            true,
 									},
 								},
