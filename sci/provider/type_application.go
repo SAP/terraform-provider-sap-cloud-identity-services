@@ -231,7 +231,12 @@ func applicationValueFrom(ctx context.Context, a applications.Application) (appl
 	}
 
 	// Authentication Schema Assertion Attributes
-	attributes, diags := types.ListValueFrom(ctx, assertionAttributesObjType, a.AuthenticationSchema.AssertionAttributes)
+	// the API omits the attribute when the list is empty, so it is mapped to an empty list to match a configured empty list
+	assertionAttributes := a.AuthenticationSchema.AssertionAttributes
+	if assertionAttributes == nil {
+		assertionAttributes = []applications.AssertionAttribute{}
+	}
+	attributes, diags := types.ListValueFrom(ctx, assertionAttributesObjType, assertionAttributes)
 	diagnostics.Append(diags...)
 
 	if diagnostics.HasError() {
