@@ -241,7 +241,7 @@ Read-Only:
 Read-Only:
 
 - `source` (String) The source of the fallback attribute.
-- `value` (String) The value of the fallback attribute. Possible values are: `none`, `uid`, `mail`, `loginName`, `displayName`, `personnelNumber`, `userUuid`.
+- `value` (String) The value of the fallback attribute. Possible values are: `uid`, `mail`, `loginName`, `displayName`, `personnelNumber`, `userUuid`.
 
 
 
