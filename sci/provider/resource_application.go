@@ -1149,6 +1149,14 @@ func stateModify(ctx context.Context, plan applicationData, state *applicationDa
 
 		}
 
+		// If the plan explicitly set assertion_attributes to an empty list, store [] in state.
+		// The API resets to defaults when PATCHed with [], but the user intent was to clear them.
+		// Storing [] keeps state consistent with config so subsequent plans show no drift.
+		if !planData.AssertionAttributes.IsNull() && !planData.AssertionAttributes.IsUnknown() &&
+			len(planData.AssertionAttributes.Elements()) == 0 {
+			stateData.AssertionAttributes = planData.AssertionAttributes
+		}
+
 		// The Rest API Authentication's Unlock parameter is not returned in the API response as it is a write-only parameter
 		if !planData.RestApiAuthentication.IsNull() && !planData.RestApiAuthentication.IsUnknown() {
 			var planRestApiAuthData restApiAuthenticationData
