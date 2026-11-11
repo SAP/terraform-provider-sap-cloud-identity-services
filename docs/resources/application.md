@@ -360,16 +360,16 @@ Optional:
 
 Optional:
 
-- `fallback_attribute` (Attributes) The fallback attribute used to identify the user when the primary subject name identifier is not available. (see [below for nested schema](#nestedatt--authentication_schema--subject_name_identifier--fallback_attribute))
+- `fallback_attribute` (Attributes) The fallback attribute used to identify the user when the primary subject name identifier is not available. To remove the fallback attribute, remove this block. (see [below for nested schema](#nestedatt--authentication_schema--subject_name_identifier--fallback_attribute))
 - `source` (String) Acceptable values are : `Identity Directory`, `Corporate Identity Provider`, `Expression`
 - `value` (String) If the source is Identity Directory, the only acceptable values are `none`, `uid`, `mail`, `loginName`, `displayName`, `personnelNumber`, `userUuid`
 
 <a id="nestedatt--authentication_schema--subject_name_identifier--fallback_attribute"></a>
 ### Nested Schema for `authentication_schema.subject_name_identifier.fallback_attribute`
 
-Optional:
+Required:
 
-- `value` (String) The value of the fallback attribute. Possible values are: `none`, `uid`, `mail`, `loginName`, `displayName`, `personnelNumber`, `userUuid`.
+- `value` (String) The value of the fallback attribute. Possible values are: `uid`, `mail`, `loginName`, `displayName`, `personnelNumber`, `userUuid`.
 
 Read-Only:
 
