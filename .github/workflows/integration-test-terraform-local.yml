@@ -2,8 +2,8 @@ name: Integration Test - Terraform - Local Provider
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 2 * * 2,5' # Every Tuesday and Friday at 7:30 AM IST (2:00 AM UTC)
+  #schedule:
+  #  - cron: '0 2 * * 2,5' # Every Tuesday and Friday at 7:30 AM IST (2:00 AM UTC)
 
 concurrency:
   group: ${{ github.workflow }}
@@ -12,7 +12,7 @@ concurrency:
 permissions:
   issues: write
   contents: read
-  
+
 jobs:
   canary-main:
     name: Canary Main
