@@ -15,7 +15,7 @@ terraform {
   required_providers {
     sci = {
       source  = "SAP/sap-cloud-identity-services"
-      version = "0.7.0-beta1"
+      version = "0.8.0-beta1"
     }
   }
 }
