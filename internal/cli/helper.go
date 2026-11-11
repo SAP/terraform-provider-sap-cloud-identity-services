@@ -44,7 +44,7 @@ func getCustomSchemas[I any](res any) (string, error) {
 	}
 
 	for field := range reflectType.Fields() {
-		key := strings.Split(field.Tag.Get("json"), ",")[0]
+		key, _, _ := strings.Cut(field.Tag.Get("json"), ",")
 		delete(resMap, key)
 	}
 
