@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 env:
-  LATEST_VERSION: 1.12.*
+  LATEST_VERSION: 1.13.*
 
 jobs:
   # Ensure project builds before running testing matrix

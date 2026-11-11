@@ -2,8 +2,8 @@ name: Integration Test - OpenTofu - Local Provider
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 14 * * 2,5' # Every Tuesday and Friday at 7:30 PM IST (2:00 PM UTC)
+  #schedule:
+  #  - cron: '0 14 * * 2,5' # Every Tuesday and Friday at 7:30 PM IST (2:00 PM UTC)
 
 concurrency:
   group: ${{ github.workflow }}
